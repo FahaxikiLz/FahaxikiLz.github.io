@@ -2671,17 +2671,15 @@ hello,world!
 
 > 前两种方式都是在当前 shell 中打开一个子 shell 来执行脚本内容，当脚本内容结束，则 子 shell 关闭，回到父 shell 中。
 >
->  第三种，也就是使用在脚本路径前加“.”或者 source 的方式，可以使脚本内容在当前 shell 里执行，而无需打开子 shell！这也是为什么我们每次要修改完/etc/profile 文件以后，需 要 source 一下的原因。
+>  第三种，也就是使用在脚本路径前加“.”或者 source 的方式，可以使脚本内容在当前 shell 里执行，而无需打开子 shell！这也是为什么我们每次要修改完/etc/profile 文件以后，需要 source 一下的原因。
 >
-> 开子 shell 与不开子 shell 的区别就在于，环境变量的继承关系，如在子 shell 中设置的 当前变量，父 shell 是不可见的。
+> 开子 shell 与不开子 shell 的区别就在于，环境变量的继承关系，如在子 shell 中设置的当前变量，父 shell 是不可见的。
 
 ## 变量
 
-### 系统预定义变量
-
-#### 常用系统变量
-
-> `$HOME`、`$PWD`、`$SHELL`、`$USER `
+> Linux Shell 中的变量分为，**系统变量**和**用户自定义变量**。
+>
+> 常用系统变量：`$HOME`、`$PWD`、`$SHELL`、`$USER `
 
 > 查看所有系统变量
 >
@@ -2703,3 +2701,535 @@ hello,world!
 > ```shell
 > [root@lz88 scirpts]# set 
 > ```
+
+### 自定义变量
+
+#### 规则
+
+> - 变量名称可以由字母、数字和下划线组成，但是不能以数字开头。
+> - 等号两侧不能有空格
+> - 变量名称一般习惯为大写
+
+```shell
+变量=值        #定义变量  注意：中间不能用空格隔开
+unset 变量       #撤销变量
+readonly 变量    #声明静态变量  注意：静态变量不能unset
+```
+
+#### 普通变量
+
+```shell
+##定义变量
+#!/bin/bash
+a=11						#定义变量a
+echo "a = $a"				#输出a
+
+unset a						#撤销变量a
+echo "unset a = $a"			#输出a
+```
+
+![image-20221028094958920](linux/image-20221028094958920.png)
+
+#### 静态变量
+
+```shell
+##声明静态变量
+#!/bin/bash
+readonly A=12
+echo "readonly A = $A"
+
+unset A
+echo "readonly A2 = $A"
+```
+
+![image-20221028095044295](linux/image-20221028095044295.png)
+
+#### 将命令的返回值赋值给变量（重点）
+
+```shell
+A=`ls -la`    #反引号，运行里面的命令，并把结果返回给变量A
+A=$(ls -la)   #等价于反引号
+```
+
+```shell
+###实例
+#!/bin/bash
+A=`date`
+echo "A = $A"
+
+echo "----------------"
+
+B=$(date)
+echo "B = $B"
+```
+
+![image-20221028095247613](linux/image-20221028095247613.png)
+
+### 设置环境变量
+
+```shell
+export 变量名=变量值     #将shell变量输出为环境变量（系统变量）
+source 配置文件         #让修改后的配置信息立即生效
+echo $变量名			 #查询环境变量的值
+```
+
+```shell
+###实例
+#1、在/home/shell/tomcat.sh文件中定义TOMCAT_HOME环境变量
+#!/bin/bash
+export TOMCAT_HOME="hello,my name is tomcat!"
+
+#2、查看环境变量TOMCAT_HOME的值
+source /home/shell/tomcat.sh
+echo $TOMCAT_HOME
+
+#3、在另外一个shell程序（/home/shell/usetomcat.sh）中使用TOMCAT_HOME
+#!/bin/bash
+A=$TOMCAT_HOME
+echo "A = $A"
+```
+
+### 位置参数变量
+
+#### 介绍
+
+> 当我们执行一个shell脚本时，如果希望获取到命令行的参数信息，就可以使用到位置参数变量
+>
+> 比如：
+>
+> ```bash
+> ./myshell.sh 100 200  
+> #这个就是一个执行shell的命令行，可以在myshell脚本中获取到参数信息，类似于python的cmd传参
+> ```
+
+#### 基本语法
+
+```shell
+$n  #n为数字，$0代表命令本身，$1-$9代表第一到第九个参数，十以上的参数需要用大括号包含，如{10}
+$*  #这个变量代表命令行中所有的参数，$*把所有的参数看成一个整体
+$@  #这个变量也代表命令行中所有的参数，不过$@把每个参数区分对待
+$#  #这个变量代表命令行中所有参数的个数
+```
+
+```shell
+#实例：写一个脚本  打印出传递进去的11个参数及详细
+#!/bin/bash
+echo "param[0] ----  $0"
+echo "param[1] ----  $1"
+echo "param[2] ----  $2"
+echo "param[3] ----  $3"
+echo "param[4] ----  $4"
+echo "param[5] ----  $5"
+echo "param[6] ----  $6"
+echo "param[7] ----  $7"
+echo "param[8] ----  $8"
+echo "param[9] ----  $9"
+echo "param[10] ----  ${10}"
+echo "param[11] ----  ${11}"
+
+echo "param count is $#"
+echo "param  -----------  $@"
+echo "param  ===========  $*"
+```
+
+![image-20221028100838191](linux/image-20221028100838191.png)
+
+### 预定义变量
+
+> - 就是shell设计者实现一键定义好的变量，可以直接在shell脚本中使用
+
+```shell
+$$   #当前进程的进程号（PID）
+$!   #当前运行的最后一个进程的进程号(PID)
+$?   #最后一次执行的命令的返回状态。如果这个变量的值为0，证明上一个命令正确执行；如果这个变量的值为非0（具体是哪个数，由命令自己来决定），则证明上一个命令执行不正确了。
+```
+
+```shell
+#!/bin/bash
+echo "当前进程的进程号 = $$"
+#后台的方式运行tomcat.sh
+./tomcat.sh &   #后台运行
+
+echo "当前运行的最后一个进程的进程号 = $!"
+echo "最后一次执行的命令的返回状态 = $?"
+```
+
+![image-20221028103030679](linux/image-20221028103030679.png)
+
+## 运算符
+
+```shell
+$((运算式))
+#或
+$[运算式]
+```
+
+```shell
+expr m + n   #加
+expr m - n	 #减
+expr \*		 #乘
+expr /		 #除
+expr %		 #取余
+```
+
+```shell
+#!/bin/bash
+M=100
+N=5
+
+echo "M + N = $((M + N))"
+
+echo "M - N = $[M - N]"
+MN1=`expr $M \* $N`
+echo "M * N = $MN1"
+
+C=`expr $M / $N`
+echo "M / N = $C"
+
+D=`expr $M % $N`
+echo "M % N = $D"
+```
+
+![image-20221028104251158](linux/image-20221028104251158.png)
+
+> 案例：求出命令行输入两个参数的和
+
+```shell
+#!/bin/bash
+A=$1
+B=$2
+SUM=$[A+B]
+echo "sum = $SUM"
+```
+
+![image-20221028104516393](linux/image-20221028104516393.png)
+
+## 条件判断
+
+```shell
+[ condition ]    #非空返回true   可使用$?严重（0位true，>1为false）   注意：condition前后要有空格
+```
+
+### 常用判断条件
+
+> - 两个整数的比较
+>
+>   | 符号 | 说明       |
+>   | ---- | ---------- |
+>   | =    | 字符串比较 |
+>   | -lt  | 小于       |
+>   | -le  | 小于等于   |
+>   | -eq  | 等于       |
+>   | -gt  | 大于       |
+>   | -ge  | 大于等于   |
+>   | -ne  | 不等于     |
+>
+> - 按照文件权限进行判断
+>
+>   | 符号 | 说明         |
+>   | ---- | ------------ |
+>   | -r   | 有读的权限   |
+>   | -w   | 有写的权限   |
+>   | -x   | 有执行的权限 |
+>
+> - 按照文件类型进行判断
+>
+>   | 符号 | 说明                         |
+>   | ---- | ---------------------------- |
+>   | -f   | 文件存在并且是一个常规的文件 |
+>   | -e   | 文件存在                     |
+>   | -d   | 文件存在并是一个目录         |
+
+### 实例
+
+```shell
+##判断 "ok"和"ok"是否相等
+#!/bin/bash
+if [ "ok" = "ok" ]
+then
+        echo "equal"
+fi
+
+##23是否大于22
+if [ 23 -gt 22 ]
+then
+        echo "大于"
+fi
+
+##判断文件是否存在
+if [ -e /home/shell/aaa.txt ]
+then
+		echo "存在"
+fi
+```
+
+## 流程控制
+
+### if
+
+```shell
+if [ 条件判断式 ];then
+    程序
+fi
+
+###或者
+
+if [ 条件判断式 ]
+then
+    程序
+elif [ 条件判断式 ]
+then
+    程序
+fi
+```
+
+```shell
+#编写sh脚本  输入参数，参数>=60,打印"及格了"，参数<60，打印"不及格"
+#!/bin/bash
+if [ $1 -ge 60 ]
+then
+        echo "及格了"
+elif [ $1 -lt 60 ]
+then
+        echo "不及格"
+fi
+```
+
+### case
+
+```shell
+case $变量名 in
+"值1")
+程序1
+;;
+"值2")
+程序2
+;;
+..........
+"值n")
+程序n
+;;
+*)
+如果变量的值都不是以上的值，则执行此程序
+;;
+esac
+```
+
+```shell
+#实例
+
+#!/bin/bash
+case $1 in
+        1)
+                echo "一"
+                ;;
+        2)      
+                echo "二"
+                ;;
+        3)      
+                echo "三"
+                ;;
+        *)      
+                echo "其他"
+                ;;
+esac 
+```
+
+### for循环
+
+```shell
+#语法一
+for 变量 in 值1 值2 ... 值n
+do
+ 	程序
+done
+
+#实例：打印命令行输入的参数  $* $@
+#！/bin/bash
+for i in "$*"
+do
+		echo "the num is $i"
+done
+
+echo "-------------------------"
+
+for j in "$@"
+do
+		echo "the num is $j"
+done
+```
+
+```shell
+#语法二
+for((初始值;循环控制条件;变量变化))
+do
+	程序
+done
+
+#实例：从1加到100并输出结果
+#！/bin/bash
+SUM=0
+for((i=1;i<=100;i++))
+do
+	SUM=$[$SUM+$i]
+done
+echo "最终结果是：$SUM"
+```
+
+### while循环
+
+```shell
+while [ 条件判断式 ]
+do
+	程序
+done
+
+#案例：从命令行输入一个n，统计从1+...+n的值是多少
+#!/bin/bash
+SUM=0
+i=0
+while [ $i -le $1 ]
+do
+		SUM=$[$SUM+$i]
+		i=$[$i+1]
+done
+echo "sum = $SUM"
+```
+
+## read读取控制台输入
+
+```shell
+read 选项 参数
+#-p 指定读取值时的提示符（阻塞）
+#-t 指定读取值时等待的时间（秒），如果没有在指定的时间内输入，就不再等待了
+```
+
+```shell
+#案例1：读取控制台输入一个num值
+#!/bin/bash
+read -p "请输入一个数：" NUM1
+echo "你输入的值是：$NUM1"
+
+#案例2：读取控制台输入一个num值，在10秒内输入。
+#!/bin/bash
+read -t 10 -p "请输入一个数：" NUM1
+echo "你输入的值是：$NUM1"
+```
+
+## 函数
+
+### 系统函数
+
+```shell
+basename [pathname] [suffix]  #返回完整路径最后/的部分，常用于获取文件名
+#basename命令会删掉所有的前缀包括最后一个（"/"）字符，然后将字符串显示出来
+
+#案例：请返回/home/shell/hello.sh的"hello.sh"部分
+echo `basename /home/shell/hello.sh`
+
+#案例：请返回/home/shell/hello.sh的"hello"部分
+echo `basename /home/shell/hello.sh .sh`
+```
+
+```shell
+dirname 文件绝对路径 
+#返回完整路径最后/的前面的部分，常用于返回路径部分
+#从给定的包含绝对路径的文件名中去除文件名（非目录的部分），然后返回剩下的路径（目录的部分）
+
+#实例：请返回/home/shell/hello.sh的/home/shell
+echo `dirname /home/shell/hello.sh`
+```
+
+### 自定义函数
+
+```shell
+function funname()
+{
+    Action;
+    [return int;]
+}
+
+#应用实例：编写一个函数，计算两个参数的和,getSum
+function getSum()
+{
+    SUM=$[$n1+$n2]
+    echo "和是：$SUM"
+}
+read -p "请输入第一个数 n1:" n1
+read -p "请输入第二个数 n2:" n2
+
+getSum $n1 $n2
+```
+
+## Shell编程综合案例
+
+### 需求
+
+> - 每天凌晨2:10备份数据库 kugou 到 `/home/mysql/data/db`
+> - 备份开始和备份结束能够给出相应的提示信息
+> - 备份后的文件要求以备份时间为文件名，并打包成`.tar.gz`的形式，比如：`2019-6-15_222222.tar.gz`
+> - 在备份的同时，检查是否有10天前备份的数据库文件，如果有就将其删除。
+
+### 实现
+
+#### 写脚本
+
+```shell
+# /home/shell/testmysql.sh
+#!/bin/bash
+#完成数据库的定时备份
+
+echo "=========开始备份=========="
+
+#备份的路径
+BACKUP=/home/mysql/data/db          
+echo "备份的路径：${BACKUP}"
+
+#获取到当前的时间
+DATETIME=$(date +%Y-%m-%d_%H%M%S)  
+echo "当前时间：${DATETIME}"
+
+#主机
+HOST=localhost
+echo "主机：${HOST}"
+
+#用户名
+DB_USER=yxh_mysql
+echo "用户名：${DB_USER}"
+
+#密码
+DB_PWD=a
+echo "密码：${DB_PWD}"
+
+#备份数据库名
+DATABASE=shelltest
+echo "备份数的据库名：${DATABASE}"
+
+#创建备份路径
+#如果备份路径存在，就使用，否则就创建
+[ ! -d "$BACKUP/$DATETIME" ] && mkdir -p "$BACKUP/$DATETIME"
+
+#执行mysql的备份数据库命令
+mysqldump -u${DB_USER} -p$DB_PWD --host=$HOST $DATABASE | gzip > $BACKUP/$DATETIME/$DATETIME.sql.gz
+
+#打包备份文件
+cd ${BACKUP}
+tar -zcvf $DATETIME.tar.gz $DATETIME
+
+#删除临时目录
+rm -rf $BACKUP/$DATETIME
+
+#删除10天前的备份文件
+find $BACKUP -mtime +10 -name "*.tar.gz" -exec rm -rf {} \;
+
+echo "=========备份完成========"
+```
+
+#### 定时
+
+```shell
+crontab -e
+
+10 2 * * * /home/shell/testmysql.sh
+```
+

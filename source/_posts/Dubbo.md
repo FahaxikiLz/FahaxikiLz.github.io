@@ -113,6 +113,8 @@ tags:
 >
 >    ![image-20221023215635686](Dubbo/image-20221023215635686.png)
 
+### [Linux下的环境搭建](https://cloud.tencent.com/developer/article/1441954)
+
 ## dubbo-helloworld
 
 ### 提出需求
