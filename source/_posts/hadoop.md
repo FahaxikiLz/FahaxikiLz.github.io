@@ -4,11 +4,11 @@ date: 2022-10-16 19:55:30
 comments: true
 tags:
 - hadoop
-catefories:
+categories: 
 - 大数据
 ---
 
-# Hadoop集群搭建1
+# Hadoop集群搭建
 
 ## 1.配置静态ip
 
