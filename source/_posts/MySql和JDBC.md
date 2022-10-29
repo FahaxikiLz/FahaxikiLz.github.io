@@ -8,7 +8,70 @@ tags:
 - MySql
 - JDBC
 ---
-# MySQL篇
+### [索引](https://developer.aliyun.com/article/831250#slide-0)
+
+> - 创建索引：
+>   `CREATE [ UNIQUE | FULLTEXT ] INDEX index_name ON table_name (index_col_name, ...);`
+>   如果不加 CREATE 后面不加索引类型参数，则创建的是常规索引
+> - 查看索引：
+>   `SHOW INDEX FROM table_name;`
+>
+> - 删除索引：
+>   `DROP INDEX index_name ON table_name;`
+
+> 在关系数据库中，如果有上万甚至上亿条记录，在查找记录的时候，想要获得非常快的速度，就需要使用索引。
+>
+> 索引是关系数据库中对某一列或多个列的值进行预排序的数据结构。通过使用索引，可以让数据库系统不必扫描整个表，而是直接定位到符合条件的记录，这样就大大加快了查询速度。
+>
+> 例如，对于`students`表：
+>
+> ![image-20220321190904195](MySql和JDBC/image-20220321190904195.png)
+>
+> 如果要经常根据`score`列进行查询，就可以对`score`列创建索引：
+>
+> ```mysql
+> ALTER TABLE students
+> ADD INDEX idx_score (score);
+> ```
+>
+> <span style="color:orange">**使用`ADD INDEX idx_score (score)`就创建了一个名称为`idx_score`，使用列`score`的索引。**</span>索引名称是任意的，索引如果有多列，可以在括号里依次写上，例如：
+>
+> ```mysql
+> ALTER TABLE students
+> ADD INDEX idx_name_score (name, score);
+> ```
+>
+> <span style="color:orange">**索引的效率取决于索引列的值是否散列，即该列的值如果越互不相同，那么索引效率越高。**</span>反过来，如果记录的列存在大量相同的值，例如`gender`列，大约一半的记录值是`M`，另一半是`F`，因此，对该列创建索引就没有意义。
+>
+> <span style="color:orange">**可以对一张表创建多个索引。索引的优点是提高了查询效率，缺点是在插入、更新和删除记录时，需要同时修改索引，因此，索引越多，插入、更新和删除记录的速度就越慢。**</span>
+>
+> <span style="color:orange">**对于主键，关系数据库会自动对其创建主键索引。使用主键索引的效率是最高的，**</span>因为主键会保证绝对唯一。
+
+#### 唯一索引
+
+> 在设计关系数据表的时候，看上去唯一的列，例如身份证号、邮箱地址等，因为他们具有业务含义，因此不宜作为主键。
+>
+> 但是，这些列根据业务要求，又具有唯一性约束：即不能出现两条记录存储了同一个身份证号。这个时候，就可以给该列添加一个唯一索引。例如，我们假设`students`表的`name`不能重复：
+>
+> ```mysql
+> ALTER TABLE students
+> ADD UNIQUE INDEX uni_name (name);
+> ```
+>
+> <span style="color:orange">**通过`UNIQUE`关键字添加一个唯一索引。唯一索引的表示某一列的值具有唯一性**</span>
+>
+> <span style="color:orange">**也可以只对某一列添加一个唯一约束而不创建唯一索引**</span>
+>
+> ```mysql
+> ALTER TABLE students
+> ADD CONSTRAINT uni_name UNIQUE (name);
+> ```
+>
+> 这种情况下，`name`列没有索引，但仍然具有唯一性保证。
+>
+> 无论是否创建索引，对于用户和应用程序来说，使用关系数据库不会有任何区别。这里的意思是说，当我们<span style="color:purple">**在数据库中查询时，如果有相应的索引可用，数据库系统就会自动使用索引来提高查询效率**</span>，如果没有索引，查询也能正常执行，只是速度会变慢。因此，索引可以在使用数据库的过程中逐步优化。
+
+# MySQL基础篇
 
 ## [安装MySQL](https://blog.csdn.net/wangpaiblog/article/details/112000033)
 
@@ -148,6 +211,10 @@ SELECT 'ok' as 'result:';
 >   ALTER TABLE students DROP COLUMN birthday;
 >   ```
 
+### 注意事项
+
+> - UTF8字符集长度为3字节，有些符号占4字节，所以推荐用utf8mb4字符集
+
 ## DML（数据操作语言）
 
 ### Insert
@@ -167,6 +234,11 @@ delete from 表名 where ...;
 ```mysql
 update 表名 set 字段1 = 值1，字段2 = 值2,...where...;
 ```
+
+### 注意事项
+
+> - 字符串和日期类型数据应该包含在引号中
+> - 插入的数据大小应该在字段的规定范围内
 
 ## DQL（数据查询语言）
 
@@ -238,16 +310,22 @@ SELECT * from students WHERE score > 50 or score <80
 SELECT * from students WHERE not score = 90
 ```
 
-### 排序
+### 排序查询
 
 > - 升序(ASC)：`select * from xxx order by score ASC`，**<span style="color:red">默认升序</span>**
 > - 降序(DESC)：`select * from xxx order by score DESC`
 > - **如果有`WHERE`子句，那么`ORDER BY`子句要放到`WHERE`子句后面。**
 > - `SELECT * from students ORDER BY score DESC,id ASC`，先以成绩降序，成绩相同的以id升序
 
-### 分页
+### 分页查询
 
 > - **分页实查询可以<span style="color:orange">通过`LIMIT M OFFSET N `</span>子句实现。**第一个数据**从N开始，每页M个**。**可以<span style="color:orange">简写成 `LIMIT N,M`</span>**
+
+#### 注意事项
+
+> - 起始索引从0开始，起始索引 = （查询页码 - 1） * 每页显示记录数
+> - 分页查询是数据库的方言，不同数据库有不同实现，MySQL是LIMIT
+> - 如果查询的是第一页数据，起始索引可以省略，直接简写 LIMIT 10
 
 ### 聚合查询
 
@@ -280,12 +358,248 @@ SELECT * from students WHERE not score = 90
 > - `SELECT name, class_id, COUNT(*) num FROM students GROUP BY class_id;`不出意外，执行这条查询我们会得到一个语法错误，因为在任意一个分组中，只有`class_id`都相同，`name`是不同的，SQL引擎不能把多个`name`的值放入一行记录中。因此，聚合查询的列中，只能放入分组的列。
 > - `SELECT class_id, gender, COUNT(*) num FROM students GROUP BY class_id, gender;`统计各班的男生和女生人数
 
+#### 注意事项
+
+> - 执行顺序：where > 聚合函数 > having
+> - 分组之后，查询的字段一般为聚合函数和分组字段，查询其他字段无任何意义
+
 #### where和having的区别
 
 > - 执行时机不同：where是分组之前进行过滤，不满足where条件不参与分组；having是分组后对结果进行过滤。
 > - 判断条件不同：<span style="color:orange">**where不能对聚合函数进行判断，而having可以。**</span>
 
+### DQL执行顺序
+
+> FROM -> WHERE -> GROUP BY -> SELECT -> ORDER BY -> LIMIT
+
+## 函数
+
+### 字符串函数
+
+| 函数                             | 功能                                                      |
+| -------------------------------- | --------------------------------------------------------- |
+| CONCAT(s1, s2, ..., sn)          | 字符串拼接，将s1, s2, ..., sn拼接成一个字符串             |
+| LOWER(str)                       | 将字符串全部转为小写                                      |
+| UPPER(str)                       | 将字符串全部转为大写                                      |
+| LPAD(str, n, pad)                | 左填充，用字符串pad对str的左边进行填充，达到n个字符串长度 |
+| RPAD(str, n, pad)                | 右填充，用字符串pad对str的右边进行填充，达到n个字符串长度 |
+| TRIM(str)                        | 去掉字符串头部和尾部的空格                                |
+| SUBSTRING(str, start, len)       | 返回从字符串str从start位置起的len个长度的字符串           |
+| REPLACE(column, source, replace) | 替换字符串                                                |
+
+```mysql
+-- 拼接
+SELECT CONCAT('Hello', 'World');
+-- 小写
+SELECT LOWER('Hello');
+-- 大写
+SELECT UPPER('Hello');
+-- 左填充
+SELECT LPAD('01', 5, '-');
+-- 右填充
+SELECT RPAD('01', 5, '-');
+-- 去除空格
+SELECT TRIM(' Hello World ');
+-- 切片（起始索引为1）
+SELECT SUBSTRING('Hello World', 1, 5);
+```
+
+### 数值函数
+
+| 函数        | 功能                             |
+| ----------- | -------------------------------- |
+| CEIL(x)     | 向上取整                         |
+| FLOOR(x)    | 向下取整                         |
+| MOD(x, y)   | 返回x/y的模                      |
+| RAND()      | 返回0~1内的随机数                |
+| ROUND(x, y) | 求参数x的四舍五入值，保留y位小数 |
+
+### 日期函数
+
+| 函数                               | 功能                                              |
+| ---------------------------------- | ------------------------------------------------- |
+| CURDATE()                          | 返回当前日期                                      |
+| CURTIME()                          | 返回当前时间                                      |
+| NOW()                              | 返回当前日期和时间                                |
+| YEAR(date)                         | 获取指定date的年份                                |
+| MONTH(date)                        | 获取指定date的月份                                |
+| DAY(date)                          | 获取指定date的日期                                |
+| DATE_ADD(date, INTERVAL expr type) | 返回一个日期/时间值加上一个时间间隔expr后的时间值 |
+| DATEDIFF(date1, date2)             | 返回起始时间date1和结束时间date2之间的天数        |
+
+```mysql
+-- DATE_ADD
+SELECT DATE_ADD(NOW(), INTERVAL 70 YEAR);
+```
+
+### 流程函数
+
+| 函数                                                         | 功能                                                      |
+| ------------------------------------------------------------ | --------------------------------------------------------- |
+| IF(value, t, f)                                              | 如果value为true，则返回t，否则返回f                       |
+| IFNULL(value1, value2)                                       | 如果value1不为空，返回value1，否则返回value2              |
+| CASE WHEN [ val1 ] THEN [ res1 ] ... ELSE [ default ] END    | 如果val1为true，返回res1，... 否则返回default默认值       |
+| CASE [ expr ] WHEN [ val1 ] THEN [ res1 ] ... ELSE [ default ] END | 如果expr的值等于val1，返回res1，... 否则返回default默认值 |
+
+```mysql
+select
+	name,
+	(case when age > 30 then '中年' else '青年' end)
+from employee;
+select
+	name,
+	(case workaddress when '北京市' then '一线城市' when '上海市' then '一线城市' else '二线城市' end) as '工作地址'
+from employee;
+```
+
+## 约束constraint
+
+> 约束是作用于表中字段上的，可以再创建表/修改表的时候添加约束。
+
+### 约束类型
+
+| 约束                    | 描述                                                     | 关键字      |
+| ----------------------- | -------------------------------------------------------- | ----------- |
+| 非空约束                | 限制该字段的数据不能为null                               | NOT NULL    |
+| 唯一约束                | 保证该字段的所有数据都是唯一、不重复的                   | UNIQUE      |
+| 主键约束                | 主键是一行数据的唯一标识，要求非空且唯一                 | PRIMARY KEY |
+| 默认约束                | 保存数据时，如果未指定该字段的值，则采用默认值           | DEFAULT     |
+| 检查约束（8.0.1版本后） | 保证字段值满足某一个条件                                 | CHECK       |
+| 外键约束                | 用来让两张图的数据之间建立连接，保证数据的一致性和完整性 | FOREIGN KEY |
+
+```sql
+create table user(
+	id int primary key auto_increment,
+	name varchar(10) not null unique,
+	age int check(age > 0 and age < 120),
+	status char(1) default '1',
+	gender char(1)
+);
+```
+
+### 主键约束
+
+> - 对于关系表，有个很重要的约束，就是任意两条记录不能重复。<span style="color:orange">不能重复不是指两条记录不完全相同，而是指能够通过某个字段唯一区分出不同的记录，这个字段被称为**主键**。</span>
+> - 对主键的要求，最关键的一点是：**记录一旦插入到表中，主键最好不要再修改，**因为主键是用来唯一定位记录的，修改了主键，会造成一系列的影响。
+> - 选取主键的一个基本原则是：<span style="color:orange">**不使用任何业务相关的字段作为主键。**</span>而应该使用BIGINT自增或者GUID类型。<span style="color:orange">**主键也不应该允许`NULL`。**</span>
+
+#### 联合主键
+
+> 关系数据库实际上还允许通过多个字段唯一标识记录，即两个或更多的字段都设置为主键，这种主键被称为联合主键。
+>
+> <span style="color:green">**对于联合主键，允许一列有重复，只要不是所有主键列都重复即可**</span>
+>
+> ![image-20220321164844007](MySql和JDBC/image-20220321164844007.png)
+>
+> 如果我们把上述表的`id_num`和`id_type`这两列作为联合主键，那么上面的3条记录都是允许的，因为没有两列主键组合起来是相同的。
+>
+> 没有必要的情况下，我们尽量不使用联合主键，因为它给关系表带来了复杂度的上升。
+
+### 外键约束
+
+> students表
+
+![image-20220321184155880](MySql和JDBC/image-20220321184155880.png)
+
+> class表
+
+![image-20220321184225207](MySql和JDBC/image-20220321184225207.png)
+
+> 设置外键（使用图形化工具），在需要设置外键的表右键选设计表
+
+![image-20220321184351430](MySql和JDBC/image-20220321184351430.png)
+
+> 设置外键（设置sql语句）
+>
+> ```mysql
+> ALTER TABLE school
+> ADD CONSTRAINT fk_class_id
+> FOREIGN KEY (class_id)
+> REFERENCES class (id);
+> ```
+>
+> 外键约束的名称`fk_class_id`可以任意，`FOREIGN KEY (class_id)`指定了`class_id`作为外键，`REFERENCES class (id)`指定了这个外键将关联到`class`表的`id`列（即`class`表的主键）。
+>
+> 通过定义外键约束，关系数据库可以保证无法插入无效的数据。即如果`class`表不存在`id=99`的记录，`students`表就无法插入`class_id=99`的记录。
+>
+> 要删除一个外键约束，也是通过`ALTER TABLE`实现的：
+>
+> ```sql
+> ALTER TABLE students
+> DROP FOREIGN KEY fk_class_id;
+> ```
+
+#### 删除/更新行为
+
+| 行为        | 说明                                                         |
+| ----------- | ------------------------------------------------------------ |
+| NO ACTION   | 当在父表中删除/更新对应记录时，首先检查该记录是否有对应外键，如果有则不允许删除/更新（与RESTRICT一致） |
+| RESTRICT    | 当在父表中删除/更新对应记录时，首先检查该记录是否有对应外键，如果有则不允许删除/更新（与NO ACTION一致） |
+| CASCADE     | 当在父表中删除/更新对应记录时，首先检查该记录是否有对应外键，如果有则也删除/更新外键在子表中的记录 |
+| SET NULL    | 当在父表中删除/更新对应记录时，首先检查该记录是否有对应外键，如果有则设置子表中该外键值为null（要求该外键允许为null） |
+| SET DEFAULT | 父表有变更时，子表将外键设为一个默认值（Innodb不支持）       |
+
+> 命令
+
+```sql
+ALTER TABLE 表名 ADD CONSTRAINT 外键名称 FOREIGN KEY (外键字段) REFERENCES 主表名(主表字段名) ON UPDATE 行为 ON DELETE 行为;
+```
+
+> 图形化界面
+
+![image-20221029171858453](MySql%E5%92%8CJDBC/image-20221029171858453.png)
+
 ## 多表查询
+
+### 关系模型
+
+#### 一对多
+
+> 实现：<span style="color:orange">**在多的一方建立外键，指向一的一方的主键**</span>
+
+#### 多对多
+
+> 通过一个表的外键关联到另一个表，我们可以定义出一对多关系。有些时候，还需要定义“多对多”关系。例如，一个老师可以对应多个班级，一个班级也可以对应多个老师，因此，班级表和老师表存在多对多关系。
+>
+> <span style="color:orange">**多对多关系实际上是通过两个一对多关系实现的，即通过一个中间表，**</span>关联两个一对多关系，就形成了多对多关系：
+>
+> ![image-20220321185146617](MySql和JDBC/image-20220321185146617.png)
+>
+> ![image-20220321185417131](MySql和JDBC/image-20220321185417131.png)
+>
+> ![image-20220321185205665](MySql和JDBC/image-20220321185205665.png)
+>
+> 通过中间表`teacher_class`可知`teachers`到`classes`的关系：
+>
+> - `id=1`的张老师对应`id=1,2`的一班和二班；
+> - `id=2`的王老师对应`id=1,2`的一班和二班；
+> - `id=3`的李老师对应`id=1`的一班；
+> - `id=4`的赵老师对应`id=2`的二班。
+>
+> 同理可知`classes`到`teachers`的关系：
+>
+> - `id=1`的一班对应`id=1,2,3`的张老师、王老师和李老师；
+> - `id=2`的二班对应`id=1,2,4`的张老师、王老师和赵老师；
+>
+> 因此，通过中间表，我们就定义了一个“多对多”关系。
+
+#### 一对一
+
+> **一对一关系是指，一个表的记录对应到另一个表的唯一一个记录。**
+>
+> 例如，`students`表的每个学生可以有自己的联系方式，如果把联系方式存入另一个表`contacts`，我们就可以得到一个“一对一”关系：
+>
+> ![image-20220321185237547](MySql和JDBC/image-20220321185237547.png)
+>
+> 有细心的童鞋会问，既然是一对一关系，那为啥不给`students`表增加一个`mobile`列，这样就能合二为一了？
+>
+> 如果业务允许，完全可以把两个表合为一个表。但是，有些时候，如果某个学生没有手机号，那么，`contacts`表就不存在对应的记录。实际上，一对一关系准确地说，是`contacts`表一对一对应`students`表。
+>
+> 还有一些应用会把一个大表拆成两个一对一的表，目的是把经常读取和不经常读取的字段分开，以获得更高的性能。例如，把一个大的用户表分拆为用户基本信息表`user_info`和用户详细信息表`user_profiles`，大部分时候，只需要查询`user_info`表，并不需要查询`user_profiles`表，这样就提高了查询速度。
+
+#### 小结
+
+> **关系数据库通过外键可以实现一对多、多对多和一对一的关系。**外键既可以通过数据库来约束，**也可以不设置约束，仅依靠应用程序的逻辑来保证。**
 
 ### 连接查询
 
@@ -423,6 +737,69 @@ SELECT a.`o_name`AS '科目' ,b.`o_name`'类别' FROM `obj`AS a join`obj`AS b wh
 > - 语法：**<span style="color:orange">`SELECT * FROM t1 WHERE column1 = ( SELECT column1 FROM t2);`</span>**
 > - **子查询外部的语句可以是 INSERT / UPDATE / DELETE / SELECT 的任何一个**
 
+#### 标量子查询
+
+>- 子查询返回的结果是单个值（数字、字符串、日期等）
+>- 常用操作符：- < > > >= < <=
+
+```mysql
+-- 查询销售部所有员工
+select id from dept where name = '销售部';
+-- 根据销售部部门ID，查询员工信息
+select * from employee where dept = 4;
+-- 合并（子查询）
+select * from employee where dept = (select id from dept where name = '销售部');
+
+-- 查询xxx入职之后的员工信息
+select * from employee where entrydate > (select entrydate from employee where name = 'xxx');
+```
+
+#### 列子查询
+
+> - 返回的结果是一列（可以是多行）
+>
+> - 常用操作符：
+>
+>   | 操作符 | 描述                                   |
+>   | ------ | -------------------------------------- |
+>   | IN     | 在指定的集合范围内，多选一             |
+>   | NOT IN | 不在指定的集合范围内                   |
+>   | ANY    | 子查询返回列表中，有任意一个满足即可   |
+>   | SOME   | 与ANY等同，使用SOME的地方都可以使用ANY |
+>   | ALL    | 子查询返回列表的所有值都必须满足       |
+
+```mysql
+-- 查询销售部和市场部的所有员工信息
+select * from employee where dept in (select id from dept where name = '销售部' or name = '市场部');
+-- 查询比财务部所有人工资都高的员工信息
+select * from employee where salary > all(select salary from employee where dept = (select id from dept where name = '财务部'));
+-- 查询比研发部任意一人工资高的员工信息
+select * from employee where salary > any (select salary from employee where dept = (select id from dept where name = '研发部'));
+```
+
+#### 行子查询
+
+> - 返回的结果是一行（可以是多列）
+> - 常用操作符：=, <, >, IN, NOT IN
+
+```mysql
+-- 查询与xxx的薪资及直属领导相同的员工信息
+select * from employee where (salary, manager) = (12500, 1);
+select * from employee where (salary, manager) = (select salary, manager from employee where name = 'xxx');
+```
+
+#### 表子查询
+
+> - 返回的结果是多行多列
+> - 常用操作符：IN
+
+```mysql
+-- 查询与xxx1，xxx2的职位和薪资相同的员工
+select * from employee where (job, salary) in (select job, salary from employee where name = 'xxx1' or name = 'xxx2');
+-- 查询入职日期是2006-01-01之后的员工，及其部门信息
+select e.*, d.* from (select * from employee where entrydate > '2006-01-01') as e left join dept as d on e.dept = d.id;
+```
+
 ## 实用sql语句
 
 ### 插入或替换
@@ -511,250 +888,179 @@ SELECT a.`o_name`AS '科目' ,b.`o_name`'类别' FROM `obj`AS a join`obj`AS b wh
 >
 > **指定索引的前提是索引`idx_class_id`必须存在。**
 
-## 函数
+## 事务
 
-### 字符串函数
+> **数据库系统保证在一个事务中的所有SQL要么全部执行成功，要么全部不执行**
+>
+> - **begin/start transaction：开启事务**
+> - **commit：提交事务**
+> - **rollback：回滚事务，整个事务会失败**
+>
+> 注：在mysql中输入命令时后面要加上**`;`**  
 
-| 函数                             | 功能                                                      |
-| -------------------------------- | --------------------------------------------------------- |
-| CONCAT(s1, s2, ..., sn)          | 字符串拼接，将s1, s2, ..., sn拼接成一个字符串             |
-| LOWER(str)                       | 将字符串全部转为小写                                      |
-| UPPER(str)                       | 将字符串全部转为大写                                      |
-| LPAD(str, n, pad)                | 左填充，用字符串pad对str的左边进行填充，达到n个字符串长度 |
-| RPAD(str, n, pad)                | 右填充，用字符串pad对str的右边进行填充，达到n个字符串长度 |
-| TRIM(str)                        | 去掉字符串头部和尾部的空格                                |
-| SUBSTRING(str, start, len)       | 返回从字符串str从start位置起的len个长度的字符串           |
-| REPLACE(column, source, replace) | 替换字符串                                                |
+```sql
+-- 查看事务提交方式
+SELECT @@AUTOCOMMIT;
+-- 设置事务提交方式，1为自动提交，0为手动提交，该设置只对当前会话有效
+SET @@AUTOCOMMIT = 0;
 
-```mysql
--- 拼接
-SELECT CONCAT('Hello', 'World');
--- 小写
-SELECT LOWER('Hello');
--- 大写
-SELECT UPPER('Hello');
--- 左填充
-SELECT LPAD('01', 5, '-');
--- 右填充
-SELECT RPAD('01', 5, '-');
--- 去除空格
-SELECT TRIM(' Hello World ');
--- 切片（起始索引为1）
-SELECT SUBSTRING('Hello World', 1, 5);
+
+-- 开启事务，开启事务默认关闭自动提交
+begin;
+
+select * from account where name = '张三';
+update account set money = money - 1000 where name = '张三';
+update account set money = money + 1000 where name = '李四';
+
+-- 提交事务
+commit;
+
+-- 回滚事务
+rollback;
 ```
 
-### 数值函数
+### 四大特性ACID
 
-| 函数        | 功能                             |
-| ----------- | -------------------------------- |
-| CEIL(x)     | 向上取整                         |
-| FLOOR(x)    | 向下取整                         |
-| MOD(x, y)   | 返回x/y的模                      |
-| RAND()      | 返回0~1内的随机数                |
-| ROUND(x, y) | 求参数x的四舍五入值，保留y位小数 |
+> - 原子性(Atomicity)：事务是不可分割的最小操作但愿，要么全部成功，要么全部失败
+> - 一致性(Consistency)：事务完成时，必须使所有数据都保持一致状态
+> - 隔离性(Isolation)：数据库系统提供的隔离机制，保证事务在不受外部并发操作影响的独立环境下运行
+> - 持久性(Durability)：事务一旦提交或回滚，它对数据库中的数据的改变就是永久的
 
-### 日期函数
+### 隔离级别
 
-| 函数                               | 功能                                              |
-| ---------------------------------- | ------------------------------------------------- |
-| CURDATE()                          | 返回当前日期                                      |
-| CURTIME()                          | 返回当前时间                                      |
-| NOW()                              | 返回当前日期和时间                                |
-| YEAR(date)                         | 获取指定date的年份                                |
-| MONTH(date)                        | 获取指定date的月份                                |
-| DAY(date)                          | 获取指定date的日期                                |
-| DATE_ADD(date, INTERVAL expr type) | 返回一个日期/时间值加上一个时间间隔expr后的时间值 |
-| DATEDIFF(date1, date2)             | 返回起始时间date1和结束时间date2之间的天数        |
-
-```mysql
--- DATE_ADD
-SELECT DATE_ADD(NOW(), INTERVAL 70 YEAR);
-```
-
-### 流程函数
-
-| 函数                                                         | 功能                                                      |
-| ------------------------------------------------------------ | --------------------------------------------------------- |
-| IF(value, t, f)                                              | 如果value为true，则返回t，否则返回f                       |
-| IFNULL(value1, value2)                                       | 如果value1不为空，返回value1，否则返回value2              |
-| CASE WHEN [ val1 ] THEN [ res1 ] ... ELSE [ default ] END    | 如果val1为true，返回res1，... 否则返回default默认值       |
-| CASE [ expr ] WHEN [ val1 ] THEN [ res1 ] ... ELSE [ default ] END | 如果expr的值等于val1，返回res1，... 否则返回default默认值 |
-
-```mysql
-select
-	name,
-	(case when age > 30 then '中年' else '青年' end)
-from employee;
-select
-	name,
-	(case workaddress when '北京市' then '一线城市' when '上海市' then '一线城市' else '二线城市' end) as '工作地址'
-from employee;
-```
-
-## 关系模型
-
-### 主键
-
-> - 对于关系表，有个很重要的约束，就是任意两条记录不能重复。<span style="color:orange">不能重复不是指两条记录不完全相同，而是指能够通过某个字段唯一区分出不同的记录，这个字段被称为**主键**。</span>
-> - 对主键的要求，最关键的一点是：**记录一旦插入到表中，主键最好不要再修改，**因为主键是用来唯一定位记录的，修改了主键，会造成一系列的影响。
-> - 选取主键的一个基本原则是：<span style="color:orange">**不使用任何业务相关的字段作为主键。**</span>而应该使用BIGINT自增或者GUID类型。<span style="color:orange">**主键也不应该允许`NULL`。**</span>
-
-#### 联合主键
-
-> 关系数据库实际上还允许通过多个字段唯一标识记录，即两个或更多的字段都设置为主键，这种主键被称为联合主键。
+> 对于两个并发执行的事务，如果涉及到操作同一条记录的时候，可能会发生问题。因为并发操作会带来数据的不一致性，包括**脏读、不可重复读、幻读**等。数据库系统提供了隔离级别来让我们有针对性地选择事务的隔离级别，避免数据不一致的问题。
 >
-> <span style="color:green">**对于联合主键，允许一列有重复，只要不是所有主键列都重复即可**</span>
+> | 问题       | 描述                                                         |
+> | ---------- | ------------------------------------------------------------ |
+> | 脏读       | 一个事务读到另一个事务还没提交的数据                         |
+> | 不可重复读 | 一个事务先后读取同一条记录，但两次读取的数据不同             |
+> | 幻读       | 一个事务按照条件查询数据时，没有对应的数据行，但是再插入数据时，又发现这行数据已经存在 |
 >
-> ![image-20220321164844007](MySql和JDBC/image-20220321164844007.png)
+> SQL标准定义了**4种隔离级别**，分别对应可能出现的问题：
 >
-> 如果我们把上述表的`id_num`和`id_type`这两列作为联合主键，那么上面的3条记录都是允许的，因为没有两列主键组合起来是相同的。
->
-> 没有必要的情况下，我们尽量不使用联合主键，因为它给关系表带来了复杂度的上升。
+> | Isolation Level                   | 脏读（Dirty Read） | 不可重复读（Non Repeatable Read） | 幻读（Phantom Read） |
+> | :-------------------------------- | :----------------- | :-------------------------------- | :------------------- |
+> | Read Uncommitte(读未提交)         | Yes                | Yes                               | Yes                  |
+> | Read Committed（读已提交）        | -                  | Yes                               | Yes                  |
+> | Repeatable Read（可重复读。默认） | -                  | -                                 | Yes                  |
+> | Serializable（串行化）            | -                  | -                                 | -                    |
 
-### 外键
-
-> students表
-
-![image-20220321184155880](MySql和JDBC/image-20220321184155880.png)
-
-> class表
-
-![image-20220321184225207](MySql和JDBC/image-20220321184225207.png)
-
-> 设置外键（使用图形化工具），在需要设置外键的表右键选设计表
-
-![image-20220321184351430](MySql和JDBC/image-20220321184351430.png)
-
-> 设置外键（设置sql语句）
->
-> ```mysql
-> ALTER TABLE school
-> ADD CONSTRAINT fk_class_id
-> FOREIGN KEY (class_id)
-> REFERENCES class (id);
-> ```
->
-> 外键约束的名称`fk_class_id`可以任意，`FOREIGN KEY (class_id)`指定了`class_id`作为外键，`REFERENCES class (id)`指定了这个外键将关联到`class`表的`id`列（即`class`表的主键）。
->
-> 通过定义外键约束，关系数据库可以保证无法插入无效的数据。即如果`class`表不存在`id=99`的记录，`students`表就无法插入`class_id=99`的记录。
->
-> 要删除一个外键约束，也是通过`ALTER TABLE`实现的：
+> 查看当前隔离级别：
 >
 > ```sql
-> ALTER TABLE students
-> DROP FOREIGN KEY fk_class_id;
+> select @@transaction_isolation
+> ```
+>
+> 设置隔离级别
+>
+> ```sql
+> set session transaction isolation level read uncommitted
 > ```
 
-#### 一对多
+#### Read Uncommitted
 
-> 实现：<span style="color:orange">**在多的一方建立外键，指向一的一方的主键**</span>
-
-#### 多对多
-
-> 通过一个表的外键关联到另一个表，我们可以定义出一对多关系。有些时候，还需要定义“多对多”关系。例如，一个老师可以对应多个班级，一个班级也可以对应多个老师，因此，班级表和老师表存在多对多关系。
+> Read Uncommitted是隔离级别最低的一种事务级别。在这种隔离级别下，一个事务会读到另一个事务更新后但未提交的数据，如果另一个事务回滚，那么当前事务读到的数据就是脏数据，这就是脏读（Dirty Read）。
 >
-> <span style="color:orange">**多对多关系实际上是通过两个一对多关系实现的，即通过一个中间表，**</span>关联两个一对多关系，就形成了多对多关系：
+> 我们来看一个例子。
 >
-> ![image-20220321185146617](MySql和JDBC/image-20220321185146617.png)
->
-> ![image-20220321185417131](MySql和JDBC/image-20220321185417131.png)
->
-> ![image-20220321185205665](MySql和JDBC/image-20220321185205665.png)
->
-> 通过中间表`teacher_class`可知`teachers`到`classes`的关系：
->
-> - `id=1`的张老师对应`id=1,2`的一班和二班；
-> - `id=2`的王老师对应`id=1,2`的一班和二班；
-> - `id=3`的李老师对应`id=1`的一班；
-> - `id=4`的赵老师对应`id=2`的二班。
->
-> 同理可知`classes`到`teachers`的关系：
->
-> - `id=1`的一班对应`id=1,2,3`的张老师、王老师和李老师；
-> - `id=2`的二班对应`id=1,2,4`的张老师、王老师和赵老师；
->
-> 因此，通过中间表，我们就定义了一个“多对多”关系。
-
-#### 一对一
-
-> **一对一关系是指，一个表的记录对应到另一个表的唯一一个记录。**
->
-> 例如，`students`表的每个学生可以有自己的联系方式，如果把联系方式存入另一个表`contacts`，我们就可以得到一个“一对一”关系：
->
-> ![image-20220321185237547](MySql和JDBC/image-20220321185237547.png)
->
-> 有细心的童鞋会问，既然是一对一关系，那为啥不给`students`表增加一个`mobile`列，这样就能合二为一了？
->
-> 如果业务允许，完全可以把两个表合为一个表。但是，有些时候，如果某个学生没有手机号，那么，`contacts`表就不存在对应的记录。实际上，一对一关系准确地说，是`contacts`表一对一对应`students`表。
->
-> 还有一些应用会把一个大表拆成两个一对一的表，目的是把经常读取和不经常读取的字段分开，以获得更高的性能。例如，把一个大的用户表分拆为用户基本信息表`user_info`和用户详细信息表`user_profiles`，大部分时候，只需要查询`user_info`表，并不需要查询`user_profiles`表，这样就提高了查询速度。
-
-#### 小结
-
-> **关系数据库通过外键可以实现一对多、多对多和一对一的关系。**外键既可以通过数据库来约束，**也可以不设置约束，仅依靠应用程序的逻辑来保证。**
-
-### [索引](https://developer.aliyun.com/article/831250#slide-0)
-
-> - 创建索引：
->   `CREATE [ UNIQUE | FULLTEXT ] INDEX index_name ON table_name (index_col_name, ...);`
->   如果不加 CREATE 后面不加索引类型参数，则创建的是常规索引
-> - 查看索引：
->   `SHOW INDEX FROM table_name;`
->
-> - 删除索引：
->   `DROP INDEX index_name ON table_name;`
-
-> 在关系数据库中，如果有上万甚至上亿条记录，在查找记录的时候，想要获得非常快的速度，就需要使用索引。
->
-> 索引是关系数据库中对某一列或多个列的值进行预排序的数据结构。通过使用索引，可以让数据库系统不必扫描整个表，而是直接定位到符合条件的记录，这样就大大加快了查询速度。
->
-> 例如，对于`students`表：
->
-> ![image-20220321190904195](MySql和JDBC/image-20220321190904195.png)
->
-> 如果要经常根据`score`列进行查询，就可以对`score`列创建索引：
+> 首先，我们准备好`students`表的数据，该表仅一行记录：
 >
 > ```mysql
-> ALTER TABLE students
-> ADD INDEX idx_score (score);
+> mysql> select * from students;
+> +----+-------+
+> | id | name  |
+> +----+-------+
+> |  1 | Alice |
+> +----+-------+
+> 1 row in set (0.00 sec)
 > ```
 >
-> <span style="color:orange">**使用`ADD INDEX idx_score (score)`就创建了一个名称为`idx_score`，使用列`score`的索引。**</span>索引名称是任意的，索引如果有多列，可以在括号里依次写上，例如：
+> 然后，分别开启两个MySQL客户端连接，按顺序依次执行事务A和事务B：
 >
-> ```mysql
-> ALTER TABLE students
-> ADD INDEX idx_name_score (name, score);
-> ```
+> ![image-20220201174440467](MySql和JDBC/image-20220201174440467.png)
 >
-> <span style="color:orange">**索引的效率取决于索引列的值是否散列，即该列的值如果越互不相同，那么索引效率越高。**</span>反过来，如果记录的列存在大量相同的值，例如`gender`列，大约一半的记录值是`M`，另一半是`F`，因此，对该列创建索引就没有意义。
+> 当事务A执行完第3步时，它更新了`id=1`的记录，但并未提交，而事务B在第4步读取到的数据就是未提交的数据。
 >
-> <span style="color:orange">**可以对一张表创建多个索引。索引的优点是提高了查询效率，缺点是在插入、更新和删除记录时，需要同时修改索引，因此，索引越多，插入、更新和删除记录的速度就越慢。**</span>
+> 随后，事务A在第5步进行了回滚，事务B再次读取`id=1`的记录，发现和上一次读取到的数据不一致，这就是脏读。
 >
-> <span style="color:orange">**对于主键，关系数据库会自动对其创建主键索引。使用主键索引的效率是最高的，**</span>因为主键会保证绝对唯一。
+> 可见，在Read Uncommitted隔离级别下，一个事务可能读取到另一个事务更新但未提交的数据，这个数据有可能是脏数据。
 
-#### 唯一索引
+![image-20220201180832178](MySql和JDBC/image-20220201180832178.png)	
 
-> 在设计关系数据表的时候，看上去唯一的列，例如身份证号、邮箱地址等，因为他们具有业务含义，因此不宜作为主键。
+#### Read Committed
+
+> 在Read Committed隔离级别下，一个事务可能会遇到不可重复读（Non Repeatable Read）的问题。
 >
-> 但是，这些列根据业务要求，又具有唯一性约束：即不能出现两条记录存储了同一个身份证号。这个时候，就可以给该列添加一个唯一索引。例如，我们假设`students`表的`name`不能重复：
+> 不可重复读是指，在一个事务内，多次读同一数据，在这个事务还没有结束时，如果另一个事务恰好修改了这个数据，那么，在第一个事务中，两次读取的数据就可能不一致。
 >
-> ```mysql
-> ALTER TABLE students
-> ADD UNIQUE INDEX uni_name (name);
-> ```
->
-> <span style="color:orange">**通过`UNIQUE`关键字添加一个唯一索引。唯一索引的表示某一列的值具有唯一性**</span>
->
-> <span style="color:orange">**也可以只对某一列添加一个唯一约束而不创建唯一索引**</span>
+> 我们仍然先准备好`students`表的数据：
 >
 > ```mysql
-> ALTER TABLE students
-> ADD CONSTRAINT uni_name UNIQUE (name);
+> mysql> select * from students;
+> +----+-------+
+> | id | name  |
+> +----+-------+
+> |  1 | Alice |
+> +----+-------+
+> 1 row in set (0.00 sec)
 > ```
 >
-> 这种情况下，`name`列没有索引，但仍然具有唯一性保证。
+> 然后，分别开启两个MySQL客户端连接，按顺序依次执行事务A和事务B：
 >
-> 无论是否创建索引，对于用户和应用程序来说，使用关系数据库不会有任何区别。这里的意思是说，当我们<span style="color:purple">**在数据库中查询时，如果有相应的索引可用，数据库系统就会自动使用索引来提高查询效率**</span>，如果没有索引，查询也能正常执行，只是速度会变慢。因此，索引可以在使用数据库的过程中逐步优化。
+> ![image-20220201175300380](MySql和JDBC/image-20220201175300380.png)
+>
+> 当事务B第一次执行第3步的查询时，得到的结果是`Alice`，随后，由于事务A在第4步更新了这条记录并提交，所以，事务B在第6步再次执行同样的查询时，得到的结果就变成了`Bob`，因此，在Read Committed隔离级别下，事务不可重复读同一条记录，因为很可能读到的结果不一致。
+
+![image-20220201181010311](MySql和JDBC/image-20220201181010311.png)
+
+#### Repeatable Read（默认的隔离级别）
+
+> 在Repeatable Read隔离级别下，一个事务可能会遇到幻读（Phantom Read）的问题。
+>
+> 幻读是指，在一个事务中，第一次查询某条记录，发现没有，但是，当试图更新这条不存在的记录时，竟然能成功，并且，再次读取同一条记录，它就神奇地出现了。
+>
+> 我们仍然先准备好`students`表的数据：
+>
+> ```mysql
+> mysql> select * from students;
+> +----+-------+
+> | id | name  |
+> +----+-------+
+> |  1 | Alice |
+> +----+-------+
+> 1 row in set (0.00 sec)
+> ```
+>
+> 然后，分别开启两个MySQL客户端连接，按顺序依次执行事务A和事务B：
+>
+> ![image-20220201180333223](MySql和JDBC/image-20220201180333223.png)
+
+<img src="MySql和JDBC/image-20220201180611696.png" alt="image-20220201180611696" />
+
+#### Serializable
+
+> **Serializable是最严格的隔离级别**。在Serializable隔离级别下，所有事务按照次序依次执行，因此，脏读、不可重复读、幻读都不会出现。
+>
+> 虽然Serializable隔离级别下的事务具有最高的安全性，但是，由于事务是串行执行，所以**效率会大大下降**，应用程序的性能会急剧降低。如果没有特别重要的情景，一般都不会使用Serializable隔离级别。
+>
+> 如果没有指定隔离级别，数据库就会使用默认的隔离级别。在MySQL中，如果使用InnoDB，默认的隔离级别是Repeatable Read。
+
+## Java类型和SQL类型对应
+
+| Java类型           | SQL类型                  |
+| ------------------ | ------------------------ |
+| boolean            | BIT                      |
+| byte               | TINYINY                  |
+| short              | SMALLINT                 |
+| int                | INTEGER                  |
+| long               | BIGINT                   |
+| String             | CHAR,VARCHAR,LONGVARCHAR |
+| byte    array      | BINARY,VAR BINARY        |
+| java.sql.Date      | DATE                     |
+| java.sql.Time      | TIME                     |
+| java.sql.Timestamp | TIMESTAMP                |
+
+# MySQL进阶篇
 
 ## SQL 优化
 
@@ -872,131 +1178,105 @@ InnoDB 的行锁是针对索引加的锁，不是针对记录加的锁，并且�
 `update student set no = '123' where id = 1;`，这句由于id有主键索引，所以只会锁这一行；
 `update student set no = '123' where name = 'test';`，这句由于name没有索引，所以会把整张表都锁住进行数据更新，解决方法是给name字段添加索引
 
-## 事务
+<hr/>
 
-> **数据库系统保证在一个事务中的所有SQL要么全部执行成功，要么全部不执行**
->
-> - **begin：开启事务**
-> - **commit：提交事务**
-> - **rollback：回滚事务，整个事务会失败**
->
-> 注：在mysql中输入命名时后面要加上 **;**  
 
-### 隔离级别
 
-> 对于两个并发执行的事务，如果涉及到操作同一条记录的时候，可能会发生问题。因为并发操作会带来数据的不一致性，包括脏读、不可重复读、幻读等。数据库系统提供了隔离级别来让我们有针对性地选择事务的隔离级别，避免数据不一致的问题。
->
-> SQL标准定义了4种隔离级别，分别对应可能出现的数据不一致的情况：
->
-> | Isolation Level                   | 脏读（Dirty Read） | 不可重复读（Non Repeatable Read） | 幻读（Phantom Read） |
-> | :-------------------------------- | :----------------- | :-------------------------------- | :------------------- |
-> | Read Uncommitte(读未提交)         | Yes                | Yes                               | Yes                  |
-> | Read Committed（读已提交）        | -                  | Yes                               | Yes                  |
-> | Repeatable Read（可重复读。默认） | -                  | -                                 | Yes                  |
-> | Serializable（串行化）            | -                  | -                                 | -                    |
 
-#### Read Uncommitted
 
-> Read Uncommitted是隔离级别最低的一种事务级别。在这种隔离级别下，一个事务会读到另一个事务更新后但未提交的数据，如果另一个事务回滚，那么当前事务读到的数据就是脏数据，这就是脏读（Dirty Read）。
->
-> 我们来看一个例子。
->
-> 首先，我们准备好`students`表的数据，该表仅一行记录：
->
-> ```mysql
-> mysql> select * from students;
-> +----+-------+
-> | id | name  |
-> +----+-------+
-> |  1 | Alice |
-> +----+-------+
-> 1 row in set (0.00 sec)
-> ```
->
-> 然后，分别开启两个MySQL客户端连接，按顺序依次执行事务A和事务B：
->
-> ![image-20220201174440467](MySql和JDBC/image-20220201174440467.png)
->
-> 当事务A执行完第3步时，它更新了`id=1`的记录，但并未提交，而事务B在第4步读取到的数据就是未提交的数据。
->
-> 随后，事务A在第5步进行了回滚，事务B再次读取`id=1`的记录，发现和上一次读取到的数据不一致，这就是脏读。
->
-> 可见，在Read Uncommitted隔离级别下，一个事务可能读取到另一个事务更新但未提交的数据，这个数据有可能是脏数据。
 
-![image-20220201180832178](MySql和JDBC/image-20220201180832178.png)	
 
-#### Read Committed
 
-> 在Read Committed隔离级别下，一个事务可能会遇到不可重复读（Non Repeatable Read）的问题。
->
-> 不可重复读是指，在一个事务内，多次读同一数据，在这个事务还没有结束时，如果另一个事务恰好修改了这个数据，那么，在第一个事务中，两次读取的数据就可能不一致。
->
-> 我们仍然先准备好`students`表的数据：
->
-> ```mysql
-> mysql> select * from students;
-> +----+-------+
-> | id | name  |
-> +----+-------+
-> |  1 | Alice |
-> +----+-------+
-> 1 row in set (0.00 sec)
-> ```
->
-> 然后，分别开启两个MySQL客户端连接，按顺序依次执行事务A和事务B：
->
-> ![image-20220201175300380](MySql和JDBC/image-20220201175300380.png)
->
-> 当事务B第一次执行第3步的查询时，得到的结果是`Alice`，随后，由于事务A在第4步更新了这条记录并提交，所以，事务B在第6步再次执行同样的查询时，得到的结果就变成了`Bob`，因此，在Read Committed隔离级别下，事务不可重复读同一条记录，因为很可能读到的结果不一致。
 
-![image-20220201181010311](MySql和JDBC/image-20220201181010311.png)
 
-#### Repeatable Read（默认的隔离级别）
 
-> 在Repeatable Read隔离级别下，一个事务可能会遇到幻读（Phantom Read）的问题。
->
-> 幻读是指，在一个事务中，第一次查询某条记录，发现没有，但是，当试图更新这条不存在的记录时，竟然能成功，并且，再次读取同一条记录，它就神奇地出现了。
->
-> 我们仍然先准备好`students`表的数据：
->
-> ```mysql
-> mysql> select * from students;
-> +----+-------+
-> | id | name  |
-> +----+-------+
-> |  1 | Alice |
-> +----+-------+
-> 1 row in set (0.00 sec)
-> ```
->
-> 然后，分别开启两个MySQL客户端连接，按顺序依次执行事务A和事务B：
->
-> ![image-20220201180333223](MySql和JDBC/image-20220201180333223.png)
 
-<img src="MySql和JDBC/image-20220201180611696.png" alt="image-20220201180611696" />
 
-#### Serializable
 
-> Serializable是最严格的隔离级别。在Serializable隔离级别下，所有事务按照次序依次执行，因此，脏读、不可重复读、幻读都不会出现。
->
-> 虽然Serializable隔离级别下的事务具有最高的安全性，但是，由于事务是串行执行，所以效率会大大下降，应用程序的性能会急剧降低。如果没有特别重要的情景，一般都不会使用Serializable隔离级别。
->
-> 如果没有指定隔离级别，数据库就会使用默认的隔离级别。在MySQL中，如果使用InnoDB，默认的隔离级别是Repeatable Read。
 
-## Java类型和SQL类型对应
 
-| Java类型           | SQL类型                  |
-| ------------------ | ------------------------ |
-| boolean            | BIT                      |
-| byte               | TINYINY                  |
-| short              | SMALLINT                 |
-| int                | INTEGER                  |
-| long               | BIGINT                   |
-| String             | CHAR,VARCHAR,LONGVARCHAR |
-| byte    array      | BINARY,VAR BINARY        |
-| java.sql.Date      | DATE                     |
-| java.sql.Time      | TIME                     |
-| java.sql.Timestamp | TIMESTAMP                |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # JDBC篇
 

@@ -47,7 +47,7 @@ tags:
 >
 >7. @EnableAspectJAutoProxy：完全注解开发，开启 Aspect 生成代理对象
 >
->8. @Transacational：事务配置注解
+>8. @Transactional：事务配置注解
 >
 >9. @EnableTransactionManagement：完全注解开发，开启事务
 >
