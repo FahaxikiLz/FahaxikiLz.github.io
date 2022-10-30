@@ -2,7 +2,9 @@ hexo clean
 hexo g
 hexo d
 
-# while [ !$? ]
+echo =========>$?
+
+# while [ $? ！= 0 ]
 # do
 #  if [ -e G:/L\ ZHEN/Desktop/LZBlog/.deploy_git ]
 #  then
