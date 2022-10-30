@@ -73,7 +73,115 @@ tags:
 
 # MySQL基础篇
 
-## [安装MySQL](https://blog.csdn.net/wangpaiblog/article/details/112000033)
+## [Windows安装MySQL](https://blog.csdn.net/wangpaiblog/article/details/112000033)
+
+## Linux安装Mysql
+
+### 1.下载Linux版MySQL安装包
+
+> 下载地址：[MySQL :: Download MySQL Community Server (Archived Versions)](https://downloads.mysql.com/archives/community/)
+
+![image-20221030150821856](MySql%E5%92%8CJDBC/image-20221030150821856.png)
+
+### 2.上传MySQL安装包
+
+### 3.创建目录,并解压
+
+```
+mkdir mysql
+
+tar -xvf mysql-8.0.26-1.el7.x86_64.rpm-bundle.tar -C mysql
+```
+
+### 4. 安装mysql的安装包
+
+```
+cd mysql
+
+rpm -ivh mysql-community-common-8.0.26-1.el7.x86_64.rpm 
+
+rpm -ivh mysql-community-client-plugins-8.0.26-1.el7.x86_64.rpm 
+
+rpm -ivh mysql-community-libs-8.0.26-1.el7.x86_64.rpm 
+
+rpm -ivh mysql-community-libs-compat-8.0.26-1.el7.x86_64.rpm
+
+yum install openssl-devel
+
+rpm -ivh  mysql-community-devel-8.0.26-1.el7.x86_64.rpm
+
+rpm -ivh mysql-community-client-8.0.26-1.el7.x86_64.rpm
+
+rpm -ivh  mysql-community-server-8.0.26-1.el7.x86_64.rpm
+
+```
+
+### 5.启动MySQL服务
+
+```
+systemctl start mysqld
+```
+
+```
+systemctl restart mysqld
+```
+
+```
+systemctl stop mysqld
+```
+
+### 6.查询自动生成的root用户密码
+
+```
+grep 'temporary password' /var/log/mysqld.log
+```
+
+> 命令行执行指令 :
+
+```
+mysql -u root -p
+```
+
+> 然后输入上述查询到的自动生成的密码, 完成登录 .
+
+### 7.修改root用户密码
+
+> 登录到MySQL之后，需要将自动生成的不便记忆的密码修改了，修改成自己熟悉的便于记忆的密码。
+
+```
+ALTER  USER  'root'@'localhost'  IDENTIFIED BY '1234';
+```
+
+> 执行上述的SQL会报错，原因是因为设置的密码太简单，密码复杂度不够。我们可以设置密码的复杂度为简单类型，密码长度为4。
+
+```
+set global validate_password.policy = 0;
+set global validate_password.length = 4;
+```
+
+> 降低密码的校验规则之后，再次执行上述修改密码的指令。
+
+### 8.创建用户
+
+> 默认的root用户只能当前节点localhost访问，是无法远程访问的，我们还需要创建一个root账户，用户远程访问
+
+```
+create user 'root'@'%' IDENTIFIED WITH mysql_native_password BY '1234';
+```
+
+### 9.并给root用户分配权限
+
+```
+grant all on *.* to 'root'@'%';
+```
+
+### 10.重新连接MySQL
+
+```
+mysql -u root -p
+```
+
+### 11.通过Navicat远程连接MySQL
 
 ## 所用sql脚本
 
@@ -626,7 +734,9 @@ ALTER TABLE 表名 ADD CONSTRAINT 外键名称 FOREIGN KEY (外键字段) REFERE
 
 > 通过一个表的外键关联到另一个表，我们可以定义出一对多关系。有些时候，还需要定义“多对多”关系。例如，一个老师可以对应多个班级，一个班级也可以对应多个老师，因此，班级表和老师表存在多对多关系。
 >
-> <span style="color:orange">**多对多关系实际上是通过两个一对多关系实现的，即通过一个中间表，**</span>关联两个一对多关系，就形成了多对多关系：
+> <span style="color:orange">**多对多关系实际上是通过两个一对多关系实现的，即通过一个中间表，**</span>关联两个一对多关系，就形成了多对多关系
+>
+> 实现：**<span style="color:orange">建立第三张中间表，中间表至少包含两个外键，分别关联两方主键</span>**
 >
 > ![image-20220321185146617](MySql和JDBC/image-20220321185146617.png)
 >
@@ -1233,12 +1343,6 @@ show engines;
 >
 > **电商中的足迹和评论适合使用 MyISAM 引擎，缓存适合使用 Memory 引擎。**
 
-## Linux安装Mysql
-
-> 下载地址：[MySQL :: Download MySQL Community Server (Archived Versions)](https://downloads.mysql.com/archives/community/)
-
-![image-20221030150821856](MySql%E5%92%8CJDBC/image-20221030150821856.png)
-
 ## 索引
 
 > 索引是帮助 MySQL **高效获取数据**的**数据结构（有序）**。在数据之外，数据库系统还维护着满足特定查找算法的数据结构，这些数据结构以某种方式引用（指向）数据，这样就可以在这些数据结构上实现高级查询算法，这种数据结构就是索引。
@@ -1302,8 +1406,8 @@ show engines;
 
 > 与 B-Tree 的区别：
 >
-> - 所有的数据都会出现在叶子节点
-> - 叶子节点形成一个单向链表
+> - **所有的数据都会出现在叶子节点**
+> - **叶子节点形成一个单向链表**
 >
 > MySQL 索引数据结构对经典的 B+Tree 进行了优化。在原 B+Tree 的基础上，增加一个指向相邻叶子节点的链表指针，就形成了带有顺序指针的 B+Tree，提高区间访问的性能。
 
@@ -1311,7 +1415,7 @@ show engines;
 
 #### Hash
 
-> 哈希索引就是采用一定的hash算法，将键值换算成新的hash值，映射到对应的槽位上，然后存储在hash表中。
+> 哈希索引就是**采用一定的hash算法，将键值换算成新的hash值，映射到对应的槽位上，然后存储在hash表中。**
 > 如果两个（或多个）键值，映射到一个相同的槽位上，他们就产生了hash冲突（也称为hash碰撞），可以通过链表来解决。
 
 ![image-20221030161220477](MySql%E5%92%8CJDBC/image-20221030161220477.png)
@@ -1385,13 +1489,85 @@ show engines;
 >
 > 另外，如果有成千上万的数据，那么就要考虑分表，涉及运维篇知识。
 
+### 语法
 
+> - 创建索引：
+>   `CREATE [ UNIQUE | FULLTEXT ] INDEX index_name ON table_name (index_col_name, ...);`
+>   如果不加 CREATE 后面不加索引类型参数，则创建的是常规索引
+> - 查看索引：
+>   `SHOW INDEX FROM table_name;`
+> - 删除索引：
+>   `DROP INDEX index_name ON table_name;`
 
+```sql
+-- name字段为姓名字段，该字段的值可能会重复，为该字段创建索引
+create index idx_user_name on tb_user(name);
+-- phone手机号字段的值非空，且唯一，为该字段创建唯一索引
+create unique index idx_user_phone on tb_user (phone);
+-- 为profession, age, status创建联合索引
+create index idx_user_pro_age_stat on tb_user(profession, age, status);
+-- 为email建立合适的索引来提升查询效率
+create index idx_user_email on tb_user(email);
 
+-- 删除索引
+drop index idx_user_email on tb_user;
+```
 
+### 性能分析
 
+#### 查看执行频次
 
+> 查看当前数据库的 INSERT, UPDATE, DELETE, SELECT 访问频次：
+> `SHOW GLOBAL STATUS LIKE 'Com_______';` 或者 `SHOW SESSION STATUS LIKE 'Com_______';`
+> 例：`show global status like 'Com_______'`
 
+#### 慢查询日志
+
+> 慢查询日志记录了所有执行时间超过指定参数（long_query_time，单位：秒，默认10秒）的所有SQL语句的日志。
+> MySQL的慢查询日志默认没有开启，需要在MySQL的配置文件（/etc/my.cnf）中配置如下信息：
+>
+> - 开启慢查询日志开关
+>   `slow_query_log=1`
+> - 设置慢查询日志的时间为2秒，SQL语句执行时间超过2秒，就会视为慢查询，记录慢查询日志`long_query_time=2`
+>   更改后记得重启MySQL服务，日志文件位置：`/var/lib/mysql/localhost-slow.log`
+> - 查看慢查询日志开关状态：
+>   `show variables like 'slow_query_log';`
+
+#### profile
+
+> show profile 能在做SQL优化时帮我们了解时间都耗费在哪里。通过 have_profiling 参数，能看到当前 
+>
+> - MySQL 是否支持 profile 操作：
+>   `SELECT @@have_profiling;`
+> - profiling 默认关闭，可以通过set语句在session/global级别开启 profiling：
+>   `SET profiling = 1;`
+> - 查看所有语句的耗时：
+>   `show profiles;`
+> - 查看指定query_id的SQL语句各个阶段的耗时：
+>   `show profile for query query_id;`
+> - 查看指定query_id的SQL语句CPU的使用情况
+>   `show profile cpu for query query_id;`
+
+#### explain
+
+> EXPLAIN 或者 DESC 命令获取 MySQL 如何执行 SELECT 语句的信息，包括在 SELECT 语句执行过程中表如何连接和连接的顺序。
+> 语法：
+>
+> ```sql
+> # 直接在select语句之前加上关键字 explain / desc
+> EXPLAIN SELECT 字段列表 FROM 表名 HWERE 条件;
+> ```
+>
+> EXPLAIN 各字段含义：
+>
+> - id：select 查询的序列号，表示查询中执行 select 子句或者操作表的顺序（id相同，执行顺序从上到下；id不同，值越大越先执行）
+> - select_type：表示 SELECT 的类型，常见取值有 SIMPLE（简单表，即不适用表连接或者子查询）、PRIMARY（主查询，即外层的查询）、UNION（UNION中的第二个或者后面的查询语句）、SUBQUERY（SELECT/WHERE之后包含了子查询）等
+> - type：表示连接类型，性能由好到差的连接类型为 NULL、system、const、eq_ref、ref、range、index、all
+> - possible_key：可能应用在这张表上的索引，一个或多个
+> - Key：实际使用的索引，如果为 NULL，则没有使用索引
+> - Key_len：表示索引中使用的字节数，该值为索引字段最大可能长度，并非实际使用长度，在不损失精确性的前提下，长度越短越好
+> - rows：MySQL认为必须要执行的行数，在InnoDB引擎的表中，是一个估计值，可能并不总是准确的
+> - filtered：表示返回结果的行数占需读取行数的百分比，filtered的值越大越好
 
 
 
