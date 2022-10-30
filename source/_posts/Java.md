@@ -1,7 +1,6 @@
 ---
 title: Java
 date: 2022-8-31 15:10:56
-update: 2022-10-17 19:18:30
 categories:
 - 编程语言
 tags:

@@ -1,13 +1,13 @@
----
 title: Mysql和JDBC
 date: 2022-8-31 15:10:56
 update: 2022-10-17 19:05:30
 categories:
+
 - 数据库
 tags:
 - MySql
 - JDBC
----
+
 ### [索引](https://developer.aliyun.com/article/831250#slide-0)
 
 > - 创建索引：
@@ -360,7 +360,7 @@ SELECT * from students WHERE not score = 90
 
 #### 注意事项
 
-> - 执行顺序：where > 聚合函数 > having
+> - **执行顺序：where > 聚合函数 > having**
 > - 分组之后，查询的字段一般为聚合函数和分组字段，查询其他字段无任何意义
 
 #### where和having的区别
@@ -370,7 +370,7 @@ SELECT * from students WHERE not score = 90
 
 ### DQL执行顺序
 
-> FROM -> WHERE -> GROUP BY -> SELECT -> ORDER BY -> LIMIT
+> <span style="color:purple">**FROM -> WHERE -> GROUP BY -> SELECT -> ORDER BY -> LIMIT**</span>
 
 ## 函数
 
@@ -700,7 +700,7 @@ select s.id,s.name,s.score,c.name class_name from students s LEFT OUTER JOIN cla
 >   ```
 >
 > - **UNION ALL 会有重复结果，UNION 不会**
-> - 联合查询比使用or效率高，不会使索引失效
+> - **联合查询比使用or效率高，不会使索引失效**
 
 ### 笛卡尔查询
 
@@ -729,7 +729,7 @@ select a.name, b.name from employee a left join employee b on a.manager = b.id;
 SELECT a.`o_name`AS '科目' ,b.`o_name`'类别' FROM `obj`AS a join`obj`AS b where a.`o_id` = b.`id`
 ```
 
-![image-20221004195703178](MySql和JDBC.assets/image-20221004195703178.png)
+![image-20221004195703178](MySql和JDBC/image-20221004195703178.png)
 
 ### 子查询
 
@@ -799,6 +799,12 @@ select * from employee where (job, salary) in (select job, salary from employee 
 -- 查询入职日期是2006-01-01之后的员工，及其部门信息
 select e.*, d.* from (select * from employee where entrydate > '2006-01-01') as e left join dept as d on e.dept = d.id;
 ```
+
+### [ON 与 WHERE 的区别](https://www.jianshu.com/p/d923cf8ae25f)
+
+> **先执行 `ON`，后执行 `WHERE`；`ON` 是建立关联关系，不符合`ON`条件的为`null`；`WHERE` 是对关联关系的筛选**。
+
+![image-20221030103115011](MySql%E5%92%8CJDBC/image-20221030103115011.png)
 
 ## 实用sql语句
 
@@ -883,7 +889,7 @@ select e.*, d.* from (select * from employee where entrydate > '2006-01-01') as 
 > 在查询的时候，数据库系统会自动分析查询语句，并选择一个最合适的索引。但是很多时候，数据库系统的查询优化器并不一定总是能使用最优索引。如果我们知道如何选择索引，可以**<span style="color:orange">使用`FORCE INDEX`强制查询使用指定的索引。</span>**例如：
 >
 > ```mysql
-> > SELECT * FROM students FORCE INDEX (idx_class_id) WHERE class_id = 1 ORDER BY id DESC;
+> SELECT * FROM students FORCE INDEX (idx_class_id) WHERE class_id = 1 ORDER BY id DESC;
 > ```
 >
 > **指定索引的前提是索引`idx_class_id`必须存在。**
@@ -921,10 +927,10 @@ rollback;
 
 ### 四大特性ACID
 
-> - 原子性(Atomicity)：事务是不可分割的最小操作但愿，要么全部成功，要么全部失败
-> - 一致性(Consistency)：事务完成时，必须使所有数据都保持一致状态
-> - 隔离性(Isolation)：数据库系统提供的隔离机制，保证事务在不受外部并发操作影响的独立环境下运行
-> - 持久性(Durability)：事务一旦提交或回滚，它对数据库中的数据的改变就是永久的
+> - **原子性**(Atomicity)：事务是不可分割的最小操作单元，要么全部成功，要么全部失败
+> - **一致性**(Consistency)：事务完成时，必须使所有数据都保持一致状态
+> - **隔离性**(Isolation)：数据库系统提供的隔离机制，保证事务在不受外部并发操作影响的独立环境下运行
+> - **持久性**(Durability)：事务一旦提交或回滚，它对数据库中的数据的改变就是永久的
 
 ### 隔离级别
 
@@ -934,7 +940,7 @@ rollback;
 > | ---------- | ------------------------------------------------------------ |
 > | 脏读       | 一个事务读到另一个事务还没提交的数据                         |
 > | 不可重复读 | 一个事务先后读取同一条记录，但两次读取的数据不同             |
-> | 幻读       | 一个事务按照条件查询数据时，没有对应的数据行，但是再插入数据时，又发现这行数据已经存在 |
+> | 幻读       | 在一个事务中，第一次查询某条记录，发现没有，但是，当试图更新这条不存在的记录时，竟然能成功，并且，再次读取同一条记录，它就神奇地出现了。 |
 >
 > SQL标准定义了**4种隔离级别**，分别对应可能出现的问题：
 >
@@ -959,7 +965,7 @@ rollback;
 
 #### Read Uncommitted
 
-> Read Uncommitted是隔离级别最低的一种事务级别。在这种隔离级别下，一个事务会读到另一个事务更新后但未提交的数据，如果另一个事务回滚，那么当前事务读到的数据就是脏数据，这就是脏读（Dirty Read）。
+> **Read Uncommitted是隔离级别最低的一种事务级别**。在这种隔离级别下，一个事务会读到另一个事务更新后但未提交的数据，如果另一个事务回滚，那么当前事务读到的数据就是脏数据，这就是脏读（Dirty Read）。
 >
 > 我们来看一个例子。
 >
