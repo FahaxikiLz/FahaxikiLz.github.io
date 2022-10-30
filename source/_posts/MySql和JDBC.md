@@ -1,75 +1,12 @@
+---
 title: Mysql和JDBC
 date: 2022-8-31 15:10:56
-update: 2022-10-17 19:05:30
-categories:
-
+categories: 
 - 数据库
-tags:
+tags: 
 - MySql
 - JDBC
-
-### [索引](https://developer.aliyun.com/article/831250#slide-0)
-
-> - 创建索引：
->   `CREATE [ UNIQUE | FULLTEXT ] INDEX index_name ON table_name (index_col_name, ...);`
->   如果不加 CREATE 后面不加索引类型参数，则创建的是常规索引
-> - 查看索引：
->   `SHOW INDEX FROM table_name;`
->
-> - 删除索引：
->   `DROP INDEX index_name ON table_name;`
-
-> 在关系数据库中，如果有上万甚至上亿条记录，在查找记录的时候，想要获得非常快的速度，就需要使用索引。
->
-> 索引是关系数据库中对某一列或多个列的值进行预排序的数据结构。通过使用索引，可以让数据库系统不必扫描整个表，而是直接定位到符合条件的记录，这样就大大加快了查询速度。
->
-> 例如，对于`students`表：
->
-> ![image-20220321190904195](MySql和JDBC/image-20220321190904195.png)
->
-> 如果要经常根据`score`列进行查询，就可以对`score`列创建索引：
->
-> ```mysql
-> ALTER TABLE students
-> ADD INDEX idx_score (score);
-> ```
->
-> <span style="color:orange">**使用`ADD INDEX idx_score (score)`就创建了一个名称为`idx_score`，使用列`score`的索引。**</span>索引名称是任意的，索引如果有多列，可以在括号里依次写上，例如：
->
-> ```mysql
-> ALTER TABLE students
-> ADD INDEX idx_name_score (name, score);
-> ```
->
-> <span style="color:orange">**索引的效率取决于索引列的值是否散列，即该列的值如果越互不相同，那么索引效率越高。**</span>反过来，如果记录的列存在大量相同的值，例如`gender`列，大约一半的记录值是`M`，另一半是`F`，因此，对该列创建索引就没有意义。
->
-> <span style="color:orange">**可以对一张表创建多个索引。索引的优点是提高了查询效率，缺点是在插入、更新和删除记录时，需要同时修改索引，因此，索引越多，插入、更新和删除记录的速度就越慢。**</span>
->
-> <span style="color:orange">**对于主键，关系数据库会自动对其创建主键索引。使用主键索引的效率是最高的，**</span>因为主键会保证绝对唯一。
-
-#### 唯一索引
-
-> 在设计关系数据表的时候，看上去唯一的列，例如身份证号、邮箱地址等，因为他们具有业务含义，因此不宜作为主键。
->
-> 但是，这些列根据业务要求，又具有唯一性约束：即不能出现两条记录存储了同一个身份证号。这个时候，就可以给该列添加一个唯一索引。例如，我们假设`students`表的`name`不能重复：
->
-> ```mysql
-> ALTER TABLE students
-> ADD UNIQUE INDEX uni_name (name);
-> ```
->
-> <span style="color:orange">**通过`UNIQUE`关键字添加一个唯一索引。唯一索引的表示某一列的值具有唯一性**</span>
->
-> <span style="color:orange">**也可以只对某一列添加一个唯一约束而不创建唯一索引**</span>
->
-> ```mysql
-> ALTER TABLE students
-> ADD CONSTRAINT uni_name UNIQUE (name);
-> ```
->
-> 这种情况下，`name`列没有索引，但仍然具有唯一性保证。
->
-> 无论是否创建索引，对于用户和应用程序来说，使用关系数据库不会有任何区别。这里的意思是说，当我们<span style="color:purple">**在数据库中查询时，如果有相应的索引可用，数据库系统就会自动使用索引来提高查询效率**</span>，如果没有索引，查询也能正常执行，只是速度会变慢。因此，索引可以在使用数据库的过程中逐步优化。
+---
 
 # MySQL基础篇
 
@@ -1459,9 +1396,9 @@ show engines;
 
 > 聚集索引选取规则：
 >
-> - 如果存在主键，主键索引就是聚集索引
-> - 如果不存在主键，将使用第一个唯一(UNIQUE)索引作为聚集索引
-> - 如果表没有主键或没有合适的唯一索引，则 InnoDB 会自动生成一个 rowid 作为隐藏的聚集索引
+> - **如果存在主键，主键索引就是聚集索引**
+> - **如果不存在主键，将使用第一个唯一(UNIQUE)索引作为聚集索引**
+> - **如果表没有主键或没有合适的唯一索引，则 InnoDB 会自动生成一个 rowid 作为隐藏的聚集索引**
 
 > sql语句执行的流程
 
