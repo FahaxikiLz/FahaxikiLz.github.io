@@ -172,6 +172,78 @@ INSERT INTO students (id, class_id, name, gender, score) VALUES (10, 3, '小丽'
 SELECT 'ok' as 'result:';
 ```
 
+## 数据类型
+
+### 整型
+
+| 类型名称      | 取值范围                                  | 大小    |
+| ------------- | ----------------------------------------- | ------- |
+| TINYINT       | -128〜127                                 | 1个字节 |
+| SMALLINT      | -32768〜32767                             | 2个宇节 |
+| MEDIUMINT     | -8388608〜8388607                         | 3个字节 |
+| INT (INTEGHR) | -2147483648〜2147483647                   | 4个字节 |
+| BIGINT        | -9223372036854775808〜9223372036854775807 | 8个字节 |
+
+无符号在数据类型后加 unsigned 关键字。
+
+### 浮点型
+
+| 类型名称            | 说明               | 存储需求   |
+| ------------------- | ------------------ | ---------- |
+| FLOAT               | 单精度浮点数       | 4 个字节   |
+| DOUBLE              | 双精度浮点数       | 8 个字节   |
+| DECIMAL (M, D)，DEC | 压缩的“严格”定点数 | M+2 个字节 |
+
+### 日期和时间
+
+| 类型名称  | 日期格式            | 日期范围                                          | 存储需求 |
+| --------- | ------------------- | ------------------------------------------------- | -------- |
+| YEAR      | YYYY                | 1901 ~ 2155                                       | 1 个字节 |
+| TIME      | HH:MM:SS            | -838:59:59 ~ 838:59:59                            | 3 个字节 |
+| DATE      | YYYY-MM-DD          | 1000-01-01 ~ 9999-12-3                            | 3 个字节 |
+| DATETIME  | YYYY-MM-DD HH:MM:SS | 1000-01-01 00:00:00 ~ 9999-12-31 23:59:59         | 8 个字节 |
+| TIMESTAMP | YYYY-MM-DD HH:MM:SS | 1980-01-01 00:00:01 UTC ~ 2040-01-19 03:14:07 UTC | 4 个字节 |
+
+### 字符串
+
+| 类型名称   | 说明                                         | 存储需求                                                   |
+| ---------- | -------------------------------------------- | ---------------------------------------------------------- |
+| CHAR(M)    | 固定长度非二进制字符串                       | M 字节，1<=M<=255                                          |
+| VARCHAR(M) | 变长非二进制字符串                           | L+1字节，在此，L< = M和 1<=M<=255                          |
+| TINYTEXT   | 非常小的非二进制字符串                       | L+1字节，在此，L<2^8                                       |
+| TEXT       | 小的非二进制字符串                           | L+2字节，在此，L<2^16                                      |
+| MEDIUMTEXT | 中等大小的非二进制字符串                     | L+3字节，在此，L<2^24                                      |
+| LONGTEXT   | 大的非二进制字符串                           | L+4字节，在此，L<2^32                                      |
+| ENUM       | 枚举类型，只能有一个枚举字符串值             | 1或2个字节，取决于枚举值的数目 (最大值为65535)             |
+| SET        | 一个设置，字符串对象可以有零个或 多个SET成员 | 1、2、3、4或8个字节，取决于集合 成员的数量（最多64个成员） |
+
+### 二进制类型
+
+| 类型名称       | 说明                 | 存储需求               |
+| -------------- | -------------------- | ---------------------- |
+| BIT(M)         | 位字段类型           | 大约 (M+7)/8 字节      |
+| BINARY(M)      | 固定长度二进制字符串 | M 字节                 |
+| VARBINARY (M)  | 可变长度二进制字符串 | M+1 字节               |
+| TINYBLOB (M)   | 非常小的BLOB         | L+1 字节，在此，L<2^8  |
+| BLOB (M)       | 小 BLOB              | L+2 字节，在此，L<2^16 |
+| MEDIUMBLOB (M) | 中等大小的BLOB       | L+3 字节，在此，L<2^24 |
+| LONGBLOB (M)   | 非常大的BLOB         | L+4 字节，在此，L<2^32 |
+
+### Java类型和SQL类型对应
+
+| Java类型           | SQL类型                  |
+| ------------------ | ------------------------ |
+| boolean            | BIT                      |
+| byte               | TINYINY                  |
+| short              | SMALLINT                 |
+| int                | INTEGER                  |
+| long               | BIGINT                   |
+| String             | CHAR,VARCHAR,LONGVARCHAR |
+| byte    array      | BINARY,VAR BINARY        |
+| java.sql.Date      | DATE                     |
+| java.sql.Time      | TIME                     |
+| java.sql.Timestamp | TIMESTAMP                |
+
 ## DDL（数据定义语言）
 
 ### 操作数据库
@@ -1162,21 +1234,6 @@ rollback;
 > 虽然Serializable隔离级别下的事务具有最高的安全性，但是，由于事务是串行执行，所以**效率会大大下降**，应用程序的性能会急剧降低。如果没有特别重要的情景，一般都不会使用Serializable隔离级别。
 >
 > 如果没有指定隔离级别，数据库就会使用默认的隔离级别。在MySQL中，如果使用InnoDB，默认的隔离级别是Repeatable Read。
-
-## Java类型和SQL类型对应
-
-| Java类型           | SQL类型                  |
-| ------------------ | ------------------------ |
-| boolean            | BIT                      |
-| byte               | TINYINY                  |
-| short              | SMALLINT                 |
-| int                | INTEGER                  |
-| long               | BIGINT                   |
-| String             | CHAR,VARCHAR,LONGVARCHAR |
-| byte    array      | BINARY,VAR BINARY        |
-| java.sql.Date      | DATE                     |
-| java.sql.Time      | TIME                     |
-| java.sql.Timestamp | TIMESTAMP                |
 
 # MySQL进阶篇
 
