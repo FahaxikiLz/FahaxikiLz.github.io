@@ -2,7 +2,7 @@ hexo clean
 hexo g
 hexo d
 
-while [ $? ！= 0 ]
+while [ "$?" != 0 ]
 do
 	if [ -e G:/L\ ZHEN/Desktop/LZBlog/.deploy_git ]
 	then
