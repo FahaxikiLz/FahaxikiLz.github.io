@@ -1390,9 +1390,9 @@ export default defineComponent({
 
 ### 8.生命周期
 
-<img src="TS+Vue3.assets/lifecycle.png" style="zoom:35%;" />
+<img src="TS+Vue3/lifecycle.png" style="zoom:35%;" />
 
-<img src="TS+Vue3.assets/lifecycle.16e4c08e.png" style="zoom:40%;" />
+<img src="TS+Vue3/lifecycle.16e4c08e.png" style="zoom:40%;" />
 
 - Vue3.0中可以继续使用Vue2.x中的生命周期钩子，但有有两个被更名：
   - ```beforeDestroy```改名为 ```beforeUnmount```

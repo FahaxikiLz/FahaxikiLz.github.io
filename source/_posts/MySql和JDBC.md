@@ -184,7 +184,7 @@ SELECT 'ok' as 'result:';
 | INT (INTEGHR) | -2147483648〜2147483647                   | 4个字节 |
 | BIGINT        | -9223372036854775808〜9223372036854775807 | 8个字节 |
 
-无符号在数据类型后加 unsigned 关键字。
+> 无符号在数据类型后加 unsigned 关键字。
 
 ### 浮点型
 
@@ -2088,6 +2088,13 @@ performance_schema.data_locks;
 ## InnoDB引擎
 
 > 待续。。。
+
+## 收藏资源
+
+> - [数据库大全](https://open.yesapi.cn/list.html)：果创云已收录 9,000+ 张数据库表，非常适合学习和实际应用
+> - [sql之父](https://www.sqlfather.com/)：快速生成 SQL 和模拟数据，大幅提高开发测试效率！
+
+<hr>
 
 # JDBC篇
 

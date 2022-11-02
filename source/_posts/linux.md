@@ -3245,3 +3245,8 @@ crontab -e
 10 2 * * * /home/shell/testmysql.sh
 ```
 
+# 收藏资源
+
+> - [Linux命令大全（手册）-Linux常用命令实例详解 (ipcmen.com)](https://ipcmen.com/)
+> - [Linux命令大全(手册) – 真正好用的Linux命令在线查询网站 (linuxcool.com)](https://www.linuxcool.com/)
+> - [Linux命令搜索引擎 命令，Linux Linux命令搜索引擎命令详解 (17lai.site)](https://linux-command.17lai.site/)

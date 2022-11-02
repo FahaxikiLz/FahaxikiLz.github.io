@@ -4875,7 +4875,7 @@ public interface EmpMapper {
 
 ### if
 
-> - **if标签可通过test属性的表达式进行判断，若表达式的结果为true，则标签中的内容会执行；反之标签中 的内容不会执行**
+> - **if标签可通过test属性的表达式进行判断，若表达式的结果为true，则标签中的内容会执行；反之标签中的内容不会执行**
 > - 在where后面放一个恒成立的式子，隔开where和and
 
 ```java
@@ -4903,6 +4903,11 @@ public interface EmpMapper {
 
 	<!-- select * from t_emp where 1=1 and emp_name = ? and age = ? -->
 ```
+
+> 写项目时可能会出现这个问题`There is no getter for property named '*' in class java.lang.String`
+>
+> - 可以在给接口方法传入参数时加@param注解
+> - 可以在`<if test="value !=null">`用value占位
 
 ### where
 
