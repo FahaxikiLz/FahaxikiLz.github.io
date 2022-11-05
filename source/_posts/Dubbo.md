@@ -694,7 +694,11 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.List;
 
-
+/**
+* 如果要使用事务注解，必须在@Service后面加上(interfaceClass = “实现的接口.class”)
+*/
+//@Transactional
+//@Service(interfaceClass = UserService.class)
 @Service //暴露服务，在dubbo包下的注解
 @Component //这个不写好像也行
 public class UserServiceImpl implements UserService {

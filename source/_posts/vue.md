@@ -3881,7 +3881,9 @@ export default {
 ```
 
 > 1.存储内容大小一般支持5MB左右(不同浏览器可能还不一样)
-> ⒉.浏览器端通过Window.sessionStorage和Window.localStorage属性来实现本地存储机制。3.相关API:
+> 2.浏览器端通过`Window.sessionStorage`和`Window.localStorage`属性来实现本地存储机制。
+>
+> 3.相关API:
 >
 > 1. ```
 >    xxxxxStorage.setItem( " key " , "value");

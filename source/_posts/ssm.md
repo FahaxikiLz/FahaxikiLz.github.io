@@ -1939,8 +1939,24 @@ public class TxConfig {
 
 #### 扩展配置方式
 
-> - **通过init-param标签设置SpringMVC配置文件的位置和名称，**
-> - **通过load-on-startup标签设置SpringMVC前端控制器DispatcherServlet的初始化时间**
+> - **通过`init-param`标签设置SpringMVC配置文件的位置和名称，**
+>
+> - **通过`load-on-startup`标签设置SpringMVC前端控制器DispatcherServlet的初始化时间**
+>
+> - web.xml中url-pattern
+>
+>   1. 设置url-pattern为`*.do`(最为常见的方式)
+>      只要你的请求url中包含配置的url-pattern，该url就可以到达DispatcherServlet。当然这里业内通常都将url-pattern配置为`*.do`的方式，所以你最好也这么去做。
+>
+>   2. 设置url-pattern为`/*`(这种方式是很不好)
+>      如果将url-pattern设置为`/*`之后，web项目中的jsp都不能访问了会报出404的错误，这是因为**DispatcherServlet会将向JSP页面的跳转请求也当作是一个普通的 Controller 请求，会对其进行处理，而此时是找不到与其相应的controller。这种方式静态资源：css文件,js文件,图片也会被拦截并交给DispatcherServlet处理。**
+>
+>   3. 设置url-pattern为`/`(用的越来越多)
+>      **如果将url-pattern设置为/之后，只要是在web.xml文件中找不到匹配的URL，它们的访问请求都将交给DispatcherServlet处理，静态资源：css文件,js文件,图片也会被拦截并交给DispatcherServlet处理。该配置方式不会拦截`.jsp`文件和`.jspx`文件**，因为这个在tomcat中的conf目录里面的web.xml文件中已经添加的相应的处理方式了，他会交给`org.apache.jasper.servlet.JspServlet`来处理。即我们可以正常访问系统中的jsp文件。
+>
+>      **解决静态资源不能访问的问题：使用defaultServlet**
+>
+>   - **当发起请求时被前置的控制器拦截到请求，根据请求参数生成代理请求，找到请求对应的实际控制器**，控制器处理请求，创建数据模型，访问数据库，将模型响应给中心控制器，控制器使用模型与视图渲染视图结果，将结果返回给中心控制器，再将结果返回给请求者。
 
 ```xml
 <!-- webapp/WEB-INF/web.xml -->
@@ -1971,6 +1987,11 @@ public class TxConfig {
     -->
     <url-pattern>/</url-pattern>
 </servlet-mapping>
+
+<!--设置欢迎页-->
+<welcome-file-list>
+    <welcome-file>/pages/index.html</welcome-file>
+</welcome-file-list>
 ```
 
 > springMVC.xml文件

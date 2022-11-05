@@ -7,6 +7,10 @@ categories:
 - 练手项目
 ---
 
+> 前端：vue、axios、elementui
+>
+> 后端：spring、srping mvc、mybatis、dubbo、七牛云、Redis、Quartz、Apache POI、短信服务
+
 # 第1章 项目概述和环境搭建
 
 ## 1. 项目概述
@@ -873,6 +877,8 @@ web.xml
 > 1. 父项目打包方式为`pom`
 > 2. 父工程health_parent中管理多有的依赖，并且用`<dependencyManagement>`标签包裹，这样子项目就不能直接继承父项目的依赖，需要显式的设置依赖。这样的好处是子项目只需要显式设置依赖，但是不用设置依赖的版本，因为会继承父项目的版本。如果去除这个标签，那么子项目就会继承父项目中所有的依赖，这样的话，子项目中用不到的依赖也会被继承
 > 3. 各各项目之间的调用是通过在`pom`中引入需要调用的项目，以及调用项目的依赖也会引入
+> 4. 配置项需要通过`web.xml`加载
+> 5. 使用注解，要开启注解，在xml配置文件中或在配置类中使用注解
 
 ## 3. Power Designer
 
@@ -3987,3 +3993,4011 @@ public class ClearImgJob {
     }
 }
 ~~~
+
+# 第5章 预约管理-预约设置
+
+## 1. 需求分析
+
+前面我们已经完成了检查项管理、检查组管理、套餐管理等。接下来我们需要进行预约设置，其实就是设置每一天的体检预约最大数量。客户可以通过微信端在线预约，在线预约时需要选择体检的时间，如果客户选择的时间已经预约满则无法进行预约。
+
+## 2. Apache POI
+
+### 2.1 POI介绍
+
+Apache POI是用Java编写的免费开源的跨平台的Java API，Apache POI提供API给Java程序对Microsoft Office格式档案读和写的功能，其中使用最多的就是使用POI操作Excel文件。
+
+jxl：专门操作Excel
+
+maven坐标：
+
+~~~xml
+<dependency>
+  <groupId>org.apache.poi</groupId>
+  <artifactId>poi</artifactId>
+  <version>3.14</version>
+</dependency>
+<dependency>
+  <groupId>org.apache.poi</groupId>
+  <artifactId>poi-ooxml</artifactId>
+  <version>3.14</version>
+</dependency>
+~~~
+
+POI结构：
+
+~~~xml
+HSSF － 提供读写Microsoft Excel XLS格式档案的功能
+XSSF － 提供读写Microsoft Excel OOXML XLSX格式档案的功能
+HWPF － 提供读写Microsoft Word DOC格式档案的功能
+HSLF － 提供读写Microsoft PowerPoint格式档案的功能
+HDGF － 提供读Microsoft Visio格式档案的功能
+HPBF － 提供读Microsoft Publisher格式档案的功能
+HSMF － 提供读Microsoft Outlook格式档案的功能
+~~~
+
+### 2.2 入门案例
+
+#### 2.2.1 从Excel文件读取数据
+
+使用POI可以从一个已经存在的Excel文件中读取数据
+
+~~~java
+//创建工作簿
+XSSFWorkbook workbook = new XSSFWorkbook("D:\\hello.xlsx");
+//获取工作表，既可以根据工作表的顺序获取，也可以根据工作表的名称获取
+XSSFSheet sheet = workbook.getSheetAt(0);
+//遍历工作表获得行对象
+for (Row row : sheet) {
+  //遍历行对象获取单元格对象
+  for (Cell cell : row) {
+    //获得单元格中的值
+    String value = cell.getStringCellValue();
+    System.out.println(value);
+  }
+}
+workbook.close();
+~~~
+
+通过上面的入门案例可以看到，POI操作Excel表格封装了几个核心对象：
+
+~~~p
+XSSFWorkbook：工作簿
+XSSFSheet：工作表
+Row：行
+Cell：单元格
+~~~
+
+上面案例是通过遍历工作表获得行，遍历行获得单元格，最终获取单元格中的值。
+
+还有一种方式就是获取工作表最后一个行号，从而根据行号获得行对象，通过行获取最后一个单元格索引，从而根据单元格索引获取每行的一个单元格对象，代码如下：
+
+~~~java
+//创建工作簿
+XSSFWorkbook workbook = new XSSFWorkbook("D:\\hello.xlsx");
+//获取工作表，既可以根据工作表的顺序获取，也可以根据工作表的名称获取
+XSSFSheet sheet = workbook.getSheetAt(0);
+//获取当前工作表最后一行的行号，行号从0开始
+int lastRowNum = sheet.getLastRowNum();
+for(int i=0;i<=lastRowNum;i++){
+  //根据行号获取行对象
+  XSSFRow row = sheet.getRow(i);
+  short lastCellNum = row.getLastCellNum();
+  for(short j=0;j<lastCellNum;j++){
+    String value = row.getCell(j).getStringCellValue();
+    System.out.println(value);
+  }
+}
+workbook.close();
+~~~
+
+#### 2.2.2 向Excel文件写入数据
+
+使用POI可以在内存中创建一个Excel文件并将数据写入到这个文件，最后通过输出流将内存中的Excel文件下载到磁盘
+
+~~~java
+//在内存中创建一个Excel文件
+XSSFWorkbook workbook = new XSSFWorkbook();
+//创建工作表，指定工作表名称
+XSSFSheet sheet = workbook.createSheet("传智播客");
+
+//创建行，0表示第一行
+XSSFRow row = sheet.createRow(0);
+//创建单元格，0表示第一个单元格
+row.createCell(0).setCellValue("编号");
+row.createCell(1).setCellValue("名称");
+row.createCell(2).setCellValue("年龄");
+
+XSSFRow row1 = sheet.createRow(1);
+row1.createCell(0).setCellValue("1");
+row1.createCell(1).setCellValue("小明");
+row1.createCell(2).setCellValue("10");
+
+XSSFRow row2 = sheet.createRow(2);
+row2.createCell(0).setCellValue("2");
+row2.createCell(1).setCellValue("小王");
+row2.createCell(2).setCellValue("20");
+
+//通过输出流将workbook对象下载到磁盘
+FileOutputStream out = new FileOutputStream("D:\\itcast.xlsx");
+workbook.write(out);
+out.flush();
+out.close();
+workbook.close();
+~~~
+
+## 3. 批量导入预约设置信息
+
+预约设置信息对应的数据表为t_ordersetting，预约设置操作对应的页面为ordersetting.html
+
+t_ordersetting表结构：
+
+![2](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/2-1667544879576.png)
+
+orderDate：预约日期  
+
+number：可预约人数  
+
+reservations：已预约人数
+
+
+
+批量导入预约设置信息操作过程：
+
+1、点击模板下载按钮下载Excel模板文件
+
+2、将预约设置信息录入到模板文件中
+
+3、点击上传文件按钮将录入完信息的模板文件上传到服务器
+
+4、通过POI读取上传文件的数据并保存到数据库
+
+### 3.1 完善页面
+
+#### 3.1.1 提供模板文件
+
+资料中已经提供了Excel模板文件ordersetting_template.xlsx，将文件放在health_backend工程的template目录
+
+#### 3.1.2 实现模板文件下载
+
+为模板下载按钮绑定事件实现模板文件下载
+
+~~~html
+<el-button style="margin-bottom: 20px;margin-right: 20px" type="primary" 
+           @click="downloadTemplate()">模板下载</el-button>
+~~~
+
+~~~javascript
+//模板文件下载
+downloadTemplate(){
+	window.location.href="../../template/ordersetting_template.xlsx";
+}
+~~~
+
+#### 3.1.3 文件上传
+
+使用ElementUI的上传组件实现文件上传并绑定相关事件
+
+~~~html
+<el-upload action="/ordersetting/upload.do"
+           name="excelFile"
+           :show-file-list="false"
+           :on-success="handleSuccess"
+           :before-upload="beforeUpload">
+  <el-button type="primary">上传文件</el-button>
+</el-upload>
+~~~
+
+~~~javascript
+handleSuccess(response, file) {
+  if(response.flag){
+    this.$message({
+      message: response.message,
+      type: 'success'
+    });
+  }else{
+    this.$message.error(response.message);
+  }
+}
+
+beforeUpload(file){
+  const isXLS = file.type === 'application/vnd.ms-excel';
+  if(isXLS){
+    return true;
+  }
+  const isXLSX = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  if (isXLSX) {
+    return true;
+  }
+  this.$message.error('上传文件只能是xls或者xlsx格式!');
+  return false;
+}
+~~~
+
+### 3.2 后台代码
+
+#### 3.2.1 Controller
+
+将资料中的POIUtils工具类复制到health_common工程
+
+在health_backend工程创建OrderSettingController并提供upload方法
+
+~~~java
+package com.itheima.controller;
+
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.itheima.constant.MessageConstant;
+import com.itheima.entity.Result;
+import com.itheima.pojo.OrderSetting;
+import com.itheima.service.OrderSettingService;
+import com.itheima.utils.POIUtils;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+/**
+ * 预约设置
+ */
+@RestController
+@RequestMapping("/ordersetting")
+public class OrderSettingController {
+    @Reference
+    private OrderSettingService orderSettingService;
+
+    /**
+     * Excel文件上传，并解析文件内容保存到数据库
+     * @param excelFile
+     * @return
+     */
+    @RequestMapping("/upload")
+    public Result upload(@RequestParam("excelFile")MultipartFile excelFile){
+        try {
+            //读取Excel文件数据
+            List<String[]> list = POIUtils.readExcel(excelFile);
+            if(list != null && list.size() > 0){
+                List<OrderSetting> orderSettingList = new ArrayList<>();
+                for (String[] strings : list) {
+                    OrderSetting orderSetting = 
+                      new OrderSetting(new Date(strings[0]), Integer.parseInt(strings[1]));
+                    orderSettingList.add(orderSetting);
+                }
+                orderSettingService.add(orderSettingList);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new Result(false, MessageConstant.IMPORT_ORDERSETTING_FAIL);
+        }
+        return new Result(true,MessageConstant.IMPORT_ORDERSETTING_SUCCESS);
+    }
+}
+~~~
+
+#### 3.2.2 服务接口
+
+创建OrderSettingService服务接口并提供新增方法
+
+~~~java
+package com.itheima.service;
+
+import com.itheima.pojo.OrderSetting;
+import java.util.List;
+import java.util.Map;
+
+public interface OrderSettingService {
+    public void add(List<OrderSetting> list);
+}
+~~~
+
+#### 3.2.3 服务实现类
+
+创建服务实现类OrderSettingServiceImpl并实现新增方法
+
+~~~java
+package com.itheima.service;
+
+import com.alibaba.dubbo.config.annotation.Service;
+import com.itheima.dao.OrderSettingDao;
+import com.itheima.pojo.OrderSetting;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.*;
+/**
+ * 预约设置服务
+ */
+@Service(interfaceClass = OrderSettingService.class)
+@Transactional
+public class OrderSettingServiceImpl implements OrderSettingService {
+    @Autowired
+    private OrderSettingDao orderSettingDao;
+    //批量添加
+    public void add(List<OrderSetting> list) {
+        if(list != null && list.size() > 0){
+            for (OrderSetting orderSetting : list) {
+                //检查此数据（日期）是否存在
+                long count = orderSettingDao.findCountByOrderDate(orderSetting.getOrderDate());
+                if(count > 0){
+                    //已经存在，执行更新操作
+                    orderSettingDao.editNumberByOrderDate(orderSetting);
+                }else{
+                    //不存在，执行添加操作
+                    orderSettingDao.add(orderSetting);
+                }
+            }
+        }
+    }
+}
+~~~
+
+#### 3.2.4 Dao接口
+
+创建Dao接口OrderSettingDao并提供更新和新增方法
+
+~~~java
+package com.itheima.dao;
+
+import com.itheima.pojo.OrderSetting;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public interface OrderSettingDao {
+    public void add(OrderSetting orderSetting);
+    public void editNumberByOrderDate(OrderSetting orderSetting);
+  	public long findCountByOrderDate(Date orderDate);
+}
+~~~
+
+#### 3.2.5 Mapper映射文件
+
+创建Mapper映射文件OrderSettingDao.xml并提供相关SQL
+
+~~~xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.itheima.dao.OrderSettingDao" >
+    <!--新增-->
+    <insert id="add" parameterType="com.itheima.pojo.OrderSetting">
+        insert into t_ordersetting
+      		(orderDate,number,reservations)
+                      values 
+      		(#{orderDate},#{number},#{reservations})
+    </insert>
+    <!--根据日期更新预约人数-->
+    <update id="editNumberByOrderDate" parameterType="com.itheima.pojo.OrderSetting">
+        update t_ordersetting set number = #{number} where orderDate = #{orderDate}
+    </update>
+    <!--根据预约日期查询-->
+    <select id="findCountByOrderDate" parameterType="java.util.Date" resultType="long">
+        select count(*) from t_ordersetting where orderDate = #{orderDate}
+    </select>
+</mapper>
+~~~
+
+## 4. 日历展示预约设置信息
+
+前面已经完成了预约设置功能，现在就需要通过日历的方式展示出来每天设置的预约人数。
+
+在页面中已经完成了日历的动态展示，我们只需要查询当前月份的预约设置信息并展示到日历中即可，同时在日历中还需要展示已经预约的人数，效果如下：
+
+![1](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day05/%25E8%25AE%25B2%25E4%25B9%2589/1.png)
+
+### 4.1 完善页面
+
+#### 4.1.1 使用静态数据调试
+
+为了能够快速看到效果，我们可以先使用静态数据模拟，然后再改为发送ajax请求查询数据库。
+
+实现步骤：
+
+（1）预约设置数据对应的模型数据为leftobj，在initData方法最后为leftobj模型数据赋值：
+
+~~~javascript
+this.leftobj = [
+                  { date: 1, number: 120, reservations: 1 },
+                  { date: 3, number: 120, reservations: 1 },
+                  { date: 4, number: 120, reservations: 120 },
+                  { date: 6, number: 120, reservations: 1 },
+                  { date: 8, number: 120, reservations: 1 }
+                ];
+~~~
+
+其中date表示日期，number表示可预约人数，reservations表示已预约人数
+
+（2）使用VUE的v-for标签遍历上面的leftobj模型数据，展示到日历上：
+
+~~~html
+<template>
+  <template v-for="obj in leftobj">
+    <template v-if="obj.date == dayobject.day.getDate()">
+      <template v-if="obj.number > obj.reservations">
+        <div class="usual">
+          <p>可预约{{obj.number}}人</p>
+          <p>已预约{{obj.reservations}}人</p>
+        </div>
+      </template>
+      <template v-else>
+        <div class="fulled">
+          <p>可预约{{obj.number}}人</p>
+          <p>已预约{{obj.reservations}}人</p>
+          <p>已满</p>
+        </div>
+      </template>
+    </template>
+  </template>
+  <button v-if="dayobject.day > today" 
+          @click="handleOrderSet(dayobject.day)" class="orderbtn">设置</button>
+</template>
+~~~
+
+#### 4.1.2 发送ajax获取动态数据
+
+将上面的静态模拟数据去掉，改为发送ajax请求，根据当前页面对应的月份查询数据库获取预约设置信息，将查询结果赋值给leftobj模型数据
+
+~~~javascript
+//发送ajax请求，根据当前页面对应的月份查询预约设置信息
+axios.post(
+  "/ordersetting/getOrderSettingByMonth.do?date="+this.currentYear+'-'+this.currentMonth
+		  ).then((response)=>{
+  if(response.data.flag){
+    //为模型数据赋值，通过双向绑定展示到日历中
+    this.leftobj = response.data.data;
+  }else{
+    this.$message.error(response.data.message);
+  }
+});
+~~~
+
+### 4.2 后台代码
+
+#### 4.2.1 Controller
+
+在OrderSettingController中提供getOrderSettingByMonth方法，根据月份查询预约设置信息
+
+~~~java
+/**
+* 根据日期查询预约设置数据(获取指定日期所在月份的预约设置数据)
+* @param date
+* @return
+*/
+@RequestMapping("/getOrderSettingByMonth")
+public Result getOrderSettingByMonth(String date){//参数格式为：2019-03
+  try{
+    List<Map> list = orderSettingService.getOrderSettingByMonth(date);
+    //获取预约设置数据成功
+    return new Result(true,MessageConstant.GET_ORDERSETTING_SUCCESS,list);
+  }catch (Exception e){
+    e.printStackTrace();
+    //获取预约设置数据失败
+    return new Result(false,MessageConstant.GET_ORDERSETTING_FAIL);
+  }
+}
+~~~
+
+#### 4.2.2 服务接口
+
+在OrderSettingService服务接口中扩展方法getOrderSettingByMonth
+
+~~~java
+public List<Map> getOrderSettingByMonth(String date);//参数格式为：2019-03
+~~~
+
+#### 4.2.3 服务实现类
+
+在OrderSettingServiceImpl服务实现类中实现方法getOrderSettingByMonth
+
+~~~java
+//根据日期查询预约设置数据
+public List<Map> getOrderSettingByMonth(String date) {//2019-3
+  String dateBegin = date + "-1";//2019-3-1
+  String dateEnd = date + "-31";//2019-3-31
+  Map map = new HashMap();
+  map.put("dateBegin",dateBegin);
+  map.put("dateEnd",dateEnd);
+  List<OrderSetting> list = orderSettingDao.getOrderSettingByMonth(map);
+  List<Map> data = new ArrayList<>();
+  for (OrderSetting orderSetting : list) {
+    Map orderSettingMap = new HashMap();
+    orderSettingMap.put("date",orderSetting.getOrderDate().getDate());//获得日期（几号）
+    orderSettingMap.put("number",orderSetting.getNumber());//可预约人数
+    orderSettingMap.put("reservations",orderSetting.getReservations());//已预约人数
+    data.add(orderSettingMap);
+  }
+  return data;
+}
+~~~
+
+#### 4.2.4 Dao接口
+
+在OrderSettingDao接口中扩展方法getOrderSettingByMonth
+
+~~~java
+public List<OrderSetting> getOrderSettingByMonth(Map date);
+~~~
+
+#### 4.2.5 Mapper映射文件
+
+在OrderSettingDao.xml文件中扩展SQL
+
+~~~xml
+<!--根据月份查询预约设置信息-->
+<select id="getOrderSettingByMonth" 
+        parameterType="hashmap" 
+        resultType="com.itheima.pojo.OrderSetting">
+  select * from t_ordersetting where orderDate between #{dateBegin} and #{dateEnd}
+</select>
+~~~
+
+## 5. 基于日历实现预约设置
+
+本章节要完成的功能为通过点击日历中的设置按钮来设置对应日期的可预约人数。效果如下：
+
+![5](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/5-1667544879583.png)
+
+### 5.1 完善页面
+
+#### 5.1.1 为设置按钮绑定事件
+
+为日历中的设置按钮绑定单击事件，当前日期作为参数
+
+~~~html
+<button v-if="dayobject.day > today" 
+        @click="handleOrderSet(dayobject.day)" class="orderbtn">设置</button>
+~~~
+
+~~~javascript
+//预约设置
+handleOrderSet(day){
+	alert(day);
+}
+~~~
+
+#### 5.1.2 弹出预约设置窗口并发送ajax请求
+
+完善handleOrderSet方法，弹出预约设置窗口，用户点击确定按钮则发送ajax请求
+
+~~~javascript
+//预约设置
+handleOrderSet(day){
+  this.$prompt('请输入可预约人数', '预约设置', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    inputPattern: /^[0-9]*[1-9][0-9]*$/,
+    inputErrorMessage: '只能输入正整数'
+  }).then(({ value }) => {
+    //发送ajax请求根据日期修改可预约人数
+    axios.post("/ordersetting/editNumberByDate.do",{
+      orderDate:this.formatDate(day.getFullYear(),day.getMonth()+1,day.getDate()), //日期
+      number:value   //可预约人数
+    }).then((response)=>{
+      if(response.data.flag){
+        this.initData(this.formatDate(day.getFullYear(), day.getMonth() + 1, 1));
+        this.$message({
+          type: 'success',
+          message: response.data.message
+        });
+      }else{
+        this.$message.error(response.data.message);
+      }
+    });
+  }).catch(() => {
+    this.$message({
+      type: 'info',
+      message: '已取消'
+    });
+  });
+}
+~~~
+
+### 5.2 后台代码
+
+#### 5.2.1 Controller
+
+在OrderSettingController中提供方法editNumberByDate
+
+~~~java
+/**
+* 根据指定日期修改可预约人数
+* @param orderSetting
+* @return
+*/
+@RequestMapping("/editNumberByDate")
+public Result editNumberByDate(@RequestBody OrderSetting orderSetting){
+  try{
+    orderSettingService.editNumberByDate(orderSetting);
+    //预约设置成功
+    return new Result(true,MessageConstant.ORDERSETTING_SUCCESS);
+  }catch (Exception e){
+    e.printStackTrace();
+    //预约设置失败
+    return new Result(false,MessageConstant.ORDERSETTING_FAIL);
+  }
+}
+~~~
+
+#### 5.2.2 服务接口
+
+在OrderSettingService服务接口中提供方法editNumberByDate
+
+~~~java
+public void editNumberByDate(OrderSetting orderSetting);
+~~~
+
+#### 5.2.3 服务实现类
+
+在OrderSettingServiceImpl服务实现类中实现editNumberByDate
+
+~~~java
+//根据日期修改可预约人数
+public void editNumberByDate(OrderSetting orderSetting) {
+  long count = orderSettingDao.findCountByOrderDate(orderSetting.getOrderDate());
+  if(count > 0){
+    //当前日期已经进行了预约设置，需要进行修改操作
+    orderSettingDao.editNumberByOrderDate(orderSetting);
+  }else{
+    //当前日期没有进行预约设置，进行添加操作
+    orderSettingDao.add(orderSetting);
+  }
+}
+~~~
+
+#### 5.2.4 Dao接口
+
+在OrderSettingDao接口中提供方法
+
+~~~java
+public void editNumberByOrderDate(OrderSetting orderSetting);
+public long findCountByOrderDate(Date orderDate);
+~~~
+
+#### 5.2.5 Mapper映射文件
+
+在OrderSettingDao.xml映射文件中提供SQL
+
+~~~xml
+<!--根据日期更新可预约人数-->
+<update id="editNumberByOrderDate" parameterType="com.itheima.pojo.OrderSetting">
+  update t_ordersetting set number = #{number} where orderDate = #{orderDate}
+</update>
+<!--根据预约日期查询-->
+<select id="findCountByOrderDate" parameterType="java.util.Date" resultType="long">
+  select count(*) from t_ordersetting where orderDate = #{orderDate}
+</select>
+~~~
+
+# 第6章 移动端开发-体检预约
+
+## 1. 移动端开发
+
+### 1.1 移动端开发方式 
+
+随着移动互联网的兴起和手机的普及，目前移动端应用变得愈发重要，成为了各个商家的必争之地。例如，我们可以使用手机购物、支付、打车、玩游戏、订酒店、购票等，以前只能通过PC端完成的事情，现在通过手机都能够实现，而且更加方便，而这些都需要移动端开发进行支持，那如何进行移动端开发呢？
+
+移动端开发主要有三种方式：
+
+1、基于手机API开发（原生APP）
+
+2、基于手机浏览器开发（移动web）
+
+3、混合开发（混合APP）
+
+#### 1.1.1 基于手机API开发
+
+手机端使用手机API，例如使用Android、ios 等进行开发，服务端只是一个数据提供者。手机端请求服务端获取数据（json、xml格式）并在界面进行展示。这种方式相当于传统开发中的C/S模式，即需要在手机上安装一个客户端软件。
+
+这种方式需要针对不同的手机系统分别进行开发，目前主要有以下几个平台：
+
+1、苹果ios系统版本，开发语言是Objective-C
+
+2、安卓Android系统版本，开发语言是Java
+
+3、微软Windows phone系统版本，开发语言是C#
+
+4、塞班symbian系统版本，开发语言是C++
+
+此种开发方式举例：手机淘宝、抖音、今日头条、大众点评
+
+#### 1.1.2 基于手机浏览器开发
+
+生存在浏览器中的应用，基本上可以说是触屏版的网页应用。这种开发方式相当于传统开发中的B/S模式，也就是手机上不需要额外安装软件，直接基于手机上的浏览器进行访问。这就需要我们编写的html页面需要根据不同手机的尺寸进行自适应调节，目前比较流行的是html5开发。除了直接通过手机浏览器访问，还可以将页面内嵌到一些应用程序中，例如通过微信公众号访问html5页面。
+
+这种开发方式不需要针对不同的手机系统分别进行开发，只需要开发一个版本，就可以在不同的手机上正常访问。
+
+本项目会通过将我们开发的html5页面内嵌到微信公众号这种方式进行开发。
+
+#### 1.1.3 混合开发
+
+是半原生半Web的混合类App。需要下载安装，看上去类似原生App，访问的内容是Web网页。其实就是把HTML5页面嵌入到一个原生容器里面。
+
+### 1.2 微信公众号开发
+
+要进行微信公众号开发，首先需要访问微信公众平台，官网：https://mp.weixin.qq.com/。
+
+#### 1.2.1 帐号分类
+
+在微信公众平台可以看到，有四种帐号类型：服务号、订阅号、小程序、企业微信（原企业号）。
+
+![8](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/8-1667561940324.png)
+
+![11](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/11-1667561940325.png)
+
+本项目会选择订阅号这种方式进行公众号开发。
+
+#### 1.2.2 注册帐号
+
+要开发微信公众号，首先需要注册成为会员，然后就可以登录微信公众平台进行自定义菜单的设置。
+
+注册页面：https://mp.weixin.qq.com/cgi-bin/registermidpage?action=index&lang=zh_CN&token=
+
+![9](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/9-1667561940325.png)
+
+选择订阅号进行注册：
+
+![10](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/10-1667561940325.png)
+
+
+
+输入邮箱、邮箱验证码、密码、确认密码等按照页面流程进行注册
+
+#### 1.2.3 自定义菜单
+
+注册成功后就可以使用注册的邮箱和设置的密码进行登录，登录成功后点击左侧“自定义菜单”进入自定义菜单页面
+
+![12](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day06/%25E8%25AE%25B2%25E4%25B9%2589/12.png)
+
+在自定义菜单页面可以根据需求创建一级菜单和二级菜单，其中一级菜单最多可以创建3个，每个一级菜单下面最多可以创建5个二级菜单。每个菜单由菜单名称和菜单内容组成，其中菜单内容有3中形式：发送消息、跳转网页、跳转小程序。
+
+#### 1.2.4 上线要求
+
+如果是个人用户身份注册的订阅号，则自定义菜单的菜单内容不能进行跳转网页，因为个人用户目前不支持微信认证，而跳转网页需要微信认证之后才有权限。
+
+如果是企业用户，首先需要进行微信认证，通过后就可以进行跳转网页了，跳转网页的地址要求必须有域名并且域名需要备案通过。
+
+## 2. 需求分析和环境搭建
+
+### 2.1 需求分析
+
+用户在体检之前需要进行预约，可以通过电话方式进行预约，此时会由体检中心客服人员通过后台系统录入预约信息。用户也可以通过手机端自助预约。本章节开发的功能为用户通过手机自助预约。
+
+预约流程如下：
+
+1、访问移动端首页
+
+2、点击体检预约进入体检套餐列表页面
+
+3、在体检套餐列表页面点击具体套餐进入套餐详情页面
+
+4、在套餐详情页面点击立即预约进入预约页面
+
+5、在预约页面录入体检人相关信息点击提交预约
+
+
+
+效果如下图：
+
+![2](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/2-1667561940325.png)
+
+
+
+![3](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/3-1667561940340.png)
+
+
+
+![4](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/4-1667561940325.png)
+
+
+
+
+
+![5](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/5-1667561940340.png)
+
+
+
+### 2.2 搭建移动端工程
+
+本项目是基于SOA架构进行开发，前面我们已经完成了后台系统的部分功能开发，在后台系统中都是通过Dubbo调用服务层发布的服务进行相关的操作。本章节我们开发移动端工程也是同样的模式，所以我们也需要在移动端工程中通过Dubbo调用服务层发布的服务，如下图：
+
+![1](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/1-1667561940325.png)
+
+#### 2.2.1 导入maven坐标
+
+在health_common工程的pom.xml文件中导入阿里短信发送的maven坐标
+
+~~~xml
+<dependency>
+  <groupId>com.aliyun</groupId>
+  <artifactId>aliyun-java-sdk-core</artifactId>
+  <version>3.3.1</version>
+</dependency>
+<dependency>
+  <groupId>com.aliyun</groupId>
+  <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
+  <version>1.0.0</version>
+</dependency>
+~~~
+
+#### 2.2.2 导入通用组件
+
+在health_common工程中导入如下通用组件
+
+ValidateCodeUtils工具类：
+
+~~~java
+package com.itheima.utils;
+
+import java.util.Random;
+
+/**
+ * 随机生成验证码工具类
+ */
+public class ValidateCodeUtils {
+    /**
+     * 随机生成验证码
+     * @param length 长度为4位或者6位
+     * @return
+     */
+    public static Integer generateValidateCode(int length){
+        Integer code =null;
+        if(length == 4){
+            code = new Random().nextInt(9999);//生成随机数，最大为9999
+            if(code < 1000){
+                code = code + 1000;//保证随机数为4位数字
+            }
+        }else if(length == 6){
+            code = new Random().nextInt(999999);//生成随机数，最大为999999
+            if(code < 100000){
+                code = code + 100000;//保证随机数为6位数字
+            }
+        }else{
+            throw new RuntimeException("只能生成4位或6位数字验证码");
+        }
+        return code;
+    }
+
+    /**
+     * 随机生成指定长度字符串验证码
+     * @param length 长度
+     * @return
+     */
+    public static String generateValidateCode4String(int length){
+        Random rdm = new Random();
+        String hash1 = Integer.toHexString(rdm.nextInt());
+        String capstr = hash1.substring(0, length);
+        return capstr;
+    }
+}
+~~~
+
+SMSUtils工具类：
+
+~~~java
+package com.itheima.utils;
+
+import com.aliyuncs.DefaultAcsClient;
+import com.aliyuncs.IAcsClient;
+import com.aliyuncs.dysmsapi.model.v20170525.SendSmsRequest;
+import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
+import com.aliyuncs.exceptions.ClientException;
+import com.aliyuncs.http.MethodType;
+import com.aliyuncs.profile.DefaultProfile;
+import com.aliyuncs.profile.IClientProfile;
+
+/**
+ * 短信发送工具类
+ */
+public class SMSUtils {
+	public static final String VALIDATE_CODE = "SMS_159620392";//发送短信验证码
+	public static final String ORDER_NOTICE = "SMS_159771588";//体检预约成功通知
+
+	/**
+	 * 发送短信
+	 * @param phoneNumbers
+	 * @param param
+	 * @throws ClientException
+	 */
+	public static void sendShortMessage(String templateCode,String phoneNumbers,String param) throws ClientException{
+		// 设置超时时间-可自行调整
+		System.setProperty("sun.net.client.defaultConnectTimeout", "10000");
+		System.setProperty("sun.net.client.defaultReadTimeout", "10000");
+		// 初始化ascClient需要的几个参数
+		final String product = "Dysmsapi";// 短信API产品名称（短信产品名固定，无需修改）
+		final String domain = "dysmsapi.aliyuncs.com";// 短信API产品域名（接口地址固定，无需修改）
+		// 替换成你的AK
+		final String accessKeyId = "accessKeyId";// 你的accessKeyId,参考本文档步骤2
+		final String accessKeySecret = "accessKeySecret";// 你的accessKeySecret，参考本文档步骤2
+		// 初始化ascClient,暂时不支持多region（请勿修改）
+		IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);
+		DefaultProfile.addEndpoint("cn-hangzhou", "cn-hangzhou", product, domain);
+		IAcsClient acsClient = new DefaultAcsClient(profile);
+		// 组装请求对象
+		SendSmsRequest request = new SendSmsRequest();
+		// 使用post提交
+		request.setMethod(MethodType.POST);
+		// 必填:待发送手机号。支持以逗号分隔的形式进行批量调用，批量上限为1000个手机号码,批量调用相对于单条调用及时性稍有延迟,验证码类型的短信推荐使用单条调用的方式
+		request.setPhoneNumbers(phoneNumbers);
+		// 必填:短信签名-可在短信控制台中找到
+		request.setSignName("传智健康");
+		// 必填:短信模板-可在短信控制台中找到
+		request.setTemplateCode(templateCode);
+		// 可选:模板中的变量替换JSON串,如模板内容为"亲爱的${name},您的验证码为${code}"时,此处的值为
+		// 友情提示:如果JSON中需要带换行符,请参照标准的JSON协议对换行符的要求,比如短信内容中包含\r\n的情况在JSON中需要表示成\\r\\n,否则会导致JSON在服务端解析失败
+		request.setTemplateParam("{\"code\":\""+param+"\"}");
+		// 可选-上行短信扩展码(扩展码字段控制在7位或以下，无特殊需求用户请忽略此字段)
+		// request.setSmsUpExtendCode("90997");
+		// 可选:outId为提供给业务方扩展字段,最终在短信回执消息中将此值带回给调用者
+		// request.setOutId("yourOutId");
+		// 请求失败这里会抛ClientException异常
+		SendSmsResponse sendSmsResponse = acsClient.getAcsResponse(request);
+		if (sendSmsResponse.getCode() != null && sendSmsResponse.getCode().equals("OK")) {
+			// 请求成功
+			System.out.println("请求成功");
+		}
+	}
+}
+~~~
+
+RedisMessageConstant常量类：
+
+~~~java
+package com.itheima.constant;
+
+public class RedisMessageConstant {
+    public static final String SENDTYPE_ORDER = "001";//用于缓存体检预约时发送的验证码
+    public static final String SENDTYPE_LOGIN = "002";//用于缓存手机号快速登录时发送的验证码
+    public static final String SENDTYPE_GETPWD = "003";//用于缓存找回密码时发送的验证码
+}
+~~~
+
+#### 2.2.3 health_mobile
+
+创建移动端工程health_mobile，打包方式为war，用于存放Controller，在Controller中通过Dubbo可以远程访问服务层相关服务，所以需要依赖health_interface接口工程。
+
+pom.xml：
+
+~~~xml
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>health_parent</artifactId>
+        <groupId>com.itheima</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>health_mobile</artifactId>
+    <packaging>war</packaging>
+    <name>healthmobile_web Maven Webapp</name>
+    <url>http://www.example.com</url>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.itheima</groupId>
+            <artifactId>health_interface</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 指定端口 -->
+                    <port>80</port>
+                    <!-- 请求路径 -->
+                    <path>/</path>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+~~~
+
+静态资源（CSS、html、img等，详见资料）：
+
+![6](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/6-1667561940349.png)
+
+web.xml：
+
+~~~xml
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+<web-app>
+  <display-name>Archetype Created Web Application</display-name>
+  <!-- 解决post乱码 -->
+  <filter>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>utf-8</param-value>
+    </init-param>
+    <init-param>
+      <param-name>forceEncoding</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <servlet>
+    <servlet-name>springmvc</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <!-- 指定加载的配置文件 ，通过参数contextConfigLocation加载 -->
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>classpath:springmvc.xml</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>springmvc</servlet-name>
+    <url-pattern>*.do</url-pattern>
+  </servlet-mapping>
+  <welcome-file-list>
+    <welcome-file>/pages/index.html</welcome-file>
+  </welcome-file-list>
+</web-app>
+~~~
+
+springmvc.xml：
+
+~~~xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo" 
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		 http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://www.springframework.org/schema/mvc
+          http://www.springframework.org/schema/mvc/spring-mvc.xsd
+          http://code.alibabatech.com/schema/dubbo
+          http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+          http://www.springframework.org/schema/context
+          http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<mvc:annotation-driven>
+	  <mvc:message-converters register-defaults="true">
+	    <bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+	      <property name="supportedMediaTypes" value="application/json"/>
+	      <property name="features">
+	        <list>
+	          <value>WriteMapNullValue</value>
+	          <value>WriteDateUseDateFormat</value>
+	        </list>
+	      </property>
+	    </bean>
+	  </mvc:message-converters>
+	</mvc:annotation-driven>
+	<!-- 指定应用名称 -->
+	<dubbo:application name="health_mobile" />
+    <!--指定服务注册中心地址-->
+	<dubbo:registry address="zookeeper://127.0.0.1:2181"/>
+    <!--批量扫描-->
+	<dubbo:annotation package="com.itheima.controller" />
+    <!--
+        超时全局设置 10分钟
+        check=false 不检查服务提供方，开发阶段建议设置为false
+        check=true 启动时检查服务提供方，如果服务提供方没有启动则报错
+    -->
+	<dubbo:consumer timeout="600000" check="false"/>
+	<import resource="spring-redis.xml"></import>
+</beans>
+~~~
+
+spring-redis.xml：
+
+~~~xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo" 
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		 http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://www.springframework.org/schema/mvc
+          http://www.springframework.org/schema/mvc/spring-mvc.xsd
+          http://code.alibabatech.com/schema/dubbo
+          http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+          http://www.springframework.org/schema/context
+          http://www.springframework.org/schema/context/spring-context.xsd">
+  
+	<context:property-placeholder location="classpath:redis.properties" />
+
+	<!--Jedis连接池的相关配置-->
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxTotal">
+			<value>${redis.pool.maxActive}</value>
+		</property>
+		<property name="maxIdle">
+			<value>${redis.pool.maxIdle}</value>
+		</property>
+		<property name="testOnBorrow" value="true"/>
+		<property name="testOnReturn" value="true"/>
+	</bean>
+
+	<bean id="jedisPool" class="redis.clients.jedis.JedisPool">
+		<constructor-arg name="poolConfig" ref="jedisPoolConfig" />
+		<constructor-arg name="host" value="${redis.host}" />
+		<constructor-arg name="port" value="${redis.port}" type="int" />
+		<constructor-arg name="timeout" value="${redis.timeout}" type="int" />
+	</bean>
+</beans>
+~~~
+
+redis.properties：
+
+~~~properties
+#最大分配的对象数
+redis.pool.maxActive=200
+#最大能够保持idel状态的对象数
+redis.pool.maxIdle=50
+redis.pool.minIdle=10
+redis.pool.maxWaitMillis=20000
+#当池内没有返回对象时，最大等待时间
+redis.pool.maxWait=300
+
+#格式：redis://:[密码]@[服务器地址]:[端口]/[db index]
+#redis.uri = redis://:12345@127.0.0.1:6379/0
+
+redis.host = 127.0.0.1
+redis.port = 6379
+redis.timeout = 30000
+~~~
+
+log4j.properties：
+
+~~~properties
+### direct log messages to stdout ###
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.Target=System.err
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=%d{ABSOLUTE} %5p %c{1}:%L - %m%n
+
+### direct messages to file mylog.log ###
+log4j.appender.file=org.apache.log4j.FileAppender
+log4j.appender.file.File=c:\\mylog.log
+log4j.appender.file.layout=org.apache.log4j.PatternLayout
+log4j.appender.file.layout.ConversionPattern=%d{ABSOLUTE} %5p %c{1}:%L - %m%n
+
+### set log levels - for more verbose logging change 'info' to 'debug' ###
+
+log4j.rootLogger=info, stdout
+~~~
+
+## 3. 套餐列表页面动态展示
+
+移动端首页为/pages/index.html，效果如下：
+
+![2](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/2_.png)
+
+点击体检预约直接跳转到体检套餐列表页面（/pages/setmeal.html）
+
+### 3.1 完善页面
+
+#### 3.1.1 展示套餐信息
+
+~~~html
+<ul class="list">
+  <li class="list-item" v-for="setmeal in setmealList">
+    <a class="link-page" :href="'setmeal_detail.html?id='+setmeal.id">
+      <img class="img-object f-left" 
+           :src="'http://pqjroc654.bkt.clouddn.com/'+setmeal.img" alt="">
+      <div class="item-body">
+        <h4 class="ellipsis item-title">{{setmeal.name}}</h4>
+        <p class="ellipsis-more item-desc">{{setmeal.remark}}</p>
+        <p class="item-keywords">
+          <span>{{setmeal.sex == '0' ? '性别不限' : setmeal.sex == '1' ? '男':'女'}}</span>
+          <span>{{setmeal.age}}</span>
+        </p>
+      </div>
+    </a>
+  </li>
+</ul>
+~~~
+
+#### 3.1.2 获取套餐列表数据
+
+~~~javascript
+var vue = new Vue({
+  el:'#app',
+  data:{
+    setmealList:[]
+  },
+  mounted (){
+      //发送ajax请求，获取所有的套餐数据，赋值给setmealList模型数据，用于页面展示
+      axios.get("/setmeal/getAllSetmeal.do").then((res) => {
+          if(res.data.flag){
+              //查询成功，给模型数据赋值
+              this.setmealList = res.data.data;
+          }else{
+              //查询失败，弹出提示信息
+              this.$message.error(res.data.message);
+          }
+      });
+  }
+});
+~~~
+
+### 3.2 后台代码
+
+#### 3.2.1 Controller
+
+在health_mobile工程中创建SetmealController并提供getSetmeal方法，在此方法中通过Dubbo远程调用套餐服务获取套餐列表数据
+
+~~~java
+package com.itheima.controller;
+
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.itheima.constant.MessageConstant;
+import com.itheima.entity.Result;
+import com.itheima.pojo.Setmeal;
+import com.itheima.service.SetmealService;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@RestController
+@RequestMapping("/setmeal")
+public class SetmealController {
+    @Reference//(check = false)
+    private SetmealService setmealService;
+
+    //获取所有套餐信息
+    @RequestMapping("/getSetmeal")
+    public Result getSetmeal(){
+        try{
+            List<Setmeal> list = setmealService.findAll();
+            return new Result(true, MessageConstant.GET_SETMEAL_LIST_SUCCESS,list);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new Result(false,MessageConstant.GET_SETMEAL_LIST_FAIL);
+        }
+    }
+}
+~~~
+
+#### 3.2.2 服务接口
+
+在SetmealService服务接口中扩展findAll方法
+
+```
+public List<Setmeal> findAll();
+```
+
+#### 3.2.3 服务实现类
+
+在SetmealServiceImpl服务实现类中实现findAll方法
+
+~~~java
+public List<Setmeal> findAll() {
+  return setmealDao.findAll();
+}
+~~~
+
+#### 3.2.4 Dao接口
+
+在SetmealDao接口中扩展findAll方法
+
+~~~java
+public List<Setmeal> findAll();
+~~~
+
+#### 3.2.5 Mapper映射文件
+
+在SetmealDao.xml映射文件中扩展SQL语句
+
+~~~xml
+<select id="findAll" resultType="com.itheima.pojo.Setmeal">
+  select * from t_setmeal
+</select>
+~~~
+
+## 4. 套餐详情页面动态展示
+
+前面我们已经完成了体检套餐列表页面动态展示，点击其中任意一个套餐则跳转到对应的套餐详情页面（/pages/setmeal_detail.html），并且会携带此套餐的id作为参数提交。
+
+请求路径格式：http://localhost/pages/setmeal_detail.html?id=10
+
+在套餐详情页面需要展示当前套餐的信息（包括图片、套餐名称、套餐介绍、适用性别、适用年龄）、此套餐包含的检查组信息、检查组包含的检查项信息等。
+
+### 4.1 完善页面
+
+#### 4.1.1 获取请求参数中套餐id
+
+在页面中已经引入了healthmobile.js文件，此文件中已经封装了getUrlParam方法可以根据URL请求路径中的参数名获取对应的值
+
+~~~javascript
+function getUrlParam(paraName) {
+    var url = document.location.toString();
+    //alert(url);
+    var arrObj = url.split("?");
+    if (arrObj.length > 1) {
+        var arrPara = arrObj[1].split("&");
+        var arr;
+        for (var i = 0; i < arrPara.length; i++) {
+            arr = arrPara[i].split("=");
+            if (arr != null && arr[0] == paraName) {
+                return arr[1];
+            }
+        }
+        return "";
+    }
+    else {
+        return "";
+    }
+}
+~~~
+
+在setmeal_detail.html中调用上面定义的方法获取套餐id的值
+
+~~~javascript
+<script>
+  var id = getUrlParam("id");
+</script>
+~~~
+
+#### 4.1.2 获取套餐详细信息
+
+~~~javascript
+<script>
+    var vue = new Vue({
+        el:'#app',
+        data:{
+            imgUrl:null,//套餐对应的图片链接
+            setmeal:{}
+        },
+        mounted(){
+            axios.post("/setmeal/findById.do?id=" + id).then((response) => {
+                if(response.data.flag){
+                    this.setmeal = response.data.data;
+                    this.imgUrl = 'http://pqjroc654.bkt.clouddn.com/' + this.setmeal.img;
+                }
+            });
+        }
+    });
+</script>
+~~~
+
+#### 4.1.3 展示套餐信息
+
+~~~html
+<div class="contentBox">
+  <div class="card">
+    <div class="project-img">
+      <img :src="imgUrl" width="100%" height="100%" />
+    </div>
+    <div class="project-text">
+      <h4 class="tit">{{setmeal.name}}</h4>
+      <p class="subtit">{{setmeal.remark}}</p>
+      <p class="keywords">
+        <span>{{setmeal.sex == '0' ? '性别不限' : setmeal.sex == '1' ? '男':'女'}}</span>
+        <span>{{setmeal.age}}</span>
+      </p>
+    </div>
+  </div>
+  <div class="table-listbox">
+    <div class="box-title">
+      <i class="icon-zhen"><span class="path1"></span><span class="path2"></span></i>
+      <span>套餐详情</span>
+    </div>
+    <div class="box-table">
+      <div class="table-title">
+        <div class="tit-item flex2">项目名称</div>
+        <div class="tit-item  flex3">项目内容</div>
+        <div class="tit-item  flex3">项目解读</div>
+      </div>
+      <div class="table-content">
+        <ul class="table-list">
+          <li class="table-item" v-for="checkgroup in setmeal.checkGroups">
+            <div class="item flex2">{{checkgroup.name}}</div>
+            <div class="item flex3">
+              <label v-for="checkitem in checkgroup.checkItems">
+                {{checkitem.name}}
+              </label>
+            </div>
+            <div class="item flex3">{{checkgroup.remark}}</div>
+          </li>
+        </ul>
+      </div>
+      <div class="box-button">
+        <a @click="toOrderInfo()" class="order-btn">立即预约</a>
+      </div>
+    </div>
+  </div>
+</div>
+~~~
+
+### 4.2 后台代码
+
+#### 4.2.1 Controller
+
+在SetmealController中提供findById方法
+
+~~~java
+//根据id查询套餐信息
+@RequestMapping("/findById")
+public Result findById(int id){
+  try{
+    Setmeal setmeal = setmealService.findById(id);
+    return new Result(true,MessageConstant.QUERY_SETMEAL_SUCCESS,setmeal);
+  }catch (Exception e){
+    e.printStackTrace();
+    return new Result(false,MessageConstant.QUERY_SETMEAL_FAIL);
+  }
+}
+~~~
+
+#### 4.2.2 服务接口
+
+在SetmealService服务接口中提供findById方法
+
+~~~java
+public Setmeal findById(int id);
+~~~
+
+#### 4.2.3 服务实现类
+
+在SetmealServiceImpl服务实现类中实现findById方法
+
+~~~java
+public Setmeal findById(int id) {
+  return setmealDao.findById(id);
+}
+~~~
+
+#### 4.2.4 Dao接口
+
+在SetmealDao接口中提供findById方法
+
+~~~java
+public Setmeal findById(int id);
+~~~
+
+#### 4.2.5 Mapper映射文件
+
+此处会使用mybatis提供的关联查询，在根据id查询套餐时，同时将此套餐包含的检查组都查询出来，并且将检查组包含的检查项都查询出来。
+
+SetmealDao.xml文件：
+
+~~~xml
+<resultMap type="com.itheima.pojo.Setmeal" id="baseResultMap">
+  <id column="id" property="id"/>
+  <result column="name" property="name"/>
+  <result column="code" property="code"/>
+  <result column="helpCode" property="helpCode"/>
+  <result column="sex" property="sex"/>
+  <result column="age" property="age"/>
+  <result column="price" property="price"/>
+  <result column="remark" property="remark"/>
+  <result column="attention" property="attention"/>
+  <result column="img" property="img"/>
+</resultMap>
+<resultMap type="com.itheima.pojo.Setmeal" 
+           id="findByIdResultMap" 
+           extends="baseResultMap">
+  <collection property="checkGroups" 
+              javaType="ArrayList"
+              ofType="com.itheima.pojo.CheckGroup" 
+              column="id"
+              select="com.itheima.dao.CheckGroupDao.findCheckGroupById">
+  </collection>
+</resultMap>
+<select id="findById" resultMap="findByIdResultMap">
+  select * from t_setmeal  where id=#{id}
+</select>
+~~~
+
+CheckGroupDao.xml文件：
+
+~~~xml
+<resultMap type="com.itheima.pojo.CheckGroup" id="baseResultMap">
+  <id column="id" property="id"/>
+  <result column="name" property="name"/>
+  <result column="code" property="code"/>
+  <result column="helpCode" property="helpCode"/>
+  <result column="sex" property="sex"/>
+  <result column="remark" property="remark"/>
+  <result column="attention" property="attention"/>
+</resultMap>
+<resultMap type="com.itheima.pojo.CheckGroup" 
+           id="findByIdResultMap" 
+           extends="baseResultMap">
+  <collection property="checkItems" 
+              javaType="ArrayList"
+              ofType="com.itheima.pojo.CheckItem" 
+              column="id"
+              select="com.itheima.dao.CheckItemDao.findCheckItemById">
+  </collection>
+</resultMap>
+<!--根据套餐id查询检查项信息-->
+<select id="findCheckGroupById" resultMap="findByIdResultMap">
+  select * from t_checkgroup  
+    where id
+  	in (select checkgroup_id from t_setmeal_checkgroup where setmeal_id=#{id})
+</select>
+~~~
+
+CheckItemDao.xml文件：
+
+~~~xml
+<!--根据检查组id查询检查项信息-->
+<select id="findCheckItemById" resultType="com.itheima.pojo.CheckItem">
+  select * from t_checkitem  
+    where id
+  	in (select checkitem_id from t_checkgroup_checkitem where checkgroup_id=#{id})
+</select>
+~~~
+
+## 5. 短信发送
+
+### 5.1 短信服务介绍
+
+目前市面上有很多第三方提供的短信服务，这些第三方短信服务会和各个运营商（移动、联通、电信）对接，我们只需要注册成为会员并且按照提供的开发文档进行调用就可以发送短信。需要说明的是这些短信服务都是收费的服务。
+
+本项目短信发送我们选择的是阿里云提供的短信服务。
+
+短信服务（Short Message Service）是阿里云为用户提供的一种通信服务的能力，支持快速发送短信验证码、短信通知等。 三网合一专属通道，与工信部携号转网平台实时互联。电信级运维保障，实时监控自动切换，到达率高达99%。短信服务API提供短信发送、发送状态查询、短信批量发送等能力，在短信服务控制台上添加签名、模板并通过审核之后，可以调用短信服务API完成短信发送等操作。
+
+### 5.2 注册阿里云账号
+
+阿里云官网：https://www.aliyun.com/
+
+点击官网首页免费注册跳转到如下注册页面：
+
+![71](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/71.png)
+
+### 5.3 设置短信签名
+
+注册成功后，点击登录按钮进行登录。登录后进入短信服务管理页面，选择国内消息菜单：
+
+![72](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/72.png)
+
+点击添加签名按钮：
+
+![73](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/73.png)
+
+目前个人用户只能申请适用场景为验证码的签名
+
+### 5.4 设置短信模板
+
+在国内消息菜单页面中，点击模板管理标签页：
+
+![74](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/74.png)
+
+点击添加模板按钮：
+
+![75](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/75.png)
+
+### 5.5 设置access keys
+
+在发送短信时需要进行身份认证，只有认证通过才能发送短信。本小节就是要设置用于发送短信时进行身份认证的key和密钥。鼠标放在页面右上角当前用户头像上，会出现下拉菜单：
+
+![76](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/76.png)
+
+点击accesskeys：
+
+![77](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/77.png)
+
+点击开始使用子用户AccessKey按钮：
+
+![78](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/78.png)
+
+![79](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/79.png)
+
+![710](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/710.png)
+
+![711](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/711.png)
+
+创建成功，其中AccessKeyID为访问短信服务时使用的ID，AccessKeySecret为密钥。
+
+可以在用户详情页面下禁用刚刚创建的AccessKey：
+
+![712](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/712.png)
+
+可以设置每日和每月短信发送上限：
+
+![713](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/713.png)
+
+由于短信服务是收费服务，所以还需要进行充值才能发送短信：
+
+![714](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/714.png)
+
+### 5.6 发送短信
+
+#### 5.6.1 导入maven坐标
+
+```xml
+<dependency>
+  <groupId>com.aliyun</groupId>
+  <artifactId>aliyun-java-sdk-core</artifactId>
+  <version>3.3.1</version>
+</dependency>
+<dependency>
+  <groupId>com.aliyun</groupId>
+  <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
+#### 5.6.2 封装工具类
+
+```java
+package com.itheima.utils;
+
+import com.aliyuncs.DefaultAcsClient;
+import com.aliyuncs.IAcsClient;
+import com.aliyuncs.dysmsapi.model.v20170525.SendSmsRequest;
+import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
+import com.aliyuncs.exceptions.ClientException;
+import com.aliyuncs.http.MethodType;
+import com.aliyuncs.profile.DefaultProfile;
+import com.aliyuncs.profile.IClientProfile;
+
+/**
+ * 短信发送工具类
+ */
+public class SMSUtils {
+	public static final String VALIDATE_CODE = "SMS_159620392";//发送短信验证码
+	public static final String ORDER_NOTICE = "SMS_159771588";//体检预约成功通知
+
+	/**
+	 * 发送短信
+	 * @param phoneNumbers
+	 * @param param
+	 * @throws ClientException
+	 */
+	public static void sendShortMessage(String templateCode,String phoneNumbers,String param) throws ClientException{
+		// 设置超时时间-可自行调整
+		System.setProperty("sun.net.client.defaultConnectTimeout", "10000");
+		System.setProperty("sun.net.client.defaultReadTimeout", "10000");
+		// 初始化ascClient需要的几个参数
+		final String product = "Dysmsapi";// 短信API产品名称（短信产品名固定，无需修改）
+		final String domain = "dysmsapi.aliyuncs.com";// 短信API产品域名（接口地址固定，无需修改）
+		// 替换成你的AK
+		final String accessKeyId = "accessKeyId";// 你的accessKeyId,参考本文档步骤2
+		final String accessKeySecret = "accessKeySecret";// 你的accessKeySecret，参考本文档步骤2
+		// 初始化ascClient,暂时不支持多region（请勿修改）
+		IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);
+		DefaultProfile.addEndpoint("cn-hangzhou", "cn-hangzhou", product, domain);
+		IAcsClient acsClient = new DefaultAcsClient(profile);
+		// 组装请求对象
+		SendSmsRequest request = new SendSmsRequest();
+		// 使用post提交
+		request.setMethod(MethodType.POST);
+		// 必填:待发送手机号。支持以逗号分隔的形式进行批量调用，批量上限为1000个手机号码,批量调用相对于单条调用及时性稍有延迟,验证码类型的短信推荐使用单条调用的方式
+		request.setPhoneNumbers(phoneNumbers);
+		// 必填:短信签名-可在短信控制台中找到
+		request.setSignName("传智健康");
+		// 必填:短信模板-可在短信控制台中找到
+		request.setTemplateCode(templateCode);
+		// 可选:模板中的变量替换JSON串,如模板内容为"亲爱的${name},您的验证码为${code}"时,此处的值为
+		// 友情提示:如果JSON中需要带换行符,请参照标准的JSON协议对换行符的要求,比如短信内容中包含\r\n的情况在JSON中需要表示成\\r\\n,否则会导致JSON在服务端解析失败
+		request.setTemplateParam("{\"code\":\""+param+"\"}");
+		// 可选-上行短信扩展码(扩展码字段控制在7位或以下，无特殊需求用户请忽略此字段)
+		// request.setSmsUpExtendCode("90997");
+		// 可选:outId为提供给业务方扩展字段,最终在短信回执消息中将此值带回给调用者
+		// request.setOutId("yourOutId");
+		// 请求失败这里会抛ClientException异常
+		SendSmsResponse sendSmsResponse = acsClient.getAcsResponse(request);
+		if (sendSmsResponse.getCode() != null && sendSmsResponse.getCode().equals("OK")) {
+			// 请求成功
+			System.out.println("请求成功");
+		}
+	}
+}
+```
+
+#### 5.6.3 测试短信发送
+
+```java
+public static void main(String[] args)throws Exception {
+		SMSUtils.sendShortMessage("SMS_159620392","13812345678","1234");
+}
+```
+
+# 传智健康项目  第7章
+
+## 1. 页面静态化介绍
+
+本章课程中我们已经实现了移动端套餐列表页面和套餐详情页面的动态展示。但是我们需要思考一个问题，就是对于这两个页面来说，每次用户访问这两个页面都需要查询数据库获取动态数据进行展示，而且这两个页面的访问量是比较大的，这就对数据库造成了很大的访问压力，并且数据库中的数据变化频率并不高。那我们需要通过什么方法为数据库减压并提高系统运行性能呢？答案就是页面静态化。
+
+页面静态化其实就是将原来的动态网页(例如通过ajax请求动态获取数据库中的数据并展示的网页)改为通过静态化技术生成的静态网页，这样用户在访问网页时，服务器直接给用户响应静态html页面，没有了动态查询数据库的过程。
+
+那么这些静态HTML页面还需要我们自己去编写吗？其实并不需要，我们可以通过专门的页面静态化技术帮我们生成所需的静态HTML页面，例如：Freemarker、thymeleaf等。
+
+## 2. Freemarker介绍
+
+FreeMarker 是一个用 Java 语言编写的模板引擎，它基于模板来生成文本输出。FreeMarker与 Web 容器无关，即在 Web 运行时，它并不知道 Servlet 或 HTTP。它不仅可以用作表现层的实现技术，而且还可以用于生成 XML，JSP 或 Java 等。
+
+![1](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/1-1667564715614.png)
+
+## 3. Freemarker入门案例
+
+### 3.1 环境搭建
+
+创建maven工程并导入Freemarker的maven坐标
+
+~~~xml
+<dependency>
+  <groupId>org.freemarker</groupId>
+  <artifactId>freemarker</artifactId>
+  <version>2.3.23</version>
+</dependency>
+~~~
+
+### 3.2 创建模板文件
+
+模板文件中有四种元素：
+
+  1、文本，直接输出的部分
+  2、注释，即<#--...-->格式不会输出
+  3、插值（Interpolation）：即${..}部分,将使用数据模型中的部分替代输出
+  4、FTL指令：FreeMarker指令，和HTML标记类似，名字前加#予以区分，不会输出
+
+Freemarker的模板文件后缀可以任意，一般建议为ftl。
+
+在D盘创建ftl目录，在ftl目录中创建名称为test.ftl的模板文件，内容如下：
+
+~~~html
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Freemarker入门</title>
+</head>
+<body>
+    <#--我只是一个注释，我不会有任何输出  -->
+    ${name}你好，${message}
+</body>
+</html>
+~~~
+
+### 3.3 生成文件
+
+使用步骤：
+
+第一步：创建一个 Configuration 对象，直接 new 一个对象。构造方法的参数就是 freemarker的版本号。
+
+第二步：设置模板文件所在的路径。
+
+第三步：设置模板文件使用的字符集。一般就是 utf-8。
+
+第四步：加载一个模板，创建一个模板对象。
+
+第五步：创建一个模板使用的数据集，可以是 pojo 也可以是 map。一般是 Map。
+
+第六步：创建一个 Writer 对象，一般创建 FileWriter 对象，指定生成的文件名。
+
+第七步：调用模板对象的 process 方法输出文件。
+
+第八步：关闭流。
+
+~~~java
+public static void main(String[] args) throws Exception{
+	//1.创建配置类
+	Configuration configuration=new Configuration(Configuration.getVersion());
+	//2.设置模板所在的目录 
+	configuration.setDirectoryForTemplateLoading(new File("D:\\ftl"));
+	//3.设置字符集
+	configuration.setDefaultEncoding("utf-8");
+	//4.加载模板
+	Template template = configuration.getTemplate("test.ftl");
+	//5.创建数据模型
+	Map map=new HashMap();
+	map.put("name", "张三");
+	map.put("message", "欢迎来到传智播客！");
+	//6.创建Writer对象
+	Writer out =new FileWriter(new File("d:\\test.html"));
+	//7.输出
+	template.process(map, out);
+	//8.关闭Writer对象
+	out.close();
+}
+~~~
+
+上面的入门案例中Configuration配置对象是自己创建的，字符集和模板文件所在目录也是在Java代码中指定的。在项目中应用时可以将Configuration对象的创建交由Spring框架来完成，并通过依赖注入方式将字符集和模板所在目录注入进去。
+
+## 4. Freemarker指令
+
+### 4.1 assign指令
+
+assign指令用于在页面上定义一个变量
+
+（1）定义简单类型
+
+~~~html
+<#assign linkman="周先生">
+联系人：${linkman}
+~~~
+
+（2）定义对象类型
+
+~~~html
+<#assign info={"mobile":"13812345678",'address':'北京市昌平区'} >
+电话：${info.mobile}  地址：${info.address}
+~~~
+
+### 4.2 include指令
+
+include指令用于模板文件的嵌套
+
+（1）创建模板文件head.ftl
+
+~~~html
+<h1>黑马程序员</h1>
+~~~
+
+（2）修改入门案例中的test.ftl，在test.ftl模板文件中使用include指令引入上面的模板文件
+
+~~~html
+<#include "head.ftl"/>
+~~~
+
+### 4.3 if指令
+
+if指令用于判断
+
+（1）在模板文件中使用if指令进行判断
+
+~~~html
+<#if success=true>
+  你已通过实名认证
+<#else>  
+  你未通过实名认证
+</#if>
+~~~
+
+（2）在java代码中为success变量赋值
+
+~~~java
+map.put("success", true);
+~~~
+
+在freemarker的判断中，可以使用= 也可以使用==
+
+### 4.4 list指令
+
+list指令用于遍历
+
+（1）在模板文件中使用list指令进行遍历
+
+~~~html
+<#list goodsList as goods>
+  商品名称： ${goods.name} 价格：${goods.price}<br>
+</#list>
+~~~
+
+（2）在java代码中为goodsList赋值
+
+~~~java
+List goodsList=new ArrayList();
+
+Map goods1=new HashMap();
+goods1.put("name", "苹果");
+goods1.put("price", 5.8);
+
+Map goods2=new HashMap();
+goods2.put("name", "香蕉");
+goods2.put("price", 2.5);
+
+Map goods3=new HashMap();
+goods3.put("name", "橘子");
+goods3.put("price", 3.2);
+
+goodsList.add(goods1);
+goodsList.add(goods2);
+goodsList.add(goods3);
+
+map.put("goodsList", goodsList);
+~~~
+
+## 5. 生成移动端静态页面
+
+前面我们已经学习了Freemarker的基本使用方法，下面我们就可以将Freemarker应用到项目中，帮我们生成移动端套餐列表静态页面和套餐详情静态页面。接下来我们需要思考几个问题：
+
+（1）什么时候生成静态页面比较合适呢？
+
+（2）将静态页面生成到什么位置呢？
+
+（3）应该生成几个静态页面呢？
+
+对于第一个问题，应该是当套餐数据发生改变时，需要生成静态页面，即我们通过后台系统修改套餐数据（包括新增、删除、编辑）时。
+
+对于第二个问题，如果是在开发阶段可以将文件生成到项目工程中，如果上线后可以将文件生成到移动端系统运行的tomcat中。
+
+对于第三个问题，套餐列表只需要一个页面就可以了，在这个页面中展示所有的套餐列表数据即可。套餐详情页面需要有多个，即一个套餐应该对应一个静态页面。
+
+
+
+### 5.1 环境搭建
+
+在health_common工程的pom文件中导入Freemarker的maven坐标
+
+~~~xml
+<dependency>
+  <groupId>org.freemarker</groupId>
+  <artifactId>freemarker</artifactId>
+  <version>2.3.23</version>
+</dependency>
+~~~
+
+### 5.2 创建模板文件
+
+在health_service_provider工程的WEB-INF目录中创建ftl目录，在ftl目录中创建模板文件mobile_setmeal.ftl和mobile_setmeal_detail.ftl文件，前者是用于生成套餐列表页面的模板文件，后者是生成套餐详情页面的模板文件
+
+（1）mobile_setmeal.ftl
+
+~~~html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0,user-scalable=no,minimal-ui">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../img/asset-favico.ico">
+    <title>预约</title>
+    <link rel="stylesheet" href="../css/page-health-order.css" />
+</head>
+<body data-spy="scroll" data-target="#myNavbar" data-offset="150">
+<div class="app" id="app">
+    <!-- 页面头部 -->
+    <div class="top-header">
+        <span class="f-left"><i class="icon-back" onclick="history.go(-1)"></i></span>
+        <span class="center">传智健康</span>
+        <span class="f-right"><i class="icon-more"></i></span>
+    </div>
+    <!-- 页面内容 -->
+    <div class="contentBox">
+        <div class="list-column1">
+            <ul class="list">
+                <#list setmealList as setmeal>
+                    <li class="list-item">
+                        <a class="link-page" href="setmeal_detail_${setmeal.id}.html">
+                            <img class="img-object f-left" 
+                                 src="http://puco9aur6.bkt.clouddn.com/${setmeal.img}" 
+                                 alt="">
+                            <div class="item-body">
+                                <h4 class="ellipsis item-title">${setmeal.name}</h4>
+                                <p class="ellipsis-more item-desc">${setmeal.remark}</p>
+                                <p class="item-keywords">
+                                    <span>
+                                        <#if setmeal.sex == '0'>
+                                            性别不限
+                                            <#else>
+                                                <#if setmeal.sex == '1'>
+                                                男
+                                                <#else>
+                                                女
+                                                </#if>
+                                        </#if>
+                                    </span>
+                                    <span>${setmeal.age}</span>
+                                </p>
+                            </div>
+                        </a>
+                    </li>
+                </#list>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- 页面 css js -->
+<script src="../plugins/vue/vue.js"></script>
+<script src="../plugins/vue/axios-0.18.0.js"></script>
+</body>
+~~~
+
+注意上面模板文件中每个套餐对应的超链接如下：
+
+~~~html
+<a class="link-page" href="setmeal_detail_${setmeal.id}.html">
+~~~
+
+可以看到，链接的地址是动态构成的，如果套餐的id为1，则对应的超链接地址为setmeal_detail_1.html；如果套餐的id为5，则对应的超链接地址为setmeal_detail_5.html。所以我们需要为每个套餐生成一个套餐详情静态页面。
+
+（2）mobile_setmeal_detail.ftl
+
+~~~html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0,user-scalable=no,minimal-ui">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../img/asset-favico.ico">
+    <title>预约详情</title>
+    <link rel="stylesheet" href="../css/page-health-orderDetail.css" />
+    <script src="../plugins/vue/vue.js"></script>
+    <script src="../plugins/vue/axios-0.18.0.js"></script>
+    <script src="../plugins/healthmobile.js"></script>
+</head>
+<body data-spy="scroll" data-target="#myNavbar" data-offset="150">
+<div id="app" class="app">
+    <!-- 页面头部 -->
+    <div class="top-header">
+        <span class="f-left"><i class="icon-back" onclick="history.go(-1)"></i></span>
+        <span class="center">传智健康</span>
+        <span class="f-right"><i class="icon-more"></i></span>
+    </div>
+    <!-- 页面内容 -->
+    <div class="contentBox">
+        <div class="card">
+            <div class="project-img">
+                <img src="http://puco9aur6.bkt.clouddn.com/${setmeal.img}" 
+                     width="100%" height="100%" />
+            </div>
+            <div class="project-text">
+                <h4 class="tit">${setmeal.name}</h4>
+                <p class="subtit">${setmeal.remark}</p>
+                <p class="keywords">
+                    <span>
+						<#if setmeal.sex == '0'>
+							性别不限
+							<#else>
+								<#if setmeal.sex == '1'>
+								男
+								<#else>
+								女
+								</#if>
+						</#if>
+					</span>
+                    <span>${setmeal.age}</span>
+                </p>
+            </div>
+        </div>
+        <div class="table-listbox">
+            <div class="box-title">
+                <i class="icon-zhen"><span class="path1"></span><span class="path2"></span></i>
+                <span>套餐详情</span>
+            </div>
+            <div class="box-table">
+                <div class="table-title">
+                    <div class="tit-item flex2">项目名称</div>
+                    <div class="tit-item  flex3">项目内容</div>
+                    <div class="tit-item  flex3">项目解读</div>
+                </div>
+                <div class="table-content">
+                    <ul class="table-list">
+						<#list setmeal.checkGroups as checkgroup>
+							<li class="table-item">
+								<div class="item flex2">${checkgroup.name}</div>
+								<div class="item flex3">
+									<#list checkgroup.checkItems as checkitem>
+										<label>
+											${checkitem.name}
+										</label>
+									</#list>
+								</div>
+								<div class="item flex3">${checkgroup.remark}</div>
+							</li>
+						</#list>
+                    </ul>
+                </div>
+                <div class="box-button">
+                    <a @click="toOrderInfo()" class="order-btn">立即预约</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var vue = new Vue({
+        el:'#app',
+        methods:{
+            toOrderInfo(){
+                window.location.href = "orderInfo.html?id=${setmeal.id}";
+            }
+        }
+    });
+</script>
+</body>
+~~~
+
+### 5.3 配置文件
+
+（1）在health_service_provider工程中创建属性文件freemarker.properties
+
+~~~makefile
+out_put_path=D:/ideaProjects/health_parent/health_mobile/src/main/webapp/pages
+~~~
+
+通过上面的配置可以指定将静态HTML页面生成的目录位置
+
+（2）在health_service_provider工程的Spring配置文件中配置
+
+~~~xml
+<bean id="freemarkerConfig" 
+      class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+  <!--指定模板文件所在目录-->
+  <property name="templateLoaderPath" value="/WEB-INF/ftl/" />
+  <!--指定字符集-->
+  <property name="defaultEncoding" value="UTF-8" />
+</bean>
+<context:property-placeholder location="classpath:freemarker.properties"/>
+~~~
+
+### 5.4 生成静态页面
+
+修改health_service_provider工程中的SetmealServiceImpl类的add方法，加入生成静态页面的逻辑。
+
+~~~java
+@Service(interfaceClass = SetmealService.class)
+@Transactional
+public class SetmealServiceImpl implements SetmealService {
+  @Autowired
+  private FreeMarkerConfigurer freeMarkerConfigurer;
+  @Autowired
+  private SetmealDao setmealDao;
+  @Autowired
+  private JedisPool jedisPool;
+  
+  @Value("${out_put_path}")//从属性文件读取输出目录的路径
+  private String outputpath ;
+
+  //新增套餐，同时关联检查组
+  public void add(Setmeal setmeal, Integer[] checkgroupIds) {
+    setmealDao.add(setmeal);
+    Integer setmealId = setmeal.getId();//获取套餐id
+    this.setSetmealAndCheckGroup(setmealId,checkgroupIds);
+    //完成数据库操作后需要将图片名称保存到redis
+    jedisPool.getResource().sadd(RedisConstant.SETMEAL_PIC_DB_RESOURCES,setmeal.getImg());
+
+    //新增套餐后需要重新生成静态页面
+    generateMobileStaticHtml();
+  }
+  
+  //生成静态页面
+  public void generateMobileStaticHtml() {
+    //准备模板文件中所需的数据
+    List<Setmeal> setmealList = this.findAll();
+    //生成套餐列表静态页面
+    generateMobileSetmealListHtml(setmealList);
+    //生成套餐详情静态页面（多个）
+    generateMobileSetmealDetailHtml(setmealList);
+  }
+  
+  //生成套餐列表静态页面
+  public void generateMobileSetmealListHtml(List<Setmeal> setmealList) {
+    Map<String, Object> dataMap = new HashMap<String, Object>();
+    dataMap.put("setmealList", setmealList);
+    this.generateHtml("mobile_setmeal.ftl","m_setmeal.html",dataMap);
+  }
+  
+  //生成套餐详情静态页面（多个）
+  public void generateMobileSetmealDetailHtml(List<Setmeal> setmealList) {
+    for (Setmeal setmeal : setmealList) {
+      Map<String, Object> dataMap = new HashMap<String, Object>();
+      dataMap.put("setmeal", this.findById(setmeal.getId()));
+      this.generateHtml("mobile_setmeal_detail.ftl",
+                        "setmeal_detail_"+setmeal.getId()+".html",
+                        dataMap);
+    }
+  }
+  
+  public void generateHtml(String templateName,String htmlPageName,Map<String, Object> dataMap){
+    Configuration configuration = freeMarkerConfigurer.getConfiguration();
+    Writer out = null;
+    try {
+      // 加载模版文件
+      Template template = configuration.getTemplate(templateName);
+      // 生成数据
+      File docFile = new File(outputpath + "\\" + htmlPageName);
+      out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(docFile)));
+      // 输出文件
+      template.process(dataMap, out);
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        if (null != out) {
+          out.flush();
+        }
+      } catch (Exception e2) {
+        e2.printStackTrace();
+      }
+    }
+  }
+}
+~~~
+
+通过上面代码可以看到，我们生成的套餐列表页面名称为m_setmeal.html，为了能够在移动端访问到此页面，需要将移动端工程中的/pages/index.html页面的超链接地址进行修改：
+
+~~~html
+<a href="/pages/m_setmeal.html" class="link-page">
+  <div class="type-title">
+    <h3>体检预约</h3>
+    <p>实时预约</p>
+  </div>
+  <div class="type-icon">
+    <i class="icon-zhen">
+      <span class="path1"></span><span class="path2"></span>
+    </i>
+  </div>
+</a>
+~~~
+
+# 第8章 移动端开发-体检预约
+
+## 1. 体检预约流程
+
+用户可以通过如下操作流程进行体检预约：
+
+1、在移动端首页点击体检预约，页面跳转到套餐列表页面
+
+2、在套餐列表页面点击要预约的套餐，页面跳转到套餐详情页面
+
+3、在套餐详情页面点击立即预约，页面跳转到预约页面
+
+4、在预约页面录入体检人信息，包括手机号，点击发送验证码
+
+5、在预约页面录入收到的手机短信验证码，点击提交预约，完成体检预约
+
+## 2. 体检预约
+
+### 2.1 页面调整
+
+在预约页面（/pages/orderInfo.html）进行调整
+
+#### 2.1.1 展示预约的套餐信息
+
+第一步：从请求路径中获取当前套餐的id
+
+~~~javascript
+<script>
+  var id = getUrlParam("id");//套餐id
+</script>
+~~~
+
+第二步：定义模型数据setmeal，用于套餐数据展示
+
+~~~javascript
+var vue = new Vue({
+  el:'#app',
+  data:{
+    setmeal:{},//套餐信息
+    orderInfo:{
+      setmealId:id,
+      sex:'1'
+    }//预约信息
+  }
+});
+~~~
+
+~~~html
+<div class="card">
+  <div class="">
+    <img :src="'http://pqjroc654.bkt.clouddn.com/'+setmeal.img" width="100%" height="100%" />
+  </div>
+  <div class="project-text">
+    <h4 class="tit">{{setmeal.name}}</h4>
+    <p class="subtit">{{setmeal.remark}}</p>
+    <p class="keywords">
+        <span>{{setmeal.sex == '0' ? '性别不限' : setmeal.sex == '1' ? '男':'女'}}</span>
+        <span>{{setmeal.age}}</span>
+    </p>
+  </div>
+  <div class="project-know">
+    <a href="orderNotice.html" class="link-page">
+      <i class="icon-ask-circle"><span class="path1"></span><span class="path2"></span></i>
+      <span class="word">预约须知</span>
+      <span class="arrow"><i class="icon-rit-arrow"></i></span>
+    </a>
+  </div>
+</div>
+~~~
+
+第三步：在VUE的钩子函数中发送ajax请求，根据id查询套餐信息
+
+~~~javascript
+mounted(){
+  axios.post("/setmeal/findById.do?id=" + id).then((response) => {
+    this.setmeal = response.data.data;
+  });
+}
+~~~
+
+#### 2.1.2 手机号校验
+
+第一步：在页面导入的healthmobile.js文件中已经定义了校验手机号的方法
+
+~~~javascript
+/**
+ * 手机号校验
+ 1--以1为开头；
+ 2--第二位可为3,4,5,7,8,中的任意一位；
+ 3--最后以0-9的9个整数结尾。
+ */
+function checkTelephone(telephone) {
+    var reg=/^[1][3,4,5,7,8][0-9]{9}$/;
+    if (!reg.test(telephone)) {
+        return false;
+    } else {
+        return true;
+    }
+}
+~~~
+
+第二步：为发送验证码按钮绑定事件sendValidateCode
+
+~~~html
+<div class="input-row">
+  <label>手机号</label>
+  <input v-model="orderInfo.telephone" 
+         type="text" class="input-clear" placeholder="请输入手机号">
+  <input style="font-size: x-small;" 
+         id="validateCodeButton" @click="sendValidateCode()" type="button" value="发送验证码">
+</div>
+~~~
+
+~~~javascript
+//发送验证码
+sendValidateCode(){
+  //获取用户输入的手机号
+  var telephone = this.orderInfo.telephone;
+  //校验手机号输入是否正确
+  if (!checkTelephone(telephone)) {
+    this.$message.error('请输入正确的手机号');
+    return false;
+  }
+}
+~~~
+
+#### 2.1.3 30秒倒计时效果
+
+前面在sendValidateCode方法中进行了手机号校验，如果校验通过，需要显示30秒倒计时效果
+
+~~~javascript
+//发送验证码
+sendValidateCode(){
+  //获取用户输入的手机号
+  var telephone = this.orderInfo.telephone;
+  //校验手机号输入是否正确
+  if (!checkTelephone(telephone)) {
+    this.$message.error('请输入正确的手机号');
+    return false;
+  }
+  validateCodeButton = $("#validateCodeButton")[0];
+  clock = window.setInterval(doLoop, 1000); //一秒执行一次
+}
+~~~
+
+其中，validateCodeButton和clock是在healthmobile.js文件中定义的变量，doLoop是在healthmobile.js文件中定义的方法
+
+~~~javascript
+var clock = '';//定时器对象，用于页面30秒倒计时效果
+var nums = 30;
+var validateCodeButton;
+//基于定时器实现30秒倒计时效果
+function doLoop() {
+    validateCodeButton.disabled = true;//将按钮置为不可点击
+    nums--;
+    if (nums > 0) {
+        validateCodeButton.value = nums + '秒后重新获取';
+    } else {
+        clearInterval(clock); //清除js定时器
+        validateCodeButton.disabled = false;
+        validateCodeButton.value = '重新获取验证码';
+        nums = 30; //重置时间
+    }
+}
+~~~
+
+#### 2.1.4 发送ajax请求
+
+在按钮上显示30秒倒计时效果的同时，需要发送ajax请求，在后台给用户发送手机验证码
+
+~~~javascript
+//发送验证码
+sendValidateCode(){
+  //获取用户输入的手机号
+  var telephone = this.orderInfo.telephone;
+  //校验手机号输入是否正确
+  if (!checkTelephone(telephone)) {
+    this.$message.error('请输入正确的手机号');
+    return false;
+  }
+  validateCodeButton = $("#validateCodeButton")[0];
+  clock = window.setInterval(doLoop, 1000); //一秒执行一次
+  axios.post("/validateCode/send4Order.do?telephone=" + telephone).then((response) => {
+    if(!response.data.flag){
+      //验证码发送失败
+      this.$message.error('验证码发送失败，请检查手机号输入是否正确');
+    }
+  });
+}
+~~~
+
+创建ValidateCodeController，提供方法发送短信验证码，并将验证码保存到redis
+
+~~~java
+package com.itheima.controller;
+
+import com.aliyuncs.exceptions.ClientException;
+import com.itheima.constant.MessageConstant;
+import com.itheima.constant.RedisConstant;
+import com.itheima.constant.RedisMessageConstant;
+import com.itheima.entity.Result;
+import com.itheima.utils.JedisUtils;
+import com.itheima.utils.SMSUtils;
+import com.itheima.utils.ValidateCodeUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import java.util.Random;
+
+/**
+ * 短信验证码
+ */
+@RestController
+@RequestMapping("/validateCode")
+public class ValidateCodeController {
+    @Autowired
+    private JedisPool jedisPool;
+  
+    //体检预约时发送手机验证码
+    @RequestMapping("/send4Order")
+    public Result send4Order(String telephone){
+        Integer code = ValidateCodeUtils.generateValidateCode(4);//生成4位数字验证码
+        try {
+            //发送短信
+            SMSUtils.sendShortMessage(SMSUtils.VALIDATE_CODE,telephone,code.toString());
+        } catch (ClientException e) {
+            e.printStackTrace();
+            //验证码发送失败
+            return new Result(false, MessageConstant.SEND_VALIDATECODE_FAIL);
+        }
+        System.out.println("发送的手机验证码为：" + code);
+        //将生成的验证码缓存到redis
+        jedisPool.getResource().setex(
+          telephone + RedisMessageConstant.SENDTYPE_ORDER,5 * 60,code.toString());
+        //验证码发送成功
+        return new Result(true,MessageConstant.SEND_VALIDATECODE_SUCCESS);
+    }
+}
+~~~
+
+#### 2.1.5 日历展示
+
+页面中使用DatePicker控件来展示日历。根据需求，最多可以提前一个月进行体检预约，所以日历控件只展示未来一个月的日期
+
+~~~html
+<div class="date">
+  <label>体检日期</label>
+  <i class="icon-date" class="picktime"></i>
+  <input v-model="orderInfo.orderDate" type="text" class="picktime" readonly>
+</div>
+~~~
+
+~~~javascript
+<script>
+  //日期控件
+  var calendar = new datePicker();
+  calendar.init({
+    'trigger': '.picktime',/*按钮选择器，用于触发弹出插件*/
+    'type': 'date',/*模式：date日期；datetime日期时间；time时间；ym年月；*/
+    'minDate': getSpecifiedDate(new Date(),1),/*最小日期*/
+    'maxDate': getSpecifiedDate(new Date(),30),/*最大日期*/
+    'onSubmit': function() { /*确认时触发事件*/},
+    'onClose': function() { /*取消时触发事件*/ }
+  });
+</script>
+~~~
+
+其中getSpecifiedDate方法定义在healthmobile.js文件中
+
+~~~javascript
+//获得指定日期后指定天数的日期
+function getSpecifiedDate(date,days) {
+    date.setDate(date.getDate() + days);//获取指定天之后的日期
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    var day = date.getDate();
+    return (year + "-" + month + "-" + day);
+}
+~~~
+
+#### 2.1.6 提交预约请求
+
+为提交预约按钮绑定事件
+
+~~~html
+<div class="box-button">
+  <button @click="submitOrder()" type="button" class="btn order-btn">提交预约</button>
+</div>
+~~~
+
+~~~javascript
+//提交预约
+submitOrder(){
+  //校验身份证号格式
+  if(!checkIdCard(this.orderInfo.idCard)){
+    this.$message.error('身份证号码输入错误，请重新输入');
+    return ;
+  }
+  axios.post("/order/submit.do",this.orderInfo).then((response) => {
+    if(response.data.flag){
+      //预约成功，跳转到预约成功页面
+      window.location.href="orderSuccess.html?orderId=" + response.data.data;
+    }else{
+      //预约失败，提示预约失败信息
+      this.$message.error(response.data.message);
+    }
+  });
+}
+~~~
+
+其中checkIdCard方法是在healthmobile.js文件中定义的
+
+~~~javascript
+/**
+ * 身份证号码校验
+ * 身份证号码为15位或者18位，15位时全为数字，18位前17位为数字，最后一位是校验位，可能为数字或字符X
+ */
+function checkIdCard(idCard){
+    var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+    if(reg.test(idCard)){
+        return true;
+    }else{
+        return false;
+    }
+}
+~~~
+
+### 2.2 后台代码
+
+#### 2.2.1 Controller
+
+在health_mobile工程中创建OrderController并提供submitOrder方法
+
+~~~java
+package com.itheima.controller;
+
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.aliyuncs.exceptions.ClientException;
+import com.itheima.constant.MessageConstant;
+import com.itheima.constant.RedisConstant;
+import com.itheima.constant.RedisMessageConstant;
+import com.itheima.entity.Result;
+import com.itheima.pojo.Member;
+import com.itheima.pojo.Order;
+import com.itheima.pojo.Setmeal;
+import com.itheima.service.OrderService;
+import com.itheima.utils.JedisUtils;
+import com.itheima.utils.SMSUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import redis.clients.jedis.JedisPool;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 体检预约
+ */
+@RestController
+@RequestMapping("/order")
+public class OrderController {
+    @Reference
+    private OrderService orderService;
+    @Autowired
+    private JedisPool jedisPool;
+
+    /**
+     * 体检预约
+     * @param map
+     * @return
+     */
+    @RequestMapping("/submit")
+    public Result submitOrder(@RequestBody Map map){
+        String telephone = (String) map.get("telephone");
+        //从Redis中获取缓存的验证码，key为手机号+RedisConstant.SENDTYPE_ORDER
+        String codeInRedis = jedisPool.getResource().get(
+          telephone + RedisMessageConstant.SENDTYPE_ORDER);
+        String validateCode = (String) map.get("validateCode");
+        //校验手机验证码
+        if(codeInRedis == null || !codeInRedis.equals(validateCode)){
+            return new Result(false, MessageConstant.VALIDATECODE_ERROR);
+        }
+        Result result =null;
+        //调用体检预约服务
+        try{
+            map.put("orderType", Order.ORDERTYPE_WEIXIN);
+            result = orderService.order(map);
+        }catch (Exception e){
+            e.printStackTrace();
+            //预约失败
+            return result;
+        }
+        if(result.isFlag()){
+            //预约成功，发送短信通知
+            String orderDate = (String) map.get("orderDate");
+            try {
+                SMSUtils.sendShortMessage(SMSUtils.ORDER_NOTICE,telephone,orderDate);
+            } catch (ClientException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+}
+~~~
+
+#### 注意点
+
+> 接受post参数，没有对应的实体类，可以用Map接收，Map比较灵活。注意需要加@RequestBody注解
+
+#### 2.2.2 服务接口
+
+在health_interface工程中创建体检预约服务接口OrderService并提供预约方法
+
+~~~java
+package com.itheima.service;
+
+import com.itheima.entity.Result;
+import java.util.Map;
+/**
+ * 体检预约服务接口
+ */
+public interface OrderService {
+    //体检预约
+    public Result order(Map map) throws Exception;
+}
+~~~
+
+#### 2.2.3 服务实现类
+
+在health_service_provider工程中创建体检预约服务实现类OrderServiceImpl并实现体检预约方法。
+
+体检预约方法处理逻辑比较复杂，需要进行如下业务处理：
+
+1、检查用户所选择的预约日期是否已经提前进行了预约设置，如果没有设置则无法进行预约
+
+2、检查用户所选择的预约日期是否已经约满，如果已经约满则无法预约
+
+3、检查用户是否重复预约（同一个用户在同一天预约了同一个套餐），如果是重复预约则无法完成再次预约
+
+4、检查当前用户是否为会员，如果是会员则直接完成预约，如果不是会员则自动完成注册并进行预约
+
+5、预约成功，更新当日的已预约人数
+
+实现代码如下：
+
+~~~java
+package com.itheima.service;
+
+import com.alibaba.dubbo.config.annotation.Service;
+import com.itheima.constant.MessageConstant;
+import com.itheima.dao.MemberDao;
+import com.itheima.dao.OrderDao;
+import com.itheima.dao.OrderSettingDao;
+import com.itheima.dao.SetmealDao;
+import com.itheima.entity.Result;
+import com.itheima.pojo.Member;
+import com.itheima.pojo.Order;
+import com.itheima.pojo.OrderSetting;
+import com.itheima.pojo.Setmeal;
+import com.itheima.utils.DateUtils;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 体检预约服务
+ */
+@Service(interfaceClass = OrderService.class)
+@Transactional
+public class OrderServiceImpl implements OrderService{
+    @Autowired
+    private OrderSettingDao orderSettingDao;
+    @Autowired
+    private MemberDao memberDao;
+    @Autowired
+    private OrderDao orderDao;
+  
+    //体检预约
+    public Result order(Map map) throws Exception {
+   		//检查当前日期是否进行了预约设置
+        String orderDate = (String) map.get("orderDate");
+        Date date = DateUtils.parseString2Date(orderDate);
+        OrderSetting orderSetting = orderSettingDao.findByOrderDate(date);
+        if(orderSetting == null){
+            return new Result(false, MessageConstant.SELECTED_DATE_CANNOT_ORDER);
+        }
+      
+        //检查预约日期是否预约已满
+        int number = orderSetting.getNumber();//可预约人数
+        int reservations = orderSetting.getReservations();//已预约人数
+        if(reservations >= number){
+            //预约已满，不能预约
+            return new Result(false,MessageConstant.ORDER_FULL);
+        }
+      
+        //检查当前用户是否为会员，根据手机号判断
+        String telephone = (String) map.get("telephone");
+        Member member = memberDao.findByTelephone(telephone);
+        //防止重复预约
+        if(member != null){
+            Integer memberId = member.getId();
+            int setmealId = Integer.parseInt((String) map.get("setmealId"));
+            Order order = new Order(memberId,date,null,null,setmealId);
+            List<Order> list = orderDao.findByCondition(order);
+            if(list != null && list.size() > 0){
+                //已经完成了预约，不能重复预约
+                return new Result(false,MessageConstant.HAS_ORDERED);
+            }
+        }
+        
+      	//可以预约，设置预约人数加一
+        orderSetting.setReservations(orderSetting.getReservations()+1);
+        orderSettingDao.editReservationsByOrderDate(orderSetting);
+
+        if(member == null){
+            //当前用户不是会员，需要添加到会员表
+            member = new Member();
+            member.setName((String) map.get("name"));
+            member.setPhoneNumber(telephone);
+            member.setIdCard((String) map.get("idCard"));
+            member.setSex((String) map.get("sex"));
+            member.setRegTime(new Date());
+            memberDao.add(member);
+        }
+      
+        //保存预约信息到预约表
+        Order order = new Order(member.getId(),
+                                date,
+                                (String)map.get("orderType"),
+                                Order.ORDERSTATUS_NO,
+                                Integer.parseInt((String) map.get("setmealId")));
+        orderDao.add(order);
+      
+        return new Result(true,MessageConstant.ORDER_SUCCESS,order.getId());
+    }
+}
+~~~
+
+#### 2.2.4 Dao接口
+
+~~~java
+package com.itheima.dao;
+
+import com.itheima.pojo.OrderSetting;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public interface OrderSettingDao {
+    public void add(OrderSetting orderSetting);
+    //更新可预约人数
+    public void editNumberByOrderDate(OrderSetting orderSetting);
+    //更新已预约人数
+    public void editReservationsByOrderDate(OrderSetting orderSetting);
+    public long findCountByOrderDate(Date orderDate);
+    //根据日期范围查询预约设置信息
+    public List<OrderSetting> getOrderSettingByMonth(Map date);
+    //根据预约日期查询预约设置信息
+    public OrderSetting findByOrderDate(Date orderDate);
+}
+
+~~~
+
+~~~java
+package com.itheima.dao;
+
+import com.github.pagehelper.Page;
+import com.itheima.pojo.Member;
+import java.util.List;
+
+public interface MemberDao {
+    public List<Member> findAll();
+    public Page<Member> selectByCondition(String queryString);
+    public void add(Member member);
+    public void deleteById(Integer id);
+    public Member findById(Integer id);
+    public Member findByTelephone(String telephone);
+    public void edit(Member member);
+    public Integer findMemberCountBeforeDate(String date);
+    public Integer findMemberCountByDate(String date);
+    public Integer findMemberCountAfterDate(String date);
+    public Integer findMemberTotalCount();
+}
+~~~
+
+~~~java
+package com.itheima.dao;
+
+import com.itheima.pojo.Order;
+import java.util.List;
+import java.util.Map;
+
+public interface OrderDao {
+    public void add(Order order);
+    public List<Order> findByCondition(Order order);
+}
+~~~
+
+#### 2.2.5 Mapper映射文件
+
+OrderSettingDao.xml
+
+~~~xml
+<!--根据日期查询预约设置信息-->
+<select id="findByOrderDate" parameterType="date" resultType="com.itheima.pojo.OrderSetting">
+  select * from t_ordersetting where orderDate = #{orderDate}
+</select>
+<!--更新已预约人数-->
+<update id="editReservationsByOrderDate" parameterType="com.itheima.pojo.OrderSetting">
+  update t_ordersetting set reservations = #{reservations} where orderDate = #{orderDate}
+</update>
+~~~
+
+MemberDao.xml
+
+~~~xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.itheima.dao.MemberDao" >
+    <select id="findAll" resultType="com.itheima.pojo.Member">
+        select * from t_member
+    </select>
+
+    <!--根据条件查询-->
+    <select id="selectByCondition" 
+            parameterType="string" resultType="com.itheima.pojo.Member">
+        select * from t_member
+        <if test="value != null and value.length > 0">
+            where fileNumber = #{value} or phoneNumber = #{value} or name = #{value}
+        </if>
+    </select>
+
+    <!--新增会员-->
+    <insert id="add" parameterType="com.itheima.pojo.Member">
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into 
+      		t_member
+              (fileNumber,name,sex,idCard,phoneNumber,
+               regTime,password,email,birthday,remark)
+             values
+              (#{fileNumber},#{name},#{sex},#{idCard},#{phoneNumber},
+               #{regTime},#{password},#{email},#{birthday},#{remark})
+    </insert>
+
+    <!--删除会员-->
+    <delete id="deleteById" parameterType="int">
+        delete from t_member where id = #{id}
+    </delete>
+
+    <!--根据id查询会员-->
+    <select id="findById" parameterType="int" resultType="com.itheima.pojo.Member">
+        select * from t_member where id = #{id}
+    </select>
+
+    <!--根据id查询会员-->
+    <select id="findByTelephone" 
+            parameterType="string" resultType="com.itheima.pojo.Member">
+        select * from t_member where phoneNumber = #{phoneNumber}
+    </select>
+
+    <!--编辑会员-->
+    <update id="edit" parameterType="com.itheima.pojo.Member">
+        update t_member
+        <set>
+            <if test="fileNumber != null">
+                fileNumber = #{fileNumber},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="sex != null">
+                sex = #{sex},
+            </if>
+            <if test="idCard != null">
+                idCard = #{idCard},
+            </if>
+            <if test="phoneNumber != null">
+                phoneNumber = #{phoneNumber},
+            </if>
+            <if test="regTime != null">
+                regTime = #{regTime},
+            </if>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+            <if test="birthday != null">
+                birthday = #{birthday},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--根据日期统计会员数，统计指定日期之前的会员数-->
+    <select id="findMemberCountBeforeDate" parameterType="string" resultType="int">
+        select count(id) from t_member where regTime &lt;= #{value}
+    </select>
+
+    <!--根据日期统计会员数-->
+    <select id="findMemberCountByDate" parameterType="string" resultType="int">
+        select count(id) from t_member where regTime = #{value}
+    </select>
+
+    <!--根据日期统计会员数，统计指定日期之后的会员数-->
+    <select id="findMemberCountAfterDate" parameterType="string" resultType="int">
+        select count(id) from t_member where regTime &gt;= #{value}
+    </select>
+
+    <!--总会员数-->
+    <select id="findMemberTotalCount" resultType="int">
+        select count(id) from t_member
+    </select>
+</mapper>
+~~~
+
+OrderDao.xml
+
+~~~xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.itheima.dao.OrderDao" >
+    <resultMap id="baseResultMap" type="com.itheima.pojo.Order">
+        <id column="id" property="id"/>
+        <result column="member_id" property="memberId"/>
+        <result column="orderDate" property="orderDate"/>
+        <result column="orderType" property="orderType"/>
+        <result column="orderStatus" property="orderStatus"/>
+        <result column="setmeal_id" property="setmealId"/>
+    </resultMap>
+    <!--新增-->
+    <insert id="add" parameterType="com.itheima.pojo.Order">
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into 
+      		t_order
+      	(member_id,orderDate,orderType,orderStatus,setmeal_id)
+        	values 
+      	(#{memberId},#{orderDate},#{orderType},#{orderStatus},#{setmealId})
+    </insert>
+
+    <!--动态条件查询-->
+    <select id="findByCondition" 
+            parameterType="com.itheima.pojo.Order" 
+            resultMap="baseResultMap">
+        select * from t_order
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="memberId != null">
+                and member_id = #{memberId}
+            </if>
+            <if test="orderDate != null">
+                and orderDate = #{orderDate}
+            </if>
+            <if test="orderType != null">
+                and orderType = #{orderType}
+            </if>
+            <if test="orderStatus != null">
+                and orderStatus = #{orderStatus}
+            </if>
+            <if test="setmealId != null">
+                and setmeal_id = #{setmealId}
+            </if>
+        </where>
+    </select>
+</mapper>
+~~~
+
+## 3. 预约成功页面展示
+
+前面已经完成了体检预约，预约成功后页面会跳转到成功提示页面（orderSuccess.html）并展示预约的相关信息（体检人、体检套餐、体检时间等）。
+
+### 3.1 页面调整
+
+提供orderSuccess.html页面，展示预约成功后相关信息
+
+~~~html
+<div class="info-title">
+  <span class="name">体检预约成功</span>
+</div>
+<div class="notice-item">
+  <div class="item-title">预约信息</div>
+  <div class="item-content">
+    <p>体检人：{{orderInfo.member}}</p>
+    <p>体检套餐：{{orderInfo.setmeal}}</p>
+    <p>体检日期：{{orderInfo.orderDate}}</p>
+    <p>预约类型：{{orderInfo.orderType}}</p>
+  </div>
+</div>
+~~~
+
+~~~javascript
+<script>
+  //从请求URL根据参数名获取对应值，orderId为预约id
+  var id = getUrlParam("orderId");
+</script>
+<script>
+  var vue = new Vue({
+    el:'#app',
+    data:{
+      orderInfo:{}
+    },
+    mounted(){
+      axios.post("/order/findById.do?id=" + id).then((response) => {
+        this.orderInfo = response.data.data;
+      });
+    }
+  });
+</script>
+~~~
+
+### 3.2 后台代码
+
+#### 3.2.1 Controller
+
+在OrderController中提供findById方法，根据预约id查询预约相关信息
+
+~~~java
+/**
+ * 根据id查询预约信息，包括套餐信息和会员信息
+ * @param id
+ * @return
+*/
+@RequestMapping("/findById")
+public Result findById(Integer id){
+  try{
+    Map map = orderService.findById(id);
+    //查询预约信息成功
+    return new Result(true,MessageConstant.QUERY_ORDER_SUCCESS,map);
+  }catch (Exception e){
+    e.printStackTrace();
+    //查询预约信息失败
+    return new Result(false,MessageConstant.QUERY_ORDER_FAIL);
+  }
+}
+~~~
+
+#### 3.2.2 服务接口
+
+在OrderService服务接口中扩展findById方法
+
+~~~java
+//根据id查询预约信息，包括体检人信息、套餐信息
+public Map findById(Integer id) throws Exception;
+~~~
+
+#### 3.2.3 服务实现类
+
+在OrderServiceImpl服务实现类中实现findById方法
+
+~~~java
+//根据id查询预约信息，包括体检人信息、套餐信息
+public Map findById(Integer id) throws Exception {
+  Map map = orderDao.findById4Detail(id);
+  if(map != null){
+    //处理日期格式
+    Date orderDate = (Date) map.get("orderDate");
+    map.put("orderDate",DateUtils.parseDate2String(orderDate));
+  }
+  return map;
+}
+~~~
+
+#### 注意点
+
+> 返回的参数和实体类无法对应，也可以返回一个Map
+
+#### 3.2.4 Dao接口
+
+在OrderDao接口中扩展findById4Detail方法
+
+~~~java
+public Map findById4Detail(Integer id);
+~~~
+
+#### 3.2.5 Mapper映射文件
+
+在OrderDao.xml映射文件中提供SQL语句
+
+~~~xml
+<!--根据预约id查询预约信息，包括体检人信息、套餐信息-->
+<select id="findById4Detail" parameterType="int" resultType="map">
+  select m.name member ,s.name setmeal,o.orderDate orderDate,o.orderType orderType
+  from
+  t_order o,
+  t_member m,
+  t_setmeal s
+  where o.member_id=m.id and o.setmeal_id=s.id and o.id=#{id}
+</select>
+~~~
+
+# 第9章 移动端开发-手机快速登录、权限控制
+
+## 1. 需求分析
+
+手机快速登录功能，就是通过短信验证码的方式进行登录。这种方式相对于用户名密码登录方式，用户不需要记忆自己的密码，只需要通过输入手机号并获取验证码就可以完成登录，是目前比较流行的登录方式。
+
+![5](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/5-1667656312442.png)
+
+
+
+![2](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/2-1667656312442.png)
+
+## 2. 手机快速登录
+
+### 2.1 页面调整
+
+登录页面为/pages/login.html
+
+#### 2.1.1 发送验证码
+
+为获取验证码按钮绑定事件，并在事件对应的处理函数中校验手机号，如果手机号输入正确则显示30秒倒计时效果并发送ajax请求，发送短信验证码
+
+~~~html
+<div class="input-row">
+  <label>手机号</label>
+  <div class="loginInput">
+    <input v-model="loginInfo.telephone" id='account' type="text" 
+           placeholder="请输入手机号">
+    <input id="validateCodeButton" 
+           @click="sendValidateCode()" type="button" style="font-size: 12px" 
+           value="获取验证码">
+  </div>
+</div>
+~~~
+
+~~~javascript
+<script>
+  var vue = new Vue({
+    el:'#app',
+    data:{
+      loginInfo:{}//登录信息
+    },
+    methods:{
+      //发送验证码
+      sendValidateCode(){
+        var telephone = this.loginInfo.telephone;
+        if (!checkTelephone(telephone)) {
+          this.$message.error('请输入正确的手机号');
+          return false;
+        }
+        validateCodeButton = $("#validateCodeButton")[0];
+        clock = window.setInterval(doLoop, 1000); //一秒执行一次
+        axios.
+        post("/validateCode/send4Login.do?telephone=" + telephone).
+        then((response) => {
+          if(!response.data.flag){
+            //验证码发送失败
+            this.$message.error('验证码发送失败，请检查手机号输入是否正确');
+          }
+        });
+      }
+    }
+  });
+</script>
+~~~
+
+在ValidateCodeController中提供send4Login方法，调用短信服务发送验证码并将验证码保存到redis
+
+~~~java
+//手机快速登录时发送手机验证码
+@RequestMapping("/send4Login")
+public Result send4Login(String telephone){
+  Integer code = ValidateCodeUtils.generateValidateCode(6);//生成6位数字验证码
+  try {
+    //发送短信
+    SMSUtils.sendShortMessage(SMSUtils.VALIDATE_CODE,telephone,code.toString());
+  } catch (ClientException e) {
+    e.printStackTrace();
+    //验证码发送失败
+    return new Result(false, MessageConstant.SEND_VALIDATECODE_FAIL);
+  }
+  System.out.println("发送的手机验证码为：" + code);
+  //将生成的验证码缓存到redis
+  jedisPool.getResource().setex(telephone+RedisMessageConstant.SENDTYPE_LOGIN,
+                                5 * 60,
+                                code.toString());
+  //验证码发送成功
+  return new Result(true,MessageConstant.SEND_VALIDATECODE_SUCCESS);
+}
+~~~
+
+#### 2.1.2 提交登录请求
+
+为登录按钮绑定事件
+
+~~~javascript
+<div class="btn yes-btn"><a @click="login()" href="#">登录</a></div>
+~~~
+
+~~~javascript
+//登录
+login(){
+  var telephone = this.loginInfo.telephone;
+  if (!checkTelephone(telephone)) {
+    this.$message.error('请输入正确的手机号');
+    return false;
+  }
+  axios.post("/member/login.do",this.loginInfo).then((response) => {
+    if(response.data.flag){
+      //登录成功,跳转到会员页面
+      window.location.href="member.html";
+    }else{
+      //失败，提示失败信息
+      this.$message.error(response.data.message);
+    }
+  });
+}
+~~~
+
+### 2.2 后台代码
+
+#### 2.2.1 Controller
+
+在health_mobile工程中创建MemberController并提供login方法进行登录检查，处理逻辑为：
+
+1、校验用户输入的短信验证码是否正确，如果验证码错误则登录失败
+
+2、如果验证码正确，则判断当前用户是否为会员，如果不是会员则自动完成会员注册
+
+3、向客户端写入Cookie，内容为用户手机号
+
+4、将会员信息保存到Redis，使用手机号作为key，保存时长为30分钟
+
+~~~java
+package com.itheima.controller;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.aliyuncs.exceptions.ClientException;
+import com.itheima.constant.MessageConstant;
+import com.itheima.constant.RedisConstant;
+import com.itheima.constant.RedisMessageConstant;
+import com.itheima.entity.Result;
+import com.itheima.pojo.Member;
+import com.itheima.service.MemberService;
+import com.itheima.utils.JedisUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import redis.clients.jedis.JedisPool;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
+import java.util.Map;
+/**
+ * 会员登录
+ */
+@RestController
+@RequestMapping("/member")
+public class MemberController {
+    @Reference
+    private MemberService memberService;
+    @Autowired
+    private JedisPool jedisPool;
+  
+    //使用手机号和验证码登录
+    @RequestMapping("/login")
+    public Result login(HttpServletResponse response,@RequestBody Map map){
+        String telephone = (String) map.get("telephone");
+        String validateCode = (String) map.get("validateCode");
+        //从Redis中获取缓存的验证码
+        String codeInRedis = 
+            jedisPool.getResource().get(telephone+RedisMessageConstant.SENDTYPE_LOGIN);
+        if(codeInRedis == null || !codeInRedis.equals(validateCode)){
+            //验证码输入错误
+            return new Result(false,MessageConstant.VALIDATECODE_ERROR);
+        }else{
+            //验证码输入正确
+            //判断当前用户是否为会员
+            Member member = memberService.findByTelephone(telephone);
+            if(member == null){
+                //当前用户不是会员，自动完成注册
+                member = new Member();
+                member.setPhoneNumber(telephone);
+                member.setRegTime(new Date());
+                memberService.add(member);
+            }
+            //登录成功
+            //写入Cookie，跟踪用户
+            Cookie cookie = new Cookie("login_member_telephone",telephone);
+            cookie.setPath("/");//路径
+            cookie.setMaxAge(60*60*24*30);//有效期30天
+            response.addCookie(cookie);
+            //保存会员信息到Redis中
+            String json = JSON.toJSON(member).toString();
+            jedisPool.getResource().setex(telephone,60*30,json);
+            return new Result(true,MessageConstant.LOGIN_SUCCESS);
+        }
+    }
+}
+~~~
+
+#### 2.2.2 服务接口
+
+在MemberService服务接口中提供findByTelephone和add方法
+
+~~~java
+public void add(Member member);
+public Member findByTelephone(String telephone);
+~~~
+
+#### 2.2.3 服务实现类
+
+在MemberServiceImpl服务实现类中实现findByTelephone和add方法
+
+~~~java
+//根据手机号查询会员
+public Member findByTelephone(String telephone) {
+  return memberDao.findByTelephone(telephone);
+}
+//新增会员
+public void add(Member member) {
+  if(member.getPassword() != null){
+    member.setPassword(MD5Utils.md5(member.getPassword()));
+  }
+  memberDao.add(member);
+}
+~~~
+
+#### 2.2.4 Dao接口
+
+在MemberDao接口中声明findByTelephone和add方法
+
+~~~java
+public Member findByTelephone(String telephone);
+public void add(Member member);
+~~~
+
+#### 2.2.5 Mapper映射文件
+
+在MemberDao.xml映射文件中定义SQL语句
+
+~~~xml
+<!--新增会员-->
+<insert id="add" parameterType="com.itheima.pojo.Member">
+  <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+    SELECT LAST_INSERT_ID()
+  </selectKey>
+  insert into t_member
+  (fileNumber,name,sex,idCard,phoneNumber,regTime,password,email,birthday,remark)
+  values 
+  (#{fileNumber},#{name},#{sex},#{idCard},#{phoneNumber},#{regTime},#{password},#{email},#{birthday},#{remark})
+</insert>
+<!--根据手机号查询会员-->
+<select id="findByTelephone" parameterType="string" resultType="com.itheima.pojo.Member">
+  select * from t_member where phoneNumber = #{phoneNumber}
+</select>
+~~~
+
+## 3. 权限控制
+
+### 3.1 认证和授权概念
+
+前面我们已经完成了传智健康后台管理系统的部分功能，例如检查项管理、检查组管理、套餐管理、预约设置等。接下来我们需要思考2个问题：
+
+问题1：在生产环境下我们如果不登录后台系统就可以完成这些功能操作吗？
+
+答案显然是否定的，要操作这些功能必须首先登录到系统才可以。
+
+问题2：是不是所有用户，只要登录成功就都可以操作所有功能呢？
+
+答案是否定的，并不是所有的用户都可以操作这些功能。不同的用户可能拥有不同的权限，这就需要进行授权了。
+
+
+
+认证：系统提供的用于识别用户身份的功能，通常提供用户名和密码进行登录其实就是在进行认证，认证的目的是让系统知道你是谁。
+
+授权：用户认证成功后，需要为用户授权，其实就是指定当前用户可以操作哪些功能。
+
+本章节就是要对后台系统进行权限控制，其本质就是对用户进行认证和授权。
+
+### 3.2 权限模块数据模型
+
+前面已经分析了认证和授权的概念，要实现最终的权限控制，需要有一套表结构支撑：
+
+用户表t_user、权限表t_permission、角色表t_role、菜单表t_menu、用户角色关系表t_user_role、角色权限关系表t_role_permission、角色菜单关系表t_role_menu。
+
+表之间关系如下图：
+
+![3](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/3-1667656312442.png)
+
+通过上图可以看到，权限模块共涉及到7张表。在这7张表中，角色表起到了至关重要的作用，其处于核心位置，因为用户、权限、菜单都和角色是多对多关系。
+
+接下来我们可以分析一下在认证和授权过程中分别会使用到哪些表：
+
+认证过程：只需要用户表就可以了，在用户登录时可以查询用户表t_user进行校验，判断用户输入的用户名和密码是否正确。
+
+授权过程：用户必须完成认证之后才可以进行授权，首先可以根据用户查询其角色，再根据角色查询对应的菜单，这样就确定了用户能够看到哪些菜单。然后再根据用户的角色查询对应的权限，这样就确定了用户拥有哪些权限。所以授权过程会用到上面7张表。
+
+### 3.3 Spring Security简介
+
+Spring Security是 Spring提供的安全认证服务的框架。 使用Spring Security可以帮助我们来简化认证和授权的过程。官网：https://spring.io/projects/spring-security
+
+![4](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/4-1667656312443.png)
+
+对应的maven坐标：
+
+~~~xml
+<dependency>
+  <groupId>org.springframework.security</groupId>
+  <artifactId>spring-security-web</artifactId>
+  <version>5.0.5.RELEASE</version>
+</dependency>
+<dependency>
+  <groupId>org.springframework.security</groupId>
+  <artifactId>spring-security-config</artifactId>
+  <version>5.0.5.RELEASE</version>
+</dependency>
+~~~
+
+常用的权限框架除了Spring Security，还有Apache的shiro框架。
+
+### 3.4 Spring Security入门案例
+
+#### 3.4.1 工程搭建
+
+创建maven工程，打包方式为war，为了方便起见我们可以让入门案例工程依赖health_interface，这样相关的依赖都继承过来了。
+
+pom.xml
+
+~~~xml
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.itheima</groupId>
+  <artifactId>springsecuritydemo</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>war</packaging>
+
+  <name>springsecuritydemo Maven Webapp</name>
+  <url>http://www.example.com</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.itheima</groupId>
+      <artifactId>health_interface</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.tomcat.maven</groupId>
+        <artifactId>tomcat7-maven-plugin</artifactId>
+        <configuration>
+          <!-- 指定端口 -->
+          <port>85</port>
+          <!-- 请求路径 -->
+          <path>/</path>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+~~~
+
+提供index.html页面，内容为hello Spring Security!!
+
+#### 3.4.2 配置web.xml
+
+在web.xml中主要配置SpringMVC的DispatcherServlet和用于整合第三方框架的DelegatingFilterProxy，用于整合Spring Security。
+
+~~~xml
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+  <display-name>Archetype Created Web Application</display-name>
+  <filter>
+    <!--
+      DelegatingFilterProxy用于整合第三方框架
+      整合Spring Security时过滤器的名称必须为springSecurityFilterChain，
+	  否则会抛出NoSuchBeanDefinitionException异常
+    -->
+    <filter-name>springSecurityFilterChain</filter-name>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>springSecurityFilterChain</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <servlet>
+    <servlet-name>springmvc</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <!-- 指定加载的配置文件 ，通过参数contextConfigLocation加载 -->
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>classpath:spring-security.xml</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>springmvc</servlet-name>
+    <url-pattern>*.do</url-pattern>
+  </servlet-mapping>
+
+</web-app>
+~~~
+
+#### 3.4.3 配置spring-security.xml
+
+在spring-security.xml中主要配置Spring Security的拦截规则和认证管理器。
+
+~~~xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/mvc
+						http://www.springframework.org/schema/mvc/spring-mvc.xsd
+						http://code.alibabatech.com/schema/dubbo
+						http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context.xsd
+                          http://www.springframework.org/schema/security
+                          http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <!--
+        http：用于定义相关权限控制
+        auto-config：是否自动配置
+                        设置为true时框架会提供默认的一些配置，例如提供默认的登录页面、登出处理等
+                        设置为false时需要显示提供登录表单配置，否则会报错
+        use-expressions：用于指定intercept-url中的access属性是否使用表达式
+    -->
+    <security:http auto-config="true" use-expressions="true">
+        <!--
+            intercept-url：定义一个拦截规则
+            pattern：对哪些url进行权限控制
+            access：在请求对应的URL时需要什么权限，默认配置时它应该是一个以逗号分隔的角色列表，
+				  请求的用户只需拥有其中的一个角色就能成功访问对应的URL
+        -->
+        <security:intercept-url pattern="/**"  access="hasRole('ROLE_ADMIN')" />
+    </security:http>
+
+    <!--
+        authentication-manager：认证管理器，用于处理认证操作
+    -->
+    <security:authentication-manager>
+        <!--
+            authentication-provider：认证提供者，执行具体的认证逻辑
+        -->
+        <security:authentication-provider>
+            <!--
+                user-service：用于获取用户信息，提供给authentication-provider进行认证
+            -->
+            <security:user-service>
+                <!--
+                    user：定义用户信息，可以指定用户名、密码、角色，后期可以改为从数据库查询用户信息
+				  {noop}：表示当前使用的密码为明文
+                -->
+                <security:user name="admin" 
+                               password="{noop}admin" 
+                               authorities="ROLE_ADMIN">
+              	</security:user>
+            </security:user-service>
+        </security:authentication-provider>
+    </security:authentication-manager>
+</beans>
+~~~
+
+### 3.5 对入门案例改进
+
+前面我们已经完成了Spring Security的入门案例，通过入门案例我们可以看到，Spring Security将我们项目中的所有资源都保护了起来，要访问这些资源必须要完成认证而且需要具有ROLE_ADMIN角色。
+
+但是入门案例中的使用方法离我们真实生产环境还差很远，还存在如下一些问题：
+
+1、项目中我们将所有的资源（所有请求URL）都保护起来，实际环境下往往有一些资源不需要认证也可以访问，也就是可以匿名访问。
+
+2、登录页面是由框架生成的，而我们的项目往往会使用自己的登录页面。
+
+3、直接将用户名和密码配置在了配置文件中，而真实生产环境下的用户名和密码往往保存在数据库中。
+
+4、在配置文件中配置的密码使用明文，这非常不安全，而真实生产环境下密码需要进行加密。
+
+本章节需要对这些问题进行改进。
+
+#### 3.5.1 配置可匿名访问的资源
+
+第一步：在项目中创建pages目录，在pages目录中创建a.html和b.html
+
+第二步：在spring-security.xml文件中配置，指定哪些资源可以匿名访问
+
+~~~xml
+<!--
+  http：用于定义相关权限控制
+  指定哪些资源不需要进行权限校验，可以使用通配符
+-->
+<security:http security="none" pattern="/pages/a.html" />
+<security:http security="none" pattern="/paegs/b.html" />
+<security:http security="none" pattern="/pages/**"></security:http>
+~~~
+
+通过上面的配置可以发现，pages目录下的文件可以在没有认证的情况下任意访问。
+
+#### 3.5.2 使用指定的登录页面
+
+第一步：提供login.html作为项目的登录页面
+
+~~~html
+<html>
+<head>
+    <title>登录</title>
+</head>
+<body>
+    <form action="/login.do" method="post">
+        username：<input type="text" name="username"><br>
+        password：<input type="password" name="password"><br>
+        <input type="submit" value="submit">
+    </form>
+</body>
+</html>
+~~~
+
+第二步：修改spring-security.xml文件，指定login.html页面可以匿名访问
+
+~~~xml
+<security:http security="none" pattern="/login.html" />
+~~~
+
+第三步：修改spring-security.xml文件，加入表单登录信息的配置
+
+~~~xml
+<!--
+  form-login：定义表单登录信息
+-->
+<security:form-login login-page="/login.html"
+                     username-parameter="username"
+                     password-parameter="password"
+                     login-processing-url="/login.do"
+                     default-target-url="/index.html"
+                     authentication-failure-url="/login.html"
+                     />
+~~~
+
+第四步：修改spring-security.xml文件，关闭CsrfFilter过滤器
+
+~~~xml
+<!--
+  csrf：对应CsrfFilter过滤器
+  disabled：是否启用CsrfFilter过滤器，如果使用自定义登录页面需要关闭此项，否则登录操作会被禁用（403）
+-->
+<security:csrf disabled="true"></security:csrf>
+~~~
+
+#### 3.5.3 从数据库查询用户信息
+
+如果我们要从数据库动态查询用户信息，就必须按照spring security框架的要求提供一个实现UserDetailsService接口的实现类，并按照框架的要求进行配置即可。框架会自动调用实现类中的方法并自动进行密码校验。
+
+实现类代码：
+
+~~~java
+package com.itheima.security;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class UserService implements UserDetailsService {
+    //模拟数据库中的用户数据
+    public  static  Map<String, com.itheima.pojo.User> map = new HashMap<>();
+    static {
+        com.itheima.pojo.User user1 = new com.itheima.pojo.User();
+        user1.setUsername("admin");
+        user1.setPassword("admin");
+
+        com.itheima.pojo.User user2 = new com.itheima.pojo.User();
+        user2.setUsername("xiaoming");
+        user2.setPassword("1234");
+
+        map.put(user1.getUsername(),user1);
+        map.put(user2.getUsername(),user2);
+    }
+    /**
+     * 根据用户名加载用户信息
+     * @param username
+     * @return
+     * @throws UsernameNotFoundException
+     */
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        System.out.println("username:" + username);
+        com.itheima.pojo.User userInDb = map.get(username);//模拟根据用户名查询数据库
+        if(userInDb == null){
+            //根据用户名没有查询到用户
+            return null;
+        }
+
+        //模拟数据库中的密码，后期需要查询数据库
+        String passwordInDb = "{noop}" + userInDb.getPassword();
+
+        List<GrantedAuthority> list = new ArrayList<>();
+        //授权，后期需要改为查询数据库动态获得用户拥有的权限和角色
+        list.add(new SimpleGrantedAuthority("add"));
+        list.add(new SimpleGrantedAuthority("delete"));
+        list.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+      	
+        UserDetails user = new User(username,passwordInDb,list);
+        return user;
+    }
+}
+~~~
+
+spring-security.xml：
+
+~~~xml
+<!--
+  authentication-manager：认证管理器，用于处理认证操作
+-->
+<security:authentication-manager>
+  <!--
+    authentication-provider：认证提供者，执行具体的认证逻辑
+  -->
+  <security:authentication-provider user-service-ref="userService">
+  </security:authentication-provider>
+</security:authentication-manager>
+
+<bean id="userService" class="com.itheima.security.UserService"></bean>
+~~~
+
+本章节我们提供了UserService实现类，并且按照框架的要求实现了UserDetailsService接口。在spring配置文件中注册UserService，指定其作为认证过程中根据用户名查询用户信息的处理类。当我们进行登录操作时，spring security框架会调用UserService的loadUserByUsername方法查询用户信息，并根据此方法中提供的密码和用户页面输入的密码进行比对来实现认证操作。
+
+#### 3.5.4 对密码进行加密
+
+前面我们使用的密码都是明文的，这是非常不安全的。一般情况下用户的密码需要进行加密后再保存到数据库中。
+
+常见的密码加密方式有：
+
+3DES、AES、DES：使用对称加密算法，可以通过解密来还原出原始密码
+
+MD5、SHA1：使用单向HASH算法，无法通过计算还原出原始密码，但是可以建立彩虹表进行查表破解
+
+bcrypt：将salt随机并混入最终加密后的密码，验证时也无需单独提供之前的salt，从而无需单独处理salt问题
+
+加密后的格式一般为：
+
+~~~properties
+$2a$10$/bTVvqqlH9UiE0ZJZ7N2Me3RIgUCdgMheyTgV0B4cMCSokPa.6oCa
+~~~
+
+加密后字符串的长度为固定的60位。其中：$是分割符，无意义；2a是bcrypt加密版本号；10是cost的值；而后的前22位是salt值；再然后的字符串就是密码的密文了。
+
+
+
+实现步骤：
+
+第一步：在spring-security.xml文件中指定密码加密对象
+
+~~~xml
+<!--配置密码加密对象-->
+<bean id="passwordEncoder" 
+      class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+
+<!--认证管理器，用于处理认证操作-->
+<security:authentication-manager>
+  <!--认证提供者，执行具体的认证逻辑-->
+  <security:authentication-provider user-service-ref="userService">
+    <!--指定密码加密策略-->
+    <security:password-encoder ref="passwordEncoder" />
+  </security:authentication-provider>
+</security:authentication-manager>
+<!--开启spring注解使用-->
+<context:annotation-config></context:annotation-config>
+~~~
+
+第二步：修改UserService实现类
+
+~~~java
+package com.itheima.security;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class UserService implements UserDetailsService {
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
+    public  Map<String, com.itheima.pojo.User> map = new HashMap<>();//模拟数据库中的用户数据
+
+    public void initData(){
+        com.itheima.pojo.User user1 = new com.itheima.pojo.User();
+        user1.setUsername("admin");
+        user1.setPassword(passwordEncoder.encode("admin"));
+
+        com.itheima.pojo.User user2 = new com.itheima.pojo.User();
+        user2.setUsername("xiaoming");
+        user2.setPassword(passwordEncoder.encode("1234"));
+
+        map.put(user1.getUsername(),user1);
+        map.put(user2.getUsername(),user2);
+    }
+    /**
+     * 根据用户名加载用户信息
+     * @param username
+     * @return
+     * @throws UsernameNotFoundException
+     */
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        initData();
+        System.out.println("username:" + username);
+        com.itheima.pojo.User userInDb = map.get(username);//模拟根据用户名查询数据库
+        if(userInDb == null){
+            //根据用户名没有查询到用户
+            return null;
+        }
+
+        String passwordInDb = userInDb.getPassword();//模拟数据库中的密码，后期需要查询数据库
+
+        List<GrantedAuthority> list = new ArrayList<>();
+        //授权，后期需要改为查询数据库动态获得用户拥有的权限和角色
+        list.add(new SimpleGrantedAuthority("add"));
+        list.add(new SimpleGrantedAuthority("delete"));
+        list.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        UserDetails user = new User(username,passwordInDb,list);
+        return user;
+    }
+}
+~~~
+
+#### 3.5.5 配置多种校验规则
+
+为了测试方便，首先在项目中创建a.html、b.html、c.html、d.html几个页面
+
+修改spring-security.xml文件：
+
+~~~xml
+<!--只要认证通过就可以访问-->
+<security:intercept-url pattern="/index.jsp"  access="isAuthenticated()" />
+<security:intercept-url pattern="/a.html"  access="isAuthenticated()" />
+
+<!--拥有add权限就可以访问b.html页面-->
+<security:intercept-url pattern="/b.html"  access="hasAuthority('add')" />
+
+<!--拥有ROLE_ADMIN角色就可以访问c.html页面-->
+<security:intercept-url pattern="/c.html"  access="hasRole('ROLE_ADMIN')" />
+
+<!--拥有ROLE_ADMIN角色就可以访问d.html页面，
+	注意：此处虽然写的是ADMIN角色，框架会自动加上前缀ROLE_-->
+<security:intercept-url pattern="/d.html"  access="hasRole('ADMIN')" />
+~~~
+
+#### 3.5.6 注解方式权限控制
+
+Spring Security除了可以在配置文件中配置权限校验规则，还可以使用注解方式控制类中方法的调用。例如Controller中的某个方法要求必须具有某个权限才可以访问，此时就可以使用Spring Security框架提供的注解方式进行控制。
+
+实现步骤：
+
+第一步：在spring-security.xml文件中配置组件扫描，用于扫描Controller
+
+~~~xml
+<mvc:annotation-driven></mvc:annotation-driven>
+<context:component-scan base-package="com.itheima.controller"></context:component-scan>
+~~~
+
+第二步：在spring-security.xml文件中开启权限注解支持
+
+~~~xml
+<!--开启注解方式权限控制-->
+<security:global-method-security pre-post-annotations="enabled" />
+~~~
+
+第三步：创建Controller类并在Controller的方法上加入注解进行权限控制
+
+~~~java
+package com.itheima.controller;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@RestController
+@RequestMapping("/hello")
+public class HelloController {
+    @RequestMapping("/add")
+    @PreAuthorize("hasAuthority('add')")//表示用户必须拥有add权限才能调用当前方法
+    public String add(){
+        System.out.println("add...");
+        return "success";
+    }
+
+    @RequestMapping("/delete")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")//表示用户必须拥有ROLE_ADMIN角色才能调用当前方法
+    public String delete(){
+        System.out.println("delete...");
+        return "success";
+    }
+}
+~~~
+
+#### 3.5.7 退出登录
+
+用户完成登录后Spring Security框架会记录当前用户认证状态为已认证状态，即表示用户登录成功了。那用户如何退出登录呢？我们可以在spring-security.xml文件中进行如下配置：
+
+~~~xml
+<!--
+  logout：退出登录
+  logout-url：退出登录操作对应的请求路径
+  logout-success-url：退出登录后的跳转页面
+-->
+<security:logout logout-url="/logout.do" 
+                 logout-success-url="/login.html" invalidate-session="true"/>
+       
+~~~
+
+通过上面的配置可以发现，如果用户要退出登录，只需要请求/logout.do这个URL地址就可以，同时会将当前session失效，最后页面会跳转到login.html页面。
