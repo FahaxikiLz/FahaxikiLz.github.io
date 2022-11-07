@@ -1781,3 +1781,5 @@ spring security 功能也非常强大，但是还是挺复杂的，本篇内容�
 参考文档：
 [spring security 官方文档](https://docs.spring.io/spring-security/site/docs/4.2.1.RELEASE/reference/htmlsingle/#getting-started)
 [spring-security-session](https://www.baeldung.com/spring-security-session)
+
+# [Springboot + Spring Security 实现前后端分离登录认证及权限控制](https://blog.csdn.net/I_am_Hutengfei/article/details/100561564)
