@@ -510,7 +510,7 @@ public @interface AutoConfigurationPackage {}
  
 ```
 
-![img](SpringBoot.assets/image.png)
+![img](SpringBoot/image.png)
 
 ```java
 文件里面写死了spring-boot一启动就要给容器中加载的所有配置类（127个）

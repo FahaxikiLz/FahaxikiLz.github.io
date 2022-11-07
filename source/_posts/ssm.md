@@ -2605,15 +2605,6 @@ public String testParam(HttpServletRequest request){
 
 > **可以在控制器方法的形参位置设置一个实体类类型的形参，此时若浏览器传输的请求参数的参数名和实体类中的属性名一致，那么请求参数就会为此属性赋值**
 
-```java
-    @GetMapping("/testGet")
-    public void testGet(User user) {
-        System.out.println("get--------->"+user);
-    }
-```
-
-
-
 ```html
 <form th:action="@{/testBean}" method="POST">
     用户名<input type="text" name="username"/>
@@ -2639,12 +2630,21 @@ public class User {
 
 ```java
     @PostMapping("/testBean")
-    public String testBean(User user) {
+    public String testBean(@RequestBody User user) {
         System.out.println("user = " + user);
         return "success";
     }
 ```
 
+> 还可以使用一个map集合来接收
+
+```java
+@PostMapping("/testBean")
+public String testBean(@RequestBody Map map) {
+   
+    return "success";
+}
+```
 ### 解决中文乱码问题
 
 > 解决获取请求参数的乱码问题，可以使用SpringMVC提供的编码**过滤器CharacterEncodingFilter，但是必须在web.xml中进行注册**
@@ -2679,7 +2679,7 @@ public class User {
 ### @RequestBody
 
 > - **@RequestBody可以获取请求体**，需要在控制器方法设置一个形参，使用@RequestBody进行标识，当前请求的请求体就会为当前注解所标识的形参赋值
-> - **这种方式只可以获得post请求的请求体。和get请求的@RequestParam都可以通过形参获取请求参数，和通过实体类获取请求参数**
+> - **这种方式只可以获得post请求的请求体。**
 
 ```html
 <form th:action="@{/testRequestBody}" method="post">

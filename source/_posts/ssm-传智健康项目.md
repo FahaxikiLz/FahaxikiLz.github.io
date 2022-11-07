@@ -7,9 +7,9 @@ categories:
 - 练手项目
 ---
 
-> 前端：vue、axios、elementui
+> 前端：vue、axios、elementui、ECharts
 >
-> 后端：spring、srping mvc、mybatis、dubbo、七牛云、Redis、Quartz、Apache POI、短信服务
+> 后端：spring、srping mvc、mybatis、dubbo、七牛云、Redis、Quartz、Apache POI、短信服务、Spring Security
 
 # 第1章 项目概述和环境搭建
 
@@ -4173,6 +4173,10 @@ downloadTemplate(){
 }
 ~~~
 
+#### 注意点
+
+> 文件下载使用window.location.href=xxxx,访问这个路径是就会下载文件
+
 #### 3.1.3 文件上传
 
 使用ElementUI的上传组件实现文件上传并绑定相关事件
@@ -8001,3 +8005,2261 @@ public class HelloController {
 ~~~
 
 通过上面的配置可以发现，如果用户要退出登录，只需要请求/logout.do这个URL地址就可以，同时会将当前session失效，最后页面会跳转到login.html页面。
+
+# 第10章 权限控制、图形报表
+
+## 1. 在项目中应用Spring Security
+
+前面我们已经学习了Spring Security框架的使用方法，本章节我们就需要将Spring Security框架应用到后台系统中进行权限控制，其本质就是认证和授权。
+
+要进行认证和授权需要前面课程中提到的权限模型涉及的7张表支撑，因为用户信息、权限信息、菜单信息、角色信息、关联信息等都保存在这7张表中，也就是这些表中的数据是我们进行认证和授权的依据。所以在真正进行认证和授权之前需要对这些数据进行管理，即我们需要开发如下一些功能：
+
+1、权限数据管理（增删改查）
+
+2、菜单数据管理（增删改查）
+
+3、角色数据管理（增删改查、角色关联权限、角色关联菜单）
+
+4、用户数据管理（增删改查、用户关联角色）
+
+鉴于时间关系，我们不再实现这些数据管理的代码开发。我们可以直接将数据导入到数据库中即可。
+
+### 1.1 导入Spring Security环境
+
+第一步：在health_parent父工程的pom.xml中导入Spring Security的maven坐标
+
+~~~xml
+<dependency>
+  <groupId>org.springframework.security</groupId>
+  <artifactId>spring-security-web</artifactId>
+  <version>${spring.security.version}</version>
+</dependency>
+<dependency>
+  <groupId>org.springframework.security</groupId>
+  <artifactId>spring-security-config</artifactId>
+  <version>${spring.security.version}</version>
+</dependency>
+~~~
+
+第二步：在health_backend工程的web.xml文件中配置用于整合Spring Security框架的过滤器DelegatingFilterProxy
+
+~~~xml
+<!--委派过滤器，用于整合其他框架-->
+<filter>
+  <!--整合spring security时，此过滤器的名称固定springSecurityFilterChain-->
+  <filter-name>springSecurityFilterChain</filter-name>
+  <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+</filter>
+<filter-mapping>
+  <filter-name>springSecurityFilterChain</filter-name>
+  <url-pattern>/*</url-pattern>
+</filter-mapping>
+~~~
+
+### 1.2 实现认证和授权
+
+第一步：在health_backend工程中按照Spring Security框架要求提供SpringSecurityUserService，并且实现UserDetailsService接口
+
+~~~java
+package com.itheima.security;
+
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.itheima.pojo.CheckItem;
+import com.itheima.pojo.Permission;
+import com.itheima.pojo.Role;
+import com.itheima.service.CheckItemService;
+import com.itheima.service.UserService;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Component;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+@Component
+public class SpringSecurityUserService implements UserDetailsService{
+    @Reference //注意：此处要通过dubbo远程调用用户服务
+    private UserService userService;
+  
+    //根据用户名查询用户信息
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+      	//远程调用用户服务，根据用户名查询用户信息
+        com.itheima.pojo.User user = userService.findByUsername(username);
+        if(user == null){
+              //用户名不存在
+              return null;
+        }
+        List<GrantedAuthority> list = new ArrayList<>();
+        Set<Role> roles = user.getRoles();
+        for(Role role : roles){
+            //授予角色
+            list.add(new SimpleGrantedAuthority(role.getKeyword()));
+            Set<Permission> permissions = role.getPermissions();
+            for(Permission permission : permissions){
+              	//授权
+                list.add(new SimpleGrantedAuthority(permission.getKeyword()));
+            }
+        }
+        
+        UserDetails userDetails = new User(username,user.getPassword(),list);
+        return userDetails;
+    }
+}
+~~~
+
+第二步：创建UserService服务接口、服务实现类、Dao接口、Mapper映射文件等
+
+~~~java
+package com.itheima.service;
+
+import com.itheima.pojo.User;
+/**
+ * 用户服务接口
+ */
+public interface UserService {
+    public User findByUsername(String username);
+}
+~~~
+
+~~~java
+package com.itheima.service;
+
+import com.alibaba.dubbo.config.annotation.Service;
+import com.itheima.dao.PermissionDao;
+import com.itheima.dao.RoleDao;
+import com.itheima.dao.UserDao;
+import com.itheima.pojo.Permission;
+import com.itheima.pojo.Role;
+import com.itheima.pojo.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.Set;
+
+@Service(interfaceClass = UserService.class)
+@Transactional
+public class UserServiceImpl implements UserService {
+    @Autowired
+    private UserDao userDao;
+    @Autowired
+    private RoleDao roleDao;
+    @Autowired
+    private PermissionDao permissionDao;
+
+    public User findByUsername(String username) {
+        User user = userDao.findByUsername(username);
+        if(user == null){
+            return null;
+        }
+        Integer userId = user.getId();
+        Set<Role> roles = roleDao.findByUserId(userId);
+        if(roles != null && roles.size() > 0){
+            for(Role role : roles){
+                Integer roleId = role.getId();
+                Set<Permission> permissions = permissionDao.findByRoleId(roleId);
+                if(permissions != null && permissions.size() > 0){
+                    role.setPermissions(permissions);
+                }
+            }
+            user.setRoles(roles);
+        }
+        return user;
+    }
+}
+~~~
+
+~~~java
+package com.itheima.dao;
+
+import com.itheima.pojo.User;
+
+public interface UserDao {
+    public User findByUsername(String username);
+}
+~~~
+
+~~~java
+package com.itheima.dao;
+
+import com.itheima.pojo.Role;
+import java.util.Set;
+
+public interface RoleDao {
+    public Set<Role> findByUserId(int id);
+}
+~~~
+
+~~~java
+package com.itheima.dao;
+
+import com.itheima.pojo.Permission;
+import java.util.Set;
+
+public interface PermissionDao {
+    public Set<Permission> findByRoleId(int roleId);
+}
+~~~
+
+~~~xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.itheima.dao.UserDao" >
+    <select id="findByUsername" 
+            parameterType="string" 
+            resultType="com.itheima.pojo.User">
+        select * from t_user where username = #{username}
+    </select>
+</mapper>
+~~~
+
+~~~xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.itheima.dao.RoleDao" >
+    <select id="findByUserId" 
+            parameterType="int" 
+            resultType="com.itheima.pojo.Role">
+        select  r.* 
+      		from t_role r ,t_user_role ur 
+      		where r.id = ur.role_id and ur.user_id = #{userId}
+    </select>
+</mapper>
+~~~
+
+~~~xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.itheima.dao.PermissionDao" >
+    <select id="findByRoleId" 
+            parameterType="int" 
+            resultType="com.itheima.pojo.Permission">
+        select  p.* 
+      		from t_permission p ,t_role_permission rp 
+      		where p.id = rp.permission_id and rp.role_id = #{roleId}
+    </select>
+</mapper>
+~~~
+
+第三步：修改health_backend工程中的springmvc.xml文件，修改dubbo批量扫描的包路径
+
+~~~xml
+<!--批量扫描-->
+<dubbo:annotation package="com.itheima" />
+~~~
+
+**注意：**此处原来扫描的包为com.itheima.controller，现在改为com.itheima包的目的是需要将我们上面定义的SpringSecurityUserService也扫描到，因为在SpringSecurityUserService的loadUserByUsername方法中需要通过dubbo远程调用名称为UserService的服务。
+
+第四步：在health_backend工程中提供spring-security.xml配置文件
+
+~~~xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/mvc
+						http://www.springframework.org/schema/mvc/spring-mvc.xsd
+						http://code.alibabatech.com/schema/dubbo
+						http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context.xsd
+                          http://www.springframework.org/schema/security
+                          http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <!--
+        http：用于定义相关权限控制
+        指定哪些资源不需要进行权限校验，可以使用通配符
+    -->
+    <security:http security="none" pattern="/js/**" />
+    <security:http security="none" pattern="/css/**" />
+    <security:http security="none" pattern="/img/**" />
+    <security:http security="none" pattern="/plugins/**" />
+  
+    <!--
+        http：用于定义相关权限控制
+        auto-config：是否自动配置
+                        设置为true时框架会提供默认的一些配置，例如提供默认的登录页面、登出处理等
+                        设置为false时需要显示提供登录表单配置，否则会报错
+        use-expressions：用于指定intercept-url中的access属性是否使用表达式
+    -->
+    <security:http auto-config="true" use-expressions="true">
+        <security:headers>
+            <!--设置在页面可以通过iframe访问受保护的页面，默认为不允许访问-->
+            <security:frame-options policy="SAMEORIGIN"></security:frame-options>
+        </security:headers>
+        <!--
+            intercept-url：定义一个拦截规则
+            pattern：对哪些url进行权限控制
+            access：在请求对应的URL时需要什么权限，默认配置时它应该是一个以逗号分隔的角色列表，
+				  请求的用户只需拥有其中的一个角色就能成功访问对应的URL
+            isAuthenticated()：已经经过认证（不是匿名用户）
+        -->
+        <security:intercept-url pattern="/pages/**"  access="isAuthenticated()" />
+        <!--form-login：定义表单登录信息-->
+        <security:form-login login-page="/login.html"
+                             username-parameter="username"
+                             password-parameter="password"
+                             login-processing-url="/login.do"
+                             default-target-url="/pages/main.html"
+                             always-use-default-target="true"
+                             authentication-failure-url="/login.html"
+        />
+        
+        <!--
+            csrf：对应CsrfFilter过滤器
+            disabled：是否启用CsrfFilter过滤器，如果使用自定义登录页面需要关闭此项，
+					否则登录操作会被禁用（403）
+        -->
+        <security:csrf disabled="true"></security:csrf>
+    </security:http>
+
+    <!--配置密码加密对象-->
+    <bean id="passwordEncoder" 
+          class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+
+    <!--认证管理器，用于处理认证操作-->
+    <security:authentication-manager>
+        <!--认证提供者，执行具体的认证逻辑-->
+        <security:authentication-provider user-service-ref="springSecurityUserService">
+            <!--指定密码加密策略-->
+            <security:password-encoder ref="passwordEncoder" />
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+    <!--开启注解方式权限控制-->
+    <security:global-method-security pre-post-annotations="enabled" />
+</beans>
+~~~
+
+第五步：在springmvc.xml文件中引入spring-security.xml文件
+
+~~~xml
+<import resource="spring-security.xml"></import>
+~~~
+
+第六步：在Controller的方法上加入权限控制注解，此处以CheckItemController为例
+
+~~~java
+package com.itheima.controller;
+
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.itheima.constant.MessageConstant;
+import com.itheima.constant.PermissionConstant;
+import com.itheima.entity.PageResult;
+import com.itheima.entity.QueryPageBean;
+import com.itheima.entity.Result;
+import com.itheima.exception.CustomException;
+import com.itheima.pojo.CheckItem;
+import com.itheima.pojo.Member;
+import com.itheima.service.CheckItemService;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
+import java.util.List;
+
+/**
+ * 体检检查项管理
+ */
+@RestController
+@RequestMapping("/checkitem")
+public class CheckItemController {
+    @Reference
+    private CheckItemService checkItemService;
+
+    //分页查询
+    @PreAuthorize("hasAuthority('CHECKITEM_QUERY')")//权限校验
+    @RequestMapping("/findPage")
+    public PageResult findPage(@RequestBody QueryPageBean queryPageBean){
+        PageResult pageResult = checkItemService.pageQuery(
+                                    queryPageBean.getCurrentPage(), 
+                                    queryPageBean.getPageSize(), 
+                                    queryPageBean.getQueryString());
+        return pageResult;
+    }
+
+    //删除
+    @PreAuthorize("hasAuthority('CHECKITEM_DELETE')")//权限校验
+    @RequestMapping("/delete")
+    public Result delete(Integer id){
+        try {
+            checkItemService.delete(id);
+        }catch (RuntimeException e){
+            return new Result(false,e.getMessage());
+        }catch (Exception e){
+            return new Result(false, MessageConstant.DELETE_CHECKITEM_FAIL);
+        }
+        return new Result(true,MessageConstant.DELETE_CHECKITEM_SUCCESS);
+    }
+
+    //新增
+    @PreAuthorize("hasAuthority('CHECKITEM_ADD')")//权限校验
+    @RequestMapping("/add")
+    public Result add(@RequestBody CheckItem checkItem){
+        try {
+            checkItemService.add(checkItem);
+        }catch (Exception e){
+            return new Result(false,MessageConstant.ADD_CHECKITEM_FAIL);
+        }
+        return new Result(true,MessageConstant.ADD_CHECKITEM_SUCCESS);
+    }
+
+    //编辑
+    @PreAuthorize("hasAuthority('CHECKITEM_EDIT')")//权限校验
+    @RequestMapping("/edit")
+    public Result edit(@RequestBody CheckItem checkItem){
+        try {
+            checkItemService.edit(checkItem);
+        }catch (Exception e){
+            return new Result(false,MessageConstant.EDIT_CHECKITEM_FAIL);
+        }
+        return new Result(true,MessageConstant.EDIT_CHECKITEM_SUCCESS);
+    }
+}
+~~~
+
+第七步：修改页面，没有权限时提示信息设置，此处以checkitem.html中的handleDelete方法为例
+
+~~~javascript
+//权限不足提示
+showMessage(r){
+  if(r == 'Error: Request failed with status code 403'){
+    //权限不足
+    this.$message.error('无访问权限');
+    return;
+  }else{
+    this.$message.error('未知错误');
+    return;
+  }
+}
+~~~
+
+~~~javascript
+// 删除
+handleDelete(row) {
+  this.$confirm('此操作将永久当前数据，是否继续?', '提示', {
+    type: 'warning'
+  }).then(()=>{
+    //点击确定按钮执行此代码
+    axios.get("/checkitem/delete.do?id=" + row.id).then((res)=> {
+      if(!res.data.flag){
+        //删除失败
+        this.$message.error(res.data.message);
+      }else{
+        //删除成功
+        this.$message({
+          message: res.data.message,
+          type: 'success'
+        });
+        this.findPage();
+      }
+    }).catch((r)=>{
+      this.showMessage(r);
+    });
+  }).catch(()=> {
+    //点击取消按钮执行此代码
+    this.$message('操作已取消');
+  });
+}
+~~~
+
+### 1.3 显示用户名
+
+前面我们已经完成了认证和授权操作，如果用户认证成功后需要在页面展示当前用户的用户名。Spring Security在认证成功后会将用户信息保存到框架提供的上下文对象中，所以此处我们就可以调用Spring Security框架提供的API获取当前用户的username并展示到页面上。
+
+实现步骤：
+
+第一步：在main.html页面中修改，定义username模型数据基于VUE的数据绑定展示用户名，发送ajax请求获取username
+
+~~~javascript
+<script>
+    new Vue({
+        el: '#app',
+        data:{
+            username:null,//用户名
+    	    menuList:[]
+        },
+        created(){
+            //发送请求获取当前登录用户的用户名
+            axios.get('/user/getUsername.do').then((response)=>{
+                this.username = response.data.data;
+            });
+        }
+    });
+</script>
+~~~
+
+~~~html
+<div class="avatar-wrapper">
+  <img src="../img/user2-160x160.jpg" class="user-avatar">
+  <!--展示用户名-->
+  {{username}}
+</div>
+~~~
+
+第二步：创建UserController并提供getUsername方法
+
+~~~java
+package com.itheima.controller;
+
+import com.itheima.constant.MessageConstant;
+import com.itheima.entity.Result;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/user")
+public class UserController {
+    //获取当前登录用户的用户名
+    @RequestMapping("/getUsername")
+    public Result getUsername()throws Exception{
+        try{
+            org.springframework.security.core.userdetails.User user =
+                    (org.springframework.security.core.userdetails.User)
+                    SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            return new Result(true, MessageConstant.GET_USERNAME_SUCCESS,user.getUsername());
+        }catch (Exception e){
+            return new Result(false, MessageConstant.GET_USERNAME_FAIL);
+        }
+    }
+}
+~~~
+
+通过debug调试可以看到Spring Security框架在其上下文中保存的用户相关信息：
+
+![1](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/1-1667723963857.png)
+
+### 1.4 用户退出
+
+第一步：在main.html中提供的退出菜单上加入超链接
+
+~~~html
+<el-dropdown-item divided>
+  <span style="display:block;"><a href="/logout.do">退出</a></span>
+</el-dropdown-item>
+~~~
+
+第二步：在spring-security.xml文件中配置
+
+~~~xml
+<!--
+  logout：退出登录
+  logout-url：退出登录操作对应的请求路径
+  logout-success-url：退出登录后的跳转页面
+-->
+<security:logout logout-url="/logout.do" 
+                 logout-success-url="/login.html" invalidate-session="true"/>
+
+~~~
+
+## 2. 图形报表ECharts
+
+### 2.1 ECharts简介
+
+ECharts缩写来自Enterprise Charts，商业级数据图表，是百度的一个开源的使用JavaScript实现的数据可视化工具，可以流畅的运行在 PC 和移动设备上，兼容当前绝大部分浏览器（IE8/9/10/11，Chrome，Firefox，Safari等），底层依赖轻量级的矢量图形库 [ZRender](https://github.com/ecomfe/zrender)，提供直观、交互丰富、可高度个性化定制的数据可视化图表。
+
+官网：https://echarts.baidu.com/
+
+下载地址：https://echarts.baidu.com/download.html
+
+![2](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/2-1667723963883.png)
+
+下载完成可以得到如下文件：
+
+![6](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/6-1667723963857.png)
+
+
+
+解压上面的zip文件：
+
+![7](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/7-1667723963857.png)
+
+
+
+我们只需要将dist目录下的echarts.js文件引入到页面上就可以使用了
+
+![8](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/8-1667723963857.png)
+
+### 2.2 5分钟上手ECharts
+
+我们可以参考官方提供的5分钟上手ECharts文档感受一下ECharts的使用方式，地址如下：
+
+https://www.echartsjs.com/tutorial.html#5%20%E5%88%86%E9%92%9F%E4%B8%8A%E6%89%8B%20ECharts
+
+第一步：创建html页面并引入echarts.js文件
+
+~~~html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- 引入 ECharts 文件 -->
+    <script src="echarts.js"></script>
+</head>
+</html>
+~~~
+
+第二步：在页面中准备一个具备宽高的DOM容器。
+
+~~~html
+<body>
+    <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+    <div id="main" style="width: 600px;height:400px;"></div>
+</body>
+~~~
+
+第三步：通过echarts.init方法初始化一个 echarts 实例并通过setOption方法生成一个简单的柱状图
+
+~~~javascript
+<script type="text/javascript">
+  // 基于准备好的dom，初始化echarts实例
+  var myChart = echarts.init(document.getElementById('main'));
+
+  // 指定图表的配置项和数据
+  var option = {
+    title: {
+      text: 'ECharts 入门示例'
+    },
+    tooltip: {},
+    legend: {
+      data:['销量']
+    },
+    xAxis: {
+      data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
+    },
+    yAxis: {},
+    series: [{
+      name: '销量',
+      type: 'bar',
+      data: [5, 20, 36, 10, 10, 20]
+    }]
+};
+
+// 使用刚指定的配置项和数据显示图表。
+myChart.setOption(option);
+</script>
+~~~
+
+效果如下：
+
+![10](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/10-1667723963884.png)
+
+### 2.3 查看ECharts官方实例 
+
+ECharts提供了很多官方实例，我们可以通过这些官方实例来查看展示效果和使用方法。
+
+官方实例地址：https://www.echartsjs.com/examples/
+
+![3](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/3-1667723963857.png)
+
+可以点击具体的一个图形会跳转到编辑页面，编辑页面左侧展示源码（js部分源码），右侧展示图表效果，如下：
+
+![4](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/4-1667723963857.png)
+
+要查看完整代码可以点击右下角的Download按钮将完整页面下载到本地。
+
+
+
+通过官方案例我们可以发现，使用ECharts展示图表效果，关键点在于确定此图表所需的数据格式，然后按照此数据格式提供数据就可以了，我们无须关注效果是如何渲染出来的。
+
+在实际应用中，我们要展示的数据往往存储在数据库中，所以我们可以发送ajax请求获取数据库中的数据并转为图表所需的数据即可。
+
+## 3. 会员数量折线图
+
+### 3.1 需求分析
+
+会员信息是体检机构的核心数据，其会员数量和增长数量可以反映出机构的部分运营情况。通过折线图可以直观的反映出会员数量的增长趋势。本章节我们需要展示过去一年时间内每个月的会员总数据量。展示效果如下图：
+
+![5](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/5-1667723963857.png)
+
+### 3.2 完善页面
+
+会员数量折线图对应的页面为/pages/report_member.html。
+
+#### 3.2.1 导入ECharts库
+
+第一步：将echarts.js文件复制到health_backend工程的plugins目录下
+
+第二步：在report_member.html页面引入echarts.js文件
+
+~~~html
+<script src="../plugins/echarts/echarts.js"></script>
+~~~
+
+#### 3.2.2 参照官方实例导入折线图 
+
+~~~html
+<div class="box">
+  <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+  <div id="chart1" style="height:600px;"></div>
+</div>
+~~~
+
+~~~javascript
+<script type="text/javascript">
+  // 基于准备好的dom，初始化echarts实例
+  var myChart1 = echarts.init(document.getElementById('chart1'));
+  //发送ajax请求获取动态数据
+  axios.get("/report/getMemberReport.do").then((res)=>{
+    myChart1.setOption(
+      {
+        title: {
+          text: '会员数量'
+        },
+        tooltip: {},
+        legend: {
+          data:['会员数量']
+        },
+        xAxis: {
+          data: res.data.data.months
+        },
+        yAxis: {
+          type:'value'
+        },
+        series: [{
+          name: '会员数量',
+          type: 'line',
+          data: res.data.data.memberCount
+        }]
+      });
+  });
+</script>
+~~~
+
+根据折线图对数据格式的要求，我们发送ajax请求，服务端需要返回如下格式的数据：
+
+~~~json
+{
+	"data":{
+			"months":["2019.01","2019.02","2019.03","2019.04"],
+			"memberCount":[3,4,8,10]
+		   },
+	"flag":true,
+	"message":"获取会员统计数据成功"
+}
+~~~
+
+### 3.3 后台代码
+
+#### 3.3.1 Controller
+
+在health_backend工程中创建ReportController并提供getMemberReport方法
+
+~~~java
+package com.itheima.controller;
+
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.itheima.constant.MessageConstant;
+import com.itheima.entity.Result;
+import com.itheima.pojo.Setmeal;
+import com.itheima.service.MemberService;
+import com.itheima.service.ReportService;
+import com.itheima.service.SetmealService;
+import com.itheima.utils.DateUtils;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+/**
+ * 统计报表
+ */
+@RestController
+@RequestMapping("/report")
+public class ReportController {
+    @Reference
+    private MemberService memberService;
+    /**
+     * 会员数量统计
+     * @return
+     */
+    @RequestMapping("/getMemberReport")
+    public Result getMemberReport(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MONTH,-12);//获得当前日期之前12个月的日期
+
+        List<String> list = new ArrayList<>();
+        for(int i=0;i<12;i++){
+            calendar.add(Calendar.MONTH,1);
+            list.add(new SimpleDateFormat("yyyy.MM").format(calendar.getTime()));
+        }
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("months",list);
+
+        List<Integer> memberCount = memberService.findMemberCountByMonth(list);
+        map.put("memberCount",memberCount);
+
+        return new Result(true, MessageConstant.GET_MEMBER_NUMBER_REPORT_SUCCESS,map);
+    }
+}
+~~~
+
+#### 3.3.2 服务接口
+
+在MemberService服务接口中扩展方法findMemberCountByMonth
+
+~~~java
+public List<Integer> findMemberCountByMonth(List<String> month);
+~~~
+
+#### 3.2.3 服务实现类
+
+在MemberServiceImpl服务实现类中实现findMemberCountByMonth方法
+
+~~~java
+//根据月份统计会员数量
+public List<Integer> findMemberCountByMonth(List<String> month) {
+  List<Integer> list = new ArrayList<>();
+  for(String m : month){
+    m = m + ".31";//格式：2019.04.31
+    Integer count = memberDao.findMemberCountBeforeDate(m);
+    list.add(count);
+  }
+  return list;
+}
+~~~
+
+#### 3.3.4 Dao接口
+
+在MemberDao接口中扩展方法findMemberCountBeforeDate
+
+~~~java
+public Integer findMemberCountBeforeDate(String date);
+~~~
+
+#### 3.3.5 Mapper映射文件
+
+在MemberDao.xml映射文件中提供SQL语句
+
+~~~xml
+<!--根据日期统计会员数，统计指定日期之前的会员数-->
+<select id="findMemberCountBeforeDate" parameterType="string" resultType="int">
+  select count(id) from t_member where regTime &lt;= #{value}
+</select>
+~~~
+
+# 第11章 图形报表、POI报表
+
+## 1. 套餐预约占比饼形图
+
+### 1.1 需求分析
+
+会员可以通过移动端自助进行体检预约，在预约时需要选择预约的体检套餐。本章节我们需要通过饼形图直观的展示出会员预约的各个套餐占比情况。展示效果如下图：
+
+![1](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/1-1667738012365.png)
+
+### 1.2 完善页面
+
+套餐预约占比饼形图对应的页面为/pages/report_setmeal.html。
+
+#### 1.2.1 导入ECharts库
+
+~~~html
+<script src="../plugins/echarts/echarts.js"></script>
+~~~
+
+#### 1.2.2 参照官方实例导入饼形图 
+
+~~~html
+<div class="box">
+  <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+  <div id="chart1" style="height:600px;"></div>
+</div>
+~~~
+
+~~~javascript
+<script type="text/javascript">
+  // 基于准备好的dom，初始化echarts实例
+  var myChart1 = echarts.init(document.getElementById('chart1'));
+  //发送ajax请求获取动态数据
+  axios.get("/report/getSetmealReport.do").then((res)=>{
+    myChart1.setOption({
+      title : {
+        text: '套餐预约占比',
+        subtext: '',
+        x:'center'
+      },
+      tooltip : {//提示框组件
+        trigger: 'item',//触发类型，在饼形图中为item
+        formatter: "{a} <br/>{b} : {c} ({d}%)"//提示内容格式
+      },
+      legend: {
+        orient: 'vertical',
+        left: 'left',
+        data: res.data.data.setmealNames
+      },
+      series : [
+        {
+          name: '套餐预约占比',
+          type: 'pie',
+          radius : '55%',
+          center: ['50%', '60%'],
+          data:res.data.data.setmealCount,
+          itemStyle: {
+            emphasis: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.5)'
+            }
+          }
+        }
+      ]
+    });
+  });
+</script>
+~~~
+
+根据饼形图对数据格式的要求，我们发送ajax请求，服务端需要返回如下格式的数据：
+
+~~~json
+{
+	"data":{
+			"setmealNames":["套餐1","套餐2","套餐3"],
+			"setmealCount":[
+							{"name":"套餐1","value":10},
+							{"name":"套餐2","value":30},
+							{"name":"套餐3","value":25}
+						   ]
+		   },
+	"flag":true,
+	"message":"获取套餐统计数据成功"
+}
+~~~
+
+### 1.3 后台代码
+
+#### 1.3.1 Controller
+
+在health_backend工程的ReportController中提供getSetmealReport方法
+
+~~~java
+@Reference
+private SetmealService setmealService;
+/**
+ * 套餐占比统计
+ * @return
+ */
+@RequestMapping("/getSetmealReport")
+public Result getSetmealReport(){
+  List<Map<String, Object>> list = setmealService.findSetmealCount();
+
+  Map<String,Object> map = new HashMap<>();
+  map.put("setmealCount",list);
+
+  List<String> setmealNames = new ArrayList<>();
+  for(Map<String,Object> m : list){
+    String name = (String) m.get("name");
+    setmealNames.add(name);
+  }
+  map.put("setmealNames",setmealNames);
+  
+  return new Result(true, MessageConstant.GET_SETMEAL_COUNT_REPORT_SUCCESS,map);
+}
+~~~
+
+#### 1.3.2 服务接口
+
+在SetmealService服务接口中扩展方法findSetmealCount
+
+~~~java
+public List<Map<String,Object>> findSetmealCount();
+~~~
+
+#### 1.3.3 服务实现类
+
+在SetmealServiceImpl服务实现类中实现findSetmealCount方法
+
+~~~java
+public List<Map<String, Object>> findSetmealCount() {
+  return setmealDao.findSetmealCount();
+}
+~~~
+
+#### 1.3.4 Dao接口
+
+在SetmealDao接口中扩展方法findSetmealCount
+
+~~~java
+public List<Map<String,Object>> findSetmealCount();
+~~~
+
+#### 1.3.5 Mapper映射文件
+
+在SetmealDao.xml映射文件中提供SQL语句
+
+~~~xml
+<select id="findSetmealCount" resultType="map">
+  select s.name,count(o.id) as value 
+  	from t_order o ,t_setmeal s 
+  	where o.setmeal_id = s.id 
+  	group by s.name
+</select>
+~~~
+
+## 2. 运营数据统计
+
+### 2.1 需求分析
+
+通过运营数据统计可以展示出体检机构的运营情况，包括会员数据、预约到诊数据、热门套餐等信息。本章节就是要通过一个表格的形式来展示这些运营数据。效果如下图：
+
+![2](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/2-1667738012366.png)
+
+### 2.2 完善页面
+
+运营数据统计对应的页面为/pages/report_business.html。
+
+#### 2.2.1 定义模型数据
+
+定义数据模型，通过VUE的数据绑定展示数据
+
+~~~javascript
+<script>
+  var vue = new Vue({
+    el: '#app',
+    data:{
+      reportData:{
+        reportDate:null,
+        todayNewMember :0,
+        totalMember :0,
+        thisWeekNewMember :0,
+        thisMonthNewMember :0,
+        todayOrderNumber :0,
+        todayVisitsNumber :0,
+        thisWeekOrderNumber :0,
+        thisWeekVisitsNumber :0,
+        thisMonthOrderNumber :0,
+        thisMonthVisitsNumber :0,
+        hotSetmeal :[]
+      }
+    }
+  })
+</script>
+~~~
+
+~~~html
+<div class="box" style="height: 900px">
+  <div class="excelTitle" >
+    <el-button @click="exportExcel">导出Excel</el-button>运营数据统计
+  </div>
+  <div class="excelTime">日期：{{reportData.reportDate}}</div>
+  <table class="exceTable" cellspacing="0" cellpadding="0">
+    <tr>
+      <td colspan="4" class="headBody">会员数据统计</td>
+    </tr>
+    <tr>
+      <td width='20%' class="tabletrBg">新增会员数</td>
+      <td width='30%'>{{reportData.todayNewMember}}</td>
+      <td width='20%' class="tabletrBg">总会员数</td>
+      <td width='30%'>{{reportData.totalMember}}</td>
+    </tr>
+    <tr>
+      <td class="tabletrBg">本周新增会员数</td>
+      <td>{{reportData.thisWeekNewMember}}</td>
+      <td class="tabletrBg">本月新增会员数</td>
+      <td>{{reportData.thisMonthNewMember}}</td>
+    </tr>
+    <tr>
+      <td colspan="4" class="headBody">预约到诊数据统计</td>
+    </tr>
+    <tr>
+      <td class="tabletrBg">今日预约数</td>
+      <td>{{reportData.todayOrderNumber}}</td>
+      <td class="tabletrBg">今日到诊数</td>
+      <td>{{reportData.todayVisitsNumber}}</td>
+    </tr>
+    <tr>
+      <td class="tabletrBg">本周预约数</td>
+      <td>{{reportData.thisWeekOrderNumber}}</td>
+      <td class="tabletrBg">本周到诊数</td>
+      <td>{{reportData.thisWeekVisitsNumber}}</td>
+    </tr>
+    <tr>
+      <td class="tabletrBg">本月预约数</td>
+      <td>{{reportData.thisMonthOrderNumber}}</td>
+      <td class="tabletrBg">本月到诊数</td>
+      <td>{{reportData.thisMonthVisitsNumber}}</td>
+    </tr>
+    <tr>
+      <td colspan="4" class="headBody">热门套餐</td>
+    </tr>
+    <tr class="tabletrBg textCenter">
+      <td>套餐名称</td>
+      <td>预约数量</td>
+      <td>占比</td>
+      <td>备注</td>
+    </tr>
+    <tr v-for="s in reportData.hotSetmeal">
+      <td>{{s.name}}</td>
+      <td>{{s.setmeal_count}}</td>
+      <td>{{s.proportion}}</td>
+      <td></td>
+    </tr>
+  </table>
+</div>
+~~~
+
+#### 2.2.2 发送请求获取动态数据
+
+在VUE的钩子函数中发送ajax请求获取动态数据，通过VUE的数据绑定将数据展示到页面
+
+~~~javascript
+<script>
+  var vue = new Vue({
+    el: '#app',
+    data:{
+      reportData:{
+        reportDate:null,
+        todayNewMember :0,
+        totalMember :0,
+        thisWeekNewMember :0,
+        thisMonthNewMember :0,
+        todayOrderNumber :0,
+        todayVisitsNumber :0,
+        thisWeekOrderNumber :0,
+        thisWeekVisitsNumber :0,
+        thisMonthOrderNumber :0,
+        thisMonthVisitsNumber :0,
+        hotSetmeal :[]
+      }
+    },
+    created() {
+      //发送ajax请求获取动态数据
+      axios.get("/report/getBusinessReportData.do").then((res)=>{
+        this.reportData = res.data.data;
+      });
+    }
+  })
+</script>
+~~~
+
+根据页面对数据格式的要求，我们发送ajax请求，服务端需要返回如下格式的数据：
+
+~~~json
+{
+  "data":{
+    "todayVisitsNumber":0,
+    "reportDate":"2019-04-25",
+    "todayNewMember":0,
+    "thisWeekVisitsNumber":0,
+    "thisMonthNewMember":2,
+    "thisWeekNewMember":0,
+    "totalMember":10,
+    "thisMonthOrderNumber":2,
+    "thisMonthVisitsNumber":0,
+    "todayOrderNumber":0,
+    "thisWeekOrderNumber":0,
+    "hotSetmeal":[
+      {"proportion":0.4545,"name":"粉红珍爱(女)升级TM12项筛查体检套餐","setmeal_count":5},
+      {"proportion":0.1818,"name":"阳光爸妈升级肿瘤12项筛查体检套餐","setmeal_count":2},
+      {"proportion":0.1818,"name":"珍爱高端升级肿瘤12项筛查","setmeal_count":2},
+      {"proportion":0.0909,"name":"孕前检查套餐","setmeal_count":1}
+    ],
+  },
+  "flag":true,
+  "message":"获取运营统计数据成功"
+}
+~~~
+
+### 2.3 后台代码
+
+#### 2.3.1 Controller
+
+在ReportController中提供getBusinessReportData方法
+
+~~~java
+@Reference
+private ReportService reportService;
+
+/**
+ * 获取运营统计数据
+ * @return
+*/
+@RequestMapping("/getBusinessReportData")
+public Result getBusinessReportData(){
+  try {
+    Map<String, Object> result = reportService.getBusinessReport();
+    return new Result(true,MessageConstant.GET_BUSINESS_REPORT_SUCCESS,result);
+  } catch (Exception e) {
+    e.printStackTrace();
+    return new Result(true,MessageConstant.GET_BUSINESS_REPORT_FAIL);
+  }
+}
+~~~
+
+#### 2.3.2 服务接口
+
+在health_interface工程中创建ReportService服务接口并声明getBusinessReport方法
+
+~~~java
+package com.itheima.service;
+
+import java.util.Map;
+
+public interface ReportService {
+    /**
+     * 获得运营统计数据
+     * Map数据格式：
+     *      todayNewMember -> number
+     *      totalMember -> number
+     *      thisWeekNewMember -> number
+     *      thisMonthNewMember -> number
+     *      todayOrderNumber -> number
+     *      todayVisitsNumber -> number
+     *      thisWeekOrderNumber -> number
+     *      thisWeekVisitsNumber -> number
+     *      thisMonthOrderNumber -> number
+     *      thisMonthVisitsNumber -> number
+     *      hotSetmeals -> List<Setmeal>
+     */
+    public Map<String,Object> getBusinessReport() throws Exception;
+}
+~~~
+
+#### 2.3.3 服务实现类
+
+在health_service_provider工程中创建服务实现类ReportServiceImpl并实现ReportService接口
+
+~~~java
+package com.itheima.service;
+
+import com.alibaba.dubbo.config.annotation.Service;
+import com.itheima.dao.MemberDao;
+import com.itheima.dao.OrderDao;
+import com.itheima.utils.DateUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 统计报表服务
+ */
+@Service(interfaceClass = ReportService.class)
+@Transactional
+public class ReportServiceImpl implements ReportService {
+    @Autowired
+    private MemberDao memberDao;
+    @Autowired
+    private OrderDao orderDao;
+
+    /**
+     * 获得运营统计数据
+     * Map数据格式：
+     *      todayNewMember -> number
+     *      totalMember -> number
+     *      thisWeekNewMember -> number
+     *      thisMonthNewMember -> number
+     *      todayOrderNumber -> number
+     *      todayVisitsNumber -> number
+     *      thisWeekOrderNumber -> number
+     *      thisWeekVisitsNumber -> number
+     *      thisMonthOrderNumber -> number
+     *      thisMonthVisitsNumber -> number
+     *      hotSetmeal -> List<Setmeal>
+     */
+    public Map<String, Object> getBusinessReport() throws Exception{
+      	//获得当前日期
+        String today = DateUtils.parseDate2String(DateUtils.getToday());
+        //获得本周一的日期
+        String thisWeekMonday = DateUtils.parseDate2String(DateUtils.getThisWeekMonday());
+        //获得本月第一天的日期  
+        String firstDay4ThisMonth = 
+          					DateUtils.parseDate2String(DateUtils.getFirstDay4ThisMonth());
+
+        //今日新增会员数
+        Integer todayNewMember = memberDao.findMemberCountByDate(today);
+
+        //总会员数
+        Integer totalMember = memberDao.findMemberTotalCount();
+
+        //本周新增会员数
+        Integer thisWeekNewMember = memberDao.findMemberCountAfterDate(thisWeekMonday);
+
+        //本月新增会员数
+        Integer thisMonthNewMember = memberDao.findMemberCountAfterDate(firstDay4ThisMonth);
+
+        //今日预约数
+        Integer todayOrderNumber = orderDao.findOrderCountByDate(today);
+
+        //本周预约数
+        Integer thisWeekOrderNumber = orderDao.findOrderCountAfterDate(thisWeekMonday);
+
+        //本月预约数
+        Integer thisMonthOrderNumber = orderDao.findOrderCountAfterDate(firstDay4ThisMonth);
+
+        //今日到诊数
+        Integer todayVisitsNumber = orderDao.findVisitsCountByDate(today);
+
+        //本周到诊数
+        Integer thisWeekVisitsNumber = orderDao.findVisitsCountAfterDate(thisWeekMonday);
+
+        //本月到诊数
+        Integer thisMonthVisitsNumber = orderDao.findVisitsCountAfterDate(firstDay4ThisMonth);
+
+        //热门套餐（取前4）
+        List<Map> hotSetmeal = orderDao.findHotSetmeal();
+
+        Map<String,Object> result = new HashMap<>();
+        result.put("reportDate",today);
+        result.put("todayNewMember",todayNewMember);
+        result.put("totalMember",totalMember);
+        result.put("thisWeekNewMember",thisWeekNewMember);
+        result.put("thisMonthNewMember",thisMonthNewMember);
+        result.put("todayOrderNumber",todayOrderNumber);
+        result.put("thisWeekOrderNumber",thisWeekOrderNumber);
+        result.put("thisMonthOrderNumber",thisMonthOrderNumber);
+        result.put("todayVisitsNumber",todayVisitsNumber);
+        result.put("thisWeekVisitsNumber",thisWeekVisitsNumber);
+        result.put("thisMonthVisitsNumber",thisMonthVisitsNumber);
+        result.put("hotSetmeal",hotSetmeal);
+
+        return result;
+    }
+}
+~~~
+
+#### 2.3.4 Dao接口
+
+在OrderDao和MemberDao中声明相关统计查询方法
+
+~~~java
+package com.itheima.dao;
+
+import com.itheima.pojo.Order;
+import java.util.List;
+import java.util.Map;
+
+public interface OrderDao {
+    public void add(Order order);
+    public List<Order> findByCondition(Order order);
+    public Map findById4Detail(Integer id);
+    public Integer findOrderCountByDate(String date);
+    public Integer findOrderCountAfterDate(String date);
+    public Integer findVisitsCountByDate(String date);
+    public Integer findVisitsCountAfterDate(String date);
+    public List<Map> findHotSetmeal();
+}
+~~~
+
+~~~java
+package com.itheima.dao;
+
+import com.github.pagehelper.Page;
+import com.itheima.pojo.Member;
+import java.util.List;
+
+public interface MemberDao {
+    public List<Member> findAll();
+    public Page<Member> selectByCondition(String queryString);
+    public void add(Member member);
+    public void deleteById(Integer id);
+    public Member findById(Integer id);
+    public Member findByTelephone(String telephone);
+    public void edit(Member member);
+    public Integer findMemberCountBeforeDate(String date);
+    public Integer findMemberCountByDate(String date);
+    public Integer findMemberCountAfterDate(String date);
+    public Integer findMemberTotalCount();
+}
+~~~
+
+#### 2.3.5 Mapper映射文件
+
+在OrderDao.xml和MemberDao.xml中定义SQL语句
+
+OrderDao.xml：
+
+~~~xml
+<!--根据日期统计预约数-->
+<select id="findOrderCountByDate" parameterType="string" resultType="int">
+  select count(id) from t_order where orderDate = #{value}
+</select>
+
+<!--根据日期统计预约数，统计指定日期之后的预约数-->
+<select id="findOrderCountAfterDate" parameterType="string" resultType="int">
+  select count(id) from t_order where orderDate &gt;= #{value}
+</select>
+
+<!--根据日期统计到诊数-->
+<select id="findVisitsCountByDate" parameterType="string" resultType="int">
+  select count(id) from t_order where orderDate = #{value} and orderStatus = '已到诊'
+</select>
+
+<!--根据日期统计到诊数，统计指定日期之后的到诊数-->
+<select id="findVisitsCountAfterDate" parameterType="string" resultType="int">
+  select count(id) from t_order where orderDate &gt;= #{value} and orderStatus = '已到诊'
+</select>
+
+<!--热门套餐，查询前4条-->
+<select id="findHotSetmeal" resultType="map">
+  select 
+      s.name, 
+      count(o.id) setmeal_count ,
+      count(o.id)/(select count(id) from t_order) proportion
+    from t_order o inner join t_setmeal s on s.id = o.setmeal_id
+    group by o.setmeal_id
+    order by setmeal_count desc 
+  	limit 0,4
+</select>
+~~~
+
+MemberDao.xml：
+
+~~~xml
+<!--根据日期统计会员数，统计指定日期之前的会员数-->
+<select id="findMemberCountBeforeDate" parameterType="string" resultType="int">
+  select count(id) from t_member where regTime &lt;= #{value}
+</select>
+
+<!--根据日期统计会员数-->
+<select id="findMemberCountByDate" parameterType="string" resultType="int">
+  select count(id) from t_member where regTime = #{value}
+</select>
+
+<!--根据日期统计会员数，统计指定日期之后的会员数-->
+<select id="findMemberCountAfterDate" parameterType="string" resultType="int">
+  select count(id) from t_member where regTime &gt;= #{value}
+</select>
+
+<!--总会员数-->
+<select id="findMemberTotalCount" resultType="int">
+  select count(id) from t_member
+</select>
+~~~
+
+## 3. 运营数据统计报表导出
+
+### 3.1 需求分析
+
+运营数据统计报表导出就是将统计数据写入到Excel并提供给客户端浏览器进行下载，以便体检机构管理人员对运营数据的查看和存档。
+
+### 3.2 提供模板文件
+
+本章节我们需要将运营统计数据通过POI写入到Excel文件，对应的Excel效果如下：
+
+![3](ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/3-1667738012365.png)
+
+通过上面的Excel效果可以看到，表格比较复杂，涉及到合并单元格、字体、字号、字体加粗、对齐方式等的设置。如果我们通过POI编程的方式来设置这些效果代码会非常繁琐。
+
+在企业实际开发中，对于这种比较复杂的表格导出一般我们会提前设计一个Excel模板文件，在这个模板文件中提前将表格的结构和样式设置好，我们的程序只需要读取这个文件并在文件中的相应位置写入具体的值就可以了。
+
+在本章节资料中已经提供了一个名为report_template.xlsx的模板文件，需要将这个文件复制到health_backend工程的template目录中
+
+### 3.3 完善页面
+
+在report_business.html页面提供导出按钮并绑定事件
+
+~~~html
+<div class="excelTitle" >
+  <el-button @click="exportExcel">导出Excel</el-button>运营数据统计
+</div>
+~~~
+
+~~~javascript
+methods:{
+  //导出Excel报表
+  exportExcel(){
+    window.location.href = '/report/exportBusinessReport.do';
+  }
+}
+~~~
+
+### 3.4 后台代码
+
+在ReportController中提供exportBusinessReport方法，基于POI将数据写入到Excel中并通过输出流下载到客户端
+
+~~~java
+/**
+  * 导出Excel报表
+  * @return
+*/
+@RequestMapping("/exportBusinessReport")
+public Result exportBusinessReport(HttpServletRequest request, HttpServletResponse response){
+  try{
+    //远程调用报表服务获取报表数据
+    Map<String, Object> result = reportService.getBusinessReport();
+    
+    //取出返回结果数据，准备将报表数据写入到Excel文件中
+    String reportDate = (String) result.get("reportDate");
+    Integer todayNewMember = (Integer) result.get("todayNewMember");
+    Integer totalMember = (Integer) result.get("totalMember");
+    Integer thisWeekNewMember = (Integer) result.get("thisWeekNewMember");
+    Integer thisMonthNewMember = (Integer) result.get("thisMonthNewMember");
+    Integer todayOrderNumber = (Integer) result.get("todayOrderNumber");
+    Integer thisWeekOrderNumber = (Integer) result.get("thisWeekOrderNumber");
+    Integer thisMonthOrderNumber = (Integer) result.get("thisMonthOrderNumber");
+    Integer todayVisitsNumber = (Integer) result.get("todayVisitsNumber");
+    Integer thisWeekVisitsNumber = (Integer) result.get("thisWeekVisitsNumber");
+    Integer thisMonthVisitsNumber = (Integer) result.get("thisMonthVisitsNumber");
+    List<Map> hotSetmeal = (List<Map>) result.get("hotSetmeal");
+	
+    //获得Excel模板文件绝对路径
+    String temlateRealPath = request.getSession().getServletContext().getRealPath("template") +
+      											File.separator + "report_template.xlsx";
+	
+    //读取模板文件创建Excel表格对象
+    XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(new File(temlateRealPath)));
+    XSSFSheet sheet = workbook.getSheetAt(0);
+    
+    XSSFRow row = sheet.getRow(2);
+    row.getCell(5).setCellValue(reportDate);//日期
+
+    row = sheet.getRow(4);
+    row.getCell(5).setCellValue(todayNewMember);//新增会员数（本日）
+    row.getCell(7).setCellValue(totalMember);//总会员数
+
+    row = sheet.getRow(5);
+    row.getCell(5).setCellValue(thisWeekNewMember);//本周新增会员数
+    row.getCell(7).setCellValue(thisMonthNewMember);//本月新增会员数
+
+    row = sheet.getRow(7);
+    row.getCell(5).setCellValue(todayOrderNumber);//今日预约数	
+    row.getCell(7).setCellValue(todayVisitsNumber);//今日到诊数
+
+    row = sheet.getRow(8);
+    row.getCell(5).setCellValue(thisWeekOrderNumber);//本周预约数
+    row.getCell(7).setCellValue(thisWeekVisitsNumber);//本周到诊数
+
+    row = sheet.getRow(9);
+    row.getCell(5).setCellValue(thisMonthOrderNumber);//本月预约数
+    row.getCell(7).setCellValue(thisMonthVisitsNumber);//本月到诊数
+
+    int rowNum = 12;
+    for(Map map : hotSetmeal){//热门套餐
+      String name = (String) map.get("name");
+      Long setmeal_count = (Long) map.get("setmeal_count");
+      BigDecimal proportion = (BigDecimal) map.get("proportion");
+      row = sheet.getRow(rowNum ++);
+      row.getCell(4).setCellValue(name);//套餐名称
+      row.getCell(5).setCellValue(setmeal_count);//预约数量
+      row.getCell(6).setCellValue(proportion.doubleValue());//占比
+    }
+
+    //通过输出流进行文件下载
+    ServletOutputStream out = response.getOutputStream();
+    response.setContentType("application/vnd.ms-excel");
+    response.setHeader("content-Disposition", "attachment;filename=report.xlsx");
+    workbook.write(out);
+    
+    out.flush();
+    out.close();
+    workbook.close();
+    
+    return null;
+  }catch (Exception e){
+    return new Result(false, MessageConstant.GET_BUSINESS_REPORT_FAIL,null);
+  }
+}
+~~~
+
+# 传智健康项目  第12章
+
+在前面的课程中我们完成了将运营数据导出到Excel文件的功能。在企业开发中，除了常见的Excel形式报表，还有PDF形式的报表。那么如何导出PDF形式的报表呢？
+
+## 1. 常见的PDF报表生成方式
+
+### 1.1 iText
+
+iText是著名的开放源码的站点sourceforge一个项目，是用于生成PDF文档的一个java类库。通过iText不仅可以生成PDF或rtf的文档，而且可以将XML、Html文件转化为PDF文件。 iText的安装非常方便，下载iText.jar文件后，只需要在系统的CLASSPATH中加入iText.jar的路径，在程序中就可以使用iText类库了。
+
+maven坐标：
+
+~~~xml
+<dependency>
+  <groupId>com.lowagie</groupId>
+  <artifactId>itext</artifactId>
+  <version>2.1.7</version>
+</dependency>
+~~~
+
+示例代码:
+
+```java
+package com.itheima.app;
+
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+
+public class ItextDemo {
+    public static void main(String[] args) {
+        try {
+            Document document = new Document();
+            PdfWriter.getInstance(document, new FileOutputStream("D:\\test.pdf"));
+            document.open();
+            document.add(new Paragraph("hello itext"));
+            document.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+### 1.2 JasperReports
+
+JasperReports是一个强大、灵活的报表生成工具，能够展示丰富的页面内容，并将之转换成PDF，HTML，或者XML格式。该库完全由Java写成，可以用于在各种Java应用程序，包括J2EE，Web应用程序中生成动态内容。一般情况下，JasperReports会结合Jaspersoft Studio(模板设计器)使用导出PDF报表。
+
+maven坐标:
+
+```xml
+<dependency>
+  <groupId>net.sf.jasperreports</groupId>
+  <artifactId>jasperreports</artifactId>
+  <version>6.8.0</version>
+</dependency>
+```
+
+## 2. JasperReports概述
+
+### 2.1 JasperReports快速体验
+
+本小节我们先通过一个快速体验来感受一下JasperReports的开发过程。
+
+第一步：创建maven工程，导入JasperReports的maven坐标
+
+~~~xml
+<dependency>
+  <groupId>net.sf.jasperreports</groupId>
+  <artifactId>jasperreports</artifactId>
+  <version>6.8.0</version>
+</dependency>
+<dependency>
+    <groupId>junit</groupId>
+    <artifactId>junit</artifactId>
+    <version>4.12</version>
+</dependency>
+~~~
+
+第二步：将提前准备好的jrxml文件复制到maven工程中(后面会详细讲解如何创建jrxml文件)
+
+![42](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/42.png)
+
+第三步：编写单元测试，输出PDF报表
+
+~~~java
+@Test
+public void testJasperReports()throws Exception{
+    String jrxmlPath = 
+        "D:\\ideaProjects\\projects111\\jasperdemo\\src\\main\\resources\\demo.jrxml";
+    String jasperPath = 
+        "D:\\ideaProjects\\projects111\\jasperdemo\\src\\main\\resources\\demo.jasper";
+
+    //编译模板
+    JasperCompileManager.compileReportToFile(jrxmlPath,jasperPath);
+
+    //构造数据
+    Map paramters = new HashMap();
+    paramters.put("reportDate","2019-10-10");
+    paramters.put("company","itcast");
+    List<Map> list = new ArrayList();
+    Map map1 = new HashMap();
+    map1.put("name","xiaoming");
+    map1.put("address","beijing");
+    map1.put("email","xiaoming@itcast.cn");
+    Map map2 = new HashMap();
+    map2.put("name","xiaoli");
+    map2.put("address","nanjing");
+    map2.put("email","xiaoli@itcast.cn");
+    list.add(map1);
+    list.add(map2);
+
+    //填充数据
+    JasperPrint jasperPrint = 
+        JasperFillManager.fillReport(jasperPath, 
+                                     paramters, 
+                                     new JRBeanCollectionDataSource(list));
+
+    //输出文件
+    String pdfPath = "D:\\test.pdf";
+    JasperExportManager.exportReportToPdfFile(jasperPrint,pdfPath);
+}
+~~~
+
+### 2.2 JasperReports原理
+
+![43](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/43.png)
+
+
+
+- JRXML：报表填充模板，本质是一个xml文件
+- Jasper：由JRXML模板编译成的二进制文件，用于代码填充数据
+- Jrprint：当用数据填充完Jasper后生成的对象，用于输出报表
+- Exporter：报表输出的管理类，可以指定要输出的报表为何种格式
+- PDF/HTML/XML：报表形式
+
+### 2.3 开发流程
+
+使用JasperReports导出pdf报表，开发流程如下：
+
+1. 制作报表模板
+2. 模板编译
+3. 构造数据
+4. 填充数据
+5. 输出文件
+
+## 3. 模板设计器Jaspersoft Studio
+
+Jaspersoft Studio是一个图形化的报表设计工具，可以非常方便的设计出PDF报表模板文件(其实就是一个xml文件)，再结合JasperReports使用，就可以渲染出PDF文件。
+
+下载地址:https://community.jaspersoft.com/community-download
+
+![1](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/1.png)
+
+下载完成后会得到如下安装文件：
+
+![2](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/2.png)
+
+直接双击安装即可。
+
+### 3.1 Jaspersoft Studio面板介绍
+
+![4](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/4.png)
+
+### 3.2 创建工程和模板文件
+
+打开Jaspersoft Studio工具，首先需要创建一个工程，创建过程如下：
+
+![5](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/5.png)
+
+
+
+![6](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/6.png)
+
+
+
+![7](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/7.png)
+
+
+
+![8](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/8.png)
+
+
+
+创建完工程后，可以在工程上点击右键，创建模板文件：
+
+![9](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/9.png)
+
+
+
+
+
+![10](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/10.png)
+
+
+
+
+
+![11](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/11.png)
+
+
+
+![12](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/12.png)
+
+
+
+![13](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/13.png)
+
+
+
+![14](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/14.png)
+
+可以看到创建处理的模板文件后缀为jrxml，从设计区面板可以看到如下效果：
+
+![15](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/15.png)
+
+可以看到整个文件是可视化的，分为几大区域（Title、Page Header、Column Header等），如果某些区域不需要也可以删除。
+
+
+
+在面板左下角可以看到有三种视图方式：Design（设计模式）、Source（源码模式）、Preview（预览模式）:
+
+- 通过Design视图可以看到模板的直观结构和样式
+- 通过Source视图可以看到文件xml源码
+- 通过Preview视图可以预览PDF文件输出后的效果
+
+
+
+通过右侧Palette窗口可以看到常用的元素：
+
+![16](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/16.png)
+
+### 3.3 设计模板文件
+
+#### 3.3.1 增减Band
+
+可以根据情况删除或者增加模板文件中的区域（称为Band），例如在Page Header区域上点击右键，选择删除菜单：
+
+![17](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/17.png)
+
+
+
+其中Detail区域可以添加多个，其他区域只能有一个。
+
+#### 3.3.2 将元素应用到模板中
+
+##### 3.3.2.1 Image元素
+
+从右侧Palette面板中选择Image元素（图片元素），拖动到Title区域：
+
+![18](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/18.png)
+
+
+
+弹出如下对话框，有多种创建模式，选择URL模式，并在下面输入框中输入一个网络图片的连接地址：
+
+![19](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/19.png)
+
+
+
+![20](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/20.png)
+
+可以选中图片元素，鼠标拖动调整位置，也可以通过鼠标调整图片的大小。
+
+调整完成后，可以点击Preview进入预览视图，查看PDF输出效果：
+
+![21](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/21.png)
+
+点击Source进入源码视图，查看xml文件内容：
+
+![22](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/22.png)
+
+其实我们上面创建的demo1.jrxml模板文件，本质上就是一个xml文件，只不过我们不需要自己编写xml文件的内容，而是通过Jaspersoft Studio这个设计器软件进行可视化设计即可。
+
+##### 3.3.2.2 Static Text元素
+
+Static Text元素就是静态文本元素，用于在PDF文件上展示静态文本信息：
+
+![23](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/23.png)
+
+双击Title面板中的Static Text元素，可以修改文本内容：
+
+![24](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/24.png)
+
+选中元素，也可以调整文本的字体和字号：
+
+![25](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/25.png)
+
+
+
+点击Preview进入预览视图，查看效果：
+
+![26](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/26.png)
+
+##### 3.3.2.3 Current Date元素
+
+Current Date元素用于在报表中输出当前系统日期，将改元素拖动到Title区域：
+
+![27](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/27.png)
+
+预览输出效果：
+
+![28](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/28.png)
+
+默认日期输出格式如上图所示，可以回到设计视图并选中元素，在Properties面板中的Text Field子标签中修改日期输出格式：
+
+![29](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/29.png)
+
+修改日期格式：
+
+![30](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/30.png)
+
+保存文件后重新预览：
+
+![31](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/31.png)
+
+#### 3.3.3 动态数据填充
+
+上面我们在PDF文件中展示的都是一些静态数据，那么如果需要动态展示一些数据应该如何实现呢？我们可以使用Outline面板中的Parameters和Fields来实现。
+
+![32](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/32.png)
+
+Parameters通常用来展示单个数据，Fields通常用来展示需要循环的列表数据。
+
+##### 3.3.3.1 Parameters
+
+在Parameters上点击右键，创建一个Parameter参数：
+
+![33](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/33.png)
+
+
+
+可以在右侧的Properties面板中修改刚才创建的参数名称：
+
+![34](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/34.png)
+
+
+
+将刚才创建的Parameter参数拖动到面板中：
+
+![35](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/35.png)
+
+进入预览视图，查看效果：
+
+![36](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/36.png)
+
+由于模板中我们使用了Parameter动态元素，所以在预览之前需要为其动态赋值：
+
+![37](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/37.png)
+
+注意：由于我们是在Jaspersoft Studio软件中进行预览，所以需要通过上面的输入框动态为Parameter赋值，在后期项目使用时，需要我们在Java程序中动态为Parameter赋值进行数据填充。
+
+##### 3.3.3.2 Fields
+
+使用Fields方式进行数据填充，既可以使用jdbc数据源方式也可以使用JavaBean数据源方式。
+
+- jdbc数据源数据填充
+
+第一步：在Repository Explorer面板中，在Data Adapters点击右键，创建一个数据适配器
+
+![38](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/38.png)
+
+
+
+第二步：选择Database JDBC Connection
+
+![39](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/39.png)
+
+第三步：选择mysql数据库，并完善jdbc连接信息
+
+![40](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/40.png)
+
+为了能够在Jaspersoft Studio中预览到数据库中的数据，需要加入MySQL的驱动包
+
+![41](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/41.png)
+
+第四步：在Outline视图中，右键点击工程名，选择Database and Query菜单
+
+![44](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/44.png)
+
+第五步：在弹出的对话框中选择刚刚创建的JDBC数据库连接选项
+
+![45](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/45.png)
+
+第六步：在弹出对话框中Language选择sql，在右侧区域输入SQL语句并点击Read Fields按钮
+
+![46](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/46.png)
+
+可以看到通过点击上面的Read Fields按钮，已经读取到了t_setmeal表中的所有字段信息并展示在了下面，这些字段可以根据需要进行删除或者调整位置
+
+第七步：在Outline视图中的Fields下可以看到t_setmeal表中相关字段信息，拖动某个字段到设计区的Detail区域并调整位置
+
+![47](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/47.png)
+
+可以看到，在拖动Fields到设计区时，同时会产生两个元素，一个是静态文本，一个是动态元素。静态文本相当于表格的表头，可以根据需要修改文本内容。最终设计完的效果如下：
+
+![48](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/48.png)
+
+第八步：使用Preview预览视图进行预览
+
+![49](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/49.png)
+
+通过上图可以看到，虽然列表数据展示出来了，但是展示的还存在问题。在每条数据遍历时表头也跟着遍历了一遍。这是怎么回事呢？这是由于我们设计的表头和动态Fields都在Detail区域。为了能够解决上面的问题，需要将表头放在Column Header区域，将动态Fields放在Detail区域。具体操作如下：
+
+1、在Outline视图的Column Header点击右键创建出一个区域
+
+![50](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/50.png)
+
+2、将Detail下的静态文本拖动到Column Header下
+
+![51](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/51.png)
+
+拖动完成后如下：
+
+![52](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/52.png)
+
+3、调整静态文本在Column Header区域的位置，最终效果如下
+
+![53](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/53.png)
+
+4、预览查看效果
+
+![54](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/54.png)
+
+
+
+- JavaBean数据源数据填充
+
+第一步：复制上面的demo1.jrxml文件，名称改为demo2.jrxml
+
+![55](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/55.png)
+
+修改Report Name：
+
+![57](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/57.png)
+
+第二步：打开demo2.jrxml文件，将detail区域中的动态Fields元素删除
+
+![56](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/56.png)
+
+第三步：将Outline面板中Fields下的字段全部删除
+
+![58](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/58.png)
+
+第四步：清除JDBC数据源和相关SQL语句
+
+![61](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/61.png)
+
+![62](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/62.png)
+
+第五步：在Fields处点击右键创建新的Field
+
+![59](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/59.png)
+
+创建完成后在Properties属性面板中修改Field的名称
+
+![60](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/60.png)
+
+![63](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/63.png)
+
+第六步：将创建的Fields拖动到Detail区域并调整好位置
+
+![64](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/64.png)
+
+
+
+注意：使用此种JavaBean数据源数据填充方式，无法正常进行预览，因为这些动态Fields需要在Java程序中动态进行数据填充。
+
+### 3.4 结合JasperReports输出报表
+
+前面我们已经使用Jaspersoft Studio设计了两个模板文件：demo1.jrxml和demo2.jrxml。其中demo1.jrxml的动态列表数据是基于JDBC数据源方式进行数据填充，demo2.jrxml的动态列表数据是基于JavaBean数据源方式进行数据填充。本小节我们就结合JasperReports的Java API来完成pdf报表输出。
+
+#### 3.4.1 JDBC数据源方式填充数据
+
+第一步：创建maven工程，导入相关maven坐标
+
+~~~xml
+<dependency>
+    <groupId>net.sf.jasperreports</groupId>
+    <artifactId>jasperreports</artifactId>
+    <version>6.8.0</version>
+</dependency>
+<dependency>
+    <groupId>junit</groupId>
+    <artifactId>junit</artifactId>
+    <version>4.12</version>
+</dependency>
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>5.1.47</version>
+</dependency>
+~~~
+
+第二步：将设计好的demo1.jrxml文件复制到当前工程的resources目录下
+
+![65](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/65.png)
+
+第三步：编写单元测试
+
+~~~java
+@Test
+public void testReport_JDBC() throws Exception{
+    Class.forName("com.mysql.jdbc.Driver");
+    Connection connection = 
+        DriverManager.getConnection("jdbc:mysql://localhost:3306/health", 
+                                    "root", 
+                                    "root");
+
+    String jrxmlPath = "D:\\ideaProjects\\projects111\\jasperreports_test\\src\\main\\resources\\demo1.jrxml";
+    String jasperPath = "D:\\ideaProjects\\projects111\\jasperreports_test\\src\\main\\resources\\demo1.jasper";
+
+    //编译模板
+    JasperCompileManager.compileReportToFile(jrxmlPath,jasperPath);
+
+    //构造数据
+    Map paramters = new HashMap();
+    paramters.put("company","传智播客");
+
+    //填充数据---使用JDBC数据源方式填充
+    JasperPrint jasperPrint = 
+        JasperFillManager.fillReport(jasperPath, 
+                                    paramters, 
+                                    connection);
+    //输出文件
+    String pdfPath = "D:\\test.pdf";
+    JasperExportManager.exportReportToPdfFile(jasperPrint,pdfPath);
+}
+~~~
+
+通过上面的操作步骤可以输出pdf文件，但是中文的地方无法正常显示。这是因为JasperReports默认情况下对中文支持并不友好，需要我们自己进行修复。具体操作步骤如下：
+
+1、在Jaspersoft Studio中打开demo1.jrxml文件，选中中文相关元素，统一将字体设置为“华文宋体”并将修改后的demo1.jrxml重新复制到maven工程中
+
+2、将本章资源/解决中文无法显示问题目录下的文件复制到maven工程的resources目录中
+
+![66](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/66.png)
+
+按照上面步骤操作后重新执行单元测试导出PDF文件：
+
+![67](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/67.png)
+
+#### 3.4.2 JavaBean数据源方式填充数据
+
+第一步：为了能够避免中文无法显示问题，首先需要将demo2.jrxml文件相关元素字体改为“华文宋体”并将demo2.jrxml文件复制到maven工程的resources目录下
+
+![68](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/68.png)
+
+第二步：编写单元测试方法输出PDF文件
+
+~~~java
+@Test
+public void testReport_JavaBean() throws Exception{
+    String jrxmlPath = "D:\\ideaProjects\\projects111\\jasperreports_test\\src\\main\\resources\\demo2.jrxml";
+    String jasperPath = "D:\\ideaProjects\\projects111\\jasperreports_test\\src\\main\\resources\\demo2.jasper";
+
+    //编译模板
+    JasperCompileManager.compileReportToFile(jrxmlPath,jasperPath);
+
+    //构造数据
+    Map paramters = new HashMap();
+    paramters.put("company","传智播客");
+
+    List<Map> list = new ArrayList();
+    Map map1 = new HashMap();
+    map1.put("tName","入职体检套餐");
+    map1.put("tCode","RZTJ");
+    map1.put("tAge","18-60");
+    map1.put("tPrice","500");
+
+    Map map2 = new HashMap();
+    map2.put("tName","阳光爸妈老年健康体检");
+    map2.put("tCode","YGBM");
+    map2.put("tAge","55-60");
+    map2.put("tPrice","500");
+    list.add(map1);
+    list.add(map2);
+
+    //填充数据---使用JavaBean数据源方式填充
+    JasperPrint jasperPrint = 
+        JasperFillManager.fillReport(jasperPath, 
+                                     paramters, 
+                                     new JRBeanCollectionDataSource(list));
+    //输出文件
+    String pdfPath = "D:\\test.pdf";
+    JasperExportManager.exportReportToPdfFile(jasperPrint,pdfPath);
+}
+~~~
+
+查看输出效果：
+
+![69](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/69.png)
+
+## 4. 在项目中输出运营数据PDF报表
+
+本小节我们将在项目中实现运营数据的PDF报表导出功能。
+
+### 4.1 设计PDF模板文件
+
+使用Jaspersoft Studio设计运营数据PDF报表模板文件health_business3.jrxml，设计后的效果如下：
+
+![70](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/70.png)
+
+在资源中已经提供好了此文件，直接使用即可。
+
+### 4.2 搭建环境
+
+第一步：在health_common工程的pom.xml中导入JasperReports的maven坐标
+
+~~~xml
+<dependency>
+    <groupId>net.sf.jasperreports</groupId>
+    <artifactId>jasperreports</artifactId>
+    <version>6.8.0</version>
+</dependency>
+~~~
+
+第二步：将资源中提供的模板文件health_business3.jrxml复制到health_backend工程的template目录下
+
+![71](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/71.png)
+
+第三步：将解决中问题的相关资源文件复制到项目中
+
+![72](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/72.png)
+
+### 4.3 修改页面
+
+修改health_backend工程的report_business.html页面，添加导出PDF的按钮并绑定事件
+
+![73](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/73.png)
+
+
+
+![74](F:/%25E9%25BB%2591%25E9%25A9%25AC%25E7%25A8%258B%25E5%25BA%258F%25E5%2591%2598%25E6%2596%2587%25E4%25BB%25B6/%25E4%25BC%25A0%25E6%2599%25BA%25E5%2581%25A5%25E5%25BA%25B7%25E9%25A1%25B9%25E7%259B%25AE/day12/%25E8%25AE%25B2%25E4%25B9%2589/74.png)
+
+### 4.4 Java代码实现
+
+在health_backend工程的ReportController中提供exportBusinessReport4PDF方法
+
+~~~java
+//导出运营数据到pdf并提供客户端下载
+@RequestMapping("/exportBusinessReport4PDF")
+public Result exportBusinessReport4PDF(HttpServletRequest request, HttpServletResponse response) {
+    try {
+        Map<String, Object> result = reportService.getBusinessReportData();
+
+        //取出返回结果数据，准备将报表数据写入到PDF文件中
+        List<Map> hotSetmeal = (List<Map>) result.get("hotSetmeal");
+
+        //动态获取模板文件绝对磁盘路径
+        String jrxmlPath = 
+            request.getSession().getServletContext().getRealPath("template") + File.separator + "health_business3.jrxml";
+        String jasperPath = 
+            request.getSession().getServletContext().getRealPath("template") + File.separator + "health_business3.jasper";
+        //编译模板
+        JasperCompileManager.compileReportToFile(jrxmlPath, jasperPath);
+
+        //填充数据---使用JavaBean数据源方式填充
+        JasperPrint jasperPrint =
+            JasperFillManager.fillReport(jasperPath,result,
+                                         new JRBeanCollectionDataSource(hotSetmeal));
+
+        ServletOutputStream out = response.getOutputStream();
+        response.setContentType("application/pdf");
+        response.setHeader("content-Disposition", "attachment;filename=report.pdf");
+
+        //输出文件
+        JasperExportManager.exportReportToPdfStream(jasperPrint,out);
+
+        return null;
+    } catch (Exception e) {
+        e.printStackTrace();
+        return new Result(false, MessageConstant.GET_BUSINESS_REPORT_FAIL);
+    }
+}
+~~~
+
