@@ -5182,7 +5182,7 @@ export default {
 >    router.beforeEach((to, from, next) => {
 >        // if (to.path === "/home/message" || to.path === "/home/news") {
 >        // if (to.name === "xiaoxi" || to.name === "xinwen") {
->        if (to.meta.isAuth) {//判断当前路由是否需要进行全新控制
+>        if (to.meta.isAuth) {//判断当前路由是否需要进行权限控制
 >            if (localStorage.getItem('people') === 'lz') {//权限控制的具体规则
 >                next()//放行
 >            } else {

@@ -2271,6 +2271,17 @@ public class MyServletFilterListener {
 
 ![image-20220604104223647](SpringBoot/image-20220604104223647.png)
 
+> 注意：
+>
+> 1. 驱动类driver-class-name
+>    - **spring boot 2.0（内置jdbc5驱动），驱动类使用：driver-class-name: com.mysql.jdbc.Driver**
+>    - **spring boot 2.1及以上（内置jdbc8驱动），驱动类使用： driver-class-name: com.mysql.cj.jdbc.Driver 否则运行测试用例的时候会有 WARN 信息** 
+> 2. 连接地址url
+>    - **MySQL5.7版本的url：jdbc:mysql://localhost:3306/mybatis_plus?characterEncoding=utf-8&useSSL=false**
+>    - **MySQL8.0版本的url：jdbc:mysql://localhost:3306/mybatis_plus? serverTimezone=GMT%2B8&characterEncoding=utf-8&useSSL=false** 
+>
+> - 否则运行测试用例报告如下错误： `java.sql.SQLException: The server time zone value 'ÖÐ¹ú±ê×¼Ê±¼ä' is unrecognized or represents more`
+
 ##### 分析自动配置
 
 > 自动配置的类
