@@ -2361,5 +2361,6 @@ public void testLockLua() {
 
 > 之前老版Redis想要搭集群需要单独安装ruby环境，Redis 5 将 redis-trib.rb 的功能集成到 redis-cli 。另外官方 redis-benchmark 工具开始支持 cluster 模式了，通过多线程的方式对多个分片进行压测。
 
+# 资源
 
-
+> - Redis 命令参考：http://redisdoc.com/
