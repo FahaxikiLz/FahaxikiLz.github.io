@@ -241,8 +241,8 @@ public class Provider {
          * 生成一个队列
          * 1.队列名称
          * 2.队列里面的消息是否持久化 默认消息存储在内存中
-         * 3.该队列是否只供一个消费者进行消费 是否进行共享 true 可以多个消费者消费
-         * 4.是否自动删除 最后一个消费者端开连接以后 该队列是否自动删除 true 自动删除
+         * 3.该队列是否只供一个消费者进行消费？是否进行共享？true可以多个消费者消费
+         * 4.是否自动删除？最后一个消费者端开连接以后，该队列是否自动删除？true自动删除
          * 5.其他参数
          */
         channel.queueDeclare(QUEUE_NAME, false, false, false, null);
@@ -443,9 +443,27 @@ public class Worker01 {
 
 ### 消息手动应答的方法
 
-> 1. `Channel.basicAck`(用于肯定确认) RabbitMQ 已知道该消息并且成功的处理消息，可以将其丢弃了 
-> 2. `Channel.basicNack`(用于否定确认)
-> 3. `Channel.basicReject`(用于否定确认) 与 `Channel.basicNack` 相比少一个参数不处理该消息了直接拒绝，可以将其丢弃了
+> 1. `basicAck(long deliveryTag, boolean multiple)`：表示成功确认，使用此回执方法后，消息会被`rabbitmq broker`删除。
+>
+>    deliveryTag：表示消息投递序号，每次消费消息或者消息重新投递后，deliveryTag都会增加。手动消息确认模式下，我们可以对指定deliveryTag的消息进行ack、nack、reject等操作。
+>
+>    multiple：是否批量确认，值为 true 则会一次性 ack所有小于当前消息 deliveryTag 的消息。
+>
+>    举个栗子： 假设我先发送三条消息deliveryTag分别是5、6、7，可它们都没有被确认，当我发第四条消息此时deliveryTag为8，multiple设置为 true，会将5、6、7、8的消息全部进行确认。
+>
+> 2. `basicNack(long deliveryTag, boolean multiple, boolean requeue)`：表示失败确认，一般在消费消息业务异常时用到此方法，可以将消息重新投递入队列。
+>
+>    deliveryTag：表示消息投递序号。
+>
+>    multiple：是否批量确认。
+>
+>    requeue：值为 true 消息将重新入队列。
+>
+> 3. `basicReject(long deliveryTag, boolean requeue)`：拒绝消息，与basicNack区别在于不能进行批量操作，其他用法很相似。
+>
+>    deliveryTag：表示消息投递序号。
+>
+>    requeue：值为 true 消息将重新入队列。
 
 ### Multiple的解释 
 
@@ -729,7 +747,7 @@ Caused by: com.rabbitmq.client.ShutdownSignalException: channel error; protocol 
 
 # 发布确认
 
-> 设置队列的持久化、消息的持久化，可能会在持久化到磁盘之间宕机了，这样数据也会丢失。所以使用发布确认，一旦消息被投递到所有匹配的队列之后，broker就会发送一个确认给生产者(包含消息的唯一 ID)，这就使得生产者知道消息已经正确到达目的队列了，如果消息和队列是可持久化的，那么确认消息会在将消息写入磁盘之后发出，否则消息丢失，生产者要重新投递。
+> 设置队列的持久化、消息的持久化，可能会在持久化到磁盘之间宕机了，这样数据也会丢失。所以使用发布确认，一旦消息被投递到所有匹配的队列之后，broker就会发送一个确认给生产者(包含消息的唯一 ID)，这就使得生产者知道**消息已经正确到达目的队列了，如果消息和队列是可持久化的，那么确认消息会在将消息写入磁盘之后发出，否则消息丢失，生产者要重新投递。**
 
 ![image-20221109203454035](RabbitMQ/image-20221109203454035.png)
 
@@ -924,17 +942,20 @@ public class ConfirmMessage {
          * 2.未收到消息的回调
          */
         channel.addConfirmListener((deliveryTag,multiple) -> {
-            //删除已经确认的消息
+            //是否批量
             if (multiple) {
+                //删除已经确认的消息
                 ConcurrentNavigableMap<Long, String> headMap = map.headMap(deliveryTag);
                 headMap.clear();
             } else {
+                //删除已经确认的消息
                 map.remove(deliveryTag);
             }
 
             System.out.println("确认收到消息，序列：" + deliveryTag);
         }, (deliveryTag,multiple) -> {
-            System.out.println("未确认收到消息，序列" + deliveryTag);
+            String message = map.get(deliveryTag);
+ 			System.out.println("发布的消息"+message+"未被确认，序列号"+deliveryTag);
         });
 
         long begin = System.currentTimeMillis();
@@ -1454,20 +1475,22 @@ public class EmitLogTopic {
 
 # 死信队列
 
-> - 由于特定的原因导致 queue 中的某些消息无法被消费，这样的消息如果没有 后续的处理，就变成了死信，有死信自然就有了死信队列。
-> - 应用场景:为了保证订单业务的消息数据不丢失，需要使用到 RabbitMQ 的死信队列机制，当消息 消费发生异常时，将消息投入死信队列中.还有比如说: 用户在商城下单成功并点击去支付后在指定时 间未支付时自动失效
+> - **由于特定的原因导致 queue 中的某些消息无法被消费，这样的消息如果没有后续的处理，就变成了死信，有死信自然就有了死信队列。**
+> - 应用场景:为了保证订单业务的消息数据不丢失，需要使用到 RabbitMQ 的死信队列机制，当消息消费发生异常时，将消息投入死信队列中.还有比如说: 用户在商城下单成功并点击去支付后在指定时 间未支付时自动失效
 
 ## 死信的来源
 
-> - 消息TTL过期 
-> - 队列达到最大长度(队列满了，无法再添加数据到mq中) 
-> - 消息被拒绝(`basic.reject`或`basic.nack`)并且`requeue=false`
+> - **消息TTL过期** 
+> - **队列达到最大长度(队列满了，无法再添加数据到mq中)** 
+> - **消息被拒绝(`basic.reject`或`basic.nack`)并且`requeue=false`**
 
 ## 架构图 
 
 ![image-20221110213711393](RabbitMQ/image-20221110213711393.png)
 
 ## 实例
+
+### 消息 TTL 过期
 
 > 先创建消息消费者Consumer01
 
@@ -1513,6 +1536,9 @@ public class Consumer01 {
         hashMap.put("x-dead-letter-exchange", DEAD_EXCHANGE);
 //        正常队列设置死信 routing-key 参数 key 是固定值
         hashMap.put("x-dead-letter-routing-key", "lisi");
+        
+//        过期时间。我们在生产者中声明
+        //hashMap.put("x-message-ttl", "10000");
 
 //        创建普通队列
         channel.queueDeclare(NORMAL_QUEUE, false, false, false, hashMap);
@@ -1618,3 +1644,671 @@ public class Consumer02 {
 > 时间过去了10s，普通队列中的消息没有被消费，消息进入死信队列
 
 ![image-20221110222214663](RabbitMQ/image-20221110222214663.png)
+
+### 队列达到最大长度
+
+> 在consume01中设置普通队列的最大长度
+
+![image-20221111082955268](RabbitMQ/image-20221111082955268.png)
+
+> 将消息生产者中的时间注释
+
+![image-20221111083127518](RabbitMQ/image-20221111083127518.png)
+
+> 当启动consume01
+
+![image-20221111082743954](RabbitMQ/image-20221111082743954.png)
+
+> 关闭consume01，启动消息生产者，普通队列中会有六个消息，死信队列中有四个消息
+
+![image-20221111082825488](RabbitMQ/image-20221111082825488.png)
+
+> 要关闭consume01，否则消息都在consume01中输出了
+
+![image-20221111083425167](RabbitMQ/image-20221111083425167.png)
+
+### 消息被拒
+
+> 在consume01中设置消息info5拒绝应答
+
+![image-20221111084352401](RabbitMQ/image-20221111084352401.png)
+
+> 同时启动producer、consume01、consume02
+
+![image-20221111084544406](RabbitMQ/image-20221111084544406.png)
+
+![image-20221111084552984](RabbitMQ/image-20221111084552984.png)
+
+![image-20221111084603076](RabbitMQ/image-20221111084603076.png)
+
+# 延迟队列
+
+> 延时队列内部是有序的，最重要的特性就体现在它的延时属性上，**延时队列中的元素是希望在指定时间到了以后或之前取出和处理，简单来说，延时队列就是用来存放需要在指定时间被处理的元素的队列。**
+
+## 延迟队列使用场景 
+
+> 1. 订单在十分钟之内未支付则自动取消
+> 2. 新创建的店铺，如果在十天内都没有上传过商品，则自动发送消息提醒。
+> 3. 用户注册成功后，如果三天内没有登陆则进行短信提醒。
+> 4. 用户发起退款，如果三天内没有得到处理则通知相关运营人员。
+> 5. 预定会议后，需要在预定的时间点前十分钟通知各个与会人员参加会议
+
+## RabbitMQ 中的 TTL
+
+> TTL 是 RabbitMQ 中一个消息或者队列的属性，表明一条消息或者该队列中的所有消息的最大存活时间， 单位是毫秒。
+>
+> 换句话说，如果一条消息设置了 TTL 属性或者进入了设置 TTL 属性的队列，那么这条消息如果在 TTL 设置的时间内没有被消费，则会成为"死信"。如果同时配置了队列的 TTL 和消息的 TTL，那么较小的那个值将会被使用，有两种方式设置 TTL。
+
+## 消息设置 TTL
+
+> 针对每条消息设置 TTL
+
+```java
+rabbitTemplate.converAndSend("X","XC",message,correlationData -> {
+    correlationData.getMessageProperties().setExpiration("5000");
+});
+```
+
+## 队列设置 TTL
+
+> 在创建队列的时候设置队列的`x-message-ttl`属性
+
+```java
+Map<String, Object> params = new HashMap<>();
+params.put("x-message-ttl",5000);
+return QueueBuilder.durable("QA").withArguments(args).build(); // QA 队列的最大存活时间位5000 毫秒
+```
+
+## 两者的区别
+
+> - **如果设置了队列的 TTL 属性，那么一旦消息过期，就会被队列丢弃(如果配置了死信队列被丢到死信队列中)**
+> - **消息设置TTL，消息即使过期，也不一定会被马上丢弃，因为消息是否过期是在即将投递到消费者之前判定的，如果当前队列有严重的消息积压情况，则已过期的消息也许还能存活较长时间**
+> - 另外，**如果不设置 TTL，表示消息永远不会过期，如果将 TTL 设置为 0，则表示除非此时可以直接投递该消息到消费者，否则该消息将会被丢弃。**
+
+## 整合SpringBoot
+
+### 依赖
+
+```xml
+        <!--RabbitMQ 依赖-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.47</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <!--swagger-->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.9.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.9.2</version>
+        </dependency>
+```
+
+### 配置文件
+
+```yaml
+spring:
+  rabbitmq:
+    host: 192.168.221.100
+    port: 5672
+    username: admin
+    password: 123
+```
+
+## 架构图
+
+![image-20221111094640859](RabbitMQ/image-20221111094640859.png)
+
+## 实例
+
+### 配置文件类
+
+```java
+package com.atguigu.rabbitmq.config;
+
+import org.springframework.amqp.core.*;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.HashMap;
+
+/**
+ * @Author:lz
+ * @Date:2022/11/11 9:48
+ * @Description
+ */
+
+@Configuration
+public class TtlQueueConfig {
+
+    //    普通交换机X
+    public static final String NORMAL_EXCHANGE_X = "X";
+    //    死信交换机Y
+    public static final String DEAD_EXCHANGE_Y = "Y";
+
+    //    普通队列QA
+    public static final String NORMAL_QUEUE_QA = "QA";
+    //    普通队列QB
+    public static final String NORMAL_QUEUE_QB = "QB";
+
+    //    死信队列QD
+    public static final String DEAD_QUEUE_QD = "QD";
+
+    //    创建普通交换机
+    @Bean
+    public DirectExchange createNormalExchangeX() {
+
+        DirectExchange directExchange = new DirectExchange(NORMAL_EXCHANGE_X);
+
+        return directExchange;
+    }
+
+    //    创建死信交换机
+    @Bean
+    public DirectExchange createDeadExchangeY() {
+        DirectExchange directExchange = new DirectExchange(DEAD_EXCHANGE_Y);
+        return directExchange;
+    }
+
+    //    创建普通队列QA设置ttl为10s，并绑定到死信交换机Y
+    @Bean
+    public Queue createNormalQueueQA() {
+        HashMap<String, Object> map = new HashMap<>();
+        //声明当前队列绑定的死信交换机
+        map.put("x-dead-letter-exchange", DEAD_EXCHANGE_Y);
+        //声明当前队列的死信路由 key
+        map.put("x-dead-letter-routing-key", "YD");
+        //声明队列的 TTL
+        map.put("x-message-ttl", 10000);
+        return QueueBuilder.durable(NORMAL_QUEUE_QA).withArguments(map).build();
+    }
+
+    //    创建普通队列QB设置ttl为20s，并绑定到死信交换机Y
+    @Bean
+    public Queue createNormalQueueQB() {
+        HashMap<String, Object> map = new HashMap<>();
+        //声明当前队列绑定的死信交换机
+        map.put("x-dead-letter-exchange", DEAD_EXCHANGE_Y);
+        //声明当前队列的死信路由 key
+        map.put("x-dead-letter-routing-key", "YD");
+        //声明队列的 TTL
+        map.put("x-message-ttl", 40000);
+        return QueueBuilder.durable(NORMAL_QUEUE_QB).withArguments(map).build();
+    }
+
+
+    //    创建死信队列QD
+    @Bean
+    public Queue createDeadQueueQD() {
+        return QueueBuilder.durable(DEAD_QUEUE_QD).build();
+    }
+
+    //    普通队列QA绑定普通交换机X
+    @Bean
+    public Binding bindNormalQueueQAToNormalExchangeX(@Qualifier("createNormalQueueQA") Queue createNormalQueueQA,
+                                                      @Qualifier("createNormalExchangeX") DirectExchange directExchange) {
+        return BindingBuilder.bind(createNormalQueueQA).to(directExchange).with("XA");
+    }
+
+    //    普通队列QB绑定普通交换机X
+    @Bean
+    public Binding bindNormalQueueQBToNormalExchangeX(@Qualifier("createNormalQueueQB") Queue createNormalQueueQB,
+                                                      @Qualifier("createNormalExchangeX") DirectExchange directExchange) {
+        return BindingBuilder.bind(createNormalQueueQB).to(directExchange).with("XB");
+
+    }
+
+    //    死信队列QD绑定死信交换机Y
+    @Bean
+    public Binding bindDeadQueueQBToDeadExchangeY(@Qualifier("createDeadQueueQD") Queue createDeadQueueQD,
+                                                  @Qualifier("createDeadExchangeY") DirectExchange directExchange) {
+        return BindingBuilder.bind(createDeadQueueQD).to(directExchange).with("YD");
+    }
+}
+```
+
+### 消息生产者
+
+```java
+package com.atguigu.rabbitmq.controller;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
+
+@Slf4j
+@RequestMapping("ttl")
+@RestController
+public class SendMsgController {
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @GetMapping("sendMsg/{message}")
+    public void sendMsg(@PathVariable String message) {
+        log.info("当前时间：{},发送一条信息给两个 TTL 队列:{}", new Date(), message);
+        rabbitTemplate.convertAndSend("X", "XA", "消息来自 ttl 为 10S 的队列: " + message);
+        rabbitTemplate.convertAndSend("X", "XB", "消息来自 ttl 为 40S 的队列: " + message);
+    }
+}
+```
+
+### 消息消费者
+
+```java
+package com.atguigu.rabbitmq.consumer;
+
+import com.rabbitmq.client.Channel;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.Date;
+
+@Slf4j
+@Component
+public class DeadLetterQueueConsumer {
+    @RabbitListener(queues = "QD")
+    public void receiveD(Message message, Channel channel) throws IOException {
+        String msg = new String(message.getBody());
+        log.info("当前时间：{},收到死信队列信息{}", new Date().toString(), msg);
+    }
+}
+```
+
+### 测试
+
+> 访问[localhost:8080/ttl/sendMsg/嘿嘿](http://localhost:8080/ttl/sendMsg/嘿嘿)
+
+![image-20221111153942978](RabbitMQ/image-20221111153942978.png)
+
+## 延时队列优化
+
+> 如果这样使用的话，岂不是每增加一个新的时间需求，就要新增一个队列，这里只有 10S 和 40S 两个时间选项，如果需要一个小时后处理，那么就需要增加 TTL 为一个小时的队列，如果是预定会议室然后提前通知这样的场景，岂不是要增加无数个队列才能满足需求？
+
+### 架构图
+
+![image-20221111163617143](RabbitMQ/image-20221111163617143.png)
+
+### 配置文件类
+
+```java
+package com.atguigu.rabbitmq.config;
+
+import org.springframework.amqp.core.*;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.HashMap;
+
+/**
+ * @Author:lz
+ * @Date:2022/11/11 9:48
+ * @Description
+ */
+
+@Configuration
+public class TtlQueueConfig {
+
+    //    普通交换机X名称
+    public static final String NORMAL_EXCHANGE_X = "X";
+    //    死信交换机Y名称
+    public static final String DEAD_EXCHANGE_Y = "Y";
+
+    //    普通队列QA名称
+    public static final String NORMAL_QUEUE_QA = "QA";
+    //    普通队列QB名称
+    public static final String NORMAL_QUEUE_QB = "QB";
+
+    //    死信队列QD名称
+    public static final String DEAD_QUEUE_QD = "QD";
+    
+/////////////////////////////////////////////////////////////////////////////////////////
+    //    普通队列QC名称
+    public static final String NORMAL_QUEUE_QC = "QC";
+
+    //    创建普通队列QC
+    @Bean
+    public Queue createNormalQueueQC() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("x-dead-letter-exchange", DEAD_EXCHANGE_Y);
+        map.put("x-dead-letter-routing-key", "YD");
+        return QueueBuilder.durable(NORMAL_QUEUE_QC).withArguments(map).build();
+    }
+
+    //    普通队列QC绑定普通交换机X
+    @Bean
+    public Binding bindNormalQueueQCToNormalExchangeX(@Qualifier("createNormalQueueQC") Queue createNormalQueueQC,
+                                                      @Qualifier("createNormalExchangeX") DirectExchange directExchange) {
+        return BindingBuilder.bind(createNormalQueueQC).to(directExchange).with("XC");
+    }
+/////////////////////////////////////////////////////////////////////////////////////////
+
+    //    创建普通交换机
+    @Bean
+
+    public DirectExchange createNormalExchangeX() {
+
+        DirectExchange directExchange = new DirectExchange(NORMAL_EXCHANGE_X);
+
+        return directExchange;
+    }
+
+    //    创建死信交换机
+    @Bean
+    public DirectExchange createDeadExchangeY() {
+        DirectExchange directExchange = new DirectExchange(DEAD_EXCHANGE_Y);
+        return directExchange;
+    }
+
+    //    创建普通队列QA设置ttl为10s，并绑定到死信交换机Y
+    @Bean
+    public Queue createNormalQueueQA() {
+        HashMap<String, Object> map = new HashMap<>();
+        //声明当前队列绑定的死信交换机
+        map.put("x-dead-letter-exchange", DEAD_EXCHANGE_Y);
+        //声明当前队列的死信路由 key
+        map.put("x-dead-letter-routing-key", "YD");
+        //声明队列的 TTL
+        map.put("x-message-ttl", 10000);
+        return QueueBuilder.durable(NORMAL_QUEUE_QA).withArguments(map).build();
+    }
+
+    //    创建普通队列QB设置ttl为20s，并绑定到死信交换机Y
+    @Bean
+    public Queue createNormalQueueQB() {
+        HashMap<String, Object> map = new HashMap<>();
+        //声明当前队列绑定的死信交换机
+        map.put("x-dead-letter-exchange", DEAD_EXCHANGE_Y);
+        //声明当前队列的死信路由 key
+        map.put("x-dead-letter-routing-key", "YD");
+        //声明队列的 TTL
+        map.put("x-message-ttl", 40000);
+        return QueueBuilder.durable(NORMAL_QUEUE_QB).withArguments(map).build();
+    }
+
+
+    //    创建死信队列QD
+    @Bean
+    public Queue createDeadQueueQD() {
+        return QueueBuilder.durable(DEAD_QUEUE_QD).build();
+    }
+
+    //    普通队列QA绑定普通交换机X
+    @Bean
+    public Binding bindNormalQueueQAToNormalExchangeX(@Qualifier("createNormalQueueQA") Queue createNormalQueueQA,
+                                                      @Qualifier("createNormalExchangeX") DirectExchange directExchange) {
+        return BindingBuilder.bind(createNormalQueueQA).to(directExchange).with("XA");
+    }
+
+    //    普通队列QB绑定普通交换机X
+    @Bean
+    public Binding bindNormalQueueQBToNormalExchangeX(@Qualifier("createNormalQueueQB") Queue createNormalQueueQB,
+                                                      @Qualifier("createNormalExchangeX") DirectExchange directExchange) {
+        return BindingBuilder.bind(createNormalQueueQB).to(directExchange).with("XB");
+
+    }
+
+    //    死信队列QD绑定死信交换机Y
+    @Bean
+    public Binding bindDeadQueueQBToDeadExchangeY(@Qualifier("createDeadQueueQD") Queue createDeadQueueQD,
+                                                  @Qualifier("createDeadExchangeY") DirectExchange directExchange) {
+        return BindingBuilder.bind(createDeadQueueQD).to(directExchange).with("YD");
+    }
+}
+```
+
+### 消息生产者
+
+```java
+package com.atguigu.rabbitmq.controller;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
+
+@Slf4j
+@RequestMapping("ttl")
+@RestController
+public class SendMsgController {
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @GetMapping("sendMsg/{message}/{ttlTime}")
+    public void sendMsg(@PathVariable("message") String message, @PathVariable("ttlTime") String ttlTime) {
+        log.info("当前时间：{},发送一条时长{}毫秒 TTL 信息给队列 C:{}", new Date(), ttlTime, message);
+        rabbitTemplate.convertAndSend("X", "XC", message, correlationData -> {
+            correlationData.getMessageProperties().setExpiration(ttlTime);
+            return correlationData;
+        });
+    }
+}
+
+```
+
+### 测试
+
+> 访问
+>
+> [localhost:8080/ttl/sendMsg/hello01/20000](http://localhost:8080/ttl/sendMsg/hello01/20000)
+>
+> [localhost:8080/ttl/sendMsg/hello02/2000](http://localhost:8080/ttl/sendMsg/hello02/2000)
+
+![image-20221111163526538](RabbitMQ/image-20221111163526538.png)
+
+> 看起来似乎没什么问题，但是在最开始的时候，就介绍过如果使用在消息属性上设置 TTL 的方式，消 息可能并不会按时“死亡“，因为 **RabbitMQ 只会检查第一个消息是否过期，如果过期则丢到死信队列， 如果第一个消息的延时时长很长，而第二个消息的延时时长很短，第二个消息并不会优先得到执行。**
+
+## Rabbitmq插件实现延迟队列
+
+> 上文中提到的问题，确实是一个问题，如果不能实现在消息粒度上的 TTL，并使其在设置的 TTL 时间及时死亡，就无法设计成一个通用的延时队列。
+
+![image-20221111210656746](RabbitMQ/image-20221111210656746.png)
+
+![image-20221111210646847](RabbitMQ/image-20221111210646847.png)
+
+### 安装延时队列插件
+
+> - 在官网上[下载]( https://www.rabbitmq.com/community-plugins.html)
+>
+> - 下载完成将插件放在`/usr/lib/rabbitmq/lib/rabbitmq_server-3.8.8/plugins`
+>
+> - 安装插件(不用写版本号)，安装完成重启RabbitMQ服务
+>
+>   ```sh
+>   rabbitmq-plugins enable rabbitmq_delayed_message_exchange
+>   ```
+>
+> - 这样就代表安装成功了
+>
+>   ![image-20221111165728274](RabbitMQ/image-20221111165728274.png)
+
+### 架构图
+
+![image-20221111172408646](RabbitMQ/image-20221111172408646.png)
+
+### 配置文件类代码
+
+```java
+package com.atguigu.rabbitmq.config;
+
+import org.springframework.amqp.core.*;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.HashMap;
+
+/**
+ * @Author:lz
+ * @Date:2022/11/11 17:11
+ * @Description
+ */
+@Configuration
+public class DelayedQueueConfig {
+
+    //    延时交换机的名称
+    public static final String DELAYED_EXCHANGE = "delayed_exchange";
+
+    //    延时队列的名称
+    public static final String DELAYED_QUEUE = "delayed_queue";
+
+    public static final String DELAYED_ROUTINGKEY = "delayed_routingKey";
+
+
+    //    创建延时交换机
+    @Bean
+    public CustomExchange createDelayedExchange() {
+
+        HashMap<String, Object> args = new HashMap<>();
+
+//        自定义交换机的类型
+        args.put("x-delayed-type", "direct");
+
+        /**
+         * 第一个参数：交换机的名称
+         * 第二个参数：交换机的类型
+         * 第三个参数：是否持久化
+         * 第四个参数：是否自动删除
+         * 第五个参数：其他参数
+         *
+         */
+        return new CustomExchange(DELAYED_EXCHANGE, "x-delayed-message", true, false, args);
+    }
+
+    //    创建延时队列
+    @Bean
+    public Queue createDelayedQueue() {
+//        return QueueBuilder.durable(DELAYED_QUEUE).build();
+
+        return new Queue(DELAYED_QUEUE);
+    }
+
+    //    延时队列绑定延时交换机
+    @Bean
+    public Binding bindDelayedQueueToDelayExchange(@Qualifier("createDelayedExchange") CustomExchange delayExchange
+            , @Qualifier("createDelayedQueue") Queue createDelayedQueue) {
+        return BindingBuilder.bind(createDelayedQueue).to(delayExchange).with(DELAYED_ROUTINGKEY).noargs();
+
+    }
+}
+
+```
+
+### 消息生产者
+
+```java
+package com.atguigu.rabbitmq.controller;
+
+import com.atguigu.rabbitmq.config.DelayedQueueConfig;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
+
+@Slf4j
+@RequestMapping("ttl")
+@RestController
+public class SendMsgController {
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    //开始发消息，基于插件的 消息及 延迟的时间
+    @GetMapping("/sendDelayMsg/{message}/{delayTime}")
+    public void sendMsg(@PathVariable("message") String message,
+                        @PathVariable("delayTime") Integer delayTime) {
+        log.info("当前时间:{},发送一条时长是{}毫秒TTL信息给延迟队列delayed.queue：{}",
+                new Date().toString(), delayTime, message);
+
+        rabbitTemplate.convertAndSend(DelayedQueueConfig.DELAYED_EXCHANGE,
+                DelayedQueueConfig.DELAYED_ROUTINGKEY, message, msg -> {
+                    //发送消息的时候的延迟时长 单位ms
+                    msg.getMessageProperties().setDelay(delayTime);
+                    return msg;
+                });
+    }
+
+}
+
+```
+
+### 消息消费者
+
+```java
+package com.atguigu.rabbitmq.consumer;
+
+import com.atguigu.rabbitmq.config.DelayedQueueConfig;
+import com.rabbitmq.client.Channel;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.Date;
+
+@Slf4j
+@Component
+public class DeadLetterQueueConsumer {
+    @RabbitListener(queues = DelayedQueueConfig.DELAYED_QUEUE)
+    public void receiveDelayedQueue(Message message) throws IOException {
+        String msg = new String(message.getBody());
+        log.info("当前时间：{},收到死信队列信息{}", new Date().toString(), msg);
+    }
+}
+
+```
+
+### 测试
+
+> 访问：
+>
+> [localhost:8080/ttl/sendDelayMsg/hello01/20000](http://localhost:8080/ttl/sendDelayMsg/hello01/20000)
+>
+> [localhost:8080/ttl/sendDelayMsg/hello02/2000](http://localhost:8080/ttl/sendDelayMsg/hello02/2000)
+
+![image-20221111205406899](RabbitMQ/image-20221111205406899.png)
+
+
+
