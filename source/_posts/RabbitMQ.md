@@ -645,7 +645,7 @@ public class Worker04 {
 
 ### 队列如何实现持久化
 
-> 之前我们创建的队列都是非持久化的，rabbitmq 如果重启的化，该队列就会被删除掉，如果要队列实现持久化需要**在声明队列的时候把 durable 参数设置为持久化（消息生产者中）**
+> 之前我们创建的队列都是非持久化的，rabbitmq如果重启的化，该队列就会被删除掉，如果要队列实现持久化需要**在声明队列的时候把 durable 参数设置为持久化（消息生产者中）**
 
 ![image-20221109185655404](RabbitMQ/image-20221109185655404.png)
 
@@ -677,7 +677,7 @@ Caused by: com.rabbitmq.client.ShutdownSignalException: channel error; protocol 
 
 ![image-20221109190308824](RabbitMQ/image-20221109190308824.png)
 
-> 将消息标记为持久化并不能完全保证不会丢失消息。尽管它告诉 RabbitMQ 将消息保存到磁盘，但是 这里依然存在当消息刚准备存储在磁盘的时候 但是还没有存储完，消息还在缓存的一个间隔点。此时并没 有真正写入磁盘。持久性保证并不强，但是对于我们的简单任务队列而言，这已经绰绰有余了。如果需要 更强有力的持久化策略，参考后边课件发布确认章节。
+> 将消息标记为持久化并不能完全保证不会丢失消息。尽管它告诉 RabbitMQ 将消息保存到磁盘，但是这里依然存在当消息刚准备存储在磁盘的时候 但是还没有存储完，消息还在缓存的一个间隔点。此时并没有真正写入磁盘。持久性保证并不强，但是对于我们的简单任务队列而言，这已经绰绰有余了。如果需要更强有力的持久化策略，参考后边课件发布确认章节。
 
 ## 不公平分发
 
@@ -2310,5 +2310,917 @@ public class DeadLetterQueueConsumer {
 
 ![image-20221111205406899](RabbitMQ/image-20221111205406899.png)
 
+# 发布确认高级Springboot版
+
+> **在生产环境中由于一些不明原因，导致 rabbitmq重启，在 RabbitMQ 重启期间生产者消息投递失败， 导致消息丢失，需要手动处理和恢复。**于是，我们开始思考，如何才能进行 RabbitMQ 的消息可靠投递呢？ 特别是在这样比较极端的情况，RabbitMQ 集群不可用的时候，无法投递的消息该如何处理呢:
+
+## 架构图
+
+![image-20221112112449241](RabbitMQ/image-20221112112449241.png)
+
+## 实例
+
+### 配置文件
+
+```yaml
+spring:
+  rabbitmq:
+    host: 192.168.221.100
+    port: 5672
+    username: admin
+    password: 123
+    publisher-confirm-type: correlated # 发布确认类型
+```
+
+> - NONE 禁用发布确认模式，是默认值 
+> - CORRELATED 发布消息成功到交换器后会触发回调方法
+> - SIMPLE 经测试有两种效果
+>   - 其一效果和 CORRELATED 值一样会触发回调方法
+>   - 其二在发布消息成功后使用 rabbitTemplate 调用 waitForConfirms 或 waitForConfirmsOrDie 方法 等待 broker 节点返回发送结果，根据返回结果来判定下一步的逻辑，要注意的点是waitForConfirmsOrDie方法如果返回 false 则会关闭 channel，则接下来无法发送消息到 broke
+
+### 配置类
+
+```java
+package com.atguigu.rabbitmq.config;
+
+import org.springframework.amqp.core.*;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * @Author:lz
+ * @Date:2022/11/12 11:07
+ * @Description：确定发布配置文件
+ */
+@Configuration
+public class ConfirmConfig {
+    public static final String CONFIRM_EXCHANGE = "confirm_exchange";
+
+    public static final String CONFIRM_QUEUE = "confirm_queue";
+
+    public static final String BINDING_KEY = "key1";
+
+    //    创建交换机
+    @Bean
+    public DirectExchange createConfirmDirectExchange() {
+        return new DirectExchange(CONFIRM_EXCHANGE);
+    }
+
+    //    创建队列
+    @Bean
+    public Queue createConfirmQueue() {
+        return QueueBuilder.durable(CONFIRM_QUEUE).build();
+    }
+
+    //    队列绑定交换机
+    @Bean
+    public Binding bingConfirmQueueToConfirmExchange(@Qualifier("createConfirmDirectExchange") DirectExchange directExchange,
+                                                     @Qualifier("createConfirmQueue") Queue queue) {
+        return BindingBuilder.bind(queue).to(directExchange).with(BINDING_KEY);
+    }
+}
+```
+
+### 生产者
+
+```java
+package com.atguigu.rabbitmq.controller;
+
+import com.atguigu.rabbitmq.config.ConfirmConfig;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * @Author:lz
+ * @Date:2022/11/12 11:15
+ * @Description：确认发布高级版
+ */
+@RestController
+@RequestMapping("/confirm")
+@Slf4j
+public class ProducerController {
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @GetMapping("sendMessage/{message}")
+    public void sendMessage(@PathVariable("message") String message) {
+        CorrelationData correlationData = new CorrelationData("1");
+
+        log.info("发送消息内容:{}", message);
+        rabbitTemplate.convertAndSend(ConfirmConfig.CONFIRM_EXCHANGE, ConfirmConfig.BINDING_KEY, message, correlationData);
+    }
+}
+
+```
+
+### 回调接口
+
+```java
+package com.atguigu.rabbitmq.config;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.ReturnedMessage;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+
+/**
+ * @Author:lz
+ * @Date:2022/11/12 15:33
+ * @Description
+ */
+@Slf4j
+@Component
+public class MyCallBack implements RabbitTemplate.ConfirmCallback{
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
 
+    @PostConstruct
+    public void init() {
+//        注入
+        rabbitTemplate.setConfirmCallback(this);
+    }
+
+
+    /**
+     * @param correlationData 保存回调信息的Id及相关信息
+     * @param ack             交换机收到消息 为true
+     * @param cause           交换机收到消息 为true
+     */
+    @Override
+    public void confirm(CorrelationData correlationData, boolean ack, String cause) {
+        String id = correlationData != null ? correlationData.getId() : "";
+        if (ack) {
+            log.info("交换机已经收到了ID为:{}的消息", id);
+        } else {
+            log.info("交换机还未收到ID为:{}的消息，由于原因:{}", id, cause);
+        }
+
+    }
+}
+
+```
+
+### 消费者
+
+```java
+package com.atguigu.rabbitmq.consumer;
+
+import com.atguigu.rabbitmq.config.ConfirmConfig;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
+/**
+ * @Author:lz
+ * @Date:2022/11/12 11:19
+ * @Description:测试发布确定高级版
+ */
+@Component
+@Slf4j
+public class ConfirmConsumer {
+
+    @RabbitListener(queues = ConfirmConfig.CONFIRM_QUEUE)
+    public void ReceiveConfirmMessage(Message message) {
+
+        log.info("接受到的队列confirm.queue消息:{}", message.getBody());
+    }
+}
+
+```
+
+### 测试
+
+> 成功发送消息
+
+![image-20221112162447329](RabbitMQ/image-20221112162447329.png)
+
+>当交换机发生错误，触发回调接口
+
+![image-20221112162458312](RabbitMQ/image-20221112162458312.png)
+
+> 当队列发生错误，没有触发接口。队列没有接收到消息，消息直接被丢弃了
+
+![image-20221112162619239](RabbitMQ/image-20221112162619239.png)
+
+## 回退消息 
+
+### Mandatory 参数
+
+> **在仅开启了生产者确认机制的情况下，交换机接收到消息后，会直接给消息生产者发送确认消息，如果发现该消息不可路由，那么消息会被直接丢弃，此时生产者是不知道消息被丢弃这个事件的。**
+
+### 实例
+
+#### 配置文件
+
+```yaml
+spring:
+  rabbitmq:
+    host: 192.168.221.100
+    port: 5672
+    username: admin
+    password: 123
+    publisher-confirm-type: correlated
+    publisher-returns: true # 发布回退为true
+
+```
+
+#### 回调接口
+
+> 在上面实例只需要修改回调接口，多实现一个接口就可以
+
+```java
+package com.atguigu.rabbitmq.config;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.ReturnedMessage;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+
+/**
+ * @Author:lz
+ * @Date:2022/11/12 15:33
+ * @Description
+ */
+@Slf4j
+@Component
+//public class MyCallBack implements RabbitTemplate.ConfirmCallback, RabbitTemplate.ReturnCallback {
+public class MyCallBack implements RabbitTemplate.ConfirmCallback, RabbitTemplate.ReturnsCallback {
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+
+    @PostConstruct
+    public void init() {
+//        注入
+        rabbitTemplate.setConfirmCallback(this);
+//        rabbitTemplate.setReturnCallback(this);
+        rabbitTemplate.setReturnsCallback(this);
+    }
+
+
+    /**
+     * @param correlationData 保存回调信息的Id及相关信息
+     * @param ack             交换机收到消息 为true
+     * @param cause           交换机收到消息 为true
+     */
+    @Override
+    public void confirm(CorrelationData correlationData, boolean ack, String cause) {
+        String id = correlationData != null ? correlationData.getId() : "";
+        if (ack) {
+            log.info("交换机已经收到了ID为:{}的消息", id);
+        } else {
+            log.info("交换机还未收到ID为:{}的消息，由于原因:{}", id, cause);
+        }
+
+    }
+
+
+    /**
+     * 当消息无法路由的时候的回调方法
+     * 注释掉的为旧写法
+     */
+//    @Override
+//    public void returnedMessage(Message message, int replyCode, String replyText, String exchange, String routingKey) {
+//        log.error("消息:{}被服务器退回，回退码:{},退回原因:{}, 交换机是:{}, 路由 key:{}",
+//                new String(message.getBody()), replyCode, replyText, exchange, routingKey);
+//    }
+
+    @Override
+    public void returnedMessage(ReturnedMessage returnedMessage) {
+        log.error("消息:{}被服务器退回，回退码:{},退回原因:{}, 交换机是:{}, 路由 key:{}",
+                new String(returnedMessage.getMessage().getBody()), returnedMessage.getReplyCode(),
+                returnedMessage.getReplyText(), returnedMessage.getExchange(), returnedMessage.getRoutingKey());
+    }
+
+}
+
+```
+
+![image-20221112212326776](RabbitMQ/image-20221112212326776.png)
+
+## 备份交换机
+
+> 有了 mandatory 参数和回退消息，我们获得了对无法投递消息的感知能力，有机会在生产者的消息无法被投递时发现并处理。但有时候，我们并不知道该如何处理这些无法路由的消息，最多打个日志，然后触发报警，再来手动处理。而通过日志来处理这些无法路由的消息是很不优雅的做法，特别是当生产者所在的服务有多台机器的时候，手动复制日志会更加麻烦而且容易出错。而且设置 mandatory 参数会增加生产者的复杂性，需要添加处理这些被退回的消息的逻辑。如果既不想丢失消息，又不想增加生产者的复杂性，该怎么做呢？
+>
+> 前面在设置死信队列的文章中，我们提到，可以为队列设置死信交换机来存储那些处理失败的消息，可是这些不可路由消息根本没有机会进入到队列，因此无法使用死信队列来保存消息。 在 RabbitMQ 中，有一种备份交换机的机制存在，可以很好的应对这个问题。
+>
+> 什么是备份交换机呢？备份交换机可以理解为 RabbitMQ中交换机的“备胎”，当我们为某一个交换机声明一个对应的备份交换机时，就是为它创建一个备胎，当交换机接收到一条不可路由消息时，将会把这条消息转发到备份交换机中，由 备份交换机来进行转发和处理，通常备份交换机的类型为 Fanout ，这样就能把所有消息都投递到与其绑定的队列中，然后我们在备份交换机下绑定一个队列，这样所有那些原交换机无法被路由的消息，就会都进入这个队列了。当然，我们还可以建立一个报警队列，用独立的消费者来进行监测和报警。
+
+### 架构图
+
+![image-20221112171756041](RabbitMQ/image-20221112171756041.png)
+
+### 实例
+
+#### 配置类
+
+```java
+package com.atguigu.rabbitmq.config;
+
+import org.springframework.amqp.core.*;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * @Author:lz
+ * @Date:2022/11/12 11:07
+ * @Description：确定发布配置文件
+ */
+@Configuration
+public class ConfirmConfig {
+    //    确认交换机
+    public static final String CONFIRM_EXCHANGE = "confirm_exchange";
+
+    //    确认队列
+    public static final String CONFIRM_QUEUE = "confirm_queue";
+
+    //    bindingkey
+    public static final String BINDING_KEY = "key1";
+
+    //    备份交换机
+    public static final String BACKUP_EXCHANGE = "backup_exchange";
+    //    备份队列
+    public static final String BACKUP_QUEUE = "backup_queue";
+    //    报警队列
+    public static final String WARNING_QUEUE = "warning_queue";
+
+    //    创建确认交换机，并且绑定备份交换机
+    @Bean
+    public DirectExchange createConfirmDirectExchange() {
+        return ExchangeBuilder.directExchange(CONFIRM_EXCHANGE).durable(true).withArgument("alternate-exchange", BACKUP_EXCHANGE).build();
+    }
+
+    //    创建确认队列
+    @Bean
+    public Queue createConfirmQueue() {
+        return QueueBuilder.durable(CONFIRM_QUEUE).build();
+    }
+
+    //    确认队列绑定确认交换机
+    @Bean
+    public Binding bingConfirmQueueToConfirmExchange(@Qualifier("createConfirmDirectExchange") DirectExchange directExchange,
+                                                     @Qualifier("createConfirmQueue") Queue queue) {
+        return BindingBuilder.bind(queue).to(directExchange).with(BINDING_KEY);
+    }
+
+
+    //    创建备份交换机
+    @Bean
+    public FanoutExchange createBackupExchange() {
+        return new FanoutExchange(BACKUP_EXCHANGE);
+    }
+
+    //    创建备份队列
+    @Bean
+    public Queue createBackupQueue() {
+        return QueueBuilder.durable(BACKUP_QUEUE).build();
+    }
+
+    //    创建报警队列
+    @Bean
+    public Queue createWarningQueue() {
+        return QueueBuilder.durable(WARNING_QUEUE).build();
+    }
+
+    //    备份队列绑定备份交换机
+    @Bean
+    public Binding bindBackupQueueToBackupExchange(@Qualifier("createBackupExchange") FanoutExchange fanoutExchange,
+                                                   @Qualifier("createBackupQueue") Queue queue) {
+        return BindingBuilder.bind(queue).to(fanoutExchange);
+    }
+
+    //    报警队列绑定备份交换机
+    @Bean
+    public Binding bindWarningQueueToBackupExchange(@Qualifier("createBackupExchange") FanoutExchange fanoutExchange,
+                                                    @Qualifier("createWarningQueue") Queue queue) {
+        return BindingBuilder.bind(queue).to(fanoutExchange);
+    }
+}
+```
+
+#### 消费者
+
+```java
+package com.atguigu.rabbitmq.consumer;
+
+import com.atguigu.rabbitmq.config.ConfirmConfig;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
+/**
+ * @Author:lz
+ * @Date:2022/11/12 17:14
+ * @Description
+ */
+@Component
+@Slf4j
+public class BackupConsumer {
+
+    @RabbitListener(queues = ConfirmConfig.BACKUP_QUEUE)
+    public void receiveWarningMsg(Message message){
+        String msg = new String(message.getBody());
+        log.error("接收到备份队列中消息:{}",msg);
+    }
+
+}
+
+```
+
+```java
+package com.atguigu.rabbitmq.consumer;
+
+import com.atguigu.rabbitmq.config.ConfirmConfig;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
+/**
+ * @Author:lz
+ * @Date:2022/11/12 17:22
+ * @Description
+ */
+@Component
+@Slf4j
+public class WarningConsumer {
+
+    //接收报警信息
+    @RabbitListener(queues = ConfirmConfig.WARNING_QUEUE)
+    public void receiveWarningMsg(Message message){
+        String msg = new String(message.getBody());
+        log.error("报警发现不可路由消息:{}",msg);
+    }
+}
+
+```
+
+#### 测试
+
+![image-20221112174001125](RabbitMQ/image-20221112174001125.png)
+
+> mandatory 参数与备份交换机可以一起使用的时候，如果两者同时开启，消息究竟何去何从？谁优先级高，经过上面结果显示答案是**备份交换机优先级高。**
+
+# 其他知识点
+
+## 幂等性
+
+### 概念
+
+> 用户对于同一操作发起的一次请求或者多次请求的结果是一致的，不会因为多次点击而产生了副作用。举个最简单的例子，那就是支付，用户购买商品后支付，支付扣款成功，但是返回结果的时候网络异常，此时钱已经扣了，用户再次点击按钮，此时会进行第二次扣款，返回结果成功，用户查询余额发现多扣钱了，流水记录也变成了两条。在以前的单应用系统中，我们只需要把数据操作放入事务中即可，发生错误立即回滚，但是再响应客户端的时候也有可能出现网络中断或者异常等等。
+>
+> 可以理解为验证码，只能输入一次，再次重新输入会刷新验证码，原来的验证码失效。
+
+### 消息重复消费
+
+> 消费者在消费 MQ 中的消息时，MQ 已把消息发送给消费者，消费者在给 MQ 返回 ack 时网络中断， 故 MQ 未收到确认信息，该条消息会重新发给其他的消费者，或者在网络重连后再次发送给该消费者，但实际上该消费者已成功消费了该条消息，造成消费者消费了重复的消息。
+
+### 解决思路
+
+> MQ 消费者的幂等性的解决一般使用全局 ID 或者写个唯一标识比如时间戳 或者 UUID 或者订单消费者消费 MQ 中的消息也可利用 MQ 的该 id 来判断，或者可按自己的规则生成一个全局唯一 id，每次消费消息时用该 id 先判断该消息是否已消费过。
+
+### 消费端的幂等性保障
+
+>在海量订单生成的业务高峰期，生产端有可能就会重复发生了消息，这时候消费端就要实现幂等性，这就意味着我们的消息永远不会被消费多次，即使我们收到了一样的消息。
+>
+>业界主流的幂等性有两种操作：
+>
+>- 唯一 ID+ 指纹码机制,利用数据库主键去重
+>
+>  指纹码：我们的一些规则或者时间戳加别的服务给到的唯一信息码,它并不一定是我们系统生成的，基本都是由我们的业务规则拼接而来，但是一定要保证唯一性，然后就利用查询语句进行判断这个 id 是否存在数据库中，优势就是实现简单就一个拼接，然后查询判断是否重复；劣势就是在高并发时，如果是单个数据库就会有写入性能瓶颈当然也可以采用分库分表提升性能，但也不是我们最推荐的方式。
+>
+>- Redis 的原子性
+>
+>  利用 redis 执行 setnx 命令，天然具有幂等性。从而实现不重复消费
+
+## 优先级队列
+
+### 使用场景
+
+> 在我们系统中有一个订单催付的场景，我们的客户在天猫下的订单，淘宝会及时将订单推送给我们，如果在用户设定的时间内未付款那么就会给用户推送一条短信提醒，很简单的一个功能对吧。
+>
+> 但是，tmall 商家对我们来说，肯定是要分大客户和小客户的对吧，比如像苹果，小米这样大商家一年起码能给我们创造很大的利润，所以理应当然，他们的订单必须得到优先处理，而曾经我们的后端系统是使用 redis 来存放的定时轮询，大家都知道 redis 只能用 List 做一个简简单单的消息队列，并不能实现一个优先级的场景，所以订单量大了后采用 RabbitMQ 进行改造和优化，如果发现是大客户的订单给一个相对比较高的优先级， 否则就是默认优先级。
+
+### 添加方法
+
+#### Web页面添加
+
+![image-20221112184014186](RabbitMQ/image-20221112184014186.png)
+
+> 1. 进入 Web 页面，点击 Queue 菜单，然后点击 `Add a new queue`
+> 2. 点击下方的 `Maximum priority`
+> 3. 执行第二步，则会自动在 `Argument` 生成 `x-max-priority` 字符串
+> 4. 点击 `Add queue` 即可添加优先级队列成功
+
+#### 声明队列的时候添加优先级
+
+> - 设置队列的最大优先级 最大可以设置到 255 官网推荐 1-10 如果设置太高比较吃内存和 CPU
+> - 注意事项：队列实现优先级需要做的事情有如下：队列需要设置为优先级队列，消息需要设置消息的优先级，消费者需要等待消息已经发送到队列中才去消费，因为这样才有机会对消息进行排序
+
+```java
+Map<String, Object> params = new HashMap();
+// 优先级为 10
+params.put("x-max-priority", 10);
+channel.queueDeclare("hello", true, false, false, params);
+
+```
+
+### 实例
+
+#### 消息生产者
+
+```java
+public class PriorityProducer {
+
+    private static final String QUEUE_NAME = "priority_queue";
+
+    public static void main(String[] args) throws IOException, TimeoutException {
+        Channel channel = RabbitMQUtils.getChannel();
+
+        //给消息赋予一个priority属性
+        AMQP.BasicProperties properties =
+                new AMQP.BasicProperties().builder().priority(5).build();
+
+        for (int i = 1; i < 11; i++) {
+            String message = "info"+i;
+            if(i==5){
+                channel.basicPublish("",QUEUE_NAME,properties,message.getBytes());
+            }else {
+                channel.basicPublish("",QUEUE_NAME,null,message.getBytes());
+            }
+            System.out.println("消息发送完成："+message);
+        }
+    }
+}
+
+```
+
+#### 消息消费者
+
+```java
+public class PriorityConsumer {
+
+    private final static String QUEUE_NAME = "priority_queue";
+
+    public static void main(String[] args) throws IOException, TimeoutException {
+        Channel channel = RabbitMQUtils.getChannel();
+
+        //设置队列的最大优先级 最大可以设置到255 官网推荐1-10 如果设置太高比较吃内存和CPU
+        Map<String, Object> params = new HashMap<>();
+        params.put("x-max-priority",10);
+        channel.queueDeclare(QUEUE_NAME,true,false,false,params);
+
+
+        DeliverCallback deliverCallback = (consumerTag, delivery) ->{
+            String message = new String(delivery.getBody());
+            System.out.println("消费的消息: "+message);
+        };
+
+
+        CancelCallback cancelCallback = (consumerTag) ->{
+            System.out.println("消息消费被中断");
+        };
+
+        channel.basicConsume(QUEUE_NAME,true,deliverCallback,cancelCallback);
+    }
+}
+
+```
+
+![image-20221112184222140](RabbitMQ/image-20221112184222140.png)
+
+## 惰性队列
+
+### 使用场景
+
+> RabbitMQ 从 3.6.0 版本开始引入了惰性队列的概念。惰性队列会尽可能的将消息存入磁盘中，而在消费者消费到相应的消息时才会被加载到内存中，它的一个重要的设计目标是能够支持更长的队列，即支持更多的消息存储。当消费者由于各种各样的原因(比如消费者下线、宕机亦或者是由于维护而关闭等)而致使长时间内不能消费消息造成堆积时，惰性队列就很有必要了。
+>
+> 默认情况下，当生产者将消息发送到 RabbitMQ 的时候，队列中的消息会尽可能的存储在内存之中，这样可以更加快速的将消息发送给消费者。即使是持久化的消息，在被写入磁盘的同时也会在内存中驻留一份备份。当 RabbitMQ 需要释放内存的时候，会将内存中的消息换页至磁盘中，这个操作会耗费较长的时间，也会阻塞队列的操作，进而无法接收新的消息。虽然 RabbitMQ 的开发者们一直在升级相关的算法， 但是效果始终不太理想，尤其是在消息量特别大的时候。
+
+### 两种模式
+
+> 队列具备两种模式：default 和 lazy。默认的为 default 模式，在 3.6.0 之前的版本无需做任何变更。lazy 模式即为惰性队列的模式，可以通过调用 `channel.queueDeclare` 方法的时候在参数中设置，也可以通过 Policy 的方式设置，如果一个队列同时使用这两种方式设置的话，那么 Policy 的方式具备更高的优先级。如果要通过声明的方式改变已有队列的模式的话，那么只能先删除队列，然后再重新声明一个新的。
+>
+> 在队列声明的时候可以通过 `x-queue-mode` 参数来设置队列的模式，取值为 default 和 lazy。下面示例中演示了一个惰性队列的声明细节：
+
+```java
+Map<String, Object> args = new HashMap<String, Object>();
+args.put("x-queue-mode", "lazy");
+channel.queueDeclare("myqueue", false, false, false, args);
+```
+
+> 也可以在 Web 页面添加队列时，选择 `Lazy mode`
+
+![image-20221112200015039](RabbitMQ/image-20221112200015039.png)
+
+### 内存开销对比
+
+> 在发送 1 百万条消息，每条消息大概占 1KB 的情况下，普通队列占用内存是 1.2GB，而惰性队列仅仅占用 1.5MB
+
+![image-20221112200054569](RabbitMQ/image-20221112200054569.png)
+
+# RabbitMQ 集群
+
+## clustering
+
+> 最开始我们介绍了如何安装及运行 RabbitMQ 服务，不过这些是单机版的，无法满足目前真实应用的 要求。如果 RabbitMQ 服务器遇到内存崩溃、机器掉电或者主板故障等情况，该怎么办？单台 RabbitMQ 服务器可以满足每秒 1000 条消息的吞吐量，那么如果应用需要 RabbitMQ 服务满足每秒 10 万条消息的吞 吐量呢？购买昂贵的服务器来增强单机 RabbitMQ 务的性能显得捉襟见肘，搭建一个 RabbitMQ 集群才是 解决实际问题的关键.
+
+### 搭建步骤
+
+> 1. 修改 3 台机器的主机名称
+>
+>    ```sh
+>    vim /etc/hostname
+>    ```
+>
+> 2. 配置各个节点的 hosts 文件，让各个节点都能互相识别对方
+>
+>    ```sh
+>    vim /etc/hosts
+>    ```
+>
+>    10.211.55.74 node1
+>
+>    10.211.55.75 node2
+>
+>    10.211.55.76 node3
+>
+> 3. 以确保各个节点的 cookie 文件使用的是同一个值 在 node1 上执行远程操作命令 
+>
+>    ```sh
+>    scp /var/lib/rabbitmq/.erlang.cookie root@node2:/var/lib/rabbitmq/.erlang.cookie 
+>    
+>    scp /var/lib/rabbitmq/.erlang.cookie root@node3:/var/lib/rabbitmq/.erlang.cookie
+>    ```
+>
+> 4. 启动 RabbitMQ 服务,顺带启动 Erlang 虚拟机和 RbbitMQ 应用服务(在三台节点上分别执行以下命令) 
+>
+>    ```sh
+>    rabbitmq-server -detached
+>    ```
+>
+> 5. 在节点 2 执行
+>
+>    ```sh
+>    # rabbitmqctl stop 会将 Erlang 虚拟机关闭，rabbitmqctl stop_app 只关闭 RabbitMQ 服务
+>    rabbitmqctl stop_app
+>    rabbitmqctl reset
+>    rabbitmqctl join_cluster rabbit@node1
+>    # 只启动应用服务
+>    rabbitmqctl start_app
+>    ```
+>
+> 6. 在节点 3 执行
+>
+>    ```sh
+>    rabbitmqctl stop_app
+>    rabbitmqctl reset
+>    rabbitmqctl join_cluster rabbit@node2
+>    rabbitmqctl start_app 
+>    ```
+>
+> 7. 集群状态 
+>
+>    ```sh
+>    rabbitmqctl cluster_status 
+>    ```
+>
+> 8. 需要重新设置用户
+>
+>    ```sh
+>    # 创建账号 
+>    rabbitmqctl add_user admin 123
+>    
+>    # 设置用户角色 
+>    rabbitmqctl set_user_tags admin administrator
+>    
+>    # 设置用户权限 
+>    rabbitmqctl set_permissions -p "/" admin ".*" ".*" ".*" 
+>    ```
+>
+> 9. 解除集群节点(node2 和 node3 机器分别执行)
+>
+>    ```sh
+>    rabbitmqctl stop_app 
+>    rabbitmqctl reset 
+>    rabbitmqctl start_app 
+>    rabbitmqctl cluster_status 
+>    # node1 机器上执行
+>    rabbitmqctl forget_cluster_node rabbit@node2
+>    ```
+
+## 镜像队列
+
+> 如果 RabbitMQ 集群中只有一个 Broker 节点，那么该节点的失效将导致整体服务的临时性不可用，并 且也可能会导致消息的丢失。可以将所有消息都设置为持久化，并且对应队列的durable属性也设置为true， 但是这样仍然无法避免由于缓存导致的问题：因为消息在发送之后和被写入磁盘井执行刷盘动作之间存在 一个短暂却会产生问题的时间窗。通过 publisherconfirm 机制能够确保客户端知道哪些消息己经存入磁盘， 尽管如此，一般不希望遇到因单点故障导致的服务不可用。
+>
+> 引入镜像队列(Mirror Queue)的机制，可以将队列镜像到集群中的其他 Broker 节点之上，如果集群中 的一个节点失效了，队列能自动地切换到镜像中的另一个节点上以保证服务的可用性。
+
+### 搭建步骤
+
+> 1. 启动三台集群节点
+>
+> 2. 随便找一个节点添加 policy
+>
+>    <img src="RabbitMQ/image-20221112213111453.png" alt="image-20221112213111453" style="zoom:60%;" />
+>
+> 3. 在 node1 上创建一个队列发送一条消息，队列存在镜像队列
+>
+>    <img src="RabbitMQ/image-20221112213256553.png" alt="image-20221112213256553" style="zoom:67%;" />
+>
+> 4. 停掉 node1 之后发现 node2 成为镜像队列
+>
+>    <img src="RabbitMQ/image-20221112213405504.png" alt="image-20221112213405504" style="zoom:67%;" />
+>
+> 5. 就算整个集群只剩下一台机器了依然能消费队列里面的消息，说明队列里面的消息被镜像队列传递到相应机器里面了
+
+## Haproxy+Keepalive 实现高可用负载均衡
+
+### 整体架构图
+
+![image-20221112215246287](RabbitMQ/image-20221112215246287.png)
+
+### Haproxy 实现负载均衡
+
+> HAProxy 提供高可用性、负载均衡及基于 TCPHTTP 应用的代理，支持虚拟主机，它是免费、快速并 且可靠的一种解决方案，包括 Twitter,Reddit,StackOverflow,GitHub 在内的多家知名互联网公司在使用。 HAProxy 实现了一种事件驱动、单一进程模型，此模型支持非常大的井发连接数。 
+>
+> 扩展 nginx,lvs,haproxy 之间的区别: http://www.ha97.com/5646.html
+
+#### 搭建步骤
+
+> 1. 下载haproxy(在 node1 和 node2) 
+>
+>    ```sh
+>    yum -y install haproxy
+>    ```
+>
+> 2. 修改node1和node2的haproxy.cfg`
+>
+>    ```sh
+>    vim /etc/haproxy/haproxy.cfg
+>    ```
+>
+>    需要修改红色 IP 为当前机器 IP
+>
+>    ![image-20221112215418798](RabbitMQ/image-20221112215418798.png)
+>
+> 3. 在两台节点启动 haproxy
+>
+>    ```sh
+>    haproxy -f /etc/haproxy/haproxy.cfg
+>    
+>    ps -ef | grep haproxy
+>    ```
+>
+> 4. 访问地址 http://10.211.55.71:8888/stats
+
+### Keepalived 实现双机(主备)热备 
+
+> 试想如果前面配置的 HAProxy 主机突然宕机或者网卡失效，那么虽然 RbbitMQ 集群没有任何故障但是 对于外界的客户端来说所有的连接都会被断开结果将是灾难性的为了确保负载均衡服务的可靠性同样显得 十分重要，这里就要引入 Keepalived 它能够通过自身健康检查、资源接管功能做高可用(双机热备)，实现 故障转移.
+
+#### 搭建步骤
+
+> 1. 下载 keepalived
+>
+>    ```sh
+>    yum -y install keepalived
+>    ```
+>
+> 2. 节点 node1 配置文件
+>
+>    ```
+>    # 把资料里面的 keepalived.conf 修改之后替换 
+>    vim /etc/keepalived/keepalived.conf 
+>    ```
+>
+> 3. 节点 node2 配置文件 
+>
+>    需要修改 global_defs 的 router_id,如:nodeB 
+>
+>    其次要修改 vrrp_instance_VI 中 state 为"BACKUP"
+>
+>    最后要将 priority 设置为小于 100 的值
+>
+> 4. 添加 haproxy_chk.sh 
+>
+>    (为了防止 HAProxy 服务挂掉之后 Keepalived 还在正常工作而没有切换到 Backup 上，所以 这里需要编写一个脚本来检测 HAProxy 务的状态,当 HAProxy 服务挂掉之后该脚本会自动重启 HAProxy 的服务，如果不成功则关闭 Keepalived 服务，这样便可以切换到 Backup 继续工作) 
+>
+>    vim /etc/keepalived/haproxy_chk.sh(可以直接上传文件) 
+>
+>    修改权限 chmod 777 /etc/keepalived/haproxy_chk.sh
+>
+> 5. 启动 keepalive 命令(node1 和 node2 启动)
+>
+>    systemctl start keepalived 
+>
+> 6. 观察 Keepalived 的日志
+>
+>    tail -f /var/log/messages -n 200 
+>
+> 7. 观察最新添加的
+>
+>    vip ip add show
+>
+> 8. node1 模拟 keepalived 关闭状态
+>
+>    systemctl stop keepalived 
+>
+> 9. 使用 vip 地址来访问 rabbitmq 集群
+
+### Federation Exchange
+
+> (broker 北京)，(broker 深圳)彼此之间相距甚远，网络延迟是一个不得不面对的问题。有一个在北京 的业务(Client 北京) 需要连接(broker 北京)，向其中的交换器 exchangeA 发送消息，此时的网络延迟很小， (Client 北京)可以迅速将消息发送至 exchangeA 中，就算在开启了 publisherconfirm 机制或者事务机制的 情况下，也可以迅速收到确认信息。此时又有个在深圳的业务(Client 深圳)需要向 exchangeA 发送消息， 那么(Client 深圳) (broker 北京)之间有很大的网络延迟，(Client 深圳) 将发送消息至 exchangeA 会经历一 定的延迟，尤其是在开启了 publisherconfirm 机制或者事务机制的情况下，(Client 深圳) 会等待很长的延 迟时间来接收(broker 北京)的确认信息，进而必然造成这条发送线程的性能降低，甚至造成一定程度上的 阻塞。 
+>
+> 将业务(Client 深圳)部署到北京的机房可以解决这个问题，但是如果(Client 深圳)调用的另些服务都部 署在深圳，那么又会引发新的时延问题，总不见得将所有业务全部部署在一个机房，那么容灾又何以实现？ 这里使用 Federation 插件就可以很好地解决这个问题.
+
+![image-20221112215845007](RabbitMQ/image-20221112215845007.png)
+
+#### 搭建步骤
+
+> 1. 需要保证每台节点单独运行
+>
+> 2. 在每台机器上开启 federation 相关插件 
+>
+>    ```sh
+>    rabbitmq-plugins enable rabbitmq_federation rabbitmq-plugins enable rabbitmq_federation_management 
+>    ```
+>
+> 3. 原理图(先运行 consumer 在 node2 创建 fed_exchange)
+>
+>    ![image-20221112215953174](RabbitMQ/image-20221112215953174.png)
+>
+> 4. 在 downstream(node2)配置 upstream(node1)
+>
+>    ![image-20221112220025449](RabbitMQ/image-20221112220025449.png)
+>
+> 5. 添加 policy
+>
+>    ![image-20221112220048328](RabbitMQ/image-20221112220048328.png)
+>
+> 6. 成功的前提
+>
+>    ![image-20221112220108502](RabbitMQ/image-20221112220108502.png)
+
+### Federation Queue
+
+> 联邦队列可以在多个 Broker 节点(或者集群)之间为单个队列提供均衡负载的功能。一个联邦队列可以 连接一个或者多个上游队列(upstream queue)，并从这些上游队列中获取消息以满足本地消费者消费消息 的需求。
+
+#### 搭建步骤
+
+> 1. 原理图
+>
+>    ![image-20221112220209200](RabbitMQ/image-20221112220209200.png)
+>
+> 2. 添加 upstream(同上)
+>
+> 3. 添加 policy
+>
+>    ![image-20221112220245765](RabbitMQ/image-20221112220245765.png)
+
+### Shovel
+
+> Federation 具备的数据转发功能类似，Shovel 够可靠、持续地从一个 Broker 中的队列(作为源端，即 source)拉取数据并转发至另一个 Broker 中的交换器(作为目的端，即 destination)。作为源端的队列和作 为目的端的交换器可以同时位于同一个 Broker，也可以位于不同的 Broker 上。Shovel 可以翻译为"铲子"， 是一种比较形象的比喻，这个"铲子"可以将消息从一方"铲子"另一方。Shovel 行为就像优秀的客户端应用 程序能够负责连接源和目的地、负责消息的读写及负责连接失败问题的处理。
+
+### 搭建步骤
+
+> 1. 开启插件(需要的机器都开启) 
+>
+>    ```sh
+>    rabbitmq-plugins enable rabbitmq_shovel rabbitmq-plugins enable rabbitmq_shovel_manaQgement
+>    ```
+>
+> 2. 原理图(在源头发送的消息直接回进入到目的地队列)  
+>
+>    ![image-20221112220351510](RabbitMQ/image-20221112220351510.png)
+>
+> 3. 添加 shovel 源和目的地
+>
+>    ![image-20221112220410902](RabbitMQ/image-20221112220410902.png)
+
+# 资源
+
+> - ⭐ RabbitMQ 在线模拟器：[http://tryrabbitmq.com/](https://gitee.com/link?target=http%3A%2F%2Ftryrabbitmq.com%2F)
+> - RabbitMQ 中文文档：[http://rabbitmq.mr-ping.com/](https://gitee.com/link?target=http%3A%2F%2Frabbitmq.mr-ping.com%2F)

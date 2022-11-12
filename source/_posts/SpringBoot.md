@@ -289,49 +289,36 @@ public class MyConfig {
 }
 ```
 
-##### @Conditional
-
-> **条件装配：满足Conditional指定的条件，则进行组件注入**
-
-![image-20220524154840452](SpringBoot/image-20220524154840452.png)
+> 导入配置类
+>
+> @Import 是被用来整合所有在@Configuration注解中定义的bean配置。（应该是只能导入配置类）
 
 ```java
-@Configuration(proxyBeanMethods = false)
-@ConditionalOnBean(name = "cat")//有名字为cat的组件再创建下面所有的组件
-public class MyConfig {
+package com.yiibai.config;
 
-    @ConditionalOnBean(name="cat01")//有名为cat01的组件，再创建user组件
-    public User user() {
-        User lz = new User("lz");
-        //lz.setCat(cat());//组件依赖
-        return lz;
-    }
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
-    @Bean
-    public Cat cat() {
-        return new Cat("tomcat");
-    }
-}
+@Configuration
+@Import({ CustomerConfig.class, SchedulerConfig.class })
+public class AppConfig {
 
-```
-
-```java
-@SpringBootApplication
-public class MainApplication {
-    public static void main(String[] args) {
-        ConfigurableApplicationContext run = SpringApplication.run(MainApplication.class, args);
-
-        boolean cat = run.containsBean("cat");
-        System.out.println("容器中cat组件："+cat);//false
-
-        boolean user = run.containsBean("user");
-        System.out.println("容器中user组件："+user);//false
-
-    }
 }
 ```
 
-#### 原生配置文件引入
+> @Import 是被用来整合所有在@Configuration注解中定义的bean配置。
+
+```xml
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+ 
+    <import resource="config/customer.xml"/>
+    <import resource="config/scheduler.xml"/>
+ 
+</beans>
+```
 
 ##### @ImportResource
 
@@ -370,6 +357,48 @@ public class MainApplication {
 
         boolean user = run.containsBean("user");
         System.out.println("容器中user组件："+user);//true
+
+    }
+}
+```
+
+##### @Conditional
+
+> **条件装配：满足Conditional指定的条件，则进行组件注入**
+
+![image-20220524154840452](SpringBoot/image-20220524154840452.png)
+
+```java
+@Configuration(proxyBeanMethods = false)
+@ConditionalOnBean(name = "cat")//有名字为cat的组件再创建下面所有的组件
+public class MyConfig {
+
+    @ConditionalOnBean(name="cat01")//有名为cat01的组件，再创建user组件
+    public User user() {
+        User lz = new User("lz");
+        //lz.setCat(cat());//组件依赖
+        return lz;
+    }
+
+    @Bean
+    public Cat cat() {
+        return new Cat("tomcat");
+    }
+}
+
+```
+
+```java
+@SpringBootApplication
+public class MainApplication {
+    public static void main(String[] args) {
+        ConfigurableApplicationContext run = SpringApplication.run(MainApplication.class, args);
+
+        boolean cat = run.containsBean("cat");
+        System.out.println("容器中cat组件："+cat);//false
+
+        boolean user = run.containsBean("user");
+        System.out.println("容器中user组件："+user);//false
 
     }
 }
