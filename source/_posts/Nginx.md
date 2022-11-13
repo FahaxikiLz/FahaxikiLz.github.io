@@ -102,7 +102,7 @@ categories:
 >       make && make install
 >       ```
 >
-> 5. 进入目录`/usr/local/nginx/sbin/nginx`启动服务
+> 5. 进入目录`/usr/local/nginx/sbin`启动服务
 >
 >    ```sh
 >    [root@lz sbin]# cd /usr/local/nginx/sbin
@@ -128,3 +128,279 @@ categories:
 > 7. 访问IP+80端口`192.168.221.100:80`
 >
 >    ![image-20221113134315499](Nginx/image-20221113134315499.png)
+
+# nginx常用的命令和配置文件
+
+## 常用命令
+
+> - 查看nginx版本号 ，在`/usr/local/nginx/sbin`目录下执行
+>
+>   ```sh
+>   ./nginx -v
+>   ```
+>
+> - 启动命令，在`/usr/local/nginx/sbin`目录下执行
+>
+>   ```sh
+>   ./nginx
+>   ```
+>
+> - 关闭命令，在`/usr/local/nginx/sbin`目录下执行
+>
+>   ```sh
+>   ./nginx -s stop 
+>   ```
+>
+> - 重新加载命令，在`/usr/local/nginx/sbin`目录下执行
+>
+>   ```sh
+>   ./nginx -s reload
+>   ```
+
+## 配置文件
+
+> - nginx 配置文件位置
+>
+>   ```sh
+>   vim /usr/local/nginx/conf/nginx.conf
+>   ```
+>
+> - 配置文件中的内容
+>
+>   1. 全局块：配置服务器整体运行的配置指令
+>
+>      <img src="Nginx/image-20221113155627574.png" alt="image-20221113155627574" style="zoom:80%;" />
+>
+>      比如 worker_processes 1;处理并发数的配置
+>
+>   2. events块：影响 Nginx 服务器与用户的网络连接
+>
+>      <img src="Nginx/image-20221113155649537.png" alt="image-20221113155649537" style="zoom:80%;" />
+>
+>      比如 worker_connections 1024; 支持的最大连接数为 1024
+>
+>   3. http块：包含两部分： http全局块 server块
+
+# Nginx配置实例-反向代理
+
+## 实例一
+
+> - 实现效果：打开浏览器，在浏览器地址栏输入地址 www.123.com，跳转到 liunx 系统 tomcat 主页面中 
+>
+> - 准备工作
+>
+>   - 在 liunx 系统安装 tomcat，使用默认端口 8080 
+>
+>   - tomcat 安装文件放到 liunx 系统中，解压
+>
+>   - 进入 tomcat 的 bin 目录中，`./startup.sh`启动 tomcat 服务器
+>
+>   - 对外开放访问的端口(或者关闭防火墙)
+>
+>     ```sh
+>     firewall-cmd --add-port=8080/tcp --permanent
+>     firewall-cmd –reload
+>     # 查看已经开放的端口号
+>     firewall-cmd --list-all
+>     ```
+>
+>   - 在 windows 系统中通过浏览器访问 tomcat 服务器（IP+8080端口）
+>
+>     <img src="Nginx/image-20221113162917202.png" alt="image-20221113162917202" style="zoom:60%;" />
+>
+> - 访问过程的分析
+>
+>   正常访问流程是，根据域名查看本地hosts文件中的配置，hosts中没有配置根据DNS域名解析系统访问服务器
+>
+>   ![image-20221113163213128](Nginx/image-20221113163213128.png)
+>
+> - 具体配置
+>
+>   1. 在 windows 系统的 host 文件进行域名和 ip 对应关系的配置
+>
+>      ![image-20221113163503455](Nginx/image-20221113163503455.png)
+>
+>      ![image-20221113163620423](Nginx/image-20221113163620423.png)
+>
+>   2. 在 nginx 进行请求转发的配置（反向代理配置）`vim /usr/local/nginx/conf/nginx.conf`
+>
+>      注意后面的分号不要忘记
+>
+>      ![image-20221113164942382](Nginx/image-20221113164942382.png)
+>
+>   3. 重启nginx
+>
+> - 测试
+>
+>   <img src="Nginx/image-20221113164839584.png" alt="image-20221113164839584" style="zoom:67%;" />
+
+## 实例二
+
+> - 实现效果
+>
+>   使用 nginx 反向代理，根据访问的路径跳转到不同端口的服务中 nginx 监听端口为 9001，
+>
+>   访问 http://192.168.221.100:9001/edu/ 直接跳转到 127.0.0.1:8080
+>
+>   访问 http://192.168.221.100:9001/vod/ 直接跳转到 127.0.0.1:8081
+>
+> - 准备工作
+>
+>   准备两个 tomcat 服务器，一个 8080 端口，一个 8081 端口 
+>
+>   创建文件夹和测试页面
+>
+>   ![image-20221113194804406](Nginx/image-20221113194804406.png)
+>
+>   ![image-20221113194826565](Nginx/image-20221113194826565.png)
+>
+> - 具体配置 
+>
+>   找到 nginx 配置文件，进行反向代理配置`vim /usr/local/nginx/conf/nginx.conf`
+>
+>   ![image-20221113173639222](Nginx/image-20221113173639222.png) 
+>
+>   开放对外访问的端口号 9001 8080 8081或者关闭防火墙
+>
+> - 最终测试
+>
+>   ![image-20221113195026213](Nginx/image-20221113195026213.png)
+>
+>   ![image-20221113195052318](Nginx/image-20221113195052318.png)
+
+### location 指令说明 
+
+> location有两种匹配规则：
+>
+> - 匹配URL类型，有四种参数可选，当然也可以不带参数。
+>   `location [ = | ~ | ~* | ^~ ] uri { … }`
+> - 命名location，用@标识，类似于定于goto语句块。
+>   `location @name { … }`
+
+#### `“=”` 
+
+> 精确匹配，内容要同表达式完全一致才匹配成功
+
+```
+location = /abc/ {
+  .....
+ }
+        
+# 只匹配http://abc.com/abc
+#http://abc.com/abc [匹配成功]
+#http://abc.com/abc/index [匹配失败]
+```
+
+#### `“~”`
+
+> 执行正则匹配，区分大小写。
+
+```
+location ~ /Abc/ {
+  .....
+}
+#http://abc.com/Abc/ [匹配成功]
+#http://abc.com/abc/ [匹配失败]
+```
+
+#### `“~*”`
+
+> 执行正则匹配，忽略大小写
+
+```
+location ~* /Abc/ {
+  .....
+}
+# 则会忽略 uri 部分的大小写
+#http://abc.com/Abc/ [匹配成功]
+#http://abc.com/abc/ [匹配成功]
+```
+
+#### `“^~”`
+
+> 表示普通字符串匹配上以后不再进行正则匹配。
+
+```
+location ^~ /index/ {
+  .....
+}
+#以 /index/ 开头的请求，都会匹配上
+#http://abc.com/index/index.page  [匹配成功]
+#http://abc.com/error/error.page [匹配失败]
+```
+
+#### 不加任何规则时
+
+> 默认是大小写敏感，前缀匹配，相当于加了“~”与“^~”
+
+```
+location /index/ {
+  ......
+}
+#http://abc.com/index  [匹配成功]
+#http://abc.com/index/index.page  [匹配成功]
+#http://abc.com/test/index  [匹配失败]
+#http://abc.com/Index  [匹配失败]
+# 匹配到所有uri
+```
+
+#### `“@”`
+
+> nginx内部跳转
+
+```
+location /index/ {
+  error_page 404 @index_error;
+}
+location @index_error {
+  .....
+}
+#以 /index/ 开头的请求，如果链接的状态为 404。则会匹配到 @index_error 这条规则上。
+```
+
+# Nginx 配置实例-负载均衡
+
+> 1. 实现效果
+>
+>    浏览器地址栏输入地址 http://192.168.221.100/edu/a.html，负载均衡效果，平均 8080 和 8081 端口中
+>
+> 2. 准备工作
+>
+>    准备两台 tomcat 服务器，一台 8080，一台 8081 
+>
+>    在两台 tomcat 里面 webapps 目录中，创建名称是 edu 文件夹，在 edu 文件夹中创建 页面 a.html，用于测
+>
+> 3. 在 nginx 的配置文件中进行负载均衡的配置
+>
+>    <img src="Nginx/image-20221113214002528.png" alt="image-20221113214002528" style="zoom:80%;" />
+>
+> 4. nginx 分配服务器策略
+>
+>    - 第一种 轮询（默认）
+>
+>      每个请求按时间顺序逐一分配到不同的后端服务器，如果后端服务器 down 掉，能自动剔除。
+>
+>    - 第二种 weight
+>
+>      weight 代表权重默认为 1,权重越高被分配的客户端越多
+>
+>      ![image-20221113214321148](Nginx/image-20221113214321148.png)
+>
+>    - 第三种 ip_hash
+>
+>      每个请求按访问 ip 的 hash 结果分配，这样每个访客固定访问一个后端服务器
+>
+>      ![image-20221113214552892](Nginx/image-20221113214552892.png)
+>
+>    - 第四种 fair（第三方）
+>
+>      按后端服务器的响应时间来分配请求，响应时间短的优先分配。
+>
+>      ![image-20221113214657179](Nginx/image-20221113214657179.png)
+
+
+
+
+
+
+
