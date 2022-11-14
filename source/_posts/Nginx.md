@@ -398,9 +398,170 @@ location @index_error {
 >
 >      ![image-20221113214657179](Nginx/image-20221113214657179.png)
 
+# Nginx 配置实例-动静分离
 
+<img src="Nginx/image-20221114103740323.png" alt="image-20221114103740323" style="zoom: 50%;" />
 
+> Nginx 动静分离简单来说就是把动态跟静态请求分开，不能理解成只是单纯的把动态页面和 静态页面物理分离。严格意义上说应该是动态请求跟静态请求分开，可以理解成使用 Nginx  处理静态页面，Tomcat 处理动态页面。
+>
+> 动静分离从目前实现角度来讲大致分为两种：
+>
+> 一种是纯粹把静态文件独立成单独的域名，放在独立的服务器上，也是目前主流推崇的方案； 
+>
+> 另外一种方法就是动态跟静态文件混合在一起发布，通过 nginx 来分开。 通过 location 指定不同的后缀名实现不同的请求转发。通过 expires 参数设置，可以使 浏览器缓存过期时间，减少与服务器之前的请求和流量。具体 Expires 定义：是给一个资 源设定一个过期时间，也就是说无需去服务端验证，直接通过浏览器自身确认是否过期即可， 所以不会产生额外的流量。此种方法非常适合不经常变动的资源。（如果经常更新的文件， 不建议使用 Expires 来缓存），我这里设置 3d，表示在这 3 天之内访问这个 URL，发送 一个请求，比对服务器该文件最后更新时间没有变化，则不会从服务器抓取，返回状态码 304，如果有修改，则直接从服务器重新下载，返回状态码 200。
 
+> 1. 准备工作 
+>
+>    在 liunx 系统中准备静态资源，用于进行访问
+>
+>    ![image-20221114103844175](Nginx/image-20221114103844175.png)
+>
+> 2. 具体配置
+>
+>    在 nginx 配置文件中进行配置`vim /usr/local/nginx/conf/nginx.conf`
+>
+>    `autoindex on`：展示文件夹里的所有内容
+>
+>    <img src="Nginx/image-20221114103943751.png" alt="image-20221114103943751" style="zoom:67%;" />
+>
+> 3. 最终测试
+>
+>    浏览器中输入地址192.168.221.100/www/a.html
+>
+>    <img src="Nginx/image-20221114104050390.png" alt="image-20221114104050390" style="zoom:67%;" />
+>
+>    浏览器中输入地址192.168.221.100/images/ 		192.168.221.100/images/404.png
+>
+>    <img src="Nginx/image-20221114104206710.png" alt="image-20221114104206710" style="zoom: 67%;" />
+>
+>    <img src="Nginx/image-20221114104307748.png" alt="image-20221114104307748" style="zoom:67%;" />
 
+# Nginx 配置高可用的集群
 
+> 1. 什么是 nginx 高可用
+>
+>    <img src="Nginx/image-20221114171955560.png" alt="image-20221114171955560" style="zoom:60%;" />
+>
+>    需要两台 nginx 服务器
+>
+>    需要 keepalived
+>
+>    需要虚拟 ip
+>
+> 2. 配置高可用的准备工作
+>
+>    需要两台服务器 192.168.221.100 和 192.168.221.111
+>
+>    在两台服务器安装 nginx 
+>
+>    在两台服务器安装 keepalived，安装之后，在 etc 里面生成目录 keepalived，有文件 keepalived.conf
+>
+>    ```sh
+>    yum install keepalived –y
+>    ```
+>
+> 3. 完成高可用配置（主从配置）
+>
+>    修改`/etc/keepalived/keepalivec.conf`配置文件
+>
+>    ```
+>    bal_defs {
+>       notification_email {
+>       acassen@firewall.loc
+>       failover@firewall.loc
+>       sysadmin@firewall.loc
+>     }
+>    
+>       notification_email_from Alexandre.Cassen@firewall.loc        #定义利用什么邮箱发送邮件
+>       smtp_server smtp.163.com     #定义邮件服务器信息
+>       smtp_connect_timeout 30      #定义邮件发送超时时间
+>       router_id 192.168.221.100    #（重点参数）局域网keppalived主机身份标识信息(每台唯一)
+>       script_user root             #添加运行健康检查脚本的用户
+>       enable_script_security       #添加运行健康检查脚本的组
+>    }
+>    
+>    vrrp_script chk_http_port {
+>     script "/usr/local/src/nginx_check.sh"         #表示将一个脚本信息赋值给变量check_web
+>     interval 2      #检测脚本执行的间隔
+>     weight -20      #监测失败，则相应的vrrp_instance的优先级会减少20个点
+>    }
+>    
+>    vrrp_instance VI_1 {
+>     state MASTER           #keepalived角色描述信息，备份服务器上将 MASTER 改为 BACKUP
+>     interface ens33        #将虚拟ip用于那块网卡
+>     virtual_router_id 51   #主、备机的 virtual_router_id 必须相同
+>     priority 100            #主、备机取不同的优先级，主机值较大，备份机值较小
+>     advert_int 1           #主服务器组播包发送间隔时间
+>    
+>    authentication {        # 主备主机之间的认证表示信息
+>       auth_type PASS       #采用明文认证机制
+>       auth_pass 1111       #编写明文密码
+>     }
+>     virtual_ipaddress {
+>       192.168.221.50      #设置虚拟ip地址信息，此参数备节点设置和主节点相同
+>     }
+>     track_script {
+>        chk_http_port       #调用执行脚本
+>      }
+>    }
+>    ```
+>
+>    在`/usr/local/src`添加检测脚本
+>
+>    ```sh
+>    #!/bin/bash
+>    A=`ps -C nginx 每no-header |wc -l`
+>    if [ $A -eq 0 ];then
+>        /usr/local/nginx/sbin/nginx
+>        sleep 2
+>        if [ `ps -C nginx --no-header |wc -l` -eq 0 ];then
+>            killall keepalived
+>        fi
+>    fi
+>    ```
+>
+> 4. 把两台服务器上 nginx 和 keepalived 启动
+>
+>    启动 nginx：`./nginx`
+>
+>    启动 keepalived：`systemctl start keepalived.service`
+>
+> 5. 最终测试 
+>
+>    在浏览器地址栏输入 虚拟 ip 地址 192.168.221.50
+>
+>    <img src="Nginx/image-20221114180040911.png" alt="image-20221114180040911" style="zoom:67%;" />
+>
+>    把主服务器（192.168.221.100）nginx 和 keepalived 停止，再输入 192.168.221.50
+>
+>    <img src="Nginx/image-20221114180042938.png" alt="image-20221114180042938" style="zoom:67%;" />
 
+# Nginx 的原理
+
+## mater 和 worker
+
+![image-20221114210836879](Nginx/image-20221114210836879.png)
+
+## worker 如何进行工作的
+
+![image-20221114210856853](Nginx/image-20221114210856853.png)
+
+## 一个master和多个woker有好处
+
+> 1. 可以使用 nginx –s reload 热部署，利用 nginx 进行热部署操作
+> 2. 每个 woker 是独立的进程，如果有其中的一个 woker 出现问题，其他 woker 独立的， 继续进行争抢，实现请求过程，不会造成服务中断
+
+## 设置多少个 woker 合适
+
+> worker 数和服务器的 cpu 数相等是最为适宜的
+
+## 连接数 worker_connection
+
+> - 第一个：发送请求，占用了 woker 的几个连接数？
+>
+>   答案：2 或者 4 个 
+>
+> - 第二个：nginx 有一个 master，有四个 woker，每个 woker 支持最大的连接数 1024，支持的 最大并发数是多少？ 
+>
+>   - 普通的静态访问最大并发数是： worker_connections * worker_processes /2，
+>   - 而如果是 HTTP 作 为反向代理来说，最大并发数量应该是 worker_connections *  worker_processes/4
