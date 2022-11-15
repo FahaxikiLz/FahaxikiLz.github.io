@@ -129,9 +129,45 @@ categories:
 >
 >    ![image-20221113134315499](Nginx/image-20221113134315499.png)
 
-# nginx常用的命令和配置文件
+## nginx目录结构
 
-## 常用命令
+```sh
+[root@localhost ~]# tree /usr/local/nginx
+/usr/local/nginx
+├── client_body_temp                 # POST 大文件暂存目录
+├── conf                             # Nginx所有配置文件的目录
+│   ├── fastcgi.conf                 # fastcgi相关参数的配置文件
+│   ├── fastcgi.conf.default         # fastcgi.conf的原始备份文件
+│   ├── fastcgi_params               # fastcgi的参数文件
+│   ├── fastcgi_params.default       
+│   ├── koi-utf
+│   ├── koi-win
+│   ├── mime.types                   # 媒体类型
+│   ├── mime.types.default
+│   ├── nginx.conf                   #这是Nginx默认的主配置文件，日常使用和修改的文件
+│   ├── nginx.conf.default
+│   ├── scgi_params                  # scgi相关参数文件
+│   ├── scgi_params.default  
+│   ├── uwsgi_params                 # uwsgi相关参数文件
+│   ├── uwsgi_params.default
+│   └── win-utf
+├── fastcgi_temp                     # fastcgi临时数据目录
+├── html                             # Nginx默认站点目录
+│   ├── 50x.html                     # 错误页面优雅替代显示文件，例如出现502错误时会调用此页面
+│   └── index.html                   # 默认的首页文件
+├── logs                             # Nginx日志目录
+│   ├── access.log                   # 访问日志文件
+│   ├── error.log                    # 错误日志文件
+│   └── nginx.pid                    # pid文件，Nginx进程启动后，会把所有进程的ID号写到此文件
+├── proxy_temp                       # 临时目录
+├── sbin                             # Nginx 可执行文件目录
+│   └── nginx                        # Nginx 二进制可执行程序
+├── scgi_temp                        # 临时目录
+└── uwsgi_temp                       # 临时目录
+
+```
+
+## nginx常用命令
 
 > - 查看nginx版本号 ，在`/usr/local/nginx/sbin`目录下执行
 >
@@ -157,7 +193,7 @@ categories:
 >   ./nginx -s reload
 >   ```
 
-## 配置文件
+## nginx配置文件
 
 > - nginx 配置文件位置
 >
@@ -180,6 +216,212 @@ categories:
 >      比如 worker_connections 1024; 支持的最大连接数为 1024
 >
 >   3. http块：包含两部分： http全局块 server块
+
+### 初始的完整文件
+
+```sh
+worker_processes  1; #允许进程数量，建议设置为cpu核心数或者auto自动检测，注意Windows服务器上虽然可以启动多个processes，但是实际只会用其中一个
+
+events {
+    #单个进程最大连接数（最大连接数=连接数*进程数）
+    #根据硬件调整，和前面工作进程配合起来用，尽量大，但是别把cpu跑到100%就行。
+    worker_connections  1024;
+}
+
+
+http {
+    #文件扩展名与文件类型映射表(是conf目录下的一个文件)
+    include       mime.types;
+    #默认文件类型，如果mime.types预先定义的类型没匹配上，默认使用二进制流的方式传输
+    default_type  application/octet-stream;
+
+    #sendfile指令指定nginx是否调用sendfile 函数（zero copy 方式）来输出文件，对于普通应用，必须设为on。如果用来进行下载等应用磁盘IO重负载应用，可设置为off，以平衡磁盘与网络IO处理速度。
+    sendfile        on;
+    
+    #长连接超时时间，单位是秒
+    keepalive_timeout  65;
+
+ 	#虚拟主机的配置
+    server {
+    	#监听端口
+        listen       80;
+        #域名，可以有多个，用空格隔开
+        server_name  localhost;
+
+		#配置根目录以及默认页面
+        location / {
+            root   html;
+            #前面的优先级更高，index.html优先级高于index.htm
+            index  index.html index.htm;
+        }
+
+		#出错页面配置
+        error_page   500 502 503 504  /50x.html;
+        #/50x.html文件所在位置
+        location = /50x.html {
+            root   html;
+        }
+        
+    }
+
+}
+
+```
+
+### ServerName匹配规则
+
+> 我们可以在同一个servername中配置多个域名，多个域名用空格隔开
+
+#### 完整匹配
+
+> server中可以配置多个域名，例如：
+
+```sh
+server_name  test81.xzj520520.cn  test82.xzj520520.cn;
+```
+
+#### 通配符匹配
+
+> 需要注意的是精确匹配的优先级大于通配符匹配和正则匹配。
+
+```
+server_name  *.xzj520520.cn;
+```
+
+#### 通配符结束匹配
+
+```sh
+server_name  www.xzj520520.*;
+```
+
+#### 正则表达式
+
+<img src="Nginx/image-20221114221200670.png" alt="image-20221114221200670" style="zoom: 67%;" />
+
+![image-20221114221240510](Nginx/image-20221114221240510.png)
+
+> **正则匹配格式，必须以~开头**，比如：`server_name ~^www\d+\.example\.net$;`。**如果开头没有~，则nginx认为是精确匹配。**在逻辑上，需要添加^和$锚定符号。注意，正则匹配格式中.为正则元字符，**如果需要匹配.，则需要反斜线转义。如果正则匹配中含有{和}则需要双引号引用起来，避免nginx报错**，如果没有加双引号，则nginx会报如下错误：directive "server_name" is not terminated by ";" in ...。
+
+#### 特殊匹配格式
+
+```sh
+server_name ""; #匹配Host请求头不存在的情况。
+```
+
+#### 匹配顺序
+
+> 1. 精确的名字
+> 2. 以*号开头的最长通配符名称，例如 *.example.org
+> 3. 以*号结尾的最长通配符名称，例如 mail.*
+> 4. 第一个匹配的正则表达式（在配置文件中出现的顺序）
+
+#### 优化
+
+> 1. **尽量使用精确匹配;**
+> 2. 当定义大量server_name时或特别长的server_name时，需要在http级别调整server_names_hash_max_size和server_names_hash_bucket_size，否则nginx将无法启动。
+
+### location 指令说明 
+
+> location有两种匹配规则：
+>
+> - 匹配URL类型，有四种参数可选，当然也可以不带参数。
+>   `location [ = | ~ | ~* | ^~ ] uri { … }`
+>
+>   优先级：
+>
+>   ​	首先精确匹配 `=`
+>
+>   ​	其次前缀匹配 `^~ `
+>
+>   ​	其次是按文件中顺序的正则匹配 `~` 或 `~* `
+>
+>   ​	然后匹配不带任何修饰的前缀匹配 
+>
+>   ​	最后是交给 `/` 通用匹配
+>
+> - 命名location，用@标识，类似于定于goto语句块。
+>   `location @name { … }`
+
+#### `“=”` 
+
+> 精确匹配，内容要同表达式完全一致才匹配成功
+
+```
+location = /abc/ {
+  .....
+ }
+        
+# 只匹配http://abc.com/abc
+#http://abc.com/abc [匹配成功]
+#http://abc.com/abc/index [匹配失败]
+```
+
+#### `“~”`
+
+> 执行正则匹配，区分大小写。
+
+```
+location ~ /Abc/ {
+  .....
+}
+#http://abc.com/Abc/ [匹配成功]
+#http://abc.com/abc/ [匹配失败]
+```
+
+#### `“~*”`
+
+> 执行正则匹配，忽略大小写
+
+```
+location ~* /Abc/ {
+  .....
+}
+# 则会忽略 uri 部分的大小写
+#http://abc.com/Abc/ [匹配成功]
+#http://abc.com/abc/ [匹配成功]
+```
+
+#### `“^~”`
+
+> 表示普通字符串匹配上以后不再进行正则匹配。
+
+```
+location ^~ /index/ {
+  .....
+}
+#以 /index/ 开头的请求，都会匹配上
+#http://abc.com/index/index.page  [匹配成功]
+#http://abc.com/error/error.page [匹配失败]
+```
+
+#### 不加任何规则时
+
+> 默认是大小写敏感，前缀匹配，相当于加了`~`与`^~`
+
+```
+location /index/ {
+  ......
+}
+#http://abc.com/index  [匹配成功]
+#http://abc.com/index/index.page  [匹配成功]
+#http://abc.com/test/index  [匹配失败]
+#http://abc.com/Index  [匹配失败]
+# 匹配到所有uri
+```
+
+#### `“@”`
+
+> nginx内部跳转
+
+```
+location /index/ {
+  error_page 404 @index_error;
+}
+location @index_error {
+  .....
+}
+#以 /index/ 开头的请求，如果链接的状态为 404。则会匹配到 @index_error 这条规则上。
+```
 
 # Nginx配置实例-反向代理
 
@@ -268,96 +510,6 @@ categories:
 >
 >   ![image-20221113195052318](Nginx/image-20221113195052318.png)
 
-### location 指令说明 
-
-> location有两种匹配规则：
->
-> - 匹配URL类型，有四种参数可选，当然也可以不带参数。
->   `location [ = | ~ | ~* | ^~ ] uri { … }`
-> - 命名location，用@标识，类似于定于goto语句块。
->   `location @name { … }`
-
-#### `“=”` 
-
-> 精确匹配，内容要同表达式完全一致才匹配成功
-
-```
-location = /abc/ {
-  .....
- }
-        
-# 只匹配http://abc.com/abc
-#http://abc.com/abc [匹配成功]
-#http://abc.com/abc/index [匹配失败]
-```
-
-#### `“~”`
-
-> 执行正则匹配，区分大小写。
-
-```
-location ~ /Abc/ {
-  .....
-}
-#http://abc.com/Abc/ [匹配成功]
-#http://abc.com/abc/ [匹配失败]
-```
-
-#### `“~*”`
-
-> 执行正则匹配，忽略大小写
-
-```
-location ~* /Abc/ {
-  .....
-}
-# 则会忽略 uri 部分的大小写
-#http://abc.com/Abc/ [匹配成功]
-#http://abc.com/abc/ [匹配成功]
-```
-
-#### `“^~”`
-
-> 表示普通字符串匹配上以后不再进行正则匹配。
-
-```
-location ^~ /index/ {
-  .....
-}
-#以 /index/ 开头的请求，都会匹配上
-#http://abc.com/index/index.page  [匹配成功]
-#http://abc.com/error/error.page [匹配失败]
-```
-
-#### 不加任何规则时
-
-> 默认是大小写敏感，前缀匹配，相当于加了“~”与“^~”
-
-```
-location /index/ {
-  ......
-}
-#http://abc.com/index  [匹配成功]
-#http://abc.com/index/index.page  [匹配成功]
-#http://abc.com/test/index  [匹配失败]
-#http://abc.com/Index  [匹配失败]
-# 匹配到所有uri
-```
-
-#### `“@”`
-
-> nginx内部跳转
-
-```
-location /index/ {
-  error_page 404 @index_error;
-}
-location @index_error {
-  .....
-}
-#以 /index/ 开头的请求，如果链接的状态为 404。则会匹配到 @index_error 这条规则上。
-```
-
 # Nginx 配置实例-负载均衡
 
 > 1. 实现效果
@@ -435,6 +587,94 @@ location @index_error {
 >    <img src="Nginx/image-20221114104206710.png" alt="image-20221114104206710" style="zoom: 67%;" />
 >
 >    <img src="Nginx/image-20221114104307748.png" alt="image-20221114104307748" style="zoom:67%;" />
+
+## URLRewrite
+
+<img src="Nginx/image-20221115173813927.png" alt="image-20221115173813927" style="zoom:67%;" />
+
+> rewrite是实现URL重写的关键指令，根据regex(正则表达式)部分内容，重定向到repacement，结尾是flag标记。
+>
+> 优点：掩藏真实的url以及url中可能暴露的参数，以及隐藏web使用的编程语言，提高安全性便于搜索引擎收录
+>
+> 缺点：降低效率，影响性能。如果项目是内网使用，比如公司内部软件，则没有必要配置。
+
+### 实例
+
+![image-20221115173829405](Nginx/image-20221115173829405.png)
+
+![image-20221115173843579](Nginx/image-20221115173843579.png)
+
+## 防盗链
+
+> **盗链**是指服务提供商自己不提供服务的内容，通过技术手段绕过其它有利益的最终用户界面（如广告），直接在自己的网站上向最终用户提供其它服务提供商的服务内容，骗取最终用户的浏览和点击率。受益者不提供资源或提供很少的资源，而真正的服务提供商却得不到任何的收益。
+>
+> 当我们请求到一个页面后，这个页面一般会再去请求其中的静态资源，这时候请求头中，会有一个refer字段，表示当前这个请求的来源，我们可以限制指定来源的请求才返回，否则就不返回，这样可以节省资源
+
+![image-20220503162830153](Nginx/image-20220503162830153.png)
+
+```shell
+valid_referers none|server_name
+```
+
+> 设置有效的refer值
+>
+> - none：检测地址没有refer，则有效
+> - server_name：检测主机地址，refer显示是从这个地址来的，则有效（server_name必须是完整的`http://xxxx`）
+>
+> 注意：`if ($invalid_referer)`中if后有个空格，不写就会报错
+
+```shell
+nginx: [emerg] unknown directive "if($invalid_referer)" in /usr/local/nginx/conf/nginx.conf:27
+```
+
+> 例子：这里设置nginx服务器中的img目录下的图片必须refer为http:192.168.174/133才能访问
+
+```shell
+        server {
+            listen       80;
+            server_name  localhost;
+				
+				location / { 
+        		proxy_pass http://xxx;
+       	 }
+      
+				location /img{
+				# 设置防盗链
+                valid_referers http:192.168.174/133;
+                if ($invalid_referer){#无效的
+                        return 403;#返回状态码403
+                }
+                root html;
+                index  index.html index.htm;
+        	}
+        
+            error_page   500 502 503 504  /50x.html;
+            location = /50x.html {
+                root   html;
+            }
+        }
+```
+
+> 如果引用这张图片的页面且refer并没有被设置，图片无法加载出来
+>
+> 如果直接访问图片地址，因为没有refer字段指向来源，会直接显示Nginx的页面
+
+![image-20220503153401325](Nginx/image-20220503153401325.png)
+
+### 设置盗链图片
+
+> 将提示图片放在html/img/x.png，访问设置防盗链图片时，就返回这x.png张图
+
+```text
+		location /img{
+                valid_referers http:192.168.174/133;
+                if ($invalid_referer){#无效的
+                     rewrite ^/  /img/x.png break;
+                }
+                root html;
+                index  index.html index.htm;
+		}
+```
 
 # Nginx 配置高可用的集群
 
@@ -565,3 +805,9 @@ location @index_error {
 >
 >   - 普通的静态访问最大并发数是： worker_connections * worker_processes /2，
 >   - 而如果是 HTTP 作 为反向代理来说，最大并发数量应该是 worker_connections *  worker_processes/4
+
+# 资源
+
+> - Nginx 中文文档：[https://www.nginx.cn/doc/index.html](https://gitee.com/link?target=https%3A%2F%2Fwww.nginx.cn%2Fdoc%2Findex.html)
+>
+> - Nginx 配置在线生成：[https://www.digitalocean.com/community/tools/nginx?global.app.lang=zhCN](https://gitee.com/link?target=https%3A%2F%2Fwww.digitalocean.com%2Fcommunity%2Ftools%2Fnginx%3Fglobal.app.lang%3DzhCN)
