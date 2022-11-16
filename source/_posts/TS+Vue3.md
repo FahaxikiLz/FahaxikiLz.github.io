@@ -1,7 +1,6 @@
 ---
 title: TS+Vue3
 date: 2022-8-31 15:10:56
-update: 2022-10-17 19:05:30
 categories:
 - 前端框架
 tags:
@@ -900,7 +899,7 @@ export default defineComponent({
 
   - prop
 
-    要定义或修改的属性的名称或 [`Symbol`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Symbol) 。
+    要定义或修改的属性的名称或Symbol。
 
   - descriptor
 
@@ -1696,15 +1695,6 @@ export default {
 
 <script lang="ts">
 import { reactive, readonly, shallowReadonly } from 'vue'
-/*
-readonly: 深度只读数据
-  获取一个对象 (响应式或纯对象) 或 ref 并返回原始代理的只读代理。
-  只读代理是深层的：访问的任何嵌套 property 也是只读的。
-shallowReadonly: 浅只读数据
-  创建一个代理，使其自身的 property 为只读，但不执行嵌套对象的深度只读转换 
-应用场景: 
-  在某些特定情况下, 我们可能不希望对数据进行更新的操作, 那就可以包装生成一个只读代理对象来读取数据, 而不能修改或删除
-*/
 
 export default {
 
@@ -2023,7 +2013,7 @@ export default {
 
 #### state
 
-> 存放数据的地方（数据仓库），state可以是一个函数，也可以是一个对象
+> 存放数据的地方（数据仓库），**state可以是一个函数，也可以是一个对象**
 
 ```js
 import { createApp } from 'vue'
