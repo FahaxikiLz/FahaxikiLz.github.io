@@ -2302,7 +2302,7 @@ tags:
 
 ## 生命周期
 
-<div style="border:1px solid black;width:510px;margin-right:20px;margin:auto"><strong>vue2.x的生命周期</strong><img src="https://cn.vuejs.org/images/lifecycle.png" alt="lifecycle_2" style="zoom:33%;width:100%" /></div>
+<img src="vue/lifecycle.png" style="zoom: 30%;" />
 
 ### 引出生命周期
 
@@ -3096,21 +3096,40 @@ export default {
 ```
 
 > 功能:让组件接收外部传过来的数据
-> 	(1).传递数据:
-> 		<Demo name="xxx"/>
-> 	(2).接收数据:
-> 		第一种方式（只接收）:props: [ 'name']
-> 		第二种方式（限制类型):props:{name:String}
-> 		第三种方式(限制类型、限制必要性、指定默认值）:
 >
-> ​			props:{
-> ​						type:String,//类型
+> 1. 传递数据:
 >
-> ​						required:true,//必要性
+>    ```
+>    <Demo name="xxx"/>
+>    ```
 >
-> ​						default:'老王’//默认值
-> ​						}
-> ​	备注: props是只读的，Vue底层会监测你对props的修改，如果进行了修改，就会发出警告,若业务需求确实需要修改，那么请复制props的内容到data中一份，然后去修改data中的数据-
+> 2. 接收数据:
+>
+>    第一种方式（只接收）
+>
+>    ```
+>    props: ['name']
+>    ```
+>
+>    第二种方式（限制类型)
+>
+>    ```
+>    props:{name:String}
+>    ```
+>
+>    第三种方式(限制类型、限制必要性、指定默认值）
+>
+>    ```
+>    props:{
+>        type:String,//类型
+>    
+>        required:true,//必要性
+>    
+>        default:'老王’//默认值
+>    }
+>    ```
+>
+> 备注: **props是只读的，Vue底层会监测你对props的修改，如果进行了修改，就会发出警告,**若业务需求确实需要修改，那么请复制props的内容到data中一份，然后去修改data中的数据
 
 ## mixin混入（合）
 
@@ -3204,20 +3223,22 @@ new Vue({
 
 > 功能:可以把多个组件共用的配置提取成一个混入对象使用方式:
 > 第一步定义混合，例如:
-> 	{
-> 		data(){
 >
-> 、	}，
+> ```
+> {
+> 	data(){
+> 
+> 	}，
+> 	methods:{
+> 
+> 	}
+> }	
+> ```
 >
-> ​		methods:{
->
-> ​		}
->
-> ​	}	
 > 第二步使用混入,例如:
-> (1).全局混入:Vue.mixin(xxx)
 >
-> (2).局部混入: mixins : [ "xxx " ]
+> - 全局混入:`Vue.mixin(xxx)`
+> - 局部混入: `mixins : [ "xxx " ]`
 
 ## 插件
 
@@ -3306,23 +3327,25 @@ export default {
 > 功能:用于增强Vue
 > 本质:包含install方法的一个对象，install的第一个参数是Vue，第二个以后的参数是插件使用者传递的数据。
 > 定义插件:
-> 	对象.install = function (Vue，options){
+>
+> ```
+> 对象.install = function (Vue，options){
 > 	// 1.添加全局过滤器
 > 	Vue.filter(....)
 > 	// 2.添加全局指令
->
-> ​	Vue.directive( ....)
-> ​	// 3.配置全局混入(合)
->
-> ​	Vue.mixin(....)
-> ​	//4.添加实例方法
-> ​	Vue.prototype. $myMethod = function() {...}
->
-> ​	Vue.prototype. $myProperty = XxXx
->
+> 
+> 	Vue.directive( ....)
+> 	// 3.配置全局混入(合)
+> 
+> 	Vue.mixin(....)
+> 	//4.添加实例方法
+> 	Vue.prototype. $myMethod = function() {...}
+> 
+> 	Vue.prototype. $myProperty = XxXx
 > }
+> ```
 >
-> 使用插件:Vue.use()
+> 使用插件:`Vue.use()`
 
 ## scoped样式
 
@@ -3687,7 +3710,7 @@ export default {
 > }
 > ```
 >
-> ​	2.提供数据: this.$bus.$emit( 'xxxx',数据)
+> ​	2.提供数据: `this.$bus.$emit( 'xxxx',数据)`
 > 4.最好在beforeDestroy钩子中，用$off去解绑当前组件所用到的事件。
 
 ## 消息订阅与发布(pubsub)
@@ -4134,7 +4157,7 @@ h2 {
 >
 > 在项目根目录下新建`vue.config.js`文件
 
-### 方法一：
+### 方法一
 
 ```vue
 //app组件
@@ -4185,7 +4208,7 @@ module.exports = {
 > 2. 缺点:**不能配置多个代理，不能灵活的控制请求是否走代理。**
 > 3. 工作方式:若按照上述配置代理，当请求了前端不存在的资源时，那么该请求会转发给服务器（优先匹配前端资源)
 
-### 方法二：
+### 方法二
 
 ![](vue/image-20211027223552295.png)
 

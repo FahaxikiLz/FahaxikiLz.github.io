@@ -311,8 +311,8 @@ server_name ""; #匹配Host请求头不存在的情况。
 #### 匹配顺序
 
 > 1. 精确的名字
-> 2. 以*号开头的最长通配符名称，例如 *.example.org
-> 3. 以*号结尾的最长通配符名称，例如 mail.*
+> 2. 以\*号开头的最长通配符名称，例如`*.example.org`
+> 3. 以\*号结尾的最长通配符名称，例如`mail.*`
 > 4. 第一个匹配的正则表达式（在配置文件中出现的顺序）
 
 #### 优化
@@ -661,19 +661,48 @@ nginx: [emerg] unknown directive "if($invalid_referer)" in /usr/local/nginx/conf
 
 ![image-20220503153401325](Nginx/image-20220503153401325.png)
 
+### 设置错误页面
+
+```sh
+        server {
+            listen       80;
+            server_name  localhost;
+				
+				location / { 
+        		proxy_pass http://xxx;
+       	 }
+      
+				location /img{
+				# 设置防盗链
+                valid_referers http:192.168.174/133;
+                if ($invalid_referer){#无效的
+                        return 501;#返回状态码501
+                }
+                root html;
+                index  index.html index.htm;
+        	}
+        
+            # 错误页面
+            error_page 501 /501.html;
+            location = /501.html {
+                root html;
+            }
+        }
+```
+
 ### 设置盗链图片
 
-> 将提示图片放在html/img/x.png，访问设置防盗链图片时，就返回这x.png张图
+> 将提示图片放在`html/img/x.png`，访问设置防盗链图片时，就返回这x.png张图
 
 ```text
-		location /img{
+			location /img{
                 valid_referers http:192.168.174/133;
                 if ($invalid_referer){#无效的
                      rewrite ^/  /img/x.png break;
                 }
                 root html;
                 index  index.html index.htm;
-		}
+			}
 ```
 
 # Nginx 配置高可用的集群
