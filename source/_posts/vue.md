@@ -4755,7 +4755,10 @@ export default {
 >
 >    ```js
 >    //方式一:自己直接读取
+>    XXX(){
 >    this.$store.state.personAbout.list1
+>    }
+>    
 >    //方式二:借助mapState读取:
 >    ...mapstate('countAbout',["sum",'school','subject']),
 >    ```

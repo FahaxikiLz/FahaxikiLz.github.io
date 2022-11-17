@@ -718,9 +718,6 @@ vite官网：https://vitejs.cn
   - 开发环境中，无需打包操作，可快速的冷启动。
   - 轻量快速的热重载（HMR）。
   - 真正的按需编译，不再等待整个应用编译完成。
-- 传统构建 与 vite构建对比图
-
-<img src="https://cn.vitejs.dev/assets/bundler.37740380.png" style="width:500px;height:280px;float:left" /><img src="https://cn.vitejs.dev/assets/esm.3070012d.png" style="width:480px;height:280px" />
 
 ```bash
 ## 创建工程
@@ -1922,30 +1919,27 @@ export default {
 ### 创建路由
 
 ```js
-import * as VueRouter from 'vue-router';
-
-import Demo from '../components/Demo.vue'
-import HelloWorld from '../components/HelloWorld.vue'
-
+import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
-    {
-        path: '/demo',
-        component: Demo,
-    },
-    {
-        path: '/helloworld',
-        component: HelloWorld
-    }
-]
-const router = VueRouter.createRouter({
-    // 内部提供了 history 模式的实现。为了简单起见，我们在这里使用 hash 模式。
-    history: VueRouter.createWebHashHistory(),
-    routes, // `routes: routes` 的缩写
-})
+  {
+    path: "/",
+    # 按需引入
+    component: () => import("../views/Main.vue"),
+    children: [
+      { path: "/", component: () => import("../views/home/Home.vue") },
+    ],
+  },
+  ,
+];
 
+const routerHistory = createWebHistory();
+const routers = createRouter({
+  history: routerHistory,
+  routes: routes,
+});
+export default routers;
 
-export default router 
 ```
 
 ```js
@@ -2068,7 +2062,8 @@ export default {
     const store = useStore()
     
     function fn() {
-      store.dispatch("increment", 666)
+      store.dispatch("increment", 666)//YES
+      //$store.dispatch("increment", 666)//NO
     }
     return {
       store,
