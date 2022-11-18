@@ -1141,7 +1141,7 @@ app.all('/cors', (request, response) => {
 
 > axios是一个基于Promise的HTTP库。
 
-![](JSON和AJAX和Axios.assets/axios.png)
+![](JSON和AJAX和Axios/axios.png)
 
 ## axios 常用语法
 
