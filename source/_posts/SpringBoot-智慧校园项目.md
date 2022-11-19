@@ -860,7 +860,9 @@ public class UploadFile {
 
 ## 登录页面
 
-![](SpringBoot-%E6%99%BA%E6%85%A7%E6%A0%A1%E5%9B%AD/%E7%99%BB%E5%BD%95.png)
+![image-20221119202020302](SpringBoot-%E6%99%BA%E6%85%A7%E6%A0%A1%E5%9B%AD%E9%A1%B9%E7%9B%AE/image-20221119202020302.png)
+
+![](SpringBoot-%E6%99%BA%E6%85%A7%E6%A0%A1%E5%9B%AD%E9%A1%B9%E7%9B%AE/%E7%99%BB%E5%BD%95.png)
 
 ### 验证码功能实现
 

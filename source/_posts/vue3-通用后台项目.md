@@ -7,6 +7,27 @@ categories:
 - 练手项目
 ---
 
+> - vite
+> - vue3
+
+# 引入静态文件
+
+```vue
+    <img class="img" :src="imgSrc()" />
+
+     setup() {
+
+        function imgSrc() {
+            return new URL("../../assets/vue.svg", import.meta.url).href;
+        }
+
+        return {
+            imgSrc,
+        }
+```
+
+# [Mock.js ](http://mockjs.com/)
+
 # Axios二次封装
 
 `utils/request.js` 文件
@@ -128,3 +149,17 @@ proxy.$request({//vue3
 })
 
 ```
+
+# 侧边栏不同渲染及权限
+
+> 个人思路。。。
+
+![image-20221119203505653](vue3-%E9%80%9A%E7%94%A8%E5%90%8E%E5%8F%B0%E9%A1%B9%E7%9B%AE/image-20221119203505653.png)
+
+## [Vue-Router根据用户权限添加动态路由](https://cloud.tencent.com/developer/article/2162648)
+
+注意：vuex中的数据不持久化，一刷新侧边栏就没有了
+
+![image-20221119215430066](vue3-%E9%80%9A%E7%94%A8%E5%90%8E%E5%8F%B0%E9%A1%B9%E7%9B%AE/image-20221119215430066.png)
+
+然后在某个初始的地方调用addmenu方法
