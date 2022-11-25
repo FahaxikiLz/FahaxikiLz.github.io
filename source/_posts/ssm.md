@@ -2605,18 +2605,6 @@ public String testParam(HttpServletRequest request){
 
 > **可以在控制器方法的形参位置设置一个实体类类型的形参，此时若浏览器传输的请求参数的参数名和实体类中的属性名一致，那么请求参数就会为此属性赋值**
 
-```html
-<form th:action="@{/testBean}" method="POST">
-    用户名<input type="text" name="username"/>
-    密码<input type="text" name="password"/>
-    性别<input type="radio" name="sex" value="男"/>男
-    <input type="radio" name="sex" value="女"/>女
-    年龄<input type="text" name="age"/>
-    邮箱<input type="text" name="email"/>
-    <input type="submit" value="使用实体类获取参数"/>
-</form>
-```
-
 ```java
 public class User {
     private Integer id;
@@ -2678,16 +2666,15 @@ public String testBean(@RequestBody Map map) {
 
 ### @RequestBody
 
-> - **@RequestBody可以获取请求体**，需要在控制器方法设置一个形参，使用@RequestBody进行标识，当前请求的请求体就会为当前注解所标识的形参赋值
+> - **@RequestBody可以获取请求体(body)**，需要在控制器方法设置一个形参，使用@RequestBody进行标识，当前请求的请求体就会为当前注解所标识的形参赋值
+>
 > - **这种方式只可以获得post请求的请求体。**
-
-```html
-<form th:action="@{/testRequestBody}" method="post">
-    用户名：<input type="text" name="username"><br>
-    密码：<input type="password" name="password"><br>
-    <input type="submit">
-</form>
-```
+>
+> - 有时可以看到加注解，又有时不加
+>
+>   **requestbody接收json的数据，axios之类的请求是json类型的，这时候加注解**
+>
+>   **表单提交是application/x-www-form-urlencoded类型的，这时候不加注解**
 
 ```java
 @RequestMapping("/testRequestBody")
