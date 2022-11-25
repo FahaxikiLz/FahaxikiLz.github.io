@@ -8,6 +8,8 @@ categories:
 - 微服务
 ---
 
+✔️ `:heavy_check_mark:`
+
 # 1.微服务概述
 
 ## 什么是微服务？
@@ -543,3 +545,143 @@ public class ConsumerController {
 ### 目前工程样图
 
 <img src="SpringCloud/%E7%9B%AE%E5%89%8D%E5%B7%A5%E7%A8%8B%E6%A0%B7%E5%9B%BE.png" style="zoom:60%;" />
+
+# 5.服务注册与发现
+
+## :x:Eureka
+
+> -  什么是服务治理
+>
+>   Spring Cloud 封装了 Netflix 公司开发的 Eureka 模块来实现服务治理
+>
+>   在传统的rpc远程调用框架中，管理每个服务与服务之间依赖关系比较复杂，管理比较复杂，所以需要使用服务治理，管理服务于服务之间依赖关系，可以实现服务调用、负载均衡、容错等，实现服务发现与注册。
+>
+> -   什么是服务注册与发现
+>
+>   Eureka采用了CS的设计架构，Eureka Server 作为服务注册功能的服务器，它是服务注册中心。而系统中的其他微服务，使用 Eureka的客户端连接到 Eureka Server并维持心跳连接。这样系统的维护人员就可以通过 Eureka Server 来监控系统中各个微服务是否正常运行。
+>
+>   在服务注册与发现中，有一个注册中心。当服务器启动的时候，会把当前自己服务器的信息 比如 服务地址通讯地址等以别名方式注册到注册中心上。另一方（消费者|服务提供者），以该别名的方式去注册中心上获取到实际的服务通讯地址，然后再实现本地RPC调用RPC远程调用框架核心设计思想：在于注册中心，因为使用注册中心管理每个服务与服务之间的一个依赖关系(服务治理概念)。在任何rpc远程框架中，都会有一个注册中心(存放服务地址相关信息(接口地址))
+
+![Eureka和Dubbo的对比](SpringCloud/image-20221125165408158.png)
+
+### 生成EurekaServer端服务注册中心
+
+#### 创建maven子工程
+
+> 创建子工程cloud-eureka-server7001
+
+#### 改POM
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId><!--注意这里是server-->
+</dependency>
+
+```
+
+#### 写yaml
+
+```yaml
+server:
+  port: 7001
+
+eureka:
+  instance:
+    hostname: localhost #eureka服务端的实例名称
+  client:
+    #false表示不向注册中心注册自己。
+    register-with-eureka: false
+    #false表示自己端就是注册中心，我的职责就是维护服务实例，并不需要去检索服务
+    fetch-registry: false
+    service-url:
+      #设置与Eureka Server交互的地址查询服务和注册服务都需要依赖这个地址。
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+```
+
+#### 主启动
+
+<img src="SpringCloud/image-20221125170633503.png" alt="image-20221125170633503" style="zoom:80%;" />
+
+#### 测试
+
+> 访问localhost:7001
+
+![image-20221125171122487](SpringCloud/image-20221125171122487.png)
+
+### 修改提供者支付模块
+
+> EurekaClient端将cloud-provider-payment8001注册进EurekaServer成为服务提供者provider
+
+#### 改pom
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId><!--注意这里是client-->
+</dependency>
+```
+
+#### 写yaml
+
+```yaml
+eureka:
+  client:
+    #表示是否将自己注册进EurekaServer默认为true。
+    register-with-eureka: true
+    #是否从EurekaServer抓取已有的注册信息，默认为true。单节点无所谓，集群必须设置为true才能配合ribbon使用负载均衡
+    fetchRegistry: true
+    service-url:
+      defaultZone: http://localhost:7001/eureka
+```
+
+#### 主启动
+
+![image-20221125171308002](SpringCloud/image-20221125171308002.png)
+
+#### 测试
+
+<img src="SpringCloud/image-20221125171442381.png" alt="image-20221125171442381" style="zoom:80%;" />
+
+### 修改消费者订单模块
+
+> EurekaClient端将cloud-consumer-order80注册进EurekaServer成为服务消费者consumer
+
+#### 改pom
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId><!--注意这里是client-->
+</dependency>
+```
+
+#### 写yaml
+
+```yaml
+server:
+  port: 80
+
+
+spring:
+  application:
+    name: cloud-order-service
+
+eureka:
+  client:
+    #表示是否将自己注册进EurekaServer默认为true。
+    register-with-eureka: true
+    #是否从EurekaServer抓取已有的注册信息，默认为true。单节点无所谓，集群必须设置为true才能配合ribbon使用负载均衡
+    fetchRegistry: true
+    service-url:
+      defaultZone: http://localhost:7001/eureka
+ 
+```
+
+#### 主启动
+
+![image-20221125171823880](SpringCloud/image-20221125171823880.png)
+
+#### 测试
+
+![image-20221125171920036](SpringCloud/image-20221125171920036.png)
