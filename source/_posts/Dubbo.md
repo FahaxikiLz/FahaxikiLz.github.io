@@ -2,7 +2,6 @@
 title: Dubbo
 date: 2022-10-23 16:59:30
 categories: 
-- 分布式
 - 微服务
 tags: 
 - Dubbo
@@ -46,9 +45,9 @@ tags:
 
 ### 安装zookeeper
 
-> 1. 下载[zookeeper](https://archive.apache.org/dist/zookeeper/zookeeper-3.4.13/)
+> 1. 下载[zookeeper](https://archive.apache.org/dist/zookeeper/zookeeper-3.4.13/)或者执行`wget http://mirror.bit.edu.cn/apache/zookeeper/zookeeper-3.4.13/zookeeper-3.4.13.tar.gz`
 >
-> 2. 解压运行`bin/zkServer.cmd` ，初次运行会报错，没有`zoo.cfg`配置文件
+> 2. 解压，进入bin目录， 运行`./zkServer.sh start` ，初次运行会报错，没有`zoo.cfg`配置文件
 >
 > 3. 修改`zoo.cfg`配置文件
 >
@@ -69,6 +68,12 @@ tags:
 >      `create –e /atguigu 123`：创建一个atguigu节点，值为123
 >
 >      `get /atguigu`：获取/atguigu节点的值
+>
+> 5. 查看zookeeper的运行状态
+>
+>    ```
+>    [root@lz bin]# ./zkServer.sh status
+>    ```
 
 ### 安装dubbo-admin管理控制台
 
