@@ -1149,7 +1149,7 @@ eureka:
 
 ## ✔️ Zookeeper
 
-#### 安装zookeeper
+### 安装zookeeper
 
 > 1. 下载[zookeeper](https://archive.apache.org/dist/zookeeper/zookeeper-3.4.13/)或者执行`wget http://mirror.bit.edu.cn/apache/zookeeper/zookeeper-3.4.13/zookeeper-3.4.13.tar.gz`
 >
@@ -1181,13 +1181,11 @@ eureka:
 >    [root@lz bin]# ./zkServer.sh status
 >    ```
 
-#### SpringCloud整合Zookeeper代替Eureka
-
-##### 创建服务提供者
+### 创建服务提供者
 
 > 新建cloud-provider-payment8004作为服务提供者
 
-##### 改pom
+#### 改pom
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1242,7 +1240,7 @@ eureka:
 </project>
 ```
 
-##### 写yaml
+#### 写yaml
 
 ```yaml
 #8004表示注册到zookeeper服务器的支付服务提供者端口号
@@ -1257,7 +1255,7 @@ spring:
       connect-string: 192.168.221.100:2181
 ```
 
-##### 主启动
+#### 主启动
 
 ```java
 package com.atguigu.springcloud;
@@ -1281,7 +1279,7 @@ public class PaymentMain8004 {
 
 ```
 
-##### controller
+#### controller
 
 ```java
 package com.atguigu.springcloud.controller;
@@ -1305,17 +1303,17 @@ public class PaymentController {
 }
 ```
 
-##### 报错
+#### 报错
 
 ![image-20221126224023641](SpringCloud/image-20221126224023641.png)
 
-###### 原因
+##### 原因
 
 > zookeeper-discovery中有一个zookeeper的jar包，这个jar包版本和我们Linux中的版本不一样，发生了冲突
 
 <img src="SpringCloud/image-20221126224259609.png" alt="image-20221126224259609" style="zoom: 70%;" />
 
-###### 解决
+##### 解决
 
 > 修改pom文件，将自带的zookeeper排除
 
@@ -1340,10 +1338,521 @@ public class PaymentController {
         </dependency>
 ```
 
-##### 测试1
+#### 测试1
 
 ![image-20221126224856743](SpringCloud/image-20221126224856743.png)
 
-##### 测试2
+#### 测试2
 
 ![image-20221126225249482](SpringCloud/image-20221126225249482.png)
+
+### 创建服务消费者
+
+> 新建cloud-consumerzk-order80作为服务的消费者
+
+#### 改pom
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>cloud2020</artifactId>
+        <groupId>com.atguigu</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>cloud-consumerzk-order80</artifactId>
+
+    <dependencies>
+        <!-- SpringBoot整合Web组件 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- 引入自己定义的api通用包，可以使用Payment支付Entity -->
+        <dependency>
+            <groupId>com.atguigu</groupId>
+            <artifactId>cloud-api-commons</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- SpringBoot整合zookeeper客户端 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-zookeeper-discovery</artifactId>
+            <!--先排除自带的zookeeper3.5.3-->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.zookeeper</groupId>
+                    <artifactId>zookeeper</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--添加zookeeper3.4.9版本,和linux中的版本一致-->
+        <dependency>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+            <version>3.4.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
+```
+
+#### 写yaml
+
+```yaml
+server:
+  port: 80
+
+spring:
+  application:
+    name: cloud-consumer-order
+  cloud:
+    #注册到zookeeper地址
+    zookeeper:
+      connect-string: 192.168.221.100:2181
+```
+
+#### 主启动
+
+```java
+package com.atguigu.springcloud;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+
+/**
+ * @Author: lz
+ * @Date: 2022-11-27 0027 10:52
+ * @Description:
+ */
+
+@SpringBootApplication
+@EnableDiscoveryClient
+public class OrderZK80 {
+
+    public static void main(String[] args) {
+        SpringApplication.run(OrderZK80.class, args);
+    }
+}
+```
+
+#### 实现类
+
+> 配置RestTemplate
+
+```java
+package com.atguigu.springcloud.config;
+
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
+
+/**
+ * @Author: lz
+ * @Date: 2022-11-27 0027 10:54
+ * @Description:
+ */
+
+@Configuration
+public class ApplicationContextConfig {
+
+    @Bean
+    @LoadBalanced
+    public RestTemplate getRestTemplage() {
+        return new RestTemplate();
+    }
+}
+```
+
+> controller
+
+```java
+package com.atguigu.springcloud.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+/**
+ * @Author: lz
+ * @Date: 2022-11-27 0027 10:54
+ * @Description:
+ */
+@RestController
+public class OrderZKController {
+
+    public static final String INVOKE_URL = "http://cloud-provider-payment";
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @RequestMapping(value = "/consumer/zk")
+    public String paymentInfo() {
+        String result = restTemplate.getForObject(INVOKE_URL + "/payment/zk", String.class);
+        System.out.println("消费者调用支付服务(zookeeper)--->result:" + result);
+        return result;
+    }
+}
+```
+
+#### 测试
+
+![image-20221127111732018](SpringCloud/image-20221127111732018.png)
+
+![image-20221127111747844](SpringCloud/image-20221127111747844.png)
+
+## ✔️consul
+
+> - Consul 是一套开源的分布式服务发现和配置管理系统，由 HashiCorp 公司用 Go 语言开发。提供了微服务系统中的服务治理、配置中心、控制总线等功能。这些功能中的每一个都可以根据需要单独使用，也可以一起使用以构建全方位的服务网格，总之Consul提供了一种完整的服务网格解决方案。
+> - [下载地址](https://www.consul.io/downloads.html)
+> - [中文文档](https://www.springcloud.cc/spring-cloud-consul.html)
+
+### 安装并运行Consul
+
+> window环境下载完成后只有一个consul.exe文件，硬盘路径下双击运行，查看版本号信息
+
+![image-20221127120213081](SpringCloud/image-20221127120213081.png)
+
+> - 使用开发模式启动，执行`consul agent -dev`
+> - 通过以下地址可以访问Consul的首页：http://localhost:8500
+
+![image-20221127120302445](SpringCloud/image-20221127120302445.png)
+
+![image-20221127120419564](SpringCloud/image-20221127120419564.png)
+
+### 服务提供者
+
+> 新建Module支付服务provider8006作为服务的提供者
+
+#### 改pom
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>cloud2020</artifactId>
+        <groupId>com.atguigu</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>cloud-providerconsul-payment8006</artifactId>
+
+    <dependencies>
+        <!--SpringCloud consul-server -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+        </dependency>
+        <!-- SpringBoot整合Web组件 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!--日常通用jar包配置-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+
+</project>
+```
+
+#### 写yaml
+
+```yaml
+###consul服务端口号
+server:
+  port: 8006
+
+spring:
+  application:
+    name: consul-provider-payment
+  ####consul注册中心地址
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        #hostname: 127.0.0.1
+        service-name: ${spring.application.name}
+```
+
+#### 主启动
+
+```java
+package com.atguigu.springcloud;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+
+/**
+ * @Author: lz
+ * @Date: 2022-11-27 0027 12:15
+ * @Description:
+ */
+@SpringBootApplication
+@EnableDiscoveryClient
+public class PaymentMain8006 {
+    public static void main(String[] args) {
+        SpringApplication.run(PaymentMain8006.class, args);
+    }
+}
+
+```
+
+#### controller
+
+```java
+package com.atguigu.springcloud.controller;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
+
+
+@RestController
+public class PaymentController {
+    @Value("${server.port}")
+    private String serverPort;
+
+    @GetMapping("/payment/consul")
+    public String paymentInfo() {
+        return "springcloud with consul: " + serverPort + "\t\t" + UUID.randomUUID().toString();
+    }
+}
+```
+
+#### 测试
+
+![image-20221127121920630](SpringCloud/image-20221127121920630.png)
+
+### 服务消费者
+
+> 新建Module消费服务order80作为服务的消费者
+
+#### pom
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>cloud2020</artifactId>
+        <groupId>com.atguigu</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>cloud-consumerconsul-order80</artifactId>
+
+    <dependencies>
+        <!--SpringCloud consul-server -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+        </dependency>
+        <!-- SpringBoot整合Web组件 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!--日常通用jar包配置-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+
+</project>
+```
+
+#### yaml
+
+```yaml
+###consul服务端口号
+server:
+  port: 80
+
+spring:
+  application:
+    name: cloud-consumer-order
+  ####consul注册中心地址
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        #hostname: 127.0.0.1
+        service-name: ${spring.application.name}
+```
+
+#### 主启动
+
+```java
+package com.atguigu.springcloud;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+
+/**
+ * @Author: lz
+ * @Date: 2022-11-27 0027 12:22
+ * @Description:
+ */
+@SpringBootApplication
+@EnableDiscoveryClient //该注解用于向使用consul或者zookeeper作为注册中心时注册服务
+public class OrderConsulMain80 {
+    public static void main(String[] args) {
+        SpringApplication.run(OrderConsulMain80.class, args);
+    }
+}
+```
+
+#### 实现类
+
+> 配置RestTemplate
+
+```java
+package com.atguigu.springcloud.config;
+
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
+
+/**
+ * @Author: lz
+ * @Date: 2022-11-27 0027 12:23
+ * @Description:
+ */
+@Configuration
+public class ApplicationContextConfig {
+    @Bean
+    @LoadBalanced
+    public RestTemplate getRestTemplate() {
+        return new RestTemplate();
+    }
+}
+```
+
+> controller
+
+```java
+package com.atguigu.springcloud.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+@RestController
+public class OrderConsulController {
+    public static final String INVOKE_URL = "http://cloud-provider-payment"; //consul-provider-payment
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @GetMapping(value = "/consumer//consul")
+    public String paymentInfo() {
+        String result = restTemplate.getForObject(INVOKE_URL + "/payment/consul", String.class);
+        System.out.println("消费者调用支付服务(consule)--->result:" + result);
+        return result;
+    }
+}
+```
+
+#### 测试
+
+![image-20221127122805196](SpringCloud/image-20221127122805196.png)
+
+![image-20221127123019571](SpringCloud/image-20221127123019571.png)
+
+## 三个注册中心异同点
+
+### CAP
+
+> - C:Consistency（强一致性）
+> - A:Availability（可用性）
+> - P:Partition tolerance（分区容错性）
+> - CAP理论关注粒度是数据，而不是整体系统设计的策略
+
+### 经典CAP图
+
+<img src="SpringCloud/image-20221127123739114.png" alt="经典CAP图" style="zoom:67%;" />
+
+#### AP架构(Eureka)
+
+> 当网络分区出现后，为了保证可用性，系统B可以返回旧值，保证系统的可用性。
+> 结论：违背了一致性C的要求，只满足可用性和分区容错，即AP
+
+#### CP架构(Zookeeper/Consul)
+
+> 当网络分区出现后，为了保证一致性，就必须拒接请求，否则无法保证一致性
+> 结论：违背了可用性A的要求，只满足一致性和分区容错，即CP
