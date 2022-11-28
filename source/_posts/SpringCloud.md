@@ -207,7 +207,7 @@ categories:
 
 ![image-20221124153852258](SpringCloud/image-20221124153852258.png)
 
-#### 改POM
+#### POM
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -422,8 +422,8 @@ public class PaymentController {
 
 > 创建子工程cloud-consumer-order80	微服务消费者订单Module模块
 >
-> - 改pom
-> - 写yaml
+> - POM
+> - yaml
 > - 主启动（同上一个模块）
 
 #### RestTemplate
@@ -531,7 +531,7 @@ public class ConsumerController {
 >
 > - 创建公共工程cloud-api-commons
 >
-> - 修改pom
+> - 修POM
 >
 > - 将实体类和统一返回类型的类放在此工程中
 >
@@ -579,7 +579,7 @@ public class ConsumerController {
 
 > 创建子工程cloud-eureka-server7001
 
-##### 改POM
+##### POM
 
 ```xml
 <dependency>
@@ -589,7 +589,7 @@ public class ConsumerController {
 
 ```
 
-##### 写yaml
+##### yaml
 
 ```yaml
 server:
@@ -622,7 +622,7 @@ eureka:
 
 > EurekaClient端将cloud-provider-payment8001注册进EurekaServer成为服务提供者provider
 
-##### 改pom
+##### POM
 
 ```xml
 <dependency>
@@ -631,7 +631,7 @@ eureka:
 </dependency>
 ```
 
-##### 写yaml
+##### yaml
 
 ```yaml
 eureka:
@@ -656,7 +656,7 @@ eureka:
 
 > EurekaClient端将cloud-consumer-order80注册进EurekaServer成为服务消费者consumer
 
-##### 改pom
+##### POM
 
 ```xml
 <dependency>
@@ -665,7 +665,7 @@ eureka:
 </dependency>
 ```
 
-##### 写yaml
+##### yaml
 
 ```yaml
 server:
@@ -707,7 +707,7 @@ eureka:
 
 > 根据新建cloud-eureka-server7001创建一个新建cloud-eureka-server7002作为注册中心，和7001组合成集群环境
 
-##### 改POM
+##### POM
 
 ```xml
 <dependency>
@@ -723,7 +723,7 @@ eureka:
 
 ![image-20221126155854611](SpringCloud/image-20221126155854611.png)
 
-##### 写yaml
+##### yaml
 
 > 7001的yaml
 
@@ -814,7 +814,7 @@ public class EurekaMain7002 {
 
 > 根据新建cloud-provider-payment8001创建一个新建cloud-provider-payment8002作为支付提供者，和8001组成集群环境
 
-##### 改pom
+##### POM
 
 ```xml
         <!--eureka-client-->
@@ -824,7 +824,7 @@ public class EurekaMain7002 {
         </dependency>
 ```
 
-##### 写yaml
+##### yaml
 
 ```yaml
 server:
@@ -926,7 +926,7 @@ public class ApplicationContextConfig {
 
 ![image-20221126201310905](SpringCloud/image-20221126201310905.png)
 
-##### 改pom
+##### POM
 
 ```xml
         <dependency>
@@ -939,7 +939,7 @@ public class ApplicationContextConfig {
         </dependency>
 ```
 
-##### 写yaml
+##### yaml
 
 ```yaml
 server:
@@ -967,7 +967,7 @@ eureka:
 
 ![image-20221126202314066](SpringCloud/image-20221126202314066.png)
 
-##### 改pom
+##### POM
 
 ```xml
         <dependency>
@@ -980,7 +980,7 @@ eureka:
         </dependency>
 ```
 
-##### 写yaml
+##### yaml
 
 ```yaml
 server:
@@ -1185,7 +1185,7 @@ eureka:
 
 > 新建cloud-provider-payment8004作为服务提供者
 
-#### 改pom
+#### POM
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1240,7 +1240,7 @@ eureka:
 </project>
 ```
 
-#### 写yaml
+#### yaml
 
 ```yaml
 #8004表示注册到zookeeper服务器的支付服务提供者端口号
@@ -1315,7 +1315,7 @@ public class PaymentController {
 
 ##### 解决
 
-> 修改pom文件，将自带的zookeeper排除
+> 修POM文件，将自带的zookeeper排除
 
 ```xml
         <!-- SpringBoot整合zookeeper客户端 -->
@@ -1350,7 +1350,7 @@ public class PaymentController {
 
 > 新建cloud-consumerzk-order80作为服务的消费者
 
-#### 改pom
+#### POM
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1417,7 +1417,7 @@ public class PaymentController {
 </project>
 ```
 
-#### 写yaml
+#### yaml
 
 ```yaml
 server:
@@ -1547,7 +1547,7 @@ public class OrderZKController {
 
 > 新建Module支付服务provider8006作为服务的提供者
 
-#### 改pom
+#### POM
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1601,7 +1601,7 @@ public class OrderZKController {
 </project>
 ```
 
-#### 写yaml
+#### yaml
 
 ```yaml
 ###consul服务端口号
@@ -1836,6 +1836,8 @@ public class OrderConsulController {
 
 ## 三个注册中心异同点
 
+![image-20221127203037307](SpringCloud/image-20221127203037307.png)
+
 ### CAP
 
 > - C:Consistency（强一致性）
@@ -1856,3 +1858,420 @@ public class OrderConsulController {
 
 > 当网络分区出现后，为了保证一致性，就必须拒接请求，否则无法保证一致性
 > 结论：违背了可用性A的要求，只满足一致性和分区容错，即CP
+
+# 6.服务调用
+
+## ✔️Ribbon负载均衡服务调用
+
+> - Spring Cloud Ribbon是基于Netflix Ribbon实现的一套客户端负载均衡的工具。简单的说，Ribbon是Netflix发布的开源项目，**主要功能是提供客户端的软件负载均衡算法和服务调用。**Ribbon客户端组件提供一系列完善的配置项如连接超时，重试等。简单的说，就是在配置文件中列出Load Balancer（简称LB）后面所有的机器，Ribbon会自动的帮助你基于某种规则（如简单轮询，随机连接等）去连接这些机器。我们很容易使用Ribbon实现自定义的负载均衡算法。
+>
+> - LB负载均衡(Load Balance)是什么
+>   简单的说就是将用户的请求平摊的分配到多个服务上，从而达到系统的HA（高可用）。常见的负载均衡有软件Nginx，LVS，硬件 F5等。
+>
+> - Ribbon本地负载均衡客户端 VS Nginx服务端负载均衡区别
+>   Nginx是服务器负载均衡，客户端所有请求都会交给nginx，然后由nginx实现转发请求。即负载均衡是由服务端实现的。
+>
+>    Ribbon本地负载均衡，在调用微服务接口时候，会在注册中心上获取注册信息服务列表之后缓存到JVM本地，从而在本地实现RPC远程服务调用技术。
+>
+> - 一句话：**负载均衡+RestTemplate调用** 
+
+### Ribbon实例
+
+#### pom
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+</dependency>
+```
+
+> Eureka默认带有Ribbon的依赖
+
+<img src="SpringCloud/image-20221127191724381.png" alt="image-20221127191724381" style="zoom:67%;" />
+
+#### RestTemplate配置类
+
+```java
+package com.atguigu.springcloud.config;
+
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
+
+/**
+ * @Author: lz
+ * @Date: 2022-11-25 0025 14:06
+ * @Description:
+ */
+@Configuration
+public class ApplicationContextConfig {
+    @Bean
+    @LoadBalanced //使用@LoadBalanced注解赋予RestTemplate负载均衡的能力
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}
+```
+
+#### RestTemplate的使用
+
+> - `getForObject`方法/`postForObject`方法：返回对象为响应体中数据转化成的对象，基本上可以理解为Json
+>
+> - `getForEntity`方法/`postForEntity`方法：返回对象为`ResponseEntity`对象，包含了响应中的一些重要信息，比如响应头、响应状态码、响应体等
+
+![image-20221127192052586](SpringCloud/image-20221127192052586.png)
+
+### Ribbon核心组件IRule
+
+#### 负载均衡策略
+
+> - `com.netflix.loadbalancer.RoundRobinRule`：轮询
+> - `com.netflix.loadbalancer.RandomRule`：随机
+> - `com.netflix.loadbalancer.RetryRule`：先按照`RoundRobinRule`的策略获取服务，如果获取服务失败则在指定时间内会进行重试，获取可用的服务
+> - `WeightedResponseTimeRule`：对`RoundRobinRule`的扩展，响应速度越快的实例选择权重越大，越容易被选择
+> - `BestAvailableRule`：会先过滤掉由于多次访问故障而处于断路器跳闸状态的服务，然后选择一个并发量最小的服务
+> - `AvailabilityFilteringRule`：先过滤掉故障实例，再选择并发较小的实例
+> - `ZoneAvoidanceRule`：默认规则,复合判断server所在区域的性能和server的可用性选择服务器
+
+#### 更改策略
+
+> 官方文档明确给出了警告：这个自定义配置类不能放在`@ComponentScan`所扫描的当前包下以及子包下，
+> 否则我们自定义的这个配置类就会被所有的Ribbon客户端所共享，达不到特殊化定制的目的了。也就是说**不能放到主启动类所在的包和主启动类的子包**
+
+##### 新建package 
+
+![image-20221127204725942](SpringCloud/image-20221127204725942.png)
+
+##### 配置规则类
+
+```java
+package com.atguigu.myrule;
+
+import com.netflix.loadbalancer.IRule;
+import com.netflix.loadbalancer.RandomRule;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * @Author: lz
+ * @Date: 2022-11-27 0027 20:45
+ * @Description:
+ */
+@Configuration
+public class MySelfRule {
+
+    @Bean
+    public IRule myRule() {
+        return new RandomRule();
+    }
+}
+
+```
+
+##### 主启动
+
+```java
+package com.atguigu.springcloud;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.cloud.netflix.ribbon.RibbonClient;
+
+/**
+ * @Author: lz
+ * @Date: 2022-11-25 0025 14:02
+ * @Description:
+ */
+
+@SpringBootApplication
+@EnableEurekaClient//client的注解
+@RibbonClient(name = "CLOUD-PAYMENT-SERVICE",configuration=MySelfRule.class)
+public class MainApp80 {
+    public static void main(String[] args) {
+        SpringApplication.run(MainApp80.class, args);
+    }
+}
+
+```
+
+##### 测试
+
+![image-20221127210025489](SpringCloud/image-20221127210025489.png)
+
+### Ribbon负载均衡算法
+
+#### 原理
+
+>
+> 负载均衡算法：rest接口第几次请求数 % 服务器集群总数量 = 实际调用服务器位置下标  ，每次服务重启动后rest接口计数从1开始。
+>
+> `List<ServiceInstance> instances = discoveryClient.getInstances("CLOUD-PAYMENT-SERVICE");`
+>
+> 如：   List [0] instances = 127.0.0.1:8002
+> 　　　List [1] instances = 127.0.0.1:8001
+>
+> 8001+ 8002 组合成为集群，它们共计2台机器，集群总数为2， 按照轮询算法原理：
+>
+> 当总请求数为1时： 1 % 2 =1 对应下标位置为1 ，则获得服务地址为127.0.0.1:8001
+> 当总请求数位2时： 2 % 2 =0 对应下标位置为0 ，则获得服务地址为127.0.0.1:8002
+> 当总请求数位3时： 3 % 2 =1 对应下标位置为1 ，则获得服务地址为127.0.0.1:8001
+> 当总请求数位4时： 4 % 2 =0 对应下标位置为0 ，则获得服务地址为127.0.0.1:8002
+> 如此类推......
+
+## ✔️OpenFeign服务接口调用
+
+> - Feign能干什么
+>   Feign旨在使编写Java Http客户端变得更容易。
+>   前面在使用Ribbon+RestTemplate时，利用RestTemplate对http请求的封装处理，形成了一套模版化的调用方法。但是在实际开发中，由于对服务依赖的调用可能不止一处，往往一个接口会被多处调用，所以通常都会针对每个微服务自行封装一些客户端类来包装这些依赖服务的调用。所以，Feign在此基础上做了进一步封装，由他来帮助我们定义和实现依赖服务接口的定义。在Feign的实现下，我们**只需创建一个接口并使用注解的方式来配置它(以前是Dao接口上面标注Mapper注解,现在是一个微服务接口上面标注一个Feign注解即可)，即可完成对服务提供方的接口绑定**，简化了使用Spring cloud Ribbon时，自动封装服务调用客户端的开发量。
+>
+> - **Feign集成了Ribbon**
+>   利用Ribbon维护了Payment的服务列表信息，并且通过轮询实现了客户端的负载均衡。而与Ribbon不同的是，通过feign只需要定义服务绑定接口且以声明式的方法，优雅而简单的实现了服务调用
+
+![image-20221128205556636](SpringCloud/image-20221128205556636.png)
+
+### OpenFeign使用步骤
+
+#### 创建消费者
+
+> - 创建cloud-consumer-feign-order80作为消费者
+> - **Feign在消费端使用**
+
+#### POM
+
+```XML
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>cloud2020</artifactId>
+        <groupId>com.atguigu</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>cloud-consumer-feign-order80</artifactId>
+
+    <dependencies>
+        <!--openfeign-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        <!--eureka client-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+        <!-- 引入自己定义的api通用包，可以使用Payment支付Entity -->
+        <dependency>
+            <groupId>com.atguigu</groupId>
+            <artifactId>cloud-api-commons</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!--web-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!--一般基础通用配置-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+
+</project>
+```
+
+> OpenFeign集成了Ribbon
+
+<img src="SpringCloud/image-20221128210108677.png" alt="image-20221128210108677" style="zoom:67%;" />
+
+#### yaml
+
+```yaml
+server:
+  port: 80
+
+eureka:
+  client:
+    register-with-eureka: false
+    service-url:
+      defaultZone: http://eureka7001.com:7001/eureka/,http://eureka7002.com:7002/eureka/
+```
+
+#### 主启动
+
+```java
+package com.atguigu.springcloud;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+
+/**
+ * @Author: lz
+ * @Date: 2022-11-28 0028 21:02
+ * @Description:
+ */
+@SpringBootApplication
+@EnableFeignClients//feign的注解
+public class OrderFeignMain80 {
+    public static void main(String[] args) {
+        SpringApplication.run(OrderFeignMain80.class, args);
+    }
+}
+```
+
+#### 实现类
+
+> 创建一个接口，添加注解@FeignClient，调用其他服务提供者中的服务
+
+```java
+package com.atguigu.springcloud.service;
+
+import com.atguigu.springcloud.entities.CommonResult;
+import com.atguigu.springcloud.entities.Payment;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+@Component
+@FeignClient("CLOUD-PAYMENT-SERVICE")
+public interface PaymentFeignService {
+
+//    Payment getSerialById(Long id);//这个是服务提供者，service接口中方法
+
+    @GetMapping("/payment/getSerialById/{id}")
+    CommonResult getSerialById(@PathVariable("id") Long id);//这个是服务提供者，controller中的方法
+}
+
+```
+
+![image-20221128212613953](SpringCloud/image-20221128212613953.png)
+
+> controller
+
+```java
+package com.atguigu.springcloud.controller;
+
+import com.atguigu.springcloud.entities.CommonResult;
+import com.atguigu.springcloud.entities.Payment;
+import com.atguigu.springcloud.service.PaymentFeignService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * @Author: lz
+ * @Date: 2022-11-28 0028 21:07
+ * @Description:
+ */
+@RestController
+public class OrderFeignController {
+
+    @Autowired
+    private PaymentFeignService paymentFeignService;
+
+    @GetMapping(value = "/consumer/payment/{id}")
+    public CommonResult<Payment> getPaymentById(@PathVariable("id") Long id) {
+        return paymentFeignService.getSerialById(id);
+    }
+
+}
+```
+
+#### 测试
+
+<img src="SpringCloud/image-20221128213017437.png" alt="image-20221128213017437" style="zoom:67%;" />
+
+### OpenFeign超时控制
+
+> **OpenFeign默认等待1秒钟，超过后报错** 
+
+![image-20221128214920665](SpringCloud/image-20221128214920665.png)
+
+> - 为了避免这样的情况，有时候我们需要再yaml中设置Feign客户端的超时控制。
+> - OpenFeign集成了Ribbon，超时设置也是用的Ribbon的
+
+```yaml
+server:
+  port: 80
+
+  。。。。。。
+
+#设置feign客户端超时时间(OpenFeign默认支持ribbon)
+ribbon:
+  #指的是建立连接所用的时间，适用于网络状况正常的情况下,两端连接所用的时间
+  ReadTimeout: 5000
+  #指的是建立连接后从服务器读取到可用资源所用的时间
+  ConnectTimeout: 5000
+```
+
+### OpenFeign日志打印功能
+
+> - Feign 提供了日志打印功能，我们可以通过配置来调整日志级别，从而了解 Feign 中 Http 请求的细节。
+>   说白了就是对Feign接口的调用情况进行监控和输出
+> - 日志级别
+>   - NONE：默认的，不显示任何日志；
+>   - BASIC：仅记录请求方法、URL、响应状态码及执行时间；
+>   - HEADERS：除了 BASIC 中定义的信息之外，还有请求和响应的头信息；
+>   - FULL：除了 HEADERS 中定义的信息之外，还有请求和响应的正文及元数据。
+
+#### 配置日志config
+
+```java
+package com.atguigu.springcloud.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import feign.Logger;
+
+/**
+ * @auther zzyy
+ * @create 2019-11-10 17:00
+ */
+@Configuration
+public class FeignConfig {
+    @Bean
+    Logger.Level feignLoggerLevel() {
+        return Logger.Level.FULL;
+    }
+}
+```
+
+#### yaml
+
+```yaml
+logging:
+  level:
+    # feign日志以什么级别监控哪个接口
+    com.atguigu.springcloud.service.PaymentFeignService: debug
+```
+
+#### 测试
+
+![image-20221128215704949](SpringCloud/image-20221128215704949.png)
