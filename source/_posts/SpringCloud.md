@@ -2275,3 +2275,224 @@ logging:
 #### 测试
 
 ![image-20221128215704949](SpringCloud/image-20221128215704949.png)
+
+# 7.:x:Hystrix断路器
+
+## 概述
+
+> - 分布式系统面临的问题
+>
+>   复杂分布式体系结构中的应用程序有数十个依赖关系，每个依赖关系在某些时候将不可避免地失败。
+>
+> - 服务雪崩
+>   多个微服务之间调用的时候，假设微服务A调用微服务B和微服务C，微服务B和微服务C又调用其它的微服务，这就是所谓的“扇出”。**如果扇出的链路上某个微服务的调用响应时间过长或者不可用，对微服务A的调用就会占用越来越多的系统资源，进而引起系统崩溃，所谓的“雪崩效应”**
+>
+> - Hystrix是一个用于处理分布式系统的延迟和容错的开源库，在分布式系统里，许多依赖不可避免的会调用失败，比如超时、异常等，**Hystrix能够保证在一个依赖出问题的情况下，不会导致整体服务失败，避免级联故障，以提高分布式系统的弹性。**
+>
+>   “**断路器”本身是一种开关装置，当某个服务单元发生故障之后，通过断路器的故障监控（类似熔断保险丝），向调用方返回一个符合预期的、可处理的备选响应（FallBack）**，而不是长时间的等待或者抛出调用方无法处理的异常，这样就保证了服务调用方的线程不会被长时间、不必要地占用，从而避免了故障在分布式系统中的蔓延，乃至雪崩。
+>
+> - Hystrix能干嘛
+>
+>   - 服务降级
+>   - 服务熔断
+>   - 接近实时的监控
+
+## Hystrix实例
+
+### 创建一个服务提供者
+
+> 新建cloud-provider-hystrix-payment8001作为服务提供者
+
+### POM
+
+```XML
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>cloud2020</artifactId>
+        <groupId>com.atguigu</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>cloud-provider-hystrix-payment8001</artifactId>
+
+    <dependencies>
+        <!--hystrix-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+        </dependency>
+        <!--eureka client-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+        <!--web-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.atguigu</groupId>
+            <artifactId>cloud-api-commons</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+</project>
+```
+
+### yaml
+
+```yaml
+server:
+  port: 8001
+
+spring:
+  application:
+    name: cloud-provider-hystrix-payment
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://eureka7001.com:7001/eureka,http://eureka7002.com:7002/eureka
+```
+
+### 主启动
+
+```java
+package com.atguigu.springcloud;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+
+/**
+ * @Author: lz
+ * @Date: 2022-11-29 0029 20:42
+ * @Description:
+ */
+@SpringBootApplication
+@EnableEurekaClient
+public class PaymentHystrixMain8001 {
+    public static void main(String[] args) {
+        SpringApplication.run(PaymentHystrixMain8001.class, args);
+    }
+}
+```
+
+### 业务类
+
+> service
+
+```java
+package com.atguigu.springcloud.service;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.concurrent.TimeUnit;
+
+
+@Service
+public class PaymentService {
+    /**
+     * 正常访问，一切OK
+     *
+     * @param id
+     * @return
+     */
+    public String paymentInfo_OK(Integer id) {
+        return "线程池:" + Thread.currentThread().getName() + "paymentInfo_OK,id: " + id + "\t" + "O(∩_∩)O";
+    }
+
+    /**
+     * 超时访问，演示降级
+     *
+     * @param id
+     * @return
+     */
+    public String paymentInfo_TimeOut(Integer id) {
+        try {
+            TimeUnit.SECONDS.sleep(3);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return "线程池:" + Thread.currentThread().getName() + "paymentInfo_TimeOut,id: " + id + "\t" + "O(∩_∩)O，耗费3秒";
+    }
+}
+ 
+```
+
+> controller
+
+```java
+package com.atguigu.springcloud.controller;
+
+import com.atguigu.springcloud.service.PaymentService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@Slf4j
+public class PaymentController {
+    @Autowired
+    private PaymentService paymentService;
+
+    @Value("${server.port}")
+    private String serverPort;
+
+
+    @GetMapping("/payment/hystrix/ok/{id}")
+    public String paymentInfo_OK(@PathVariable("id") Integer id) {
+        String result = paymentService.paymentInfo_OK(id);
+        log.info("****result: " + result);
+        return result;
+    }
+
+    @GetMapping("/payment/hystrix/timeout/{id}")
+    public String paymentInfo_TimeOut(@PathVariable("id") Integer id) throws InterruptedException {
+        String result = paymentService.paymentInfo_TimeOut(id);
+        log.info("****result: " + result);
+        return result;
+    }
+}
+ 
+ 
+```
+
+### 测试
+
+> 访问`http://localhost:8001/payment/hystrix/ok/1`接口，立即输出
+>
+> 访问`http://localhost:8001/payment/hystrix/timeout/1`接口，3秒之后输出
+
+![image-20221129204826883](SpringCloud/image-20221129204826883.png)
+
+![image-20221129204842671](SpringCloud/image-20221129204842671.png)
