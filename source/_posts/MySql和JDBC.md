@@ -1,5 +1,5 @@
 ---
-title: Mysql和JDBC
+SELECT <字段名> FROM <表1>, <表2> [WHERE子句] title: Mysql和JDBC
 date: 2022-8-31 15:10:56
 categories: 
 - 数据库
@@ -886,10 +886,18 @@ select s.id,s.name,s.score,c.name class_name from students s LEFT OUTER JOIN cla
 > - **UNION ALL 会有重复结果，UNION 不会**
 > - **联合查询比使用or效率高，不会使索引失效**
 
-### 笛卡尔查询
+### 交叉连接
 
-> - SELECT查询不但可以从一张表查询数据，还可以从多张表同时查询数据。<span style="color:purple">**查询多张表的语法是：`SELECT * FROM <表1>,<表2>`。**</span>
+> - 查询多张表的语法是：
+>
+>   ```mysql
+>   SELECT <字段名> FROM <表1> CROSS JOIN <表2> [WHERE子句]
+>   或
+>   SELECT <字段名> FROM <表1>,<表2> [WHERE子句] 
+>   ```
+>
 > - 这种多表查询，又称**笛卡尔查询**，使用笛卡尔查询时要非常小心，由于结果集是目标表的行数乘积，对两个各自有100行记录的表进行笛卡尔查询将返回1万条记录，对两个各自有1万行记录的表进行笛卡尔查询将返回1亿条记录。**（<span style="color:purple">在多表查询时，需要消除无效的笛卡尔积</span>）**
+>
 > - 可以利用投影查询的”设置列的别名“来给两个表各自的`id`和`name`列起别名。<span style="color:purple">**多表查询时，要使用`表名.列名`这样的方式来引用列和设置别名**</span>，这样就避免了结果集的列名重复问题。但是，用`表名.列名`这种方式列举两个表的所有列实在是很麻烦，所以<span style="color:purple">**SQL还允许给表设置一个别名**</span>
 
 ```mysql

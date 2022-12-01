@@ -2029,6 +2029,7 @@ class Outer {
 
 > - <span style="color:red">**单方法的接口被称为函数式接口（FunctionalInterface）。**</span>
 > - 接收`FunctionalInterface`作为参数的时候，可以把实例化的匿名内部类改写为Lambda表达式，能大大简化代码。
+> - **只有那些函数式接口（Functional Interface）才能缩写成 Lambda 表示式。**
 
 #### 例如
 
@@ -2994,7 +2995,28 @@ public static void main(String[] args) {
 > 无论有没有异常finally中的语句都会执行
 >
 > 1. `finally`语句不是必须的，可写可不写；
+>
 > 2. `finally`总是最后执行。
+>
+> 3. **try、catch。finally 的基础用法，在 return 前会先执行 finally 语句块**
+>
+>    ```java
+>    public class TryDemo {
+>        public static void main(String[] args) {
+>        	System.out.println(test());
+>        }
+>        public static int test() {
+>            try {
+>            	return 1;
+>            } catch (Exception e) {
+>            	return 2;
+>            } finally {
+>            	System.out.print("3");
+>            }
+>        }
+>    }
+>    //31
+>    ```
 
 ### try-with-Resource
 
@@ -4325,10 +4347,49 @@ class example<T> {
 
 > 常见的做法是类型变量使用大写字母，而且很简短。Java库使用变量E表示集合的元素类型,K和V分别表示表的键和值的类型。T(必要时还可以用相邻的字母U和S)表示“任意类型”。
 
+### 泛型接口
+
+```java
+package com.demo07_泛型;
+
+public interface demo05_泛型接口<T> {
+    void showName(T name);
+}
+
+```
+
+```java
+package com.demo07_泛型;
+
+public class demo05_泛型接口Impl<T> implements demo05_泛型接口<T> {
+
+    @Override
+    public void showName(T name) {
+        System.out.println(name);
+    }
+}
+```
+
+```java
+package com.demo07_泛型;
+
+public class demo05_fanxing {
+    public static void main(String[] args) {
+        demo05_泛型接口Impl d = new demo05_泛型接口Impl();
+        d.showName("张三");
+        d.showName(12);
+    }
+}
+
+```
+
 ### 泛型方法
 
 > - **泛型方法可以在普通类中定义．也可以在泛型类中定义。**
+>
 > - <span style="color:orange">**类型变量放在修饰符(这里的修饰符就是`public/public static`）的后面,并在返回类型的前面。**</span>
+>
+>   ![image-20221201023211707](Java/image-20221201023211707.png)
 
 ```java
 public class demo04_泛型方法 {
@@ -4368,42 +4429,6 @@ class Person01 {
 > 调用方法的完整写法：`p.<String>getName("lz");`。实际也是大多数情况下，方法调用中可以省略`<String>`类型参数。编译器可以将参数的类型与泛型类型T进行匹配，推断出T一定是String
 >
 > ![image-20220929153808513](java/image-20220929153808513.png)
-
-### 泛型接口
-
-```java
-package com.demo07_泛型;
-
-public interface demo05_泛型接口<T> {
-    void showName(T name);
-}
-
-```
-
-```java
-package com.demo07_泛型;
-
-public class demo05_泛型接口Impl<T> implements demo05_泛型接口<T> {
-
-    @Override
-    public void showName(T name) {
-        System.out.println(name);
-    }
-}
-```
-
-```java
-package com.demo07_泛型;
-
-public class demo05_fanxing {
-    public static void main(String[] args) {
-        demo05_泛型接口Impl d = new demo05_泛型接口Impl();
-        d.showName("张三");
-        d.showName(12);
-    }
-}
-
-```
 
 ## 类型变量的限定
 
@@ -6005,9 +6030,22 @@ public class demo12_Stack {
 ## Map
 
 > - `Map`这种键值（key-value）映射表的数据结构，作用就是能高效通过`key`快速查找`value`（元素）。
+>
 > - **形式：<span style="color:purple">键=值（不是键:值）</span>**
+>
 > - <span style="color:orange">**Map中不存在重复的key，因为放入相同的key，只会把原有的key-value对应的value给替换掉。**</span>
+>
 > - <span style="color:orange">**在一个`Map`中，虽然`key`不能重复，但`value`是可以重复的**</span>
+>
+> - JDK1.8的数据结构是：**数组 + 链表 + 红黑树** 
+>
+>   ![image-20221201130133849](Java/image-20221201130133849.png)
+>
+>   - 桶数组是用来存储数据元素，链表是用来解决冲突，红黑树是为了提高查询的效率。
+>   -  数据元素通过映射关系，也就是散列函数，映射到桶数组对应索引的位置 
+>   - 如果发生冲突，从冲突的位置拉一个链表，插入冲突的元素 
+>   - 如果链表长度>8&数组大小>=64，链表转为红黑树 
+>   - 如果红黑树节点个数<6 ，转为链表
 
 ### API	
 
@@ -7759,6 +7797,10 @@ public class demo07_序列化 {
 > 要特别注意反序列化的几个重要特点：
 >
 > 反序列化时，由JVM直接构造出Java对象，不调用构造方法，构造方法内部的代码，在反序列化时根本不可能执行。
+
+### Serializable接口有什么用？ 
+
+> 这个接口只是一个标记，没有具体的作用，但是如果不实现这个接口，在有些序列 化场景会报错，所以一般建议，创建的JavaBean类都实现 Serializable。
 
 ## Path
 
@@ -9793,9 +9835,9 @@ public class demo04_搜索和替换 {
 
 ## 并行/并发
 
-> - 并行：多个cpu同时执行多个程序
+> - 并行：多个cpu在同一时刻执行多个程序
 >
-> - 并发：一个cpu”同时“执行多个程序
+> - 并发：一个cpu在同时一个时间范围内执行多个程序
 
 ## 创建多线程和使用
 
