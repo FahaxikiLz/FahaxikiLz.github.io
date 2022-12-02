@@ -2303,7 +2303,7 @@ logging:
 
 > 新建cloud-provider-hystrix-payment8001作为服务提供者
 
-### POM
+#### POM
 
 ```XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -2360,7 +2360,7 @@ logging:
 </project>
 ```
 
-### yaml
+#### yaml
 
 ```yaml
 server:
@@ -2378,7 +2378,7 @@ eureka:
       defaultZone: http://eureka7001.com:7001/eureka,http://eureka7002.com:7002/eureka
 ```
 
-### 主启动
+#### 主启动
 
 ```java
 package com.atguigu.springcloud;
@@ -2401,7 +2401,7 @@ public class PaymentHystrixMain8001 {
 }
 ```
 
-### 业务类
+#### 业务类
 
 > service
 
@@ -2487,7 +2487,7 @@ public class PaymentController {
  
 ```
 
-### 测试
+#### 测试
 
 > 访问`http://localhost:8001/payment/hystrix/ok/1`接口，立即输出
 >
@@ -2496,3 +2496,494 @@ public class PaymentController {
 ![image-20221129204826883](SpringCloud/image-20221129204826883.png)
 
 ![image-20221129204842671](SpringCloud/image-20221129204842671.png)
+
+#### 高并发测试
+
+> 测试：开启Jmeter，来20000个并发压死8001，20000个请求都去访问`http://localhost:8001/payment/hystrix/timeout/1`服务
+>
+> 结果：`http://localhost:8001/payment/hystrix/ok/1`、`http://localhost:8001/payment/hystrix/timeout/1`两个都在自己转圈圈
+>
+> 结论：上面还是服务提供者8001自己测试，假如此时外部的消费者80也来访问，
+> 那消费者只能干等，最终导致消费端80不满意，服务端8001直接被拖死
+
+### 创建一个服务消费者
+
+> 创建cloud-consumer-feign-hystrix-order80作为服务的消费者
+
+#### POM
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>cloud2020</artifactId>
+        <groupId>com.atguigu</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>cloud-consumer-feign-hystrix-order80</artifactId>
+
+    <dependencies>
+        <!--openfeign-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        <!--hystrix-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+        </dependency>
+        <!--eureka client-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+        <!-- 引入自己定义的api通用包，可以使用Payment支付Entity -->
+        <dependency>
+            <groupId>com.atguigu</groupId>
+            <artifactId>cloud-api-commons</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!--web-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!--一般基础通用配置-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>
+```
+
+#### yaml
+
+```yaml
+server:
+  port: 80
+
+eureka:
+  client:
+    register-with-eureka: false
+    service-url:
+      defaultZone: http://eureka7001.com:7001/eureka,http://eureka7002.com:7002/eureka
+```
+
+#### 主启动
+
+```java
+package com.atguigu.springcloud;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+
+/**
+ * @Author: lz
+ * @Date: 2022-12-02 0002 11:41
+ * @Description:
+ */
+
+@SpringBootApplication
+@EnableFeignClients
+public class OrderHystrixMain80 {
+    public static void main(String[] args) {
+        SpringApplication.run(OrderHystrixMain80.class, args);
+    }
+}
+```
+
+#### 业务类
+
+> OpenFeign调用提供者中的方法
+
+```java
+package com.atguigu.springcloud.service;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+@Component
+@FeignClient(value = "CLOUD-PROVIDER-HYSTRIX-PAYMENT")
+public interface PaymentHystrixService {
+
+    @GetMapping("/payment/hystrix/ok/{id}")
+    String paymentInfo_OK(@PathVariable("id") Integer id);
+
+    @GetMapping("/payment/hystrix/timeout/{id}")
+    String paymentInfo_TimeOut(@PathVariable("id") Integer id);
+
+}
+
+```
+
+> controller
+
+```java
+package com.atguigu.springcloud.controller;
+
+import com.atguigu.springcloud.service.PaymentHystrixService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+
+
+@RestController
+@Slf4j
+public class OrderHystirxController {
+    @Resource
+    private PaymentHystrixService paymentHystrixService;
+
+    @GetMapping("/consumer/payment/hystrix/ok/{id}")
+    public String paymentInfo_OK(@PathVariable("id") Integer id) {
+        String result = paymentHystrixService.paymentInfo_OK(id);
+        return result;
+    }
+
+    @GetMapping("/consumer/payment/hystrix/timeout/{id}")
+    public String paymentInfo_TimeOut(@PathVariable("id") Integer id) {
+        String result = paymentHystrixService.paymentInfo_TimeOut(id);
+        return result;
+    }
+}
+ 
+
+```
+
+#### 测试
+
+![image-20221202161211114](SpringCloud/image-20221202161211114.png)
+
+#### 高并发测试
+
+> 消费者80，要么转圈圈，要么超时报错
+
+### 服务降级
+
+> -  对方服务(8001)超时了，调用者(80)不能一直卡死等待，必须有服务降级
+> - 对方服务(8001)down机了，调用者(80)不能一直卡死等待，必须有服务降级
+> - 对方服务(8001)OK，调用者(80)自己出故障或有自我要求（自己的等待时间小于服务提供者），自己处理降级
+
+#### 服务提供者8001
+
+##### 业务类
+
+```java
+
+package com.atguigu.springcloud.service;
+
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.concurrent.TimeUnit;
+
+
+@Service
+public class PaymentService {
+    /**
+     * 正常访问，一切OK
+     */
+    public String paymentInfo_OK(Integer id) {
+        return "线程池:" + Thread.currentThread().getName() + "paymentInfo_OK,id: " + id + "\t" + "O(∩_∩)O";
+    }
+
+    /**
+     * 超时3s，演示降级
+     *
+     * @param id
+     * @return
+     */
+    @HystrixCommand(fallbackMethod = "timeoutFallback", commandProperties = {
+            @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "3000")
+    })
+    public String paymentInfo_TimeOut(Integer id) {
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return "线程池:" + Thread.currentThread().getName() + "paymentInfo_TimeOut,id: " + id;
+    }
+
+    public String timeoutFallback(Integer id) {
+        return "线程池:" + Thread.currentThread().getName() + "paymentInfo_TimeOut_FallBack,服务被降级了 ";
+
+    }
+}
+```
+
+##### 主启动
+
+![image-20221202164914873](SpringCloud/image-20221202164914873.png)
+
+##### 测试
+
+> 超时3s，服务降级
+
+![image-20221202165107923](SpringCloud/image-20221202165107923.png)
+
+> 服务报错，降级
+
+![image-20221202165356102](SpringCloud/image-20221202165356102.png)
+
+![image-20221202165319000](SpringCloud/image-20221202165319000.png)
+
+#### 服务消费者80
+
+##### 配置
+
+```yaml
+server:
+  port: 80
+
+eureka:
+  client:
+    register-with-eureka: false
+    service-url:
+      defaultZone: http://eureka7001.com:7001/eureka,http://eureka7002.com:7002/eureka
+
+# 配置feign 和 hystrix开启
+feign:
+  hystrix:
+    enabled: true
+```
+
+##### 主启动
+
+![image-20221202170719179](SpringCloud/image-20221202170719179.png)
+
+##### 业务类
+
+```java
+package com.atguigu.springcloud.controller;
+
+import com.atguigu.springcloud.service.PaymentHystrixService;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+
+/**
+ * @auther zzyy
+ * @create 2020-02-20 11:57
+ */
+@RestController
+@Slf4j
+public class OrderHystirxController {
+    @Resource
+    private PaymentHystrixService paymentHystrixService;
+
+    @GetMapping("/consumer/payment/hystrix/ok/{id}")
+    public String paymentInfo_OK(@PathVariable("id") Integer id) {
+        String result = paymentHystrixService.paymentInfo_OK(id);
+        return result;
+    }
+
+    /**
+     * 访问超时超过3s，服务降级
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/consumer/payment/hystrix/timeout/{id}")
+    @HystrixCommand(fallbackMethod = "timeoutFallback", commandProperties = {
+            @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "3000")
+
+    })
+    public String paymentInfo_TimeOut(@PathVariable("id") Integer id) {
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        String result = paymentHystrixService.paymentInfo_TimeOut(id);
+        return result;
+    }
+
+    public String timeoutFallback(@PathVariable("id") Integer id) {
+        return "我是消费者80,对方支付系统繁忙请10秒钟后再试或者自己运行出错请检查自己,o(╥﹏╥)o";
+    }
+}
+ 
+```
+
+##### 测试
+
+> 访问超时3s，服务降级
+
+![image-20221202171649627](SpringCloud/image-20221202171649627.png)
+
+> 服务报错，降级
+
+![image-20221202172214071](SpringCloud/image-20221202172214071.png)
+
+![image-20221202171649627](SpringCloud/image-20221202171649627.png)
+
+#### 目前问题
+
+##### 每个方法配置一个？？？膨胀
+
+> - 设置一个全局的服务降级方法
+> - 这样设置一个全局的不管是服务端还是客户端的问题都可以使用
+
+```java
+package com.atguigu.springcloud.controller;
+
+import com.atguigu.springcloud.service.PaymentHystrixService;
+import com.netflix.hystrix.contrib.javanica.annotation.DefaultProperties;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+
+
+@RestController
+@Slf4j
+@DefaultProperties(defaultFallback = "globalFallBack")//设置全局服务降级默认方法
+public class OrderHystirxController {
+    @Resource
+    private PaymentHystrixService paymentHystrixService;
+
+    @GetMapping("/consumer/payment/hystrix/timeout/{id}")
+    @HystrixCommand
+    public String paymentInfo_TimeOut(@PathVariable("id") Integer id) {
+        int i = 10 / 0;
+
+        String result = paymentHystrixService.paymentInfo_TimeOut(id);
+        return result;
+    }
+
+    public String globalFallBack() {
+        return "全局默认fallback";
+    }
+}
+ 
+ 
+```
+
+![image-20221202212026129](SpringCloud/image-20221202212026129.png)
+
+##### 和业务逻辑混一起？？？混乱
+
+> - 根据cloud-consumer-feign-hystrix-order80已经有的PaymentHystrixService接口，
+>   重新新建一个类(PaymentFallbackService)实现该接口，统一为接口里面的方法进行异常处理
+> - 这样设置统一的服务降级处理方式，只能是服务端出问题才可以使用到，客户端的问题没用
+
+###### yaml
+
+```yaml
+# 配置feign 和 hystrix开启
+feign:
+  hystrix:
+    enabled: true
+```
+
+###### 业务类
+
+![image-20221202213451123](SpringCloud/image-20221202213451123.png)
+
+> 重新新建一个类(PaymentFallbackService)实现该接口
+
+```java
+package com.atguigu.springcloud.service;
+
+import org.springframework.stereotype.Component;
+
+/**
+ * @Author: lz
+ * @Date: 2022-12-02 0002 21:31
+ * @Description:
+ */
+@Component
+public class PaymentFallbackService implements PaymentHystrixService {
+    @Override
+    public String paymentInfo_OK(Integer id) {
+        return "服务调用失败，提示来自：PaymentFallbackService----paymentInfo_OK";
+    }
+
+    @Override
+    public String paymentInfo_TimeOut(Integer id) {
+        return "服务调用失败，提示来自：PaymentFallbackService----paymentInfo_TimeOut";
+    }
+}
+```
+
+> controller
+
+```java
+package com.atguigu.springcloud.controller;
+
+import com.atguigu.springcloud.service.PaymentHystrixService;
+import com.netflix.hystrix.contrib.javanica.annotation.DefaultProperties;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+
+@RestController
+@Slf4j
+public class OrderHystirxController {
+    @Resource
+    private PaymentHystrixService paymentHystrixService;
+
+    @GetMapping("/consumer/payment/hystrix/ok/{id}")
+    public String paymentInfo_OK(@PathVariable("id") Integer id) {
+        String result = paymentHystrixService.paymentInfo_OK(id);
+        return result;
+    }
+
+    @GetMapping("/consumer/payment/hystrix/timeout/{id}")
+    public String paymentInfo_TimeOut(@PathVariable("id") Integer id) {
+
+        String result = paymentHystrixService.paymentInfo_TimeOut(id);
+        return result;
+    }
+}
+ 
+ 
+```
+
+###### 测试
+
+![image-20221202221018126](SpringCloud/image-20221202221018126.png)
