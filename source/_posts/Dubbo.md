@@ -1028,7 +1028,7 @@ public class OrderServiceImpl implements OrderService {
 
 ![image-20221026093809476](Dubbo/image-20221026093809476.png)
 
-### 整合hystrix服务熔断
+### 整合hystrix
 
 > Hystrix 旨在通过控制那些访问远程系统、服务和第三方库的节点，从而对延迟和故障提供更强大的容错能力。Hystrix具备拥有回退机制和断路器功能的线程和信号隔离，请求缓存和请求打包，以及监控和配置等功能
 
