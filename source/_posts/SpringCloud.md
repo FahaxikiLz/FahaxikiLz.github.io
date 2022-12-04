@@ -3465,3 +3465,215 @@ eureka:
 <img src="SpringCloud/image-20221203171623823.png" alt="image-20221203171623823" style="zoom:67%;" />
 
 <img src="SpringCloud/image-20221203171721081.png" alt="image-20221203171721081" style="zoom:67%;" />
+
+#### Gateway网关路由有两种配置方式
+
+##### 1.yaml
+
+##### 2.配置文件
+
+```java
+package com.atguigu.springcloud.config;
+
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * @Author: lz
+ * @Date: 2022-12-04 0004 11:47
+ * @Description:
+ */
+
+@Configuration
+public class GateWayConfig {
+
+    @Bean
+    public RouteLocator gateWayRoutes(RouteLocatorBuilder routeLocatorBuilder) {
+//             http://news.baidu.com/guonei
+
+        RouteLocatorBuilder.Builder routes = routeLocatorBuilder.routes();
+        routes.route("router_path", r -> r.path("/guonei").uri("http://news.baidu.com")).build();
+
+
+        return routes.build();
+
+    }
+}
+```
+
+![image-20221204115700202](SpringCloud/image-20221204115700202.png)
+
+### 通过微服务名实现动态路由
+
+> 之前有多个服务提供者，我们使用ribbon负载均衡调用提供者
+>
+> 现在加上了网关，那么服务消费者直接调用网关，由网关来负载均衡调用服务提供者
+>
+> 默认情况下Gateway会根据注册中心注册的服务列表，以注册中心上微服务名为路径创建动态路由进行转发，从而实现动态路由的功能
+
+```yaml
+server:
+  port: 9527
+
+spring:
+  application:
+    name: cloud-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true #开启从注册中心动态创建路由的功能，利用微服务名进行路由
+      routes:
+        - id: payment_routh #payment_route    #路由的ID，没有固定规则但要求唯一，建议配合服务名
+#          uri: http://localhost:8001          #匹配后提供服务的路由地址
+          uri: lb://cloud-payment-service #匹配后提供服务的路由地址
+          predicates:
+            - Path=/payment/getSerialById/**         # 断言，路径相匹配的进行路由
+
+        - id: payment_routh2 #payment_route    #路由的ID，没有固定规则但要求唯一，建议配合服务名
+#          uri: http://localhost:8001          #匹配后提供服务的路由地址
+          uri: lb://cloud-payment-service #匹配后提供服务的路由地址
+          predicates:
+            - Path=/payment/getLB/**         # 断言，路径相匹配的进行路由
+
+eureka:
+  instance:
+    hostname: cloud-gateway-service
+  client: #服务提供者provider注册进eureka服务列表内
+    service-url:
+      register-with-eureka: true
+      fetch-registry: true
+      defaultZone: http://eureka7001.com:7001/eureka
+```
+
+![image-20221204122448182](SpringCloud/image-20221204122448182.png)
+
+### Predicate的使用
+
+> 说白了，Predicate就是为了实现一组匹配规则，让请求过来找到对应的Route进行处理。
+
+#### After Route Predicate
+
+> 当前访问时间要在设定的时间之后，否则访问不到
+
+![image-20221204131917402](SpringCloud/image-20221204131917402.png)
+
+#### Before Route Predicate
+
+> 当前访问时间要在设定的时间之前，否则访问不到
+
+![image-20221204131954591](SpringCloud/image-20221204131954591.png)
+
+#### Between Route Predicate
+
+> 当前访问时间要在设定的时间之间，否则访问不到
+
+![](SpringCloud/image-20221204131954591%20-%20%E5%89%AF%E6%9C%AC.png)
+
+#### Cookie Route Predicate
+
+> 访问时需要带有这样的cookie，否则访问不到
+
+![image-20221204132341205](SpringCloud/image-20221204132341205.png)
+
+#### Header Route Predicate
+
+> 访问时需要带有这样的请求头，否则访问不到
+
+![image-20221204132412984](SpringCloud/image-20221204132412984.png)
+
+#### Host Route Predicate
+
+> 访问时需要带有这样的host，否则访问不到
+
+![image-20221204132441255](SpringCloud/image-20221204132441255.png)
+
+#### Method Route Predicate
+
+> 请求方法要是设定的方法
+
+![image-20221204132515173](SpringCloud/image-20221204132515173.png)
+
+#### Path Route Predicate
+
+> 请求路径
+
+![image-20221204132544581](SpringCloud/image-20221204132544581.png)
+
+#### Query Route Predicate
+
+> 请求时要带这样的请求参数
+
+![image-20221204132610384](SpringCloud/image-20221204132610384.png)
+
+### Filter的使用
+
+> 路由过滤器可用于修改进入的HTTP请求和返回的HTTP响应，路由过滤器只能指定路由进行使用。
+
+#### Spring Cloud Gateway的Filter
+
+> 生命周期，Only Two
+>
+> - pre
+> - post
+>
+> 种类，Only Two
+>
+> - GatewayFilter 
+> - GlobalFilter
+
+#### [常用的GatewayFilter](https://cloud.spring.io/spring-cloud-static/spring-cloud-gateway/2.2.1.RELEASE/reference/html/#the-addrequestparameter-gatewayfilter-factory)
+
+> 这样和Predicate差不多
+
+![image-20221204133049074](SpringCloud/image-20221204133049074.png)
+
+#### 自定义全局GlobalFilter
+
+```java
+package com.atguigu.springcloud.Filter;
+
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.Ordered;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+import java.util.Date;
+
+/**
+ * @Author: lz
+ * @Date: 2022-12-04 0004 13:32
+ * @Description:
+ */
+@Component //必须加，必须加，必须加
+public class MyLogGateWayFilter implements GlobalFilter, Ordered {
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        System.out.println("time:" + new Date() + "\t 执行了自定义的全局过滤器: " + "MyLogGateWayFilter" + "hello");
+
+        String uname = exchange.getRequest().getQueryParams().getFirst("uname");
+        if (uname == null) {
+            System.out.println("****用户名为null，无法登录");
+            exchange.getResponse().setStatusCode(HttpStatus.NOT_ACCEPTABLE);
+            return exchange.getResponse().setComplete();
+        }
+        return chain.filter(exchange);
+    }
+
+    @Override
+    public int getOrder() {
+        return 0;
+    }
+}
+```
+
+##### 测试
+
+<img src="SpringCloud/image-20221204133524510.png" alt="image-20221204133524510" style="zoom:67%;" />
+
+![image-20221204133508965](SpringCloud/image-20221204133508965.png)
