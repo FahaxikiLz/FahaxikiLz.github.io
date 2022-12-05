@@ -1,5 +1,5 @@
 ---
-SELECT <字段名> FROM <表1>, <表2> [WHERE子句] title: Mysql和JDBC
+title: Mysql和JDBC
 date: 2022-8-31 15:10:56
 categories: 
 - 数据库

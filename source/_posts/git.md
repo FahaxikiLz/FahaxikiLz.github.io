@@ -5,7 +5,7 @@ update: 2022-10-17 19:04:30
 comments: true
 tags:
 - git
-catefories:
+categories:
 - 开发
 ---
 

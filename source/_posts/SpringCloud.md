@@ -547,7 +547,7 @@ public class ConsumerController {
 
 # 5.服务注册与发现
 
-## :x:Eureka
+## [:x:Eureka](https://github.com/Netflix/eureka)
 
 > - 什么是服务治理
 >
@@ -1457,7 +1457,7 @@ public class OrderZK80 {
 }
 ```
 
-#### 实现类
+#### 业务类
 
 > 配置RestTemplate
 
@@ -1524,7 +1524,7 @@ public class OrderZKController {
 
 ![image-20221127111747844](SpringCloud/image-20221127111747844.png)
 
-## ✔️consul
+## [✔️consul](https://www.springcloud.cc/spring-cloud-consul.html)
 
 > - Consul 是一套开源的分布式服务发现和配置管理系统，由 HashiCorp 公司用 Go 语言开发。提供了微服务系统中的服务治理、配置中心、控制总线等功能。这些功能中的每一个都可以根据需要单独使用，也可以一起使用以构建全方位的服务网格，总之Consul提供了一种完整的服务网格解决方案。
 > - [下载地址](https://www.consul.io/downloads.html)
@@ -1774,7 +1774,7 @@ public class OrderConsulMain80 {
 }
 ```
 
-#### 实现类
+#### 业务类
 
 > 配置RestTemplate
 
@@ -1861,7 +1861,7 @@ public class OrderConsulController {
 
 # 6.服务调用
 
-## ✔️Ribbon负载均衡服务调用
+## [✔️Ribbon负载均衡服务调用](https://github.com/Netflix/ribbon/wiki/Getting-Started)
 
 > - Spring Cloud Ribbon是基于Netflix Ribbon实现的一套客户端负载均衡的工具。简单的说，Ribbon是Netflix发布的开源项目，**主要功能是提供客户端的软件负载均衡算法和服务调用。**Ribbon客户端组件提供一系列完善的配置项如连接超时，重试等。简单的说，就是在配置文件中列出Load Balancer（简称LB）后面所有的机器，Ribbon会自动的帮助你基于某种规则（如简单轮询，随机连接等）去连接这些机器。我们很容易使用Ribbon实现自定义的负载均衡算法。
 >
@@ -2021,7 +2021,7 @@ public class MainApp80 {
 > 当总请求数位4时： 4 % 2 =0 对应下标位置为0 ，则获得服务地址为127.0.0.1:8002
 > 如此类推......
 
-## ✔️OpenFeign服务接口调用
+## ✔️[OpenFeign服务接口调用](https://cloud.spring.io/spring-cloud-static/Hoxton.SR1/reference/htmlsingle/#spring-cloud-openfeign)
 
 > - Feign能干什么
 >   Feign旨在使编写Java Http客户端变得更容易。
@@ -2089,7 +2089,7 @@ public class OrderFeignMain80 {
 }
 ```
 
-#### 实现类
+#### 业务类
 
 > 创建一个接口，添加注解@FeignClient，调用其他服务提供者中的服务
 
@@ -2221,7 +2221,7 @@ logging:
 
 ![image-20221128215704949](SpringCloud/image-20221128215704949.png)
 
-# 7.:x:Hystrix断路器
+# 7.[:x:Hystrix断路器](https://github.com/Netflix/Hystrix/wiki/How-To-Use)
 
 ## 概述
 
@@ -3198,15 +3198,17 @@ public class PaymentHystrixMain8001 {
 
 ![image-20221203150421089](SpringCloud/image-20221203150421089.png)
 
-# 网关
+# 8.网关
 
-## :x:Zuul
+## [:x:Zuul](https://github.com/Netflix/zuul/wiki)
 
-## ✔️Gateway
+## [✔️Gateway](https://cloud.spring.io/spring-cloud-static/spring-cloud-gateway/2.2.1.RELEASE/reference/html/)
 
 ### 概述
 
 > - 是什么
+>
+>   Spring Cloud Gateway旨在提供一种简单而有效的方法来路由到API，并为它们提供跨领域关注点，例如：安全性，监控/指标和弹性。
 >
 >   gateway是原zuul1.x版的替代
 >
@@ -3677,3 +3679,296 @@ public class MyLogGateWayFilter implements GlobalFilter, Ordered {
 <img src="SpringCloud/image-20221204133524510.png" alt="image-20221204133524510" style="zoom:67%;" />
 
 ![image-20221204133508965](SpringCloud/image-20221204133508965.png)
+
+# [9.:x:SpringCloud Config分布式配置中心](https://cloud.spring.io/spring-cloud-static/spring-cloud-config/2.2.1.RELEASE/reference/html/)
+
+## 概述
+
+> - 分布式系统面临的---配置问题
+>   微服务意味着要将单体应用中的业务拆分成一个个子服务，每个服务的粒度相对较小，因此系统中会出现大量的服务。由于每个服务都需要必要的配置信息才能运行，所以一套集中式的、动态的配置管理设施是必不可少的。
+>   **SpringCloud提供了ConfigServer来解决这个问题，我们每一个微服务自己带着一个application.yml，上百个配置文件的管理**....../(ㄒoㄒ)/~~
+>
+> - 是什么
+>
+>   **SpringCloud Config为微服务架构中的微服务提供集中化的外部配置支持，配置服务器为各个不同微服务应用的所有环境提供了一个中心化的外部配置。**
+>
+>   ![image-20221205114808683](SpringCloud/image-20221205114808683.png)
+>
+> - 怎么玩
+>   SpringCloud Config分为服务端和客户端两部分。
+>   服务端也称为分布式配置中心，它是一个独立的微服务应用，用来连接配置服务器并为客户端提供获取配置信息，加密/解密信息等访问接口
+>
+> - 能干嘛
+>
+>   - 集中管理配置文件
+>
+>   - 不同环境不同配置，动态化的配置更新，分环境部署比如dev/test/prod/beta/release
+>
+>   - 运行期间动态调整配置，不再需要在每个服务部署的机器上编写配置文件，服务会向配置中心统一拉取配置自己的信息
+>
+>   - 当配置发生变动时，服务不需要重启即可感知到配置的变化并应用新的配置
+>
+>   - 将配置信息以REST接口的形式暴露
+>
+> - 与GitHub整合配置
+>
+>   **由于SpringCloud Config默认使用Git来存储配置文件(也有其它方式,比如支持SVN和本地文件)，**
+>   **而且使用的是http/https访问的形式**
+
+## Config服务端配置与测试
+
+### GitHub上创建新Repository
+
+> 创建新Repository用来存放公共配置文件，并且可以在线修改
+
+![image-20221205114014198](SpringCloud/image-20221205114014198.png)
+
+### 创建配置中心服务端模块
+
+> 新建Module模块cloud-config-center-3344。它即为Cloud的配置中心模块cloudConfig Center
+
+#### pom
+
+```
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-config-server</artifactId>
+        </dependency>
+```
+
+#### yaml
+
+```yaml
+server:
+  port: 3344
+
+spring:
+  application:
+    name:  cloud-config-center #注册进Eureka服务器的微服务名
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/FahaxikiLz/springcloud-config.git #GitHub上面的git仓库名字
+          ####搜索目录
+          search-paths:
+            - springcloud-config
+      ####读取分支
+      label: master
+
+#服务注册到eureka地址
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:7001/eureka,http://localhost:7002/eureka
+```
+
+#### 主启动
+
+```java
+package com.atguigu.springcloud;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.config.server.EnableConfigServer;
+
+/**
+ * @Author: lz
+ * @Date: 2022-12-05 0005 11:27
+ * @Description:
+ */
+
+@SpringBootApplication
+@EnableConfigServer
+public class ConfigCenterMain3344 {
+    public static void main(String[] args) {
+        SpringApplication.run(ConfigCenterMain3344.class, args);
+    }
+}
+```
+
+#### windows下修改hosts文件，增加映射
+
+```
+127.0.0.1  config-3344.com
+```
+
+#### 测试
+
+![image-20221205114254049](SpringCloud/image-20221205114254049.png)
+
+#### 配置读取规则
+
+> 1. `/{label}/{application}-{profile}.yml`
+> 2. `/{application}-{profile}.yml`
+> 3. `/{application}/{profile}[/{label}]`
+
+## Config客户端配置与测试
+
+### 创建客户端模块
+
+> 新建cloud-config-client-3355作为配置客户端模块
+
+#### pom
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-config</artifactId>
+</dependency>
+```
+
+#### yaml
+
+> 创建一个名为`bootstarp.yaml`文件
+>
+> - applicaiton.yml是用户级的资源配置项
+> - bootstrap.yml是系统级的，优先级更加高
+
+```yaml
+server:
+  port: 3355
+
+spring:
+  application:
+    name: config-client
+  cloud:
+    #Config客户端配置
+    config:
+      label: master #分支名称
+      name: config #配置文件名称
+      profile: dev #读取后缀名称   上述3个综合：master分支上config-dev.yml的配置文件被读取http://config-3344.com:3344/master/config-dev.yml
+      uri: http://localhost:3344 #配置中心地址k
+
+#服务注册到eureka地址
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:7001/eureka,http://localhost:7002/eureka
+```
+
+![image-20221205120838105](SpringCloud/image-20221205120838105.png)
+
+#### 主启动
+
+```java
+package com.atguigu.springcloud;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+
+
+@EnableEurekaClient
+@SpringBootApplication
+public class ConfigClientMain3355 {
+    public static void main(String[] args) {
+        SpringApplication.run(ConfigClientMain3355.class, args);
+    }
+}
+```
+
+#### 业务类
+
+```java
+package com.atguigu.springcloud.controller;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class ConfigClientController {
+    @Value("${config.info}")
+    private String configInfo;
+
+    @GetMapping("/configInfo")
+    public String getConfigInfo() {
+        return configInfo;
+    }
+}
+```
+
+#### 测试
+
+![image-20221205121635259](SpringCloud/image-20221205121635259.png)
+
+## Config客户端之动态刷新
+
+### 当前问题
+
+> - Linux运维修改GitHub上的配置文件内容做调整
+>
+>   <img src="SpringCloud/image-20221205125003095.png" alt="image-20221205125003095" style="zoom:67%;" />
+>
+> - 刷新3344，发现ConfigServer配置中心立刻响应
+>
+>   <img src="SpringCloud/image-20221205125016805.png" alt="image-20221205125016805" style="zoom:67%;" />
+>
+> - 刷新3355，发现ConfigClient客户端没有任何响应
+>
+>   <img src="SpringCloud/image-20221205125035814.png" alt="image-20221205125035814" style="zoom:67%;" />
+>
+> - 3355没有变化除非自己重启或者重新加载
+>
+> - 难到每次运维修改配置文件，客户端都需要重启？？噩梦
+
+### 解决问题
+
+> 修改3355
+
+#### pom
+
+> pom中再引入监控依赖
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-config</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+```
+
+#### yaml
+
+> 修改YML，暴露监控端口
+
+```yaml
+# 暴露监控端点
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+```
+
+#### 业务类
+
+![image-20221205125331821](SpringCloud/image-20221205125331821.png)
+
+#### 发送Post请求刷新3355
+
+> 必须是POST请求
+
+```
+curl -X POST "http://localhost:3355/actuator/refresh"
+```
+
+#### 测试
+
+<img src="SpringCloud/image-20221205130409234.png" alt="image-20221205130409234" style="zoom:67%;" />
+
+<img src="SpringCloud/image-20221205130316341.png" alt="image-20221205130316341" style="zoom:67%;" />
+
+<img src="SpringCloud/image-20221205130351918.png" alt="image-20221205130351918" style="zoom:67%;" />
+
+## 遗留问题
+
+> - 假如有多个微服务客户端3355/3366/3377。。。。。。
+> - 每个微服务都要执行一次post请求，手动刷新？
+> - 可否广播，一次通知，处处生效？
+> - 我们想大范围的自动刷新，求方法
