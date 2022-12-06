@@ -2606,7 +2606,7 @@ public class PaymentService {
 
 #### 服务消费者80
 
-##### 配置
+##### yaml
 
 ```yaml
 server:
@@ -3939,6 +3939,26 @@ public class ConfigClientController {
 > 修改YML，暴露监控端口
 
 ```yaml
+server:
+  port: 3355
+
+spring:
+  application:
+    name: config-client
+  cloud:
+    #Config客户端配置
+    config:
+      label: master #分支名称
+      name: config #配置文件名称
+      profile: dev #读取后缀名称   上述3个综合：master分支上config-dev.yml的配置文件被读取http://config-3344.com:3344/master/config-dev.yml
+      uri: http://localhost:3344 #配置中心地址k
+
+#服务注册到eureka地址
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:7001/eureka,http://localhost:7002/eureka
+
 # 暴露监控端点
 management:
   endpoints:
@@ -4040,6 +4060,15 @@ curl -X POST "http://localhost:3355/actuator/refresh"
 #### yaml
 
 ```yaml
+server:
+  port: 3344
+
+#服务注册到eureka地址
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:7001/eureka,http://localhost:7002/eureka
+
 spring:
   application:
     name:  cloud-config-center #注册进Eureka服务器的微服务名
@@ -4088,6 +4117,15 @@ management:
 #### yaml
 
 ```yaml
+server:
+  port: 3355
+
+#服务注册到eureka地址
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:7001/eureka,http://localhost:7002/eureka
+
 spring:
   application:
     name: config-client
@@ -4096,8 +4134,8 @@ spring:
     config:
       label: master #分支名称
       name: config #配置文件名称
-      profile: dev
-      uri: http://localhost:3344
+      profile: dev #读取后缀名称   上述3个综合：master分支上config-dev.yml的配置文件被读取http://config-3344.com:3344/master/config-dev.yml
+      uri: http://localhost:3344 #配置中心地址k
   #rabbitmq相关配置 15672是Web管理界面的端口；5672是MQ访问的端口
   rabbitmq:
     host: 192.168.221.100
@@ -4111,7 +4149,6 @@ management:
     web:
       exposure:
         include: "*"
-
 ```
 
 ### 测试
@@ -4151,3 +4188,322 @@ curl -X POST "http://localhost:3344/actuator/bus-refresh/config-client:3355"
 <img src="SpringCloud/image-20221205170140466.png" alt="image-20221205170140466" style="zoom:50%;" />
 
 <img src="SpringCloud/image-20221205170151564.png" alt="image-20221205170151564" style="zoom:50%;" />
+
+# [11.SpringCloud Stream消息驱动](https://cloud.spring.io/spring-cloud-static/spring-cloud-stream/3.0.1.RELEASE/reference/html/)
+
+> [中文手册](https://m.wang1314.com/doc/webapp/topic/20971999.html)
+
+## 概述
+
+> - 是什么？
+>
+>   **屏蔽底层消息中间件的差异,降低切换成本，统一消息的编程模型**
+>
+> - 为什么用Cloud Stream
+>
+>   比方说我们用到了RabbitMQ和Kafka，由于这两个消息中间件的架构上的不同，这些中间件的差异性导致我们实际项目开发给我们造成了一定的困扰，我们如果用了两个消息队列的其中一种，后面的业务需求，我想往另外一种消息队列进行迁移，这时候无疑就是一个灾难性的，一大堆东西都要重新推倒重新做，因为它跟我们的系统耦合了，这时候springcloud Stream给我们提供了一种解耦合的方式。
+>
+>   <img src="SpringCloud/image-20221206112820459.png" alt="image-20221206112820459" style="zoom:67%;" />
+>
+> - Binder
+>
+>   在没有绑定器这个概念的情况下，我们的SpringBoot应用要直接与消息中间件进行信息交互的时候，由于各消息中间件构建的初衷不同，它们的实现细节上会有较大的差异性，通过定义绑定器作为中间层，完美地实现了应用程序与消息中间件细节之间的隔离。**Stream对消息中间件的进一步封装，可以做到代码层面对中间件的无感知，甚至于动态的切换中间件(rabbitmq切换为kafka)，使得微服务开发的高度解耦，服务可以关注更多自己的业务流程**
+>
+>   **通过定义绑定器Binder作为中间层，实现了应用程序与消息中间件细节之间的隔离。**
+>
+>   <img src="SpringCloud/image-20221206112910013.png" alt="image-20221206112910013" style="zoom:80%;" />
+>
+> - 标准流程
+>
+>   <img src="SpringCloud/image-20221206112948317.png" alt="image-20221206112948317" style="zoom:67%;" />
+>
+> - 编码API和常用注解
+>
+>   ![image-20221206113023071](SpringCloud/image-20221206113023071.png)
+
+## 消息驱动之生产者
+
+> 新建cloud-stream-rabbitmq-provider8801模块作为消息生产者
+
+### pom
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
+</dependency>
+```
+
+### yaml
+
+```yaml
+server:
+  port: 8801
+
+spring:
+  application:
+    name: cloud-stream-provider
+  cloud:
+    stream:
+      binders: # 在此处配置要绑定的rabbitmq的服务信息；
+        defaultRabbit: # 表示定义的名称，用于于binding整合
+          type: rabbit # 消息组件类型
+          environment: # 设置rabbitmq的相关的环境配置
+            spring:
+              rabbitmq:
+                host: 192.168.221.100
+                port: 5672
+                username: admin
+                password: 123
+      bindings: # 服务的整合处理
+        output: # 这个名字是一个通道的名称
+          destination: studyExchange # 表示要使用的Exchange名称定义
+          content-type: application/json # 设置消息类型，本次为json，文本则设置“text/plain”
+          binder: defaultRabbit # 设置要绑定的消息服务的具体设置
+
+eureka:
+  client: # 客户端进行Eureka注册的配置
+    service-url:
+      defaultZone: http://localhost:7001/eureka,http://localhost:7001/eureka
+  instance:
+    lease-renewal-interval-in-seconds: 2 # 设置心跳的时间间隔（默认是30秒）
+    lease-expiration-duration-in-seconds: 5 # 如果现在超过了5秒的间隔（默认是90秒）
+    instance-id: send-8801.com  # 在信息列表时显示主机名称
+    prefer-ip-address: true     # 访问的路径变为IP地址
+```
+
+### 主启动
+
+```java
+package com.atguigu.springcloud;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+
+@SpringBootApplication
+public class StreamMQMain8801 {
+    public static void main(String[] args) {
+        SpringApplication.run(StreamMQMain8801.class, args);
+    }
+}
+```
+
+### 业务类
+
+#### service
+
+> 用来发送消息
+
+```java
+package com.atguigu.springcloud.service.Impl;
+
+import com.atguigu.springcloud.service.ISendMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.messaging.Source;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.MessageBuilder;
+
+import java.util.UUID;
+
+/**
+ * @Author: lz
+ * @Date: 2022-12-06 0006 12:04
+ * @Description:
+ */
+
+@EnableBinding(Source.class)// 可以理解为是一个消息的发送管道的定义
+public class ISendMessageImpl implements ISendMessage {
+
+    @Autowired
+    private MessageChannel output;// 消息的发送管道
+
+    @Override
+    public String sendMessage() {
+        String value = UUID.randomUUID().toString();
+
+        boolean send = output.send(MessageBuilder.withPayload(value).build());
+
+        System.out.println("消息" + value + ",发送" + send);
+
+        return null;
+    }
+}
+```
+
+#### controller
+
+```java
+package com.atguigu.springcloud.controller;
+
+import com.atguigu.springcloud.service.ISendMessage;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+
+@RestController
+public class SendMessageController {
+    @Resource
+    private ISendMessage iSendMessage;
+
+    @GetMapping(value = "/sendMessage")
+    public String sendMessage() {
+        return iSendMessage.sendMessage();
+    }
+}
+```
+
+## 消息驱动之消费者
+
+> 新建cloud-stream-rabbitmq-consumer8802作为消息消费者
+
+### pom
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
+</dependency>
+```
+
+### yaml
+
+```yaml
+server:
+  port: 8802
+
+spring:
+  application:
+    name: cloud-stream-consumer
+  cloud:
+    stream:
+      binders: # 在此处配置要绑定的rabbitmq的服务信息；
+        defaultRabbit: # 表示定义的名称，用于于binding整合
+          type: rabbit # 消息组件类型
+          environment: # 设置rabbitmq的相关的环境配置
+            spring:
+              rabbitmq:
+                host: 192.168.221.100
+                port: 5672
+                username: admin
+                password: 123
+      bindings: # 服务的整合处理
+        input: # 这个名字是一个通道的名称
+          destination: studyExchange # 表示要使用的Exchange名称定义
+          content-type: application/json # 设置消息类型，本次为对象json，如果是文本则设置“text/plain”
+          binder: defaultRabbit # 设置要绑定的消息服务的具体设置
+
+eureka:
+  client: # 客户端进行Eureka注册的配置
+    service-url:
+      defaultZone: http://localhost:7001/eureka
+  instance:
+    lease-renewal-interval-in-seconds: 2 # 设置心跳的时间间隔（默认是30秒）
+    lease-expiration-duration-in-seconds: 5 # 如果现在超过了5秒的间隔（默认是90秒）
+    instance-id: receive-8802.com  # 在信息列表时显示主机名称
+    prefer-ip-address: true     # 访问的路径变为IP地址
+```
+
+### 主启动
+
+```java
+package com.atguigu.springcloud;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class StreamMQMain8802 {
+    public static void main(String[] args) {
+        SpringApplication.run(StreamMQMain8802.class, args);
+    }
+}
+```
+
+### 业务类
+
+> 用户消费者接收消息
+
+```java
+package com.atguigu.springcloud.controller;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.cloud.stream.messaging.Sink;
+import org.springframework.messaging.Message;
+import org.springframework.stereotype.Component;
+
+/**
+ * @Author: lz
+ * @Date: 2022-12-06 0006 12:56
+ * @Description:
+ */
+@Component
+@EnableBinding(Sink.class)
+public class ReceiveMessageListener {
+
+    @Value("${server.port}")
+    private String serverPort;
+
+    @StreamListener(Sink.INPUT)
+    public void input(Message<String> message) {
+
+        System.out.println("我是消费者" + serverPort + ",我接收到的消息是" + message.getPayload());
+
+    }
+
+}
+```
+
+## 分组消费与持久化
+
+### clone一个消费者
+
+> 依照8802，clone出来一份运行8803
+
+### 目前存在的问题
+
+> 1. 有重复消费问题
+> 2. 消息持久化问题
+
+#### 分组消费
+
+> 目前是8802/8803同时都收到了，存在重复消费问题
+
+![image-20221206134932834](SpringCloud/image-20221206134932834.png)
+
+![image-20221206134940234](SpringCloud/image-20221206134940234.png)
+
+![image-20221206134947953](SpringCloud/image-20221206134947953.png)
+
+> 在Stream中处于同一个group中的多个消费者是竞争关系，就能够保证消息只会被其中一个应用消费一次。
+> **不同组是可以全面消费的(重复消费)；同一组内会发生竞争关系，只有其中一个可以消费。**
+
+##### 实例
+
+> 将两个消费者8802、8803设置成一个组
+
+![image-20221206135223092](SpringCloud/image-20221206135223092.png)
+
+##### 测试
+
+![image-20221206135306921](SpringCloud/image-20221206135306921.png)
+
+![image-20221206135317346](SpringCloud/image-20221206135317346.png)
+
+![image-20221206135324610](SpringCloud/image-20221206135324610.png)
+
+#### 持久化
+
+> - 停止8802/8803并去除掉8802的分组`group: atguigu`
+> - 8803的分组`group: atguigu`没有去掉
+> - 8801先发送4条消息到rabbitmq
+> - 先启动8802，无分组属性配置，后台没有打出来消息
+> - 再启动8803，有分组属性配置，后台打出来了MQ上的消息
+
+<img src="SpringCloud/image-20221206135851634.png" alt="image-20221206135851634" style="zoom:50%;" />
+
+<img src="SpringCloud/image-20221206135902159.png" alt="image-20221206135902159" style="zoom:55%;" />
