@@ -4507,3 +4507,172 @@ public class ReceiveMessageListener {
 <img src="SpringCloud/image-20221206135851634.png" alt="image-20221206135851634" style="zoom:50%;" />
 
 <img src="SpringCloud/image-20221206135902159.png" alt="image-20221206135902159" style="zoom:55%;" />
+
+# [12.SpringCloud Sleuth分布式请求链路跟踪](https://github.com/spring-cloud/spring-cloud-sleuth)
+
+## 概述
+
+> - 在微服务框架中，一个由客户端发起的请求在后端系统中会经过多个不同的的服务节点调用来协同产生最后的请求结果，每一个前段请求都会形成一条复杂的分布式服务调用链路，链路中的任何一环出现高延时或错误都会引起整个请求最后的失败。
+> - **Spring Cloud Sleuth提供了一套完整的服务跟踪的解决方案，在分布式系统中提供追踪解决方案并且兼容支持了zipkin**
+
+## 搭建链路监控步骤
+
+### zipkin
+
+> - SpringCloud从F版起已不需要自己构建Zipkin Server了，只需调用jar包即可
+>
+> - [下载地址](https://repo1.maven.org/maven2/io/zipkin/zipkin-server/)——`zipkin-server-2.23.9-exec.jar`
+>
+> - 运行jar
+>
+>   ```cmd
+>   java -jar zipkin-server-2.23.9-exec.jar
+>   ```
+>
+>   ![image-20221206153815908](SpringCloud/image-20221206153815908.png)
+>
+> - 访问：http://localhost:9411/
+>
+>   ![image-20221206153924354](SpringCloud/image-20221206153924354.png)
+
+### 服务提供者
+
+#### pom
+
+```xml
+<!--包含了sleuth+zipkin-->
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-zipkin</artifactId>
+</dependency>
+```
+
+#### yaml
+
+```yaml
+spring:
+  application:
+    name: cloud-payment-service
+  zipkin:
+    base-url: http://localhost:9411
+  sleuth:
+    sampler:
+      #采样率值介于 0 到 1 之间，1 则表示全部采集
+      probability: 1
+```
+
+#### controller
+
+```java
+package com.atguigu.springcloud.controller;
+
+import com.atguigu.springcloud.entities.CommonResult;
+import com.atguigu.springcloud.entities.Payment;
+import com.atguigu.springcloud.service.PaymentService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+ * @Author: lz
+ * @Date: 2022-11-24 0024 17:08
+ * @Description:
+ */
+
+@RestController
+@RequestMapping("/payment")
+public class PaymentController {
+
+    @GetMapping("/zipkin")
+    public String paymentZipkin() {
+        return "hi ,i'am paymentzipkin server fall back，welcome to atguigu，O(∩_∩)O哈哈~";
+    }
+}
+```
+
+### 服务消费者(调用方)
+
+#### pom
+
+```xml
+    <!--包含了sleuth+zipkin-->
+    <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-zipkin</artifactId>
+    </dependency>
+```
+#### yaml
+
+```yaml
+spring:
+  application:
+    name: cloud-order-service
+  zipkin:
+    base-url: http://localhost:9411
+  sleuth:
+    sampler:
+      probability: 1
+```
+
+#### controller
+
+```java
+package com.atguigu.springcloud.controller;
+
+import com.atguigu.springcloud.entities.CommonResult;
+import com.atguigu.springcloud.entities.Payment;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+/**
+ * @Author: lz
+ * @Date: 2022-11-25 0025 14:04
+ * @Description:
+ */
+
+@RestController
+@Slf4j
+@RequestMapping("/consumer")
+public class ConsumerController {
+
+    // 通过在eureka上注册过的微服务名称调用
+    public static final String PAYMENT_URL = "http://CLOUD-PAYMENT-SERVICE";
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @GetMapping("/payment/zipkin")
+    public String paymentZipkin() {
+        String result = restTemplate.getForObject(PAYMENT_URL + "/payment/zipkin/", String.class);
+        return result;
+    }
+
+}
+```
+
+### 测试
+
+> - 启动7001、7002、8001、80
+> - 执行：http://localhost/consumer/payment/zipkin
+
+![image-20221206154212907](SpringCloud/image-20221206154212907.png)
+
+# 13.SpringCloud Alibaba入门简介
+
+> - [官网](https://spring.io/projects/spring-cloud-alibaba#overview)
+> - [英文文档1](https://github.com/alibaba/spring-cloud-alibaba)
+> - [英文文档2](https://spring-cloud-alibaba-group.github.io/github-pages/greenwich/spring-cloud-alibaba.html)
+> - [中文文档](https://github.com/alibaba/spring-cloud-alibaba/blob/2021.x/README-zh.md)
+
+
+
