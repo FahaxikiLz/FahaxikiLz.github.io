@@ -1999,7 +1999,7 @@ public class MainApp80 {
 
 ##### 测试
 
-![image-20221127210025489](SpringCloud/image-20221127210025489.png)
+<img src="SpringCloud/image-20221127210025489.png" alt="image-20221127210025489" style="zoom:80%;" />
 
 ### Ribbon负载均衡算法
 
@@ -2028,7 +2028,7 @@ public class MainApp80 {
 >   前面在使用Ribbon+RestTemplate时，利用RestTemplate对http请求的封装处理，形成了一套模版化的调用方法。但是在实际开发中，由于对服务依赖的调用可能不止一处，往往一个接口会被多处调用，所以通常都会针对每个微服务自行封装一些客户端类来包装这些依赖服务的调用。所以，Feign在此基础上做了进一步封装，由他来帮助我们定义和实现依赖服务接口的定义。在Feign的实现下，我们**只需创建一个接口并使用注解的方式来配置它(以前是Dao接口上面标注Mapper注解,现在是一个微服务接口上面标注一个Feign注解即可)，即可完成对服务提供方的接口绑定**，简化了使用Spring cloud Ribbon时，自动封装服务调用客户端的开发量。
 >
 > - **Feign集成了Ribbon**
->   利用Ribbon维护了Payment的服务列表信息，并且通过轮询实现了客户端的负载均衡。而与Ribbon不同的是，通过feign只需要定义服务绑定接口且以声明式的方法，优雅而简单的实现了服务调用
+>   利用Ribbon维护了Payment的服务列表信息，并且**通过轮询实现了客户端的负载均衡**。而与Ribbon不同的是，通过feign只需要定义服务绑定接口且以声明式的方法，优雅而简单的实现了服务调用
 
 ![image-20221128205556636](SpringCloud/image-20221128205556636.png)
 
@@ -2151,7 +2151,7 @@ public class OrderFeignController {
 
 #### 测试
 
-<img src="SpringCloud/image-20221128213017437.png" alt="image-20221128213017437" style="zoom:67%;" />
+<img src="SpringCloud/image-20221127210025489.png" alt="image-20221127210025489" style="zoom: 80%;" />
 
 ### OpenFeign超时控制
 
@@ -4667,12 +4667,408 @@ public class ConsumerController {
 
 ![image-20221206154212907](SpringCloud/image-20221206154212907.png)
 
-# 13.SpringCloud Alibaba入门简介
+# 13.✔️SpringCloud Alibaba入门简介
 
 > - [官网](https://spring.io/projects/spring-cloud-alibaba#overview)
 > - [英文文档1](https://github.com/alibaba/spring-cloud-alibaba)
 > - [英文文档2](https://spring-cloud-alibaba-group.github.io/github-pages/greenwich/spring-cloud-alibaba.html)
 > - [中文文档](https://github.com/alibaba/spring-cloud-alibaba/blob/2021.x/README-zh.md)
 
+<img src="SpringCloud/image-20221206212259406.png" alt="image-20221206212259406" style="zoom: 80%;" />
+
+# 14.✔️[SpringCloud Alibaba Nacos服务注册和配置中心](https://nacos.io/zh-cn/)
+
+## Nacos简介
+
+> - 一个更易于构建云原生应用的动态服务发现、配置管理和服务管理平台。
+> - Nacos = Eureka+Config +Bus
+> - [官方文档](https://spring-cloud-alibaba-group.github.io/github-pages/greenwich/spring-cloud-alibaba.html#_spring_cloud_alibaba_nacos_discovery)
+
+<img src="SpringCloud/image-20221207135009309.png" alt="image-20221207135009309" style="zoom:80%;" />
+
+## 安装并运行Nacos
+
+> - [下载地址](https://github.com/alibaba/nacos/releases)
+>
+>   ![image-20221207135159016](SpringCloud/image-20221207135159016.png)
+>
+> - 解压安装包，直接运行bin目录下的`startup.cmd`
+>
+>   ![image-20221207140454359](SpringCloud/image-20221207140454359.png)
+>
+> - 命令运行成功后直接访问http://localhost:8848/nacos。账号密码都是nacos
+>
+>   ![image-20221207140538056](SpringCloud/image-20221207140538056.png)
+
+## Nacos作为服务注册中心演示
+
+### 基于Nacos的服务提供者
+
+> 创建cloudalibaba-provider-payment9001模块作为服务提供者
+
+#### 父pom
+
+```xml
+      <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+            <version>2.1.0.RELEASE</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+```
+#### 本模块pom
+
+```xml
+    <!--SpringCloud ailibaba nacos -->
+    <dependency>
+        <groupId>com.alibaba.cloud</groupId>
+        <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+    </dependency>
+```
+#### yaml
+
+```yaml
+server:
+  port: 9001
+
+spring:
+  application:
+    name: nacos-payment-provider
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848 #配置Nacos地址
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+```
+
+#### 主启动
+
+```java
+package com.atguigu.springcloud;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 
+@EnableDiscoveryClient
+@SpringBootApplication
+public class PaymentMain9001 {
+    public static void main(String[] args) {
+        SpringApplication.run(PaymentMain9001.class, args);
+    }
+}
+ 
+```
+
+#### controller
+
+```java
+package com.atguigu.springcloud.controller;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class PaymentController {
+    @Value("${server.port}")
+    private String serverPort;
+
+    @GetMapping(value = "/payment/nacos/{id}")
+    public String getPayment(@PathVariable("id") Integer id) {
+        return "nacos registry, serverPort: " + serverPort + "\t id" + id;
+    }
+}
+```
+
+#### 测试
+
+![image-20221207143037623](SpringCloud/image-20221207143037623.png)
+
+#### 基于9001拷贝服务提供者9002
+
+### 基于Nacos的服务消费者
+
+> - 创建cloudalibaba-consumer-nacos-order83作为服务的消费者
+>
+> - 为什么nacos支持负载均衡?
+>
+>   因为nacos整合了Ribbon
+>
+>   <img src="SpringCloud/image-20221207153109629.png" alt="image-20221207153109629" style="zoom:67%;" />
+
+#### pom
+
+```xml
+<!--SpringCloud ailibaba nacos -->
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+</dependency>
+```
+
+#### yaml
+
+```yaml
+server:
+  port: 83
+
+
+spring:
+  application:
+    name: nacos-order-consumer
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+
+
+#消费者将要去访问的微服务名称(注册成功进nacos的微服务提供者)
+service-url:
+  nacos-user-service: http://nacos-payment-provider 
+ 
+```
+
+#### 主启动
+
+```java
+package com.atguigu.springcloud;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+
+
+@EnableDiscoveryClient
+@SpringBootApplication
+public class OrderNacosMain83 {
+    public static void main(String[] args) {
+        SpringApplication.run(OrderNacosMain83.class, args);
+    }
+} 
+ 
+```
+
+#### 业务类
+
+> 配置RestTemplate
+
+```java
+package com.atguigu.springcloud.config;
+
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
+
+/**
+ * @Author: lz
+ * @Date: 2022-12-07 0007 15:23
+ * @Description:
+ */
+
+@Configuration
+public class ApplicationContextConfig {
+
+    @Bean
+    @LoadBalanced
+    public RestTemplate getRestTemplate() {
+        return new RestTemplate();
+    }
+}
+```
+
+> controller
+
+```java
+package com.atguigu.springcloud.controller;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+/**
+ * @Author: lz
+ * @Date: 2022-12-07 0007 15:25
+ * @Description:
+ */
+
+@RestController
+@Slf4j
+public class OrderNacosController {
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Value("${service-url.nacos-user-service}")
+    private String SERVER_URL;
+
+    @GetMapping("/consumer/payment/nacos/{id}")
+    public String getInfo(@PathVariable("id") Long id) {
+        String template = restTemplate.getForObject(SERVER_URL + "/payment/nacos/" + id, String.class);
+
+        return template;
+    }
+}
+```
+
+#### 测试
+
+<img src="SpringCloud/image-20221207153837233.png" alt="image-20221207153837233" style="zoom:67%;" />
+
+### 服务注册中心对比
+
+![image-20221207165918305](SpringCloud/image-20221207165918305.png)
+
+#### Nacos 支持AP和CP模式的切换
+
+> 何时选择使用何种模式？
+> 一般来说，如果不需要存储服务级别的信息且服务实例是通过nacos-client注册，并能够保持心跳上报，那么就可以选择AP模式。当前主流的服务如 Spring cloud 和 Dubbo 服务，都适用于AP模式，AP模式为了服务的可能性而减弱了一致性，因此AP模式下只支持注册临时实例。
+>
+> 如果需要在服务级别编辑或者存储配置信息，那么 CP 是必须，K8S服务和DNS服务则适用于CP模式。
+> CP模式下则支持注册持久化实例，此时则是以 Raft 协议为集群运行模式，该模式下注册实例之前必须先注册服务，如果服务不存在，则会返回错误。
+>
+> `curl -X PUT '$NACOS_SERVER:8848/nacos/v1/ns/operator/switches?entry=serverMode&value=CP'`
+
+## Nacos作为服务配置中心演示
+
+### Nacos作为配置中心-基础配置
+
+> 创建cloudalibaba-config-nacos-client3377作为配置中心
+
+#### pom
+
+```xml
+<!--nacos-config-->
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+</dependency>
+<!--nacos-discovery-->
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+</dependency>
+```
+
+#### bootstrap.yaml
+
+```yaml
+# nacos配置
+server:
+  port: 3377
+
+spring:
+  application:
+    name: nacos-config-client
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848 #Nacos服务注册中心地址
+      config:
+        server-addr: localhost:8848 #Nacos作为配置中心地址
+        file-extension: yaml #指定yaml格式的配置
+
+
+# ${spring.application.name}-${spring.profile.active}.${spring.cloud.nacos.config.file-extension}
+```
+
+#### application.yaml
+
+```yaml
+spring:
+  profiles:
+    active: dev # 表示开发环境
+```
+
+#### 主启动
+
+```java
+package com.atguigu.springcloud;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+
+
+@EnableDiscoveryClient
+@SpringBootApplication
+public class NacosConfigClientMain3377 {
+    public static void main(String[] args) {
+        SpringApplication.run(NacosConfigClientMain3377.class, args);
+    }
+}
+```
+
+#### 业务类
+
+```java
+package com.atguigu.springcloud.controller;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+
+@RestController
+@RefreshScope //在控制器类加入@RefreshScope注解使当前类下的配置支持Nacos的动态刷新功能。
+public class ConfigClientController {
+    @Value("${config.info}")
+    private String configInfo;
+
+    @GetMapping("/config/info")
+    public String getConfigInfo() {
+        return configInfo;
+    }
+}
+ 
+```
+
+#### 在Nacos中添加配置信息
+
+##### Nacos中的匹配规则
+
+> 在 Nacos Spring Cloud 中，`dataId` 的完整格式如下：
+>
+> ```plain
+> ${prefix}-${spring.profiles.active}.${file-extension}
+> ```
+>
+> - `prefix` 默认为 `spring.application.name` 的值，也可以通过配置项 `spring.cloud.nacos.config.prefix`来配置。
+> - `spring.profiles.active` 即为当前环境对应的 profile，详情可以参考 [Spring Boot文档](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-profiles.html#boot-features-profiles)。 **注意：当 `spring.profiles.active` 为空时，对应的连接符 `-` 也将不存在，dataId 的拼接格式变成 `${prefix}.${file-extension}`**
+> - `file-exetension` 为配置内容的数据格式，可以通过配置项 `spring.cloud.nacos.config.file-extension` 来配置。目前只支持 `properties` 和 `yaml` 类型。
+
+##### 实例
+
+![image-20221207170741994](SpringCloud/image-20221207170741994.png)
+
+![image-20221207171000583](SpringCloud/image-20221207171000583.png)
+
+![image-20221207171257920](SpringCloud/image-20221207171257920.png)
+
+##### 历史配置
+
+> Nacos会记录配置文件的历史版本默认保留30天，此外还有一键回滚功能，回滚操作将会触发配置更新
+
+![image-20221207171818563](SpringCloud/image-20221207171818563.png)
+
+#### 测试
+
+![image-20221207171553750](SpringCloud/image-20221207171553750.png)
+
+#### 测试动态刷新
+
+![image-20221207171635921](SpringCloud/image-20221207171635921.png)

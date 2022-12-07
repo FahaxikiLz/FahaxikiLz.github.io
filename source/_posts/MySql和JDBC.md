@@ -552,7 +552,7 @@ SELECT * from students WHERE not score = 90
 
 ### DQL执行顺序
 
-> <span style="color:purple">**FROM -> WHERE -> GROUP BY -> SELECT -> ORDER BY -> LIMIT**</span>
+> <span style="color:purple">**from > on > join > where > group by > 聚合函数 > having > select > distinct > order by > limit**</span>
 
 ## 函数
 
