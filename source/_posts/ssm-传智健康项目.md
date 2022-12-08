@@ -4259,7 +4259,7 @@ public class OrderSettingController {
      * @return
      */
     @RequestMapping("/upload")
-    public Result upload(@RequestParam("excelFile")MultipartFile excelFile){
+    public Result upload(@RequestParam("excelFile") MultipartFile excelFile){
         try {
             //读取Excel文件数据
             List<String[]> list = POIUtils.readExcel(excelFile);
@@ -4280,6 +4280,10 @@ public class OrderSettingController {
     }
 }
 ~~~
+
+#### 注意点
+
+> 图片上传为post请求，但是还是加了一个RequestParam注解，不加好像就拿不到
 
 #### 3.2.2 服务接口
 
