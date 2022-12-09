@@ -1,11 +1,10 @@
----
 title: Spring Cloud
 date: 2022-11-23 18:45:24
 tags:
+
 - Spring Cloud
 categories: 
 - 微服务
----
 
 nacos集群
 
@@ -5918,9 +5917,32 @@ public class FlowLimitController {
 > 1.  达到指定的QPS n/s 就会被限流。
 > 2. 调用该API的线程数，达到指定的阈值时，进行限流。
 
-> 下面是网上看到的教程，但是还是没有实现，好像是需要修改版本，以及配置一个过滤器，详细请看黑马springcloud alibaba
+##### 版本问题
 
-##### service
+> - 从1.6.3版本开始，Sentinel Web filter默认收敛所有URL的入口context，因此链路限流不生效。
+> - **1.7.0版本开始(对应SpringCloud Alibaba的2.1.1.RELEASE)，官方在CommonEilter引入了 `WEB_CONTEXT_UNIFY`参数，用于控制是否收敛context。将其配置为false即可根据不同的URL进行链路限流。**
+> - **SpringCloud Alibaba 2.1.1.RELEASE之后的版本，可以通过配置`spring.cloud.sentinel.web-context-unify=false`即可关闭收敛**(失败)
+
+##### 黑马教程——成功
+
+> - 我们当前使用的版本是SpringCloud Alibaba 2.1.0.RELEASE，无法实现链路限流。需要写代码的形式实现
+
+###### 更改版本
+
+> SpringCloud Alibaba更改**版本为2.1.1.RELEASE**
+
+```xml
+
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>2.1.0.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+```
+
+###### service
 
 > 创建一个方法，使用controller中两个方法调用。
 >
@@ -5948,7 +5970,7 @@ public class FlowLimitService {
 }
 ```
 
-##### controller
+###### controller
 
 > controller中两个方法去调用service中的test方法
 
@@ -5984,20 +6006,145 @@ public class FlowLimitController {
 
 ```
 
-##### yaml
+###### yaml
+
+<img src="SpringCloud/image-20221209174237744.png" alt="image-20221209174237744" style="zoom:67%;" />
+
+###### 配置类
+
+```java
+package com.atguigu.springcloud.config;
+
+import com.alibaba.csp.sentinel.adapter.servlet.CommonFilter;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * @Author: lz
+ * @Date: 2022-12-09 0009 17:23
+ * @Description:
+ */
+
+@Configuration
+public class FilterContextConfig {
+
+    @Bean
+    public FilterRegistrationBean sentinelFilterRegistration() {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(new CommonFilter());
+        registration.addUrlPatterns("/*");
+        // 入口资源关闭聚合
+        registration.addInitParameter(CommonFilter.WEB_CONTEXT_UNIFY, "false");
+        registration.setName("sentinelFilter");
+        registration.setOrder(1);
+        return registration;
+    }
+}
+```
+
+###### 测试
+
+> testB怎么访问都没事
+
+![image-20221209173240878](SpringCloud/image-20221209173240878.png)
+
+> testA超过阈值就报500
+
+![image-20221209173330064](SpringCloud/image-20221209173330064.png)
+
+##### 网上教程——失败
+
+###### 更改版本
+
+> SpringCloud Alibaba更改**版本为2.1.2.RELEASE**
+
+```xml
+           
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>2.1.2.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+```
+
+###### service
+
+> 创建一个方法，使用controller中两个方法调用。
+>
+> 要加@SentinelSource注解
+
+```java
+package com.atguigu.springcloud.service;
+
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import org.springframework.stereotype.Service;
+
+/**
+ * @Author: lz
+ * @Date: 2022-12-09 0009 15:56
+ * @Description:
+ */
+
+@Service
+public class FlowLimitService {
+
+    @SentinelResource("test")
+    public void test() {
+        System.out.println("=========================>test");
+    }
+}
+```
+
+###### controller
+
+> controller中两个方法去调用service中的test方法
+
+```java
+package com.atguigu.springcloud.controller;
+
+import com.atguigu.springcloud.service.FlowLimitService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+
+@RestController
+public class FlowLimitController {
+
+    @Autowired
+    private FlowLimitService flowLimitService;
+
+    @GetMapping("/testA")
+    public String testA() {
+        flowLimitService.test();
+
+        return "------testA";
+    }
+
+    @GetMapping("/testB")
+    public String testB() {
+        flowLimitService.test();
+
+        return "------testB";
+    }
+}
+
+```
+
+###### yaml
 
 <img src="SpringCloud/image-20221209164817057.png" alt="image-20221209164817057" style="zoom:67%;" />
 
-##### 控制台
+###### 控制台
 
-> 对/testA路径的方法调用service中的test方法进行限流。每秒2次调用，多了就挂了
+![image-20221209173629333](SpringCloud/image-20221209173629333.png)
 
-<img src="SpringCloud/image-20221209164846603.png" alt="image-20221209164846603" style="zoom:50%;" />
+###### 测试
 
-##### 测试
+> 设置的阈值是1，每秒访问超过1次，testA就会失败。但是这个方法不成功，testA没有失败
 
-> 200个并发，每0.25秒发一个，每秒发4个，阈值是2，所以要是两个成功，两个失败，两个成功。。。
+![image-20221209174146928](SpringCloud/image-20221209174146928.png)
 
-<img src="SpringCloud/image-20221209170029785.png" alt="image-20221209170029785" style="zoom:67%;" />
-
-<img src="SpringCloud/image-20221209165040022.png" alt="image-20221209165040022" style="zoom:50%;" />
