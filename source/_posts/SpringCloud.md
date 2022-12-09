@@ -7,6 +7,10 @@ categories:
 - 微服务
 ---
 
+nacos集群
+
+sentinel 流控规则  链路
+
 # 1.微服务概述
 
 ## 什么是微服务？
@@ -5394,7 +5398,7 @@ public class ConfigClientController {
 
 ![image-20221208153554925](SpringCloud/image-20221208153554925.png)
 
-#### Linux版Nacos+MySQL生产环境配置
+#### [Linux版Nacos集群+MySQL生产环境配置](https://juejin.cn/post/6850418116271292430#heading-48)
 
 ##### 准备
 
@@ -5729,3 +5733,271 @@ public class ConfigClientController {
 ##### 小结
 
 <img src="SpringCloud/image-20221208224152458.png" alt="image-20221208224152458" style="zoom:67%;" />
+
+# [✔️SpringCloud Alibaba Sentinel实现熔断与限流](https://github.com/alibaba/Sentinel)
+
+## 概述
+
+> - [中文文档](https://sentinelguard.io/zh-cn/docs/introduction.html)
+> - Sentinel 是面向分布式、多语言异构化服务架构的流量治理组件，主要以流量为切入点，从流量路由、流量控制、流量整形、熔断降级、系统自适应过载保护、热点流量防护等多个维度来帮助开发者保障微服务的稳定性。就是用来替代Hystrix的
+
+## 安装Sentinel控制台
+
+> - [下载地址](https://github.com/alibaba/Sentinel/releases)
+>
+> - 下载`sentinel-dashboard-1.7.0.jar`，并运行jar包
+>
+>   ![image-20221209145925612](SpringCloud/image-20221209145925612.png)
+>
+> - 访问sentinel管理界面
+>
+>   http://localhost:8080，注意不要tomcat不要占用8080端口，账号密码都是sentinel
+>
+>   ![image-20221209150435032](SpringCloud/image-20221209150435032.png)
+
+## 初始化演示工程
+
+> 创建cloudalibaba-sentinel-service8401模块，并且注册到nacos中
+
+### pom
+
+```xml
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+</dependency>
+```
+
+### yaml
+
+```yaml
+server:
+  port: 8401
+
+spring:
+  application:
+    name: cloudalibaba-sentinel-service
+  cloud:
+    nacos:
+      discovery:
+        #Nacos服务注册中心地址
+        server-addr: localhost:8848
+    sentinel:
+      transport:
+        #配置Sentinel dashboard地址
+        dashboard: localhost:8080
+        #默认8719端口，假如被占用会自动从8719开始依次+1扫描,直至找到未被占用的端口
+        port: 8719
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+```
+
+### 主启动
+
+```java
+package com.atguigu.springcloud;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+
+@EnableDiscoveryClient
+@SpringBootApplication
+public class MainApp8401 {
+    public static void main(String[] args) {
+        SpringApplication.run(MainApp8401.class, args);
+    }
+}
+```
+
+### controller
+
+```java
+package com.atguigu.springcloud.controller;
+
+import com.atguigu.springcloud.alibaba.service.OrderService;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+
+
+@RestController
+public class FlowLimitController {
+
+    @GetMapping("/testA")
+    public String testA() {
+        return "------testA";
+    }
+
+    @GetMapping("/testB")
+    public String testB() {
+        return "------testB";
+    }
+}
+```
+
+### 测试
+
+> 结果在sentinel中空空如也
+
+![image-20221209151208274](SpringCloud/image-20221209151208274.png)
+
+> 因为sentinel用的是懒加载，我们需要先执行一次访问
+>
+> - http://localhost:8401/testA
+>
+> - http://localhost:8401/testB
+
+![image-20221209151405551](SpringCloud/image-20221209151405551.png)
+
+## 流控规则
+
+![image-20221209153346774](SpringCloud/image-20221209153346774.png)
+
+> - 资源名:唯一名称，默认请求路径
+> - 针对来源: Sentinel可以针对调用者进行限流，填写微服务名，默认default(不区分来源)阈值类型/单机阈值:
+>   - QPS(每秒钟的请求数量):当调用该api的QPS达到阈值的时候，进行限流。
+>   - 线程数:当调用该api的线程数达到阈值的时候，进行限流
+> - 是否集群:不需要集群
+> - 流控模式:
+>   - 直接:api达到限流条件时，直接限流
+>   - 关联:当关联的资源达到阈值时，就限流自己
+>   - 链路:只记录指定链路上的流量（指定资源从入口资源进来的流量，如果达到阈值，就进行限流)【api级别的针对来源】
+> - 流控效果:
+>   - 快速失败:直接失败，抛异常
+>   - Warm Up:根据codeFactor (冷加载因子，默认3)的值，从阈值/codeFactor，经过预热时长，才达到设置的QPS阈值
+>   - 排队等待:匀速排队，让请求以匀速的速度通过，阈值类型必须设置为QPS，否则无效
+
+### 流控模式
+
+#### 直接(默认)
+
+> 表示1秒钟内查询1次就是OK，若超过次数1，就直接-快速失败，报默认错误
+
+<img src="SpringCloud/image-20221209153623988.png" alt="image-20221209153623988" style="zoom:50%;" />
+
+##### 测试
+
+> 快速访问localhost:8401/testA，超过1秒1次
+
+![image-20221209153723542](SpringCloud/image-20221209153723542.png)
+
+#### 关联
+
+> - 当关联的资源达到阈值时，就限流自己
+> - 当与A关联的资源B达到阀值后，就限流A自己。B惹事，A挂了
+> - 用处：比如支付模块撑不住了，就限流订单模块
+
+<img src="SpringCloud/image-20221209154106126.png" alt="image-20221209154106126" style="zoom:50%;" />
+
+> 当关联资源/testB的qps阀值超过1时，就限流/testA的Rest访问地址，当关联资源到阈值后限制配置好的资源名
+
+##### postman模拟并发密集访问testB
+
+![image-20221209154334933](SpringCloud/image-20221209154334933.png)
+
+![image-20221209154516542](SpringCloud/image-20221209154516542.png)
+
+##### 测试
+
+> 运行postman并发访问testB，testA挂了
+
+![image-20221209154607160](SpringCloud/image-20221209154607160.png)
+
+#### 链路——有坑
+
+> 多个请求调用同一个微服务。
+>
+> 1.  达到指定的QPS n/s 就会被限流。
+> 2. 调用该API的线程数，达到指定的阈值时，进行限流。
+
+> 下面是网上看到的教程，但是还是没有实现，好像是需要修改版本，以及配置一个过滤器，详细请看黑马springcloud alibaba
+
+##### service
+
+> 创建一个方法，使用controller中两个方法调用。
+>
+> 要加@SentinelSource注解
+
+```java
+package com.atguigu.springcloud.service;
+
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import org.springframework.stereotype.Service;
+
+/**
+ * @Author: lz
+ * @Date: 2022-12-09 0009 15:56
+ * @Description:
+ */
+
+@Service
+public class FlowLimitService {
+
+    @SentinelResource("test")
+    public void test() {
+        System.out.println("=========================>test");
+    }
+}
+```
+
+##### controller
+
+> controller中两个方法去调用service中的test方法
+
+```java
+package com.atguigu.springcloud.controller;
+
+import com.atguigu.springcloud.service.FlowLimitService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+
+@RestController
+public class FlowLimitController {
+
+    @Autowired
+    private FlowLimitService flowLimitService;
+
+    @GetMapping("/testA")
+    public String testA() {
+        flowLimitService.test();
+
+        return "------testA";
+    }
+
+    @GetMapping("/testB")
+    public String testB() {
+        flowLimitService.test();
+
+        return "------testB";
+    }
+}
+
+```
+
+##### yaml
+
+<img src="SpringCloud/image-20221209164817057.png" alt="image-20221209164817057" style="zoom:67%;" />
+
+##### 控制台
+
+> 对/testA路径的方法调用service中的test方法进行限流。每秒2次调用，多了就挂了
+
+<img src="SpringCloud/image-20221209164846603.png" alt="image-20221209164846603" style="zoom:50%;" />
+
+##### 测试
+
+> 200个并发，每0.25秒发一个，每秒发4个，阈值是2，所以要是两个成功，两个失败，两个成功。。。
+
+<img src="SpringCloud/image-20221209170029785.png" alt="image-20221209170029785" style="zoom:67%;" />
+
+<img src="SpringCloud/image-20221209165040022.png" alt="image-20221209165040022" style="zoom:50%;" />
