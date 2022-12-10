@@ -1,14 +1,13 @@
 title: Spring Cloud
 date: 2022-11-23 18:45:24
 tags:
-
 - Spring Cloud
 categories: 
 - 微服务
 
 nacos集群
 
-sentinel 流控规则  链路
+sentinel 降级规则  RT
 
 # 1.微服务概述
 
@@ -3197,9 +3196,9 @@ public class PaymentHystrixMain8001 {
 
 ### 监控窗口怎么看
 
-<img src="SpringCloud/image-20221203150350850.png" alt="image-20221203150350850" style="zoom:50%;" />
+<img src="SpringCloud/image-20221203150350850.png" alt="image-20221203150350850" style="zoom: 35%;" />
 
-![image-20221203150421089](SpringCloud/image-20221203150421089.png)
+<img src="SpringCloud/image-20221203150421089.png" alt="image-20221203150421089" style="zoom:67%;" />
 
 # 8.网关
 
@@ -5892,7 +5891,7 @@ public class FlowLimitController {
 
 > - 当关联的资源达到阈值时，就限流自己
 > - 当与A关联的资源B达到阀值后，就限流A自己。B惹事，A挂了
-> - 用处：比如支付模块撑不住了，就限流订单模块
+> - 使用场景：比如支付模块撑不住了，就限流订单模块
 
 <img src="SpringCloud/image-20221209154106126.png" alt="image-20221209154106126" style="zoom:50%;" />
 
@@ -5910,18 +5909,21 @@ public class FlowLimitController {
 
 ![image-20221209154607160](SpringCloud/image-20221209154607160.png)
 
-#### 链路——有坑
+#### 链路
 
-> 多个请求调用同一个微服务。
+> - 多个请求调用同一个微服务，对某一个请求访问服务做限流
 >
-> 1.  达到指定的QPS n/s 就会被限流。
-> 2. 调用该API的线程数，达到指定的阈值时，进行限流。
+> - 使用场景：下订单和看购物车都需要查询商品的服务，希望减少使用查询商品的服务，我们对看购物车使用查询商品服务进行限流
+>
+>   testA --> test  限流
+>
+>   testB --> test 不限流
 
 ##### 版本问题
 
 > - 从1.6.3版本开始，Sentinel Web filter默认收敛所有URL的入口context，因此链路限流不生效。
 > - **1.7.0版本开始(对应SpringCloud Alibaba的2.1.1.RELEASE)，官方在CommonEilter引入了 `WEB_CONTEXT_UNIFY`参数，用于控制是否收敛context。将其配置为false即可根据不同的URL进行链路限流。**
-> - **SpringCloud Alibaba 2.1.1.RELEASE之后的版本，可以通过配置`spring.cloud.sentinel.web-context-unify=false`即可关闭收敛**(失败)
+> - **SpringCloud Alibaba 2.1.1.RELEASE之后的版本，可以通过配置`spring.cloud.sentinel.web-context-unify=false`即可关闭收敛**
 
 ##### 黑马教程——成功
 
@@ -6053,18 +6055,17 @@ public class FilterContextConfig {
 
 ![image-20221209173330064](SpringCloud/image-20221209173330064.png)
 
-##### 网上教程——失败
+##### 网上教程——成功
 
 ###### 更改版本
 
-> SpringCloud Alibaba更改**版本为2.1.2.RELEASE**
+> SpringCloud Alibaba更改**版本为2021.0.4.0**
 
 ```xml
-           
-            <dependency>
+           <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-                <version>2.1.2.RELEASE</version>
+                <version>2021.0.4.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -6144,7 +6145,136 @@ public class FlowLimitController {
 
 ###### 测试
 
-> 设置的阈值是1，每秒访问超过1次，testA就会失败。但是这个方法不成功，testA没有失败
+> 设置的阈值是1，每秒访问超过1次，testA就会失败。
 
-![image-20221209174146928](SpringCloud/image-20221209174146928.png)
+![image-20221210134447189](SpringCloud/image-20221210134447189.png)
 
+### 流控效果
+
+> 阈值类型不可以设置为线程数，因为线程数高级选项中没有流控效果
+
+<img src="SpringCloud/image-20221210144547852.png" alt="image-20221210144547852" style="zoom:67%;" />
+
+#### 直接
+
+> 直接->快速失败(默认的流控处理)
+>
+> 直接失败，抛出异常
+
+![image-20221210134447189](SpringCloud/image-20221210134447189.png)
+
+#### 预热（Warm Up）
+
+> - Warm Up方式，即预热/冷启动方式。当系统长期处于低水位的情况下，当流量突然增加时，直接把系统拉升到高水位可能瞬间把系统压垮。通过"冷启动”，让通过的流量缓慢增加，在一定时间内逐渐增加到阈值上限，给冷系统一个预热的时间，避免冷系统被压垮。
+>
+>   <img src="SpringCloud/image-20221210142755603.png" alt="image-20221210142755603" style="zoom:67%;" />
+>
+> - 公式：阈值除以coldFactor(默认值为3),经过预热时长后才会达到阈值
+>
+> - 默认coldFactor 为 3，即请求QPS从(threshold / 3) 开始，经多少预热时长才逐渐升至设定的 QPS 阈值。
+>
+> - 应用场景：秒杀系统在开启的瞬间，会有很多流量上来，很有可能把系统打死，预热方式就是把为了保护系统，可慢慢的把流量放进来，慢慢的把阀值增长到设置的阀值。
+
+##### 控制台
+
+> 系统初始化的阀值为10 / 3 约等于3,即阀值刚开始为3；然后过了5秒后阀值才慢慢升高恢复到10
+
+<img src="SpringCloud/image-20221210142925620.png" alt="image-20221210142925620" style="zoom: 67%;" />
+
+##### 测试
+
+> 多次访问[localhost:8401/testA](http://localhost:8401/testA)，刚开始阈值为10/3，太快了不行，等5秒钟之后，阈值为10，每秒访问不超过10就没问题
+
+#### 排队等待
+
+> - 匀速排队方式会严格控制请求通过的间隔时间，也即是让请求以均匀的速度通过，对应的是漏桶算法。
+>
+>   <img src="SpringCloud/image-20221210145501402.png" alt="image-20221210145501402" style="zoom:67%;" />
+>
+> - 使用场景：这种方式主要用于处理间隔性突发的流量，例如消息队列。想象一下这样的场景，在某一秒有大量的请求到来，而接下来的几秒则处于空闲状态，我们希望系统能够在接下来的空闲期间逐渐处理这些请求，而不是在第一秒直接拒绝多余的请求。
+
+##### 控制台
+
+> 阈值为1，每秒只处理一个,超时时间为20秒
+
+<img src="SpringCloud/image-20221210144729164.png" alt="image-20221210144729164" style="zoom:67%;" />
+
+##### 测试
+
+> 1秒执行一个
+
+![image-20221210145704457](SpringCloud/image-20221210145704457.png)
+
+> 排队超过20秒限流
+
+![image-20221210145958353](SpringCloud/image-20221210145958353.png)
+
+## 降级规则
+
+> 这个是1.8以下的版本
+
+<img src="SpringCloud/image-20221210154256831.png" alt="image-20221210154256831" style="zoom:67%;" />
+
+> 这个是1.8及以上的版本，建议使用这个
+
+<img src="SpringCloud/image-20221210184027521.png" alt="image-20221210184027521" style="zoom:67%;" />
+
+> - 慢调用比例 (毫秒级)：
+>   
+>   选择以慢调用比例作为阈值，需要设置允许的**慢调用 RT（即最大的响应时间），请求的响应时间大于该值则统计为慢调用。**
+>   
+> **单位时间内请求数量 > 5 并且 慢调用比例 > 比例阈值，熔断**
+>   
+>   经过熔断时长后熔断器会进入探测恢复状态（HALF-OPEN 状态），若接下来的一个请求响应时间小于设置的慢调用 RT 则结束熔断，若大于设置的慢调用 RT 则会再次被熔断。
+>   
+> - 异常比列（秒级）
+>   QPS >= 5 且异常比例（秒级统计）超过阈值时，触发降级；时间窗口结束后，关闭降级
+>   
+> - 异常数（分钟级）
+>   异常数（分钟统计）超过阈值时，触发降级；时间窗口结束后，关闭降级
+
+### 慢调用比例
+
+> 选择以慢调用比例作为阈值，需要设置允许的**慢调用 RT（即最大的响应时间），请求的响应时间大于该值则统计为慢调用。**
+>
+> **单位时间内请求数量 > 5 并且 慢调用比例 > 比例阈值，熔断**
+>
+> 经过熔断时长后熔断器会进入探测恢复状态（HALF-OPEN 状态），若接下来的一个请求响应时间小于设置的慢调用 RT 则结束熔断，若大于设置的慢调用 RT 则会再次被熔断。
+
+#### controller
+
+```java
+@GetMapping("/testD")
+public String testD() {
+    //暂停几秒钟线程
+    try {
+        TimeUnit.SECONDS.sleep(1);
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+    log.info("testD 测试RT");
+    return "------testD";
+}
+```
+
+#### 控制台
+
+> 响应时间大于300ms为慢调用
+>
+> 请求次数 > 5  且  慢调用比例 > 0.1(1/10)，熔断。
+>
+> 熔断时长为1s，1s之后的请求如果响应时间 > 300ms，继续熔断。如果<300ms就不熔断了
+
+<img src="SpringCloud/image-20221210185703598.png" alt="image-20221210185703598" style="zoom:67%;" />
+
+#### 测试
+
+> 永远一秒钟打进来10个线程（大于5个了）调用testD，每个请求执行需要1秒（大于最大RT）,失败比例大于阈值，进行熔断
+
+<img src="SpringCloud/image-20221210155437245.png" alt="image-20221210155437245" style="zoom: 80%;" />
+
+<img src="SpringCloud/image-20221210164917782.png" alt="image-20221210164917782" style="zoom:80%;" />
+
+> 后续停止jmeter，没有这么大的访问量了，断路器关闭(保险丝恢复)，微服务恢复OK
+
+<img src="SpringCloud/image-20221210164952798.png" alt="image-20221210164952798" style="zoom:80%;" />
