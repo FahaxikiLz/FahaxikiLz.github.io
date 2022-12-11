@@ -1,13 +1,10 @@
 title: Spring Cloud
 date: 2022-11-23 18:45:24
 tags:
+
 - Spring Cloud
 categories: 
 - 微服务
-
-nacos集群
-
-sentinel 降级规则  RT
 
 # 1.微服务概述
 
@@ -6155,13 +6152,11 @@ public class FlowLimitController {
 
 <img src="SpringCloud/image-20221210144547852.png" alt="image-20221210144547852" style="zoom:67%;" />
 
-#### 直接
+#### 快速失败(默认的流控处理)
 
-> 直接->快速失败(默认的流控处理)
->
 > 直接失败，抛出异常
 
-![image-20221210134447189](SpringCloud/image-20221210134447189.png)
+![image-20221211125915270](SpringCloud/image-20221211125915270.png)
 
 #### 预热（Warm Up）
 
@@ -6171,7 +6166,7 @@ public class FlowLimitController {
 >
 > - 公式：阈值除以coldFactor(默认值为3),经过预热时长后才会达到阈值
 >
-> - 默认coldFactor 为 3，即请求QPS从(threshold / 3) 开始，经多少预热时长才逐渐升至设定的 QPS 阈值。
+> - **默认coldFactor 为 3，即请求QPS从(threshold / 3) 开始，经多少预热时长才逐渐升至设定的 QPS 阈值。**
 >
 > - 应用场景：秒杀系统在开启的瞬间，会有很多流量上来，很有可能把系统打死，预热方式就是把为了保护系统，可慢慢的把流量放进来，慢慢的把阀值增长到设置的阀值。
 
@@ -6219,21 +6214,7 @@ public class FlowLimitController {
 
 <img src="SpringCloud/image-20221210184027521.png" alt="image-20221210184027521" style="zoom:67%;" />
 
-> - 慢调用比例 (毫秒级)：
->   
->   选择以慢调用比例作为阈值，需要设置允许的**慢调用 RT（即最大的响应时间），请求的响应时间大于该值则统计为慢调用。**
->   
-> **单位时间内请求数量 > 5 并且 慢调用比例 > 比例阈值，熔断**
->   
->   经过熔断时长后熔断器会进入探测恢复状态（HALF-OPEN 状态），若接下来的一个请求响应时间小于设置的慢调用 RT 则结束熔断，若大于设置的慢调用 RT 则会再次被熔断。
->   
-> - 异常比列（秒级）
->   QPS >= 5 且异常比例（秒级统计）超过阈值时，触发降级；时间窗口结束后，关闭降级
->   
-> - 异常数（分钟级）
->   异常数（分钟统计）超过阈值时，触发降级；时间窗口结束后，关闭降级
-
-### 慢调用比例
+### 慢调用比例——有坑
 
 > 选择以慢调用比例作为阈值，需要设置允许的**慢调用 RT（即最大的响应时间），请求的响应时间大于该值则统计为慢调用。**
 >
@@ -6267,14 +6248,1129 @@ public String testD() {
 
 <img src="SpringCloud/image-20221210185703598.png" alt="image-20221210185703598" style="zoom:67%;" />
 
+> 此处的比例阈值设置成0.1，它会自己变成1。
+>
+> 下面的测试是以理想的0.1测试
+
 #### 测试
 
 > 永远一秒钟打进来10个线程（大于5个了）调用testD，每个请求执行需要1秒（大于最大RT）,失败比例大于阈值，进行熔断
 
-<img src="SpringCloud/image-20221210155437245.png" alt="image-20221210155437245" style="zoom: 80%;" />
+![image-20221211133625404](SpringCloud/image-20221211133625404.png)
+
+> 请求进行熔断
 
 <img src="SpringCloud/image-20221210164917782.png" alt="image-20221210164917782" style="zoom:80%;" />
 
-> 后续停止jmeter，没有这么大的访问量了，断路器关闭(保险丝恢复)，微服务恢复OK
+> 熔断时长过去了，再次访问这个请求，因为这个请求会睡1s，还是大于RT，这个还是慢调用
 
 <img src="SpringCloud/image-20221210164952798.png" alt="image-20221210164952798" style="zoom:80%;" />
+
+> 后面的调用又被熔断了。如果熔断之后的第一个请求不是慢调用后面的请求就不会被熔断了
+
+<img src="SpringCloud/image-20221210164917782.png" alt="image-20221210164917782" style="zoom:80%;" />
+
+### 异常比例——有坑
+
+> 当**单位统计时长内请求数目大于设置的最小请求数目，并且异常的比例大于阈值，则接下来的熔断时长内请求会自动被熔断。**
+>
+> **经过熔断时长后熔断器会进入探测恢复状态（HALF-OPEN 状态），若接下来的一个请求成功完成（没有错误）则结束熔断，否则会再次被熔断。**
+>
+> **比率的阈值范围是 `[0.0, 1.0]`，代表 0% - 100%。**
+
+#### controller
+
+```java
+    @GetMapping("/testD")
+    public String testD() {
+        log.info("测试异常比例");
+        int i = 10 / 0;
+        return "------testD";
+	} 
+```
+
+#### 控制台
+
+> 请求数 > 5个，异常比例超过10%，熔断1秒钟
+
+<img src="SpringCloud/image-20221211130710357.png" alt="image-20221211130710357" style="zoom:67%;" />
+
+#### 测试
+
+> 达到熔断条件，熔断
+
+![image-20221211131031588](SpringCloud/image-20221211131031588.png)
+
+> 熔断时长过去了，再次访问这个请求，这个请求中我们这只了/by zero的异常
+
+<img src="SpringCloud/image-20221211141440676.png" alt="image-20221211141440676" style="zoom:67%;" />
+
+> 因为熔断之后的第一次请求也是异常，那么后面的请求还会继续熔断。如果第一次请求不是异常，那么后面的请求就不会熔断（没有测出来）
+
+![image-20221211131031588](SpringCloud/image-20221211131031588.png)
+
+### 异常数
+
+> **当单位统计时长内的异常数目超过阈值之后会自动进行熔断。**
+>
+> **经过熔断时长后熔断器会进入探测恢复状态（HALF-OPEN 状态），若接下来的一个请求成功完成（没有错误）则结束熔断，否则会再次被熔断。**
+
+#### controller
+
+```java
+@GetMapping("/testD")
+public String testD() {
+    log.info("测试异常比例");
+    int i = 10 / 0;
+    return "------testD";
+} 
+```
+#### 控制台
+
+> 5次请求内，1次异常就熔断，熔断时长5秒钟
+
+<img src="SpringCloud/image-20221211142524172.png" alt="image-20221211142524172" style="zoom:67%;" />
+
+#### 测试
+
+> 达到熔断条件，熔断
+
+![image-20221211142717998](SpringCloud/image-20221211142717998.png)
+
+> 过了熔断时长，再次访问，因为有一个/by zero的异常，这次访问还是异常的
+
+![image-20221211142824825](SpringCloud/image-20221211142824825.png)
+
+> 因为熔断时长过后，第一次访问还是异常，继续熔断。如果第一次访问不是异常，后面就不会熔断了
+
+![image-20221211142911737](SpringCloud/image-20221211142911737.png)
+
+## 热点key限流
+
+> 热点即经常访问的数据，很多时候我们希望统计或者限制某个热点数据中访问频次最高的TopN数据，并对其访问进行限流或者其它操作
+
+### controller
+
+> 兜底的方法必须有BlockException参数
+
+```java
+@GetMapping("/testHostKey")
+@SentinelResource(value = "testHostKey", blockHandler = "deal_testHostKey")//value设置的资源名，blockHandler设置的兜底方法
+public String testHostKey(@RequestParam(value = "p1", required = false) String p1,
+                          @RequestParam(value = "p2", required = false) String p2) {
+    return "............testHostKey";
+
+}
+
+/**
+ * 这个是用于兜底的方法，兜底的方法必须有BlockException参数
+ *
+ * sentinel系统默认的提示：Blocked by Sentinel (flow limiting)
+ */
+public String deal_testHostKey(String p1, String p2, BlockException exception) {
+    return "...........deal_testHostKey";
+}
+```
+
+### 控制台
+
+> - 限流模式只支持QPS模式，固定写死了。（这才叫热点）
+> - @SentinelResource注解的方法参数索引，0代表第一个参数，1代表第二个参数，以此类推
+> - 单机阀值以及统计窗口时长表示在此窗口时间超过阀值就限流；1秒的QPS为1，超过就限流，限流后调用deal_testHotKey支持方法。
+
+![image-20221211152102859](SpringCloud/image-20221211152102859.png)
+
+### 测试
+
+> 访问http://localhost:8401/testHostKey?p1=abc，超过阈值就限流，执行兜底的方法
+
+![image-20221211152330979](SpringCloud/image-20221211152330979.png)
+
+> 访问http://localhost:8401/testHostKey?p1=abc&p2=xyz，超过阈值就限流，执行兜底的方法
+
+![image-20221211152534980](SpringCloud/image-20221211152534980.png)
+
+> 访问http://localhost:8401/testHostKey?p2=xyz，超过设置的阈值也不会限流，不会执行兜底方法
+
+![image-20221211152715564](SpringCloud/image-20221211152715564.png)
+
+### 参数例外项
+
+> 上述案例演示了第一个参数p1，当QPS超过1秒1次点击后马上被限流
+>
+> 特例情况：我们期望p1参数当它是某个特殊值时，它的限流值和平时不一样
+
+#### 控制台
+
+> 正常情况下，请求的第一个参数达到阈值就会限流，但是第一个参数的值为lz的时候，限流的阈值就会变成100
+
+<img src="SpringCloud/image-20221211153043335.png" alt="image-20221211153043335" style="zoom: 55%;" />
+
+#### 测试
+
+> 访问http://localhost:8401/testHostKey?p1=abc，超过阈值就限流，执行兜底的方法。这个属于正常情况
+
+![image-20221211153217634](SpringCloud/image-20221211153217634.png)
+
+> 访问http://localhost:8401/testHostKey?p1=lz，这时候的阈值就是100了。这种属于参数例外项
+
+![image-20221211153309506](SpringCloud/image-20221211153309506.png)
+
+#### 手贱添加异常看看....../(ㄒoㄒ)/~~
+
+> - @SentinelResource
+>   处理的是Sentinel控制台配置的违规情况，有blockHandler方法配置的兜底处理；
+> - RuntimeException
+>   int age = 10/0,这个是java运行时报出的运行时异常RunTimeException，@SentinelResource不管
+>   后面使用fallback可以解决
+
+## 系统规则
+
+> Sentinel 系统自适应限流从整体维度对应用入口流量进行控制，结合应用的 Load、CPU 使用率、总体平均 RT、入口 QPS 和并发线程数等几个维度的监控指标，通过自适应的流控策略，让系统的入口流量和系统的负载达到一个平衡，让系统尽可能跑在最大吞吐量的同时保证系统整体的稳定性。
+
+<img src="SpringCloud/image-20221211161618828.png" alt="image-20221211161618828" style="zoom: 67%;" />
+
+> - **Load 自适应**（仅对 Linux/Unix-like 机器生效）：系统的 load1 作为启发指标，进行自适应系统保护。当系统 load1 超过设定的启发值，且系统当前的并发线程数超过估算的系统容量时才会触发系统保护（BBR 阶段）。系统容量由系统的 `maxQps * minRt` 估算得出。设定参考值一般是 `CPU cores * 2.5`。
+> - **CPU usage**（1.5.0+ 版本）：当系统 CPU 使用率超过阈值即触发系统保护（取值范围 0.0-1.0），比较灵敏。
+> - **平均 RT**：当单台机器上所有入口流量的平均 RT 达到阈值即触发系统保护，单位是毫秒。
+> - **并发线程数**：当单台机器上所有入口流量的并发线程数达到阈值即触发系统保护。
+> - **入口 QPS**：当单台机器上所有入口流量的 QPS 达到阈值即触发系统保护。
+
+### 控制台
+
+> 入口QPS阈值设置为1，整个程序的阈值为1
+
+<img src="SpringCloud/image-20221211161804022.png" alt="image-20221211161804022" style="zoom:67%;" />
+
+### 测试
+
+> testA、testB超过了阈值，都会限流
+
+<img src="SpringCloud/image-20221211161926258.png" alt="image-20221211161926258" style="zoom: 80%;" />
+
+<img src="SpringCloud/image-20221211161944468.png" alt="image-20221211161944468" style="zoom:80%;" />
+
+## @SentinelResource
+
+### 基本使用
+
+> 兜底的方法必须有BlockException参数
+
+![image-20221211164835851](SpringCloud/image-20221211164835851.png)
+
+### 存在的问题
+
+> 1. 系统默认的，没有体现我们自己的业务要求。
+> 2. 依照现有条件，我们自定义的处理方法又和业务代码耦合在一块，不直观。
+> 3. 每个业务方法都添加一个兜底的，那代码膨胀加剧。
+> 4. 全局统一的处理方法没有体现。
+
+### 解决问题——客户自定义限流处理逻辑
+
+#### 创建CustomerBlockHandler类
+
+> 用于自定义限流处理逻辑
+
+```java
+package com.atguigu.springcloud.controller;
+
+import com.alibaba.csp.sentinel.slots.block.BlockException;
+import com.atguigu.springcloud.entities.CommonResult;
+
+/**
+ * @Author: lz
+ * @Date: 2022-12-11 0011 16:52
+ * @Description:
+ */
+public class CustomerBlockHandler {
+
+    public static CommonResult handleException1(BlockException exception) {
+        return new CommonResult(444, "兜底方法。。。。。。。。。1");
+    }
+
+    public static CommonResult handleException2(BlockException exception) {
+        return new CommonResult(444, "兜底方法。。。。。。。。。2");
+    }
+
+}
+
+```
+
+#### controller
+
+```java
+package com.atguigu.springcloud.controller;
+
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
+import com.atguigu.springcloud.entities.CommonResult;
+import com.atguigu.springcloud.entities.Payment;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+
+@RestController
+public class RateLimitController {
+    
+    @GetMapping("/rateLimit/customerBlockHandler")
+    @SentinelResource(value = "customerBlockHandler",
+            blockHandlerClass = CustomerBlockHandler.class,//创建的自定义兜底方法的类
+            blockHandler = "handleException2")//兜底的方法
+    public CommonResult customerBlockHandler() {
+        return new CommonResult(200, "按客户自定义限流处理逻辑");
+    }
+}
+```
+
+#### 测试
+
+![image-20221211165849895](SpringCloud/image-20221211165849895.png)
+
+## 服务熔断功能
+
+### 创建两个服务提供者
+
+> 新建cloudalibaba-provider-payment9003/9004两个一样的做法
+
+#### pom
+
+```xml
+ 
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>mscloud03</artifactId>
+        <groupId>com.atguigu.springcloud</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>cloudalibaba-provider-payment9003</artifactId>
+
+
+
+    <dependencies>
+        <!--SpringCloud ailibaba nacos -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <dependency><!-- 引入自己定义的api通用包，可以使用Payment支付Entity -->
+            <groupId>com.atguigu.springcloud</groupId>
+            <artifactId>cloud-api-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- SpringBoot整合Web组件 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!--日常通用jar包配置-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
+
+```
+
+#### yaml
+
+```yaml
+ 
+server:
+  port: 9003
+
+spring:
+  application:
+    name: nacos-payment-provider
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848 #配置Nacos地址
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+```
+
+#### 主启动
+
+```java
+ 
+package com.atguigu.springcloud.alibaba;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+
+
+@SpringBootApplication
+@EnableDiscoveryClient
+public class PaymentMain9003
+{
+    public static void main(String[] args) {
+            SpringApplication.run(PaymentMain9003.class, args);
+    }
+}
+```
+
+#### 业务类
+
+```java
+ 
+package com.atguigu.springcloud.alibaba.controller;
+
+import com.atguigu.springcloud.entities.CommonResult;
+import com.atguigu.springcloud.entities.Payment;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+
+@RestController
+public class PaymentController
+{
+    @Value("${server.port}")
+    private String serverPort;
+
+    public static HashMap<Long,Payment> hashMap = new HashMap<>();
+    static
+    {
+        hashMap.put(1L,new Payment(1L,"28a8c1e3bc2742d8848569891fb42181"));
+        hashMap.put(2L,new Payment(2L,"bba8c1e3bc2742d8848569891ac32182"));
+        hashMap.put(3L,new Payment(3L,"6ua8c1e3bc2742d8848569891xt92183"));
+    }
+
+    @GetMapping(value = "/paymentSQL/{id}")
+    public CommonResult<Payment> paymentSQL(@PathVariable("id") Long id)
+    {
+        Payment payment = hashMap.get(id);
+        CommonResult<Payment> result = new CommonResult(200,"from mysql,serverPort:  "+serverPort,payment);
+        return result;
+    }
+}
+
+```
+
+### 创建一个服务消费者
+
+> 新建cloudalibaba-consumer-nacos-order84作为服务消费者
+
+#### pom
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>mscloud03</artifactId>
+        <groupId>com.atguigu.springcloud</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>cloudalibaba-consumer-nacos-order84</artifactId>
+
+    <dependencies>
+        <!--SpringCloud ailibaba nacos -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <!--SpringCloud ailibaba sentinel -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+        </dependency>
+        <!-- 引入自己定义的api通用包，可以使用Payment支付Entity -->
+        <dependency>
+            <groupId>com.atguigu.springcloud</groupId>
+            <artifactId>cloud-api-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- SpringBoot整合Web组件 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!--日常通用jar包配置-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
+ 
+```
+
+#### yaml
+
+```yaml
+server:
+  port: 84
+
+
+spring:
+  application:
+    name: nacos-order-consumer
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+    sentinel:
+      transport:
+        #配置Sentinel dashboard地址
+        dashboard: localhost:8080
+        #默认8719端口，假如被占用会自动从8719开始依次+1扫描,直至找到未被占用的端口
+        port: 8719
+
+
+#消费者将要去访问的微服务名称(注册成功进nacos的微服务提供者)
+service-url:
+  nacos-user-service: http://nacos-payment-provider
+```
+
+#### 主启动
+
+```java
+ 
+package com.atguigu.springcloud.alibaba;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+
+/**
+ * @auther zzyy
+ * @create 2020-02-13 20:22
+ */
+@EnableDiscoveryClient
+@SpringBootApplication
+public class OrderNacosMain84
+{
+    public static void main(String[] args) {
+            SpringApplication.run(OrderNacosMain84.class, args);
+    }
+}
+```
+
+### 整合Ribbon
+
+#### 创建RestTemplate
+
+```java
+package com.atguigu.springcloud.alibaba.config;
+
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
+
+
+@Configuration
+public class ApplicationContextConfig
+{
+    @Bean
+    @LoadBalanced
+    public RestTemplate getRestTemplate()
+    {
+        return new RestTemplate();
+    }
+}
+```
+
+#### 业务类
+
+```java
+package com.atguigu.springcloud.controller;
+
+import com.atguigu.springcloud.entities.CommonResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+/**
+ * @Author: lz
+ * @Date: 2022-12-11 0011 20:15
+ * @Description:
+ */
+
+@RestController
+public class CircleBreakerController {
+
+    private String SERVER_URL = "http://nacos-payment-provider";
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+
+    @RequestMapping("/consumer/fallback/${id}")
+    public CommonResult testSentinelRibbon(@PathVariable("id") Long id) {
+        if (id > 3) {
+            throw new RuntimeException("id超出范围");
+        } else {
+            return restTemplate.getForObject(SERVER_URL + "/paymentSQL/" + id, CommonResult.class);
+        }
+
+    }
+}
+```
+
+#### 只配置fallback
+
+```java
+package com.atguigu.springcloud.controller;
+
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.atguigu.springcloud.entities.CommonResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+/**
+ * @Author: lz
+ * @Date: 2022-12-11 0011 20:15
+ * @Description:
+ */
+
+@RestController
+public class CircleBreakerController {
+
+    private String SERVER_URL = "http://nacos-payment-provider";
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @RequestMapping("/consumer/fallback/{id}")
+    @SentinelResource(value = "testSentinelRibbon", fallback = "handlerFallback")
+    public CommonResult testSentinelRibbon(@PathVariable("id") Long id) {
+        if (id > 3) {
+            throw new RuntimeException("id超出范围");
+        } else {
+            return restTemplate.getForObject(SERVER_URL + "/paymentSQL/" + id, CommonResult.class);
+        }
+
+    }
+
+    public CommonResult handlerFallback(Long id) {
+        return new CommonResult(444, "服务被降级了，我是兜底的方法。。。");
+    }
+}
+```
+
+##### 测试
+
+> 访问一个id为5的，id大于3java会抛异常，只配置fallback，java中异常会被兜底
+
+<img src="SpringCloud/image-20221211210133168.png" alt="image-20221211210133168" style="zoom:67%;" />
+
+> 限流也会被兜底
+
+<img src="SpringCloud/image-20221211210227479.png" alt="image-20221211210227479" style="zoom:67%;" />
+
+<img src="SpringCloud/image-20221211210248958.png" alt="image-20221211210248958" style="zoom:67%;" />
+
+#### 只配置blockHandler
+
+```java
+package com.atguigu.springcloud.controller;
+
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.atguigu.springcloud.entities.CommonResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+/**
+ * @Author: lz
+ * @Date: 2022-12-11 0011 20:15
+ * @Description:
+ */
+
+@RestController
+public class CircleBreakerController {
+
+    private String SERVER_URL = "http://nacos-payment-provider";
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+
+    @RequestMapping("/consumer/fallback/{id}")
+    @SentinelResource(value = "testSentinelRibbon", blockHandler = "blockHandler")
+    public CommonResult testSentinelRibbon(@PathVariable("id") Long id) {
+        if (id > 3) {
+            throw new RuntimeException("id超出范围");
+        } else {
+            return restTemplate.getForObject(SERVER_URL + "/paymentSQL/" + id, CommonResult.class);
+        }
+
+    }
+
+    public CommonResult blockHandler(Long id) {
+        return new CommonResult(445, "服务被降级了，我是兜底的方法。。。blockHandler");
+    }
+
+
+}
+```
+
+##### 测试
+
+> 访问一个id为5的，id大于3java会抛异常，只配置blockHandler，java中异常不会被兜底
+
+![image-20221211210542002](SpringCloud/image-20221211210542002.png)
+
+> 限流会被兜底
+
+<img src="SpringCloud/image-20221211211120152.png" alt="image-20221211211120152" style="zoom:67%;" />
+
+<img src="SpringCloud/image-20221211211452418.png" alt="image-20221211211452418" style="zoom:67%;" />
+
+#### fallback和blockHandler都配置
+
+```java
+package com.atguigu.springcloud.controller;
+
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
+import com.atguigu.springcloud.entities.CommonResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+/**
+ * @Author: lz
+ * @Date: 2022-12-11 0011 20:15
+ * @Description:
+ */
+
+@RestController
+public class CircleBreakerController {
+
+    private String SERVER_URL = "http://nacos-payment-provider";
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @RequestMapping("/consumer/fallback/{id}")
+    @SentinelResource(value = "testSentinelRibbon", fallback = "handlerFallback", blockHandler = "blockHandler")
+    public CommonResult testSentinelRibbon(@PathVariable("id") Long id) {
+        if (id > 3) {
+            throw new RuntimeException("id超出范围");
+        } else {
+            return restTemplate.getForObject(SERVER_URL + "/paymentSQL/" + id, CommonResult.class);
+        }
+
+    }
+
+    public CommonResult handlerFallback(Long id) {
+        return new CommonResult(444, "服务被降级了，我是兜底的方法。。。handlerFallback");
+    }
+
+    public CommonResult blockHandler(@PathVariable("id") Long id, BlockException exception) {
+        return new CommonResult(445, "服务被降级了，我是兜底的方法。。。blockHandler");
+    }
+
+}
+```
+
+##### 测试
+
+> 访问一个id为5的，id大于3java会抛异常；fallback和blockHandler都配置，会被fallback兜底
+
+<img src="SpringCloud/image-20221211212853257.png" alt="image-20221211212853257" style="zoom:67%;" />
+
+> 设置了限流，会被blockHandler兜底
+
+<img src="SpringCloud/image-20221211213042667.png" alt="image-20221211213042667" style="zoom:67%;" />
+
+<img src="SpringCloud/image-20221211213022989.png" alt="image-20221211213022989" style="zoom:67%;" />
+
+> 如果id大于5，并且设置了限流，超过了阈值，由blockHandler兜底
+
+<img src="SpringCloud/image-20221211213042667.png" alt="image-20221211213042667" style="zoom:67%;" />
+
+<img src="SpringCloud/image-20221211213222079.png" alt="image-20221211213222079" style="zoom:67%;" />
+
+### 整合openFeign
+
+> 修改服务消费者模块
+
+#### pom
+
+```xml
+    <!--SpringCloud openfeign -->
+    <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-openfeign</artifactId>
+    </dependency>	
+```
+#### yaml
+
+```yaml
+# 激活Sentinel对Feign的支持
+feign:
+  sentinel:
+    enabled: true  
+```
+
+#### 主启动
+
+![image-20221211220132789](SpringCloud/image-20221211220132789.png)
+
+#### 业务类
+
+> 创建一个接口，使用feign调用服务
+
+```java
+package com.atguigu.springcloud.service;
+
+import com.atguigu.springcloud.entities.CommonResult;
+import com.atguigu.springcloud.entities.Payment;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+@FeignClient(value = "nacos-payment-provider", fallback = PaymentFallbackService.class)
+public interface PaymentService {
+    @GetMapping(value = "/paymentSQL/{id}")
+    public CommonResult<Payment> paymentSQL(@PathVariable("id") Long id);
+}
+
+```
+
+> 创建一个类实现上面创建的接口，为每个方法创建兜底的方法
+
+```java
+package com.atguigu.springcloud.service;
+
+import com.atguigu.springcloud.entities.CommonResult;
+import com.atguigu.springcloud.entities.Payment;
+import org.springframework.stereotype.Component;
+
+/**
+ * @Author: lz
+ * @Date: 2022-12-11 0011 22:02
+ * @Description:
+ */
+@Component
+public class PaymentFallbackService implements PaymentService {
+    @Override
+    public CommonResult<Payment> paymentSQL(Long id) {
+        return new CommonResult<>(444, "服务降级返回,没有该流水信息", new Payment(id, "errorSerial......"));
+    }
+}
+```
+
+#### controller
+
+```java
+package com.atguigu.springcloud.controller;
+
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
+import com.atguigu.springcloud.entities.CommonResult;
+import com.atguigu.springcloud.entities.Payment;
+import com.atguigu.springcloud.service.PaymentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+import javax.annotation.Resource;
+
+/**
+ * @Author: lz
+ * @Date: 2022-12-11 0011 20:15
+ * @Description:
+ */
+
+@RestController
+public class CircleBreakerController {
+
+    @Resource
+    private PaymentService paymentService;
+
+    @GetMapping(value = "/consumer/openfeign/{id}")
+    public CommonResult<Payment> paymentSQL(@PathVariable("id") Long id) {
+        if (id == 4) {
+            throw new RuntimeException("没有该id");
+        }
+        return paymentService.paymentSQL(id);
+    }
+
+}
+```
+
+#### 测试
+
+> 对服务限流，达到阈值，但是不会进行兜底
+
+<img src="SpringCloud/image-20221211221037511.png" alt="image-20221211221037511" style="zoom:67%;" />
+
+<img src="SpringCloud/image-20221211220955006.png" alt="image-20221211220955006" style="zoom:67%;" />
+
+> 访问id等于4的请求，java内会抛出异常，这样方式也不会兜底
+
+<img src="SpringCloud/image-20221211221022855.png" alt="image-20221211221022855" style="zoom:67%;" />
+
+> 停掉服务提供者，再去访问，这时会进行兜底
+
+<img src="SpringCloud/image-20221211221133296.png" alt="image-20221211221133296" style="zoom:67%;" />
+
+> **sentinel整合openFeign和Hystrix整合openFeign一样，都是对服务端有效果，对客户端没有效果**
+
+## [规则持久化](https://juejin.cn/post/6890342340104454158)
+
+### why
+
+> 我们为一个服务配置流控规则
+
+![image-20221211222457227](SpringCloud/image-20221211222457227.png)
+
+> 当这个服务重启之后，流控规则就没有了，当然也不会有限流的效果了
+
+![image-20221211222624865](SpringCloud/image-20221211222624865.png)
+
+> **一旦我们重启应用，sentinel规则将消失；生产环境需要将配置规则进行持久化，不可能重启一起，配置一次sentinel的规则**
+
+### 流控规则
+
+#### pom
+
+```xml
+<!--SpringCloud ailibaba sentinel-datasource-nacos -->
+<dependency>
+    <groupId>com.alibaba.csp</groupId>
+    <artifactId>sentinel-datasource-nacos</artifactId>
+</dependency>
+```
+
+#### yaml
+
+```yaml
+spring:
+  application:
+    name: cloudalibaba-sentinel-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+    sentinel:
+      transport:
+        dashboard: localhost:8080
+        port: 8719
+      # sentinel nacos持久化
+      datasource:
+        ds1:
+          nacos:
+            server-addr: localhost:8848
+            dataId: cloudalibaba-sentinel-service
+            groupId: DEFAULT_GROUP
+            data-type: json
+            rule-type: flow
+```
+
+#### 添加Nacos业务规则配置
+
+![image-20221211224705876](SpringCloud/image-20221211224705876.png)
+
+```json
+[
+    {
+        "resource": "/byResource",
+        "limitApp": "default",
+        "grade": 1,
+        "count": 1,
+        "strategy": 0,
+        "controlBehavior": 0,
+        "clusterMode": false
+    }
+]
+```
+
+> - resource：资源名称；
+> - limitApp：来源应用；
+> - grade：阈值类型，0表示线程数，1表示QPS；
+> - count：单机阈值；
+> - strategy：流控模式，0表示直接，1表示关联，2表示链路；
+> - controlBehavior：流控效果，0表示快速失败，1表示Warm Up，2表示排队等待；
+> - clusterMode：是否集群。
+
+#### 测试
+
+> 停掉服务，重新启动，要先访问下请求
+
+![image-20221211225112355](SpringCloud/image-20221211225112355.png)
+
+### 降级规则
+
+#### yaml
+
+```
+		ds2:
+          nacos:
+            server-addr: ${spring.cloud.nacos.server-addr}
+            dataId: ${spring.application.name}-sentinel-degrade
+            groupId: DEFAULT_GROUP
+			#降级规则
+            rule-type: degrade
+```
+
+#### 添加Nacos业务规则配置
+
+```json
+[
+    {
+        "resource": "/test/info",
+        "grade": 2,
+        "count": 3,
+        "timeWindow": 10,
+        "minRequestAmount": 1,
+        "statIntervalMs": 1000
+    }
+    
+]
+```
+
+> - `resource`： 资源名
+> - `grade`: 熔断策略，支持慢调用比例(0)/异常比例(1)/异常数策略(2)
+> - `count`: 慢调用比例模式下为慢调用临界 RT（超出该值计为慢调用）；异常比例/异常数模式下为对应的阈值
+> - `timeWindow`:  熔断时长，单位为 s
+> - `minRequestAmount`: 熔断触发的最小请求数，请求数小于该值时即使异常比率超出阈值也不会熔断（1.7.0 引入）
+> - `statIntervalMs`:  统计时长（单位为 ms），如 60*1000 代表分钟级（1.8.0 引入）
+> - `slowRatioThreshold`： 慢调用比例阈值，仅慢调用比例模式有效（1.8.0 引入）
+
+### 热点规则
+
+#### yaml
+
+```
+		ds2:
+          nacos:
+            server-addr: ${spring.cloud.nacos.server-addr}
+            dataId: ${spring.application.name}-sentinel-degrade
+            groupId: DEFAULT_GROUP
+			#降级规则
+            rule-type: degrade
+```
+
+#### 添加Nacos业务规则配置
+
+```json
+[
+    {
+        "resource": "/test/getInfoById",
+        "count": 3,
+        "durationInSec": 1,
+        "controlBehavior": 0,
+        "maxQueueingTimeMs": 3000,
+        "paramIdx": 0
+
+    }
+    
+]
+```
+
+> - `resource`: 资源名
+> - `count`:  限流阈值
+> - `durationInSec`: 统计窗口时间长度（单位为秒），1.6.0 版本开始支持
+> - `controlBehavior`: 流控效果（支持快速失败和匀速排队模式），1.6.0 版本开始支持
+> - `maxQueueingTimeMs`: 最大排队等待时长（仅在匀速排队模式生效），1.6.0 版本开始支持
+> - `paramIdx`: 参数索引值，从`0`开始
+
+### 系统规则
+
+#### yaml
+
+```yaml
+        ds4:
+          nacos:
+            server-addr: ${spring.cloud.nacos.server-addr}
+            dataId: ${spring.application.name}-sentinel-system
+            groupId: DEFAULT_GROUP
+            #系统自适应限流
+            rule-type: system
+```
+
+#### 添加Nacos业务规则配置
+
+```json
+[
+    {
+       "highestSystemLoad": 3
+    },
+    {
+        "highestCpuUsage": 0.8
+    },
+    {
+        "avgRt": 10
+    },
+    {
+        "qps": 20
+    },
+    {
+        "maxThread": 20
+    }
+   
+]
+
+```
+
+> - **Load 自适应**（仅对 Linux/Unix-like 机器生效）：系统的 load1 作为启发指标，进行自适应系统保护。当系统 load1 超过设定的启发值，且系统当前的并发线程数超过估算的系统容量时才会触发系统保护（BBR 阶段）。系统容量由系统的 `maxQps * minRt` 估算得出。设定参考值一般是 `CPU cores * 2.5`。
+> - **CPU usage**（1.5.0+ 版本）：当系统 CPU 使用率超过阈值即触发系统保护（取值范围 0.0-1.0），比较灵敏。
+> - **平均 RT**：当单台机器上所有入口流量的平均 RT 达到阈值即触发系统保护，单位是毫秒。
+> - **并发线程数**：当单台机器上所有入口流量的并发线程数达到阈值即触发系统保护。
+> - **入口 QPS**：当单台机器上所有入口流量的 QPS 达到阈值即触发系统保护。
