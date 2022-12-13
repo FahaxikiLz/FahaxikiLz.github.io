@@ -7413,6 +7413,18 @@ spring:
 
 <img src="SpringCloud/image-20221212135543076.png" alt="image-20221212135543076" style="zoom:80%;" />
 
+
+
+
+
+
+
+
+
+
+
+# :x::x:下面的没弄好:x::x:
+
 ## Seata-Server 1.5.1安装
 
 > 1.5之后的配置不一样了，我这里也没有弄完
@@ -9053,6 +9065,7 @@ public class CommonResult<T>
 
 
 
+[localhost:2021/order/create?userId=1&productId=1&count=10&money=100](http://localhost:2021/order/create?userId=1&productId=1&count=10&money=100)
 
 
 
@@ -9060,14 +9073,12 @@ public class CommonResult<T>
 
 
 
+nacos集群
 
 
 
+降级规则   慢调用  异常比例
 
 
 
-
-```
-ERROR 7080 --- [eoutChecker_2_1] i.s.c.r.netty.NettyClientChannelManager  : can not get cluster name in registry config 'service.vgroupMapping.default_tx_group', please make sure registry config correct
-```
-
+seata1.5
