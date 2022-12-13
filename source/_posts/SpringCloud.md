@@ -1,5 +1,5 @@
 ---
-<?xml version="1.0" encoding="UTF-8"?>title: Spring Cloud
+title: Spring Cloud
 date: 2022-11-23 18:45:24
 tags:
 - Spring Cloud
@@ -5934,7 +5934,6 @@ public class FlowLimitController {
 > SpringCloud Alibaba更改**版本为2.1.1.RELEASE**
 
 ```xml
-
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
@@ -7413,21 +7412,9 @@ spring:
 
 <img src="SpringCloud/image-20221212135543076.png" alt="image-20221212135543076" style="zoom:80%;" />
 
+## Seata-Server 1.5.1安装——有坑
 
-
-
-
-
-
-
-
-
-
-# :x::x:下面的没弄好:x::x:
-
-## Seata-Server 1.5.1安装
-
-> 1.5之后的配置不一样了，我这里也没有弄完
+> 1.5之后的配置不一样了，我这里也没有弄好，配置应该没有问题，但是不回滚
 
 ### 1.[下载地址](https://github.com/seata/seata/releases)
 
@@ -7441,8 +7428,6 @@ spring:
 ![image-20221212144853602](SpringCloud/image-20221212144853602.png)
 
 ![image-20221212145033058](SpringCloud/image-20221212145033058.png)
-
-![image-20221212145208635](SpringCloud/image-20221212145208635.png)
 
 ```yaml
 server:
@@ -7497,25 +7482,6 @@ seata:
       ##if use MSE Nacos with auth, mutex with username/password attribute
       #access-key: ""
       #secret-key: ""
-  # 数据库也可以写到nacos的配置中，把这里注释掉
-  store:
-    # support: file 、 db 、 redis
-    mode: db
-    db:
-      datasource: druid
-      db-type: mysql
-      driver-class-name: com.mysql.jdbc.Driver
-      url: jdbc:mysql://127.0.0.1:3306/seata?rewriteBatchedStatements=true
-      user: root
-      password: 123456
-      min-conn: 5
-      max-conn: 100
-      global-table: global_table
-      branch-table: branch_table
-      lock-table: lock_table
-      distributed-lock-table: distributed_lock
-      query-limit: 100
-      max-wait: 5000
 #  server:
 #    service-port: 8091 #If not configured, the default is '${server.port} + 1000'
   security:
@@ -7525,9 +7491,11 @@ seata:
       urls: /,/**/*.css,/**/*.js,/**/*.html,/**/*.map,/**/*.svg,/**/*.png,/**/*.ico,/console-fe/public/**,/api/v1/auth/login
 ```
 
-> 数据库配置也可以写到nacos中，要把上面的数据库配置注释掉
+> 在nacos中创建一个配置
 
-![image-20221212171632198](SpringCloud/image-20221212171632198.png)
+![image-20221213212447458](SpringCloud/image-20221213212447458.png)
+
+> [配置内容](https://github.com/seata/seata/blob/develop/script/config-center/config.txt)
 
 ```properties
 service.vgroupMapping.abi_common_tx_group=default
@@ -7640,6 +7608,10 @@ transport.shutdown.wait=3
 transport.serialization=seata
 transport.compressor=none
 ```
+
+> 这里修改成自己的
+
+![image-20221213214709232](SpringCloud/image-20221213214709232.png)
 
 ### 3.新建数据库seata
 
@@ -7816,6 +7788,105 @@ CREATE TABLE IF NOT EXISTS `undo_log`
 >
 > 该操作跨越三个数据库，有两次远程调用，很明显会有分布式事务问题。
 
+### 父pom
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.atguigu</groupId>
+    <artifactId>cloud2020</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>seata-account-service2023</module>
+        <module>seata-order-service2021</module>
+        <module>seata-storage-service2022</module>
+
+    </modules>
+
+    <!--  父工程一定要打pom包  -->
+    <packaging>pom</packaging>
+
+    <!-- 统一管理jar包版本 -->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <junit.version>4.12</junit.version>
+        <log4j.version>1.2.17</log4j.version>
+        <lombok.version>1.16.18</lombok.version>
+        <mysql.version>5.1.47</mysql.version>
+        <druid.version>1.1.16</druid.version>
+        <mybatis.spring.boot.version>1.3.0</mybatis.spring.boot.version>
+    </properties>
+
+    <!-- 子模块继承之后，提供作用：锁定版本+子modlue不用写groupId和version  -->
+    <dependencyManagement>
+        <dependencies>
+            <!--spring boot 2.2.2-->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>2.2.2.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!--spring cloud Hoxton.SR12-->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Hoxton.SR12</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!--spring cloud alibaba-->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>2.2.9.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis.spring.boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <optional>true</optional>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>
+```
+
 ### 新建订单Order-Module
 
 > seata-order-service2021
@@ -7837,76 +7908,46 @@ CREATE TABLE IF NOT EXISTS `undo_log`
     <artifactId>seata-order-service2021</artifactId>
 
     <dependencies>
-        <!--nacos-->
+        <!--nacos-config-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+        <!--nacos-discovery-->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+
         </dependency>
         <!--seata-->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
-            <!--这个包有自带的，我们需要将他排除在外，我们导入自己包-->
             <exclusions>
                 <exclusion>
-                    <groupId>io.seata</groupId>
                     <artifactId>seata-spring-boot-starter</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-alibaba-seata</artifactId>
-            <version>2.1.0.RELEASE</version>
-            <!--这个包有自带的，我们需要将他排除在外，我们导入自己包-->
-            <exclusions>
-                <exclusion>
                     <groupId>io.seata</groupId>
-                    <artifactId>seata-all</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <!--我们导入自己包，版本和自己本地服务的一致-->
-        <dependency>
-            <groupId>io.seata</groupId>
-            <artifactId>seata-all</artifactId>
-            <version>1.5.1</version>
         </dependency>
         <dependency>
             <groupId>io.seata</groupId>
             <artifactId>seata-spring-boot-starter</artifactId>
             <version>1.5.1</version>
         </dependency>
-        
+
         <!--feign-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
-        <!--web-actuator-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-loadbalancer</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <!--mysql-druid-->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.37</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid-spring-boot-starter</artifactId>
-            <version>1.1.10</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mybatis.spring.boot</groupId>
-            <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>2.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -7914,15 +7955,44 @@ CREATE TABLE IF NOT EXISTS `undo_log`
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>1.18.20</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
 ```
 
 #### yaml
+
+![image-20221213214401278](SpringCloud/image-20221213214401278.png)
 
 ```yaml
 server:
@@ -7934,26 +8004,53 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8848
-    alibaba:
-      seata:
-        tx-service-group: default_tx_group
-        service:
-          vgroup-mapping:
-            default_tx_group: default
-        # 这里和配置文件中写的一样的
-        registry:
-          type: nacos
-          nacos:
-            namespace:
-            group: SEATA_GROUP
-            application: seata-server
+        server-addr: 127.0.0.1:8848
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/seata_order
+    url: jdbc:mysql://localhost:3306/seata_order?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
     username: root
     password: 123456
 
+seata:
+  # 默认关闭，如需启用spring.datasource.dynami.seata需要同时开启
+  enabled: true
+  # Seata 应用编号，默认为 ${spring.application.name}
+  application-id: ${spring.application.name}
+  # Seata 事务组编号，用于 TC 集群名。该配置需要与服务端提到的group相对应，也需要与下面的相对应
+  tx-service-group: default_tx_group
+  # 关闭自动代理
+  # enable-auto-data-source-proxy: flase
+  # 服务配置项
+  service:
+    # 虚拟组和分组的映射
+    vgroupMapping:
+      default_tx_group: default   #该配置需要与服务端提到的group相对应
+    grouplist:
+      default: 127.0.0.1:8091
+  config:
+    # support: nacos 、 consul 、 apollo 、 zk  、 etcd3
+    type: nacos
+    nacos:
+      server-addr: 127.0.0.1:8848
+      namespace: 0d03603d-ba22-45a0-aa56-b3f049f50d50
+      group: SEATA_GROUP
+      username: nacos
+      password: nacos
+      data-id: seataServer.properties
+    registry:
+      type: nacos
+      preferred-networks: 30.240.*
+      nacos:
+        application: seata-server
+        server-addr: 127.0.0.1:8848
+        group: SEATA_GROUP
+        namespace: 0d03603d-ba22-45a0-aa56-b3f049f50d50
+        cluster: default
+        username: nacos
+        password: nacos
+
+
+# 这里要设置false，被降级不会回滚什么的，具体自己百度。。。
 feign:
   hystrix:
     enabled: false
@@ -8301,76 +8398,46 @@ public class CommonResult<T>
     <artifactId>seata-storage-service2022</artifactId>
 
     <dependencies>
-        <!--nacos-->
+        <!--nacos-config-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+        <!--nacos-discovery-->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+
         </dependency>
         <!--seata-->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
-            <!--这个包有自带的，我们需要将他排除在外，我们导入自己包-->
             <exclusions>
                 <exclusion>
-                    <groupId>io.seata</groupId>
                     <artifactId>seata-spring-boot-starter</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-alibaba-seata</artifactId>
-            <version>2.1.0.RELEASE</version>
-            <!--这个包有自带的，我们需要将他排除在外，我们导入自己包-->
-            <exclusions>
-                <exclusion>
                     <groupId>io.seata</groupId>
-                    <artifactId>seata-all</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <!--我们导入自己包，版本和自己本地服务的一致-->
-        <dependency>
-            <groupId>io.seata</groupId>
-            <artifactId>seata-all</artifactId>
-            <version>1.5.1</version>
         </dependency>
         <dependency>
             <groupId>io.seata</groupId>
             <artifactId>seata-spring-boot-starter</artifactId>
             <version>1.5.1</version>
         </dependency>
-        
+
         <!--feign-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
-        <!--web-actuator-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-loadbalancer</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <!--mysql-druid-->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.37</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid-spring-boot-starter</artifactId>
-            <version>1.1.10</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mybatis.spring.boot</groupId>
-            <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>2.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -8378,15 +8445,44 @@ public class CommonResult<T>
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>1.18.20</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
 ```
 
 #### yaml
+
+![image-20221213214401278](SpringCloud/image-20221213214401278.png)
 
 ```yaml
 server:
@@ -8398,26 +8494,53 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8848
-    alibaba:
-      seata:
-        tx-service-group: default_tx_group
-        service:
-          vgroup-mapping:
-            default_tx_group: default
-        registry:
-          type: nacos
-          nacos:
-            namespace:
-            group: SEATA_GROUP
-            application: seata-server
+        server-addr: 127.0.0.1:8848
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/seata_storage
+    url: jdbc:mysql://localhost:3306/seata_order?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
     username: root
     password: 123456
 
+seata:
+  # 默认关闭，如需启用spring.datasource.dynami.seata需要同时开启
+  enabled: true
+  # Seata 应用编号，默认为 ${spring.application.name}
+  application-id: ${spring.application.name}
+  # Seata 事务组编号，用于 TC 集群名。该配置需要与服务端提到的group相对应，也需要与下面的相对应
+  tx-service-group: default_tx_group
+  # 关闭自动代理
+  # enable-auto-data-source-proxy: flase
+  # 服务配置项
+  service:
+    # 虚拟组和分组的映射
+    vgroupMapping:
+      default_tx_group: default   #该配置需要与服务端提到的group相对应
+    grouplist:
+      default: 127.0.0.1:8091
+  config:
+    # support: nacos 、 consul 、 apollo 、 zk  、 etcd3
+    type: nacos
+    nacos:
+      server-addr: 127.0.0.1:8848
+      namespace: 0d03603d-ba22-45a0-aa56-b3f049f50d50
+      group: SEATA_GROUP
+      username: nacos
+      password: nacos
+      data-id: seataServer.properties
+    registry:
+      type: nacos
+      preferred-networks: 30.240.*
+      nacos:
+        application: seata-server
+        server-addr: 127.0.0.1:8848
+        group: SEATA_GROUP
+        namespace: 0d03603d-ba22-45a0-aa56-b3f049f50d50
+        cluster: default
+        username: nacos
+        password: nacos
 
+
+# 这里要设置false，被降级不会回滚什么的，具体自己百度。。。
 feign:
   hystrix:
     enabled: false
@@ -8672,76 +8795,46 @@ public class CommonResult<T>
     <artifactId>seata-account-service2023</artifactId>
 
     <dependencies>
-        <!--nacos-->
+        <!--nacos-config-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+        <!--nacos-discovery-->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+
         </dependency>
         <!--seata-->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
-            <!--这个包有自带的，我们需要将他排除在外，我们导入自己包-->
             <exclusions>
                 <exclusion>
-                    <groupId>io.seata</groupId>
                     <artifactId>seata-spring-boot-starter</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-alibaba-seata</artifactId>
-            <version>2.1.0.RELEASE</version>
-            <!--这个包有自带的，我们需要将他排除在外，我们导入自己包-->
-            <exclusions>
-                <exclusion>
                     <groupId>io.seata</groupId>
-                    <artifactId>seata-all</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <!--我们导入自己包，版本和自己本地服务的一致-->
-        <dependency>
-            <groupId>io.seata</groupId>
-            <artifactId>seata-all</artifactId>
-            <version>1.5.1</version>
         </dependency>
         <dependency>
             <groupId>io.seata</groupId>
             <artifactId>seata-spring-boot-starter</artifactId>
             <version>1.5.1</version>
         </dependency>
-        
+
         <!--feign-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
-        <!--web-actuator-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-loadbalancer</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <!--mysql-druid-->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.37</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid-spring-boot-starter</artifactId>
-            <version>1.1.10</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mybatis.spring.boot</groupId>
-            <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>2.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -8749,19 +8842,48 @@ public class CommonResult<T>
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>1.18.20</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
 ```
 
 #### yaml
 
+![image-20221213214401278](SpringCloud/image-20221213214401278.png)
+
 ```yaml
 server:
-  port: 2023
+  port: 2021
 
 spring:
   application:
@@ -8769,26 +8891,52 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8848
-    alibaba:
-      seata:
-        tx-service-group: default_tx_group
-        service:
-          vgroup-mapping:
-            default_tx_group: default
-        registry:
-          type: nacos
-          nacos:
-            namespace:
-            group: SEATA_GROUP
-            application: seata-server
+        server-addr: 127.0.0.1:8848
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/seata_account
+    url: jdbc:mysql://localhost:3306/seata_order?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
     username: root
     password: 123456
 
+seata:
+  # 默认关闭，如需启用spring.datasource.dynami.seata需要同时开启
+  enabled: true
+  # Seata 应用编号，默认为 ${spring.application.name}
+  application-id: ${spring.application.name}
+  # Seata 事务组编号，用于 TC 集群名。该配置需要与服务端提到的group相对应，也需要与下面的相对应
+  tx-service-group: default_tx_group
+  # 关闭自动代理
+  # enable-auto-data-source-proxy: flase
+  # 服务配置项
+  service:
+    # 虚拟组和分组的映射
+    vgroupMapping:
+      default_tx_group: default   #该配置需要与服务端提到的group相对应
+    grouplist:
+      default: 127.0.0.1:8091
+  config:
+    # support: nacos 、 consul 、 apollo 、 zk  、 etcd3
+    type: nacos
+    nacos:
+      server-addr: 127.0.0.1:8848
+      namespace: 0d03603d-ba22-45a0-aa56-b3f049f50d50
+      group: SEATA_GROUP
+      username: nacos
+      password: nacos
+      data-id: seataServer.properties
+    registry:
+      type: nacos
+      preferred-networks: 30.240.*
+      nacos:
+        application: seata-server
+        server-addr: 127.0.0.1:8848
+        group: SEATA_GROUP
+        namespace: 0d03603d-ba22-45a0-aa56-b3f049f50d50
+        cluster: default
+        username: nacos
+        password: nacos
 
+# 这里要设置false，被降级不会回滚什么的，具体自己百度。。。
 feign:
   hystrix:
     enabled: false
@@ -9057,15 +9205,16 @@ public class CommonResult<T>
 
 ```
 
-##### 
+### 测试
+
+> - 访问http://localhost:2021/order/create?userId=1&productId=1&count=10&money=100
+> - 在AccountServiceImpl中会睡30s，我们使用openfeign调用服务，默认过1s就会报超时异常，当有异常会回滚
 
 
 
 
 
 
-
-[localhost:2021/order/create?userId=1&productId=1&count=10&money=100](http://localhost:2021/order/create?userId=1&productId=1&count=10&money=100)
 
 
 
