@@ -1,10 +1,13 @@
-title: Spring Cloud
+---
+<?xml version="1.0" encoding="UTF-8"?>title: Spring Cloud
 date: 2022-11-23 18:45:24
 tags:
-
 - Spring Cloud
 categories: 
 - 微服务
+---
+
+
 
 # 1.微服务概述
 
@@ -5167,7 +5170,7 @@ public class ConfigClientController {
 >
 > - 1.安装数据库，版本要求：5.6.5+
 >
-> - 2.初始化mysql数据库，数据库初始化文件：config/nacos-mysql.sql
+> - 2.初始化mysql数据库，数据库初始化文件：`config/nacos-mysql.sql`
 >
 >   ```mysql
 >    
@@ -5729,7 +5732,7 @@ public class ConfigClientController {
 
 <img src="SpringCloud/image-20221208224152458.png" alt="image-20221208224152458" style="zoom:67%;" />
 
-# [✔️SpringCloud Alibaba Sentinel实现熔断与限流](https://github.com/alibaba/Sentinel)
+# [15.✔️SpringCloud Alibaba Sentinel实现熔断与限流](https://github.com/alibaba/Sentinel)
 
 ## 概述
 
@@ -7374,3 +7377,1697 @@ spring:
 > - **平均 RT**：当单台机器上所有入口流量的平均 RT 达到阈值即触发系统保护，单位是毫秒。
 > - **并发线程数**：当单台机器上所有入口流量的并发线程数达到阈值即触发系统保护。
 > - **入口 QPS**：当单台机器上所有入口流量的 QPS 达到阈值即触发系统保护。
+
+# 16.✔️SpringCloud Alibaba Seata处理分布式事务
+
+## 分布式事务问题
+
+> - 单体应用被拆分成微服务应用，原来的三个模块被拆分成三个独立的应用，分别使用三个独立的数据源，业务操作需要调用三个服务来完成。此时每个服务内部的数据一致性由本地事务来保证，但是全局的数据一致性问题没法保证。
+> - 一次业务操作需要跨多个数据源或需要跨多个系统进行远程调用，就会产生分布式事务问题
+
+## Seata简介
+
+> - [官网](http://seata.io/zh-cn/)
+> - Seata是一款开源的分布式事务解决方案，致力于在微服务架构下提供高性能和简单易用的分布式事务服务。
+
+### 一个典型的分布式事务过程
+
+#### 一个ID+三个组件模型
+
+> - Transaction ID XID：全局唯一的事务ID
+> - TC (Transaction Coordinator) - 事务协调者：维护全局和分支事务的状态，驱动全局事务提交或回滚。
+> - TM (Transaction Manager) - 事务管理器：定义全局事务的范围：开始全局事务、提交或回滚全局事务。
+> - RM (Resource Manager) - 资源管理器：管理分支事务处理的资源，与TC交谈以注册分支事务和报告分支事务的状态，并驱动分支事务提交或回滚。
+
+#### 处理过程
+
+<img src="SpringCloud/image-20221212135247326.png" alt="image-20221212135247326" style="zoom:67%;" />
+
+> 1. TM 向 TC 申请开启一个全局事务，全局事务创建成功并生成一个全局唯一的 XID；
+> 2. XID 在微服务调用链路的上下文中传播；
+> 3. RM 向 TC 注册分支事务，将其纳入 XID 对应全局事务的管辖；
+> 4. TM 向 TC 发起针对 XID 的全局提交或回滚决议；
+> 5. TC 调度 XID 下管辖的全部分支事务完成提交或回滚请求。
+
+### SEATA 的分布式交易解决方案
+
+<img src="SpringCloud/image-20221212135543076.png" alt="image-20221212135543076" style="zoom:80%;" />
+
+## Seata-Server 1.5.1安装
+
+> 1.5之后的配置不一样了，我这里也没有弄完
+
+### 1.[下载地址](https://github.com/seata/seata/releases)
+
+> - 下载版本为`seata-server-1.5.1.zip`
+> - 1.5.0之后的版本安装不一样，之前版本安装看[SpringCloud Alibaba：Seata](https://juejin.cn/post/6854573210311229453#heading-5)
+
+### 2.修改`conf/application.yaml`配置文件
+
+> 配置项可以对比`application-example.yaml`，但是不要直接复制这个文件，这俩不相同
+
+![image-20221212144853602](SpringCloud/image-20221212144853602.png)
+
+![image-20221212145033058](SpringCloud/image-20221212145033058.png)
+
+![image-20221212145208635](SpringCloud/image-20221212145208635.png)
+
+```yaml
+server:
+  port: 7091
+
+spring:
+  application:
+    name: seata-server
+
+logging:
+  config: classpath:logback-spring.xml
+  file:
+    path: ${user.home}/logs/seata
+  extend:
+    logstash-appender:
+      destination: 127.0.0.1:4560
+    kafka-appender:
+      bootstrap-servers: 127.0.0.1:9092
+      topic: logback_to_logstash
+
+console:
+  user:
+    username: seata
+    password: seata
+
+seata:
+  config:
+    # support: nacos 、 consul 、 apollo 、 zk  、 etcd3
+    type: nacos
+    nacos:
+      server-addr: 127.0.0.1:8848
+      namespace:
+      group: SEATA_GROUP
+      username: nacos
+      password: nacos
+      ##if use MSE Nacos with auth, mutex with username/password attribute
+      #access-key: ""
+      #secret-key: ""
+      data-id: seataServer.properties
+  registry:
+    # support: nacos 、 eureka 、 redis 、 zk  、 consul 、 etcd3 、 sofa
+    type: nacos
+    preferred-networks: 30.240.*
+    nacos:
+      application: seata-server
+      server-addr: 127.0.0.1:8848
+      group: SEATA_GROUP
+      namespace:
+      cluster: default
+      username: nacos
+      password: nacos
+      ##if use MSE Nacos with auth, mutex with username/password attribute
+      #access-key: ""
+      #secret-key: ""
+  # 数据库也可以写到nacos的配置中，把这里注释掉
+  store:
+    # support: file 、 db 、 redis
+    mode: db
+    db:
+      datasource: druid
+      db-type: mysql
+      driver-class-name: com.mysql.jdbc.Driver
+      url: jdbc:mysql://127.0.0.1:3306/seata?rewriteBatchedStatements=true
+      user: root
+      password: 123456
+      min-conn: 5
+      max-conn: 100
+      global-table: global_table
+      branch-table: branch_table
+      lock-table: lock_table
+      distributed-lock-table: distributed_lock
+      query-limit: 100
+      max-wait: 5000
+#  server:
+#    service-port: 8091 #If not configured, the default is '${server.port} + 1000'
+  security:
+    secretKey: SeataSecretKey0c382ef121d778043159209298fd40bf3850a017
+    tokenValidityInMilliseconds: 1800000
+    ignore:
+      urls: /,/**/*.css,/**/*.js,/**/*.html,/**/*.map,/**/*.svg,/**/*.png,/**/*.ico,/console-fe/public/**,/api/v1/auth/login
+```
+
+> 数据库配置也可以写到nacos中，要把上面的数据库配置注释掉
+
+![image-20221212171632198](SpringCloud/image-20221212171632198.png)
+
+```properties
+service.vgroupMapping.abi_common_tx_group=default
+service.vgroupMapping.my_test_tx_group=default
+service.vgroupMapping.order_tx_group=default
+
+store.mode=db
+
+store.redis.host=127.0.0.1
+store.redis.port=6379
+store.redis.maxConn=10
+store.redis.minConn=1
+store.redis.database=0
+store.redis.queryLimit=100
+
+#store.lock.mode=db
+#store.session.mode=db
+#store.publicKey=
+
+store.db.datasource=druid
+store.db.dbType=mysql
+store.db.driverClassName=com.mysql.jdbc.Driver
+store.db.url=jdbc:mysql://192.168.1.11:3306/seata?useUnicode=true&rewriteBatchedStatements=true
+store.db.user=root
+store.db.password=123456
+store.db.minConn=5
+store.db.maxConn=30
+store.db.globalTable=global_table
+store.db.branchTable=branch_table
+store.db.distributedLockTable=distributed_lock
+store.db.queryLimit=100
+store.db.lockTable=lock_table
+store.db.maxWait=5000
+
+#Transaction rule configuration, only for the server
+server.recovery.committingRetryPeriod=1000
+server.recovery.asynCommittingRetryPeriod=1000
+server.recovery.rollbackingRetryPeriod=1000
+server.recovery.timeoutRetryPeriod=1000
+server.maxCommitRetryTimeout=-1
+server.maxRollbackRetryTimeout=-1
+server.rollbackRetryTimeoutUnlockEnable=false
+server.distributedLockExpireTime=10000
+server.xaerNotaRetryTimeout=60000
+server.session.branchAsyncQueueSize=5000
+server.session.enableBranchAsyncRemove=false
+
+#Transaction rule configuration, only for the client
+client.rm.asyncCommitBufferLimit=10000
+client.rm.lock.retryInterval=10
+client.rm.lock.retryTimes=30
+client.rm.lock.retryPolicyBranchRollbackOnConflict=true
+client.rm.reportRetryCount=5
+client.rm.tableMetaCheckEnable=true
+client.rm.tableMetaCheckerInterval=60000
+client.rm.sqlParserType=druid
+client.rm.reportSuccessEnable=false
+client.rm.sagaBranchRegisterEnable=false
+client.rm.sagaJsonParser=fastjson
+client.rm.tccActionInterceptorOrder=-2147482648
+client.tm.commitRetryCount=5
+client.tm.rollbackRetryCount=5
+client.tm.defaultGlobalTransactionTimeout=60000
+client.tm.degradeCheck=false
+client.tm.degradeCheckAllowTimes=10
+client.tm.degradeCheckPeriod=2000
+client.tm.interceptorOrder=-2147482648
+client.undo.dataValidation=true
+client.undo.logSerialization=jackson
+client.undo.onlyCareUpdateColumns=true
+server.undo.logSaveDays=7
+server.undo.logDeletePeriod=86400000
+client.undo.logTable=undo_log
+client.undo.compress.enable=true
+client.undo.compress.type=zip
+client.undo.compress.threshold=64k
+
+#For TCC transaction mode
+tcc.fence.logTableName=tcc_fence_log
+tcc.fence.cleanPeriod=1h
+
+#Log rule configuration, for client and server
+log.exceptionRate=100
+
+#Metrics configuration, only for the server
+metrics.enabled=false
+metrics.registryType=compact
+metrics.exporterList=prometheus
+metrics.exporterPrometheusPort=9898
+
+transport.type=TCP
+transport.server=NIO
+transport.heartbeat=true
+transport.enableTmClientBatchSendRequest=false
+transport.enableRmClientBatchSendRequest=true
+transport.enableTcServerBatchSendResponse=false
+transport.rpcRmRequestTimeout=30000
+transport.rpcTmRequestTimeout=30000
+transport.rpcTcRequestTimeout=30000
+transport.threadFactory.bossThreadPrefix=NettyBoss
+transport.threadFactory.workerThreadPrefix=NettyServerNIOWorker
+transport.threadFactory.serverExecutorThreadPrefix=NettyServerBizHandler
+transport.threadFactory.shareBossWorker=false
+transport.threadFactory.clientSelectorThreadPrefix=NettyClientSelector
+transport.threadFactory.clientSelectorThreadSize=1
+transport.threadFactory.clientWorkerThreadPrefix=NettyClientWorkerThread
+transport.threadFactory.bossThreadSize=1
+transport.threadFactory.workerThreadSize=default
+transport.shutdown.wait=3
+transport.serialization=seata
+transport.compressor=none
+```
+
+### 3.新建数据库seata
+
+> - 为数据库添加表；升级1.5.0前，请注意表结构变更，表结构详情请[点击此处](https://github.com/seata/seata/tree/1.5.0/script/server/db)
+> - 增加`distributed_lock`表用于`seata-server`异步任务调度 
+
+```sql
+-- -------------------------------- The script used when storeMode is 'db' --------------------------------
+-- the table to store GlobalSession data
+CREATE TABLE IF NOT EXISTS `global_table`
+(
+    `xid`                       VARCHAR(128) NOT NULL,
+    `transaction_id`            BIGINT,
+    `status`                    TINYINT      NOT NULL,
+    `application_id`            VARCHAR(32),
+    `transaction_service_group` VARCHAR(32),
+    `transaction_name`          VARCHAR(128),
+    `timeout`                   INT,
+    `begin_time`                BIGINT,
+    `application_data`          VARCHAR(2000),
+    `gmt_create`                DATETIME,
+    `gmt_modified`              DATETIME,
+    PRIMARY KEY (`xid`),
+    KEY `idx_status_gmt_modified` (`status` , `gmt_modified`),
+    KEY `idx_transaction_id` (`transaction_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+-- the table to store BranchSession data
+CREATE TABLE IF NOT EXISTS `branch_table`
+(
+    `branch_id`         BIGINT       NOT NULL,
+    `xid`               VARCHAR(128) NOT NULL,
+    `transaction_id`    BIGINT,
+    `resource_group_id` VARCHAR(32),
+    `resource_id`       VARCHAR(256),
+    `branch_type`       VARCHAR(8),
+    `status`            TINYINT,
+    `client_id`         VARCHAR(64),
+    `application_data`  VARCHAR(2000),
+    `gmt_create`        DATETIME(6),
+    `gmt_modified`      DATETIME(6),
+    PRIMARY KEY (`branch_id`),
+    KEY `idx_xid` (`xid`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+-- the table to store lock data
+CREATE TABLE IF NOT EXISTS `lock_table`
+(
+    `row_key`        VARCHAR(128) NOT NULL,
+    `xid`            VARCHAR(128),
+    `transaction_id` BIGINT,
+    `branch_id`      BIGINT       NOT NULL,
+    `resource_id`    VARCHAR(256),
+    `table_name`     VARCHAR(32),
+    `pk`             VARCHAR(36),
+    `status`         TINYINT      NOT NULL DEFAULT '0' COMMENT '0:locked ,1:rollbacking',
+    `gmt_create`     DATETIME,
+    `gmt_modified`   DATETIME,
+    PRIMARY KEY (`row_key`),
+    KEY `idx_status` (`status`),
+    KEY `idx_branch_id` (`branch_id`),
+    KEY `idx_xid_and_branch_id` (`xid` , `branch_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `distributed_lock`
+(
+    `lock_key`       CHAR(20) NOT NULL,
+    `lock_value`     VARCHAR(20) NOT NULL,
+    `expire`         BIGINT,
+    primary key (`lock_key`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+INSERT INTO `distributed_lock` (lock_key, lock_value, expire) VALUES ('AsyncCommitting', ' ', 0);
+INSERT INTO `distributed_lock` (lock_key, lock_value, expire) VALUES ('RetryCommitting', ' ', 0);
+INSERT INTO `distributed_lock` (lock_key, lock_value, expire) VALUES ('RetryRollbacking', ' ', 0);
+INSERT INTO `distributed_lock` (lock_key, lock_value, expire) VALUES ('TxTimeoutCheck', ' ', 0);
+```
+
+### 4.启动
+
+> - 先启动nacos，再启动seata
+> - 访问http://localhost:7091/，账号密码都是seata
+
+![image-20221212161412555](SpringCloud/image-20221212161412555.png)
+
+## 准备三个数据库
+
+> - seata_order：存储订单的数据库；
+>- seata_storage：存储库存的数据库；
+> - seata_account：存储账户信息的数据库。
+
+```mysql
+CREATE DATABASE seata_order;
+use seata_order;
+
+CREATE TABLE t_order (
+  `id` BIGINT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `user_id` BIGINT(11) DEFAULT NULL COMMENT '用户id',
+  `product_id` BIGINT(11) DEFAULT NULL COMMENT '产品id',
+  `count` INT(11) DEFAULT NULL COMMENT '数量',
+  `money` DECIMAL(11,0) DEFAULT NULL COMMENT '金额',
+  `status` INT(1) DEFAULT NULL COMMENT '订单状态：0：创建中；1：已完结' 
+) ENGINE=INNODB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+
+SELECT * FROM t_order;
+ 
+ 
+CREATE DATABASE seata_storage;
+use seata_storage;
+
+CREATE TABLE t_storage (
+ `id` BIGINT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+ `product_id` BIGINT(11) DEFAULT NULL COMMENT '产品id',
+ `total` INT(11) DEFAULT NULL COMMENT '总库存',
+ `used` INT(11) DEFAULT NULL COMMENT '已用库存',
+ `residue` INT(11) DEFAULT NULL COMMENT '剩余库存'
+) ENGINE=INNODB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+ 
+INSERT INTO seata_storage.t_storage(`id`, `product_id`, `total`, `used`, `residue`)
+VALUES ('1', '1', '100', '0', '100');
+ 
+SELECT * FROM t_storage;
+ 
+
+CREATE DATABASE seata_account;
+use seata_account;
+
+CREATE TABLE t_account (
+  `id` BIGINT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT 'id',
+  `user_id` BIGINT(11) DEFAULT NULL COMMENT '用户id',
+  `total` DECIMAL(10,0) DEFAULT NULL COMMENT '总额度',
+  `used` DECIMAL(10,0) DEFAULT NULL COMMENT '已用余额',
+  `residue` DECIMAL(10,0) DEFAULT '0' COMMENT '剩余可用额度'
+) ENGINE=INNODB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+ 
+INSERT INTO seata_account.t_account(`id`, `user_id`, `total`, `used`, `residue`)  VALUES ('1', '1', '1000', '0', '1000');
+ 
+SELECT * FROM t_account;
+```
+
+> - 三个库分别添加回滚日志表
+> - seata提供了[表](https://github.com/seata/seata/tree/1.5.0/script/client/at/db)
+
+```mysql
+-- for AT mode you must to init this sql for you business database. the seata server not need it.
+CREATE TABLE IF NOT EXISTS `undo_log`
+(
+    `branch_id`     BIGINT       NOT NULL COMMENT 'branch transaction id',
+    `xid`           VARCHAR(128) NOT NULL COMMENT 'global transaction id',
+    `context`       VARCHAR(128) NOT NULL COMMENT 'undo_log context,such as serialization',
+    `rollback_info` LONGBLOB     NOT NULL COMMENT 'rollback info',
+    `log_status`    INT(11)      NOT NULL COMMENT '0:normal status,1:defense status',
+    `log_created`   DATETIME(6)  NOT NULL COMMENT 'create datetime',
+    `log_modified`  DATETIME(6)  NOT NULL COMMENT 'modify datetime',
+    UNIQUE KEY `ux_undo_log` (`xid`, `branch_id`)
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8mb4 COMMENT ='AT transaction mode undo table';
+```
+
+<img src="SpringCloud/image-20221212162452105.png" alt="image-20221212162452105" style="zoom:67%;" />
+
+## 准备三个微服务
+
+> 这里我们会创建三个服务，一个订单服务，一个库存服务，一个账户服务。
+>
+> 当用户下单时，会在订单服务中创建一个订单，然后通过远程调用库存服务来扣减下单商品的库存，
+> 再通过远程调用账户服务来扣减用户账户里面的余额，
+> 最后在订单服务中修改订单状态为已完成。
+>
+> 该操作跨越三个数据库，有两次远程调用，很明显会有分布式事务问题。
+
+### 新建订单Order-Module
+
+> seata-order-service2021
+
+#### pom
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>cloud2020</artifactId>
+        <groupId>com.atguigu</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>seata-order-service2021</artifactId>
+
+    <dependencies>
+        <!--nacos-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <!--seata-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+            <!--这个包有自带的，我们需要将他排除在外，我们导入自己包-->
+            <exclusions>
+                <exclusion>
+                    <groupId>io.seata</groupId>
+                    <artifactId>seata-spring-boot-starter</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-alibaba-seata</artifactId>
+            <version>2.1.0.RELEASE</version>
+            <!--这个包有自带的，我们需要将他排除在外，我们导入自己包-->
+            <exclusions>
+                <exclusion>
+                    <groupId>io.seata</groupId>
+                    <artifactId>seata-all</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--我们导入自己包，版本和自己本地服务的一致-->
+        <dependency>
+            <groupId>io.seata</groupId>
+            <artifactId>seata-all</artifactId>
+            <version>1.5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.seata</groupId>
+            <artifactId>seata-spring-boot-starter</artifactId>
+            <version>1.5.1</version>
+        </dependency>
+        
+        <!--feign-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        <!--web-actuator-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!--mysql-druid-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.37</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>1.1.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+</project>
+```
+
+#### yaml
+
+```yaml
+server:
+  port: 2021
+
+spring:
+  application:
+    name: seata-order-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+    alibaba:
+      seata:
+        tx-service-group: default_tx_group
+        service:
+          vgroup-mapping:
+            default_tx_group: default
+        # 这里和配置文件中写的一样的
+        registry:
+          type: nacos
+          nacos:
+            namespace:
+            group: SEATA_GROUP
+            application: seata-server
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/seata_order
+    username: root
+    password: 123456
+
+feign:
+  hystrix:
+    enabled: false
+
+logging:
+  level:
+    io:
+      seata: info
+
+mybatis:
+  mapperLocations: classpath:mapper/*.xml
+```
+
+#### 主启动
+
+```java
+package com.atguigu.springcloud;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+
+
+@EnableDiscoveryClient
+@EnableFeignClients
+@SpringBootApplication
+public class SeataOrderMainApp2021 {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SeataOrderMainApp2021.class, args);
+    }
+}
+```
+
+#### 业务类
+
+##### OrderController
+
+```java
+package com.atguigu.springcloud.controller;
+
+import com.atguigu.springcloud.domain.CommonResult;
+import com.atguigu.springcloud.domain.Order;
+import com.atguigu.springcloud.service.OrderService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class OrderController {
+
+    @Autowired
+    private OrderService orderService;
+
+    /**
+     * 创建订单
+     */
+    @GetMapping("/order/create")
+    public CommonResult create(Order order) {
+        orderService.create(order);
+        return new CommonResult(200, "订单创建成功!");
+    }
+}
+ 
+ 
+```
+
+##### OrderService
+
+```java
+package com.atguigu.springcloud.service;
+
+
+import com.atguigu.springcloud.domain.Order;
+
+public interface OrderService {
+
+    /**
+     * 创建订单
+     */
+    void create(Order order);
+}
+```
+
+##### OrderServiceImpl
+
+```java
+package com.atguigu.springcloud.service.impl;
+
+
+import com.atguigu.springcloud.dao.OrderDao;
+import com.atguigu.springcloud.domain.Order;
+import com.atguigu.springcloud.service.AccountService;
+import com.atguigu.springcloud.service.OrderService;
+import com.atguigu.springcloud.service.StorageService;
+import io.seata.spring.annotation.GlobalTransactional;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+
+/**
+ * @auther zzyy
+ * @create 2019-12-11 16:50
+ */
+@Service
+@Slf4j
+public class OrderServiceImpl implements OrderService {
+    @Resource
+    private OrderDao orderDao;
+
+    @Resource
+    private StorageService storageService;
+
+    @Resource
+    private AccountService accountService;
+
+    /**
+     * 创建订单->调用库存服务扣减库存->调用账户服务扣减账户余额->修改订单状态
+     * 简单说：
+     * 下订单->减库存->减余额->改状态
+     */
+    @Override
+    @GlobalTransactional(name = "fsp-create-order", rollbackFor = Exception.class)
+    public void create(Order order) {
+        log.info("------->下单开始");
+        //本应用创建订单
+        orderDao.create(order);
+
+        //远程调用库存服务扣减库存
+        log.info("------->order-service中扣减库存开始");
+        storageService.decrease(order.getProductId(), order.getCount());
+        log.info("------->order-service中扣减库存结束");
+
+        //远程调用账户服务扣减余额
+        log.info("------->order-service中扣减余额开始");
+        accountService.decrease(order.getUserId(), order.getMoney());
+        log.info("------->order-service中扣减余额结束");
+
+        //修改订单状态为已完成
+        log.info("------->order-service中修改订单状态开始");
+        orderDao.update(order.getUserId(), 0);
+        log.info("------->order-service中修改订单状态结束");
+
+        log.info("------->下单结束");
+    }
+}
+ 
+```
+
+##### OrderDao
+
+```java
+package com.atguigu.springcloud.dao;
+
+
+import com.atguigu.springcloud.domain.Order;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+
+@Mapper
+public interface OrderDao {
+
+    /**
+     * 创建订单
+     */
+    void create(Order order);
+
+    /**
+     * 修改订单金额
+     */
+    void update(@Param("userId") Long userId, @Param("status") Integer status);
+}
+ 
+ 
+```
+
+##### OrderMapper.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.atguigu.springcloud.dao.OrderDao">
+
+    <resultMap id="BaseResultMap" type="com.atguigu.springcloud.domain.Order">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="product_id" property="productId" jdbcType="BIGINT"/>
+        <result column="count" property="count" jdbcType="INTEGER"/>
+        <result column="money" property="money" jdbcType="DECIMAL"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <insert id="create">
+        INSERT INTO `t_order` (`id`, `user_id`, `product_id`, `count`, `money`, `status`)
+        VALUES (NULL, #{userId}, #{productId}, #{count}, #{money}, 0);
+    </insert>
+
+    <update id="update">
+        UPDATE `t_order`
+        SET status = 1
+        WHERE user_id = #{userId} AND status = #{status};
+    </update>
+</mapper>
+```
+
+#### 服务调用
+
+##### AccountService
+
+```java
+package com.atguigu.springcloud.service;
+
+import com.atguigu.springcloud.domain.CommonResult;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.math.BigDecimal;
+
+
+@FeignClient(value = "seata-account-service")
+public interface AccountService {
+
+    /**
+     * 扣减账户余额
+     */
+    @PostMapping("/account/decrease")
+    CommonResult decrease(@RequestParam("userId") Long userId, @RequestParam("money") BigDecimal money);
+}
+ 
+ 
+```
+
+##### StorageService
+
+```java
+package com.atguigu.springcloud.service;
+
+import com.atguigu.springcloud.domain.CommonResult;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+
+@FeignClient(value = "seata-storage-service")
+public interface StorageService {
+
+    /**
+     * 扣减库存
+     */
+    @PostMapping(value = "/storage/decrease")
+    CommonResult decrease(@RequestParam("productId") Long productId, @RequestParam("count") Integer count);
+}
+
+```
+
+#### 其他类
+
+##### Order实体类
+
+```java
+package com.atguigu.springcloud.domain;
+
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Order {
+    private Long id;
+
+    private Long userId;
+
+    private Long productId;
+
+    private Integer count;
+
+    private BigDecimal money;
+
+    /**
+     * 订单状态：0：创建中；1：已完结
+     */
+    private Integer status;
+}
+ 
+```
+
+##### CommonResult统一返回类
+
+```java
+package com.atguigu.springcloud.domain;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class CommonResult<T>
+{
+    private Integer code;
+    private String  message;
+    private T       data;
+
+    public CommonResult(Integer code, String message)
+    {
+        this(code,message,null);
+    }
+}
+
+```
+
+
+
+### 新建库存Storage-Module
+
+> seata-storage-service2022
+
+#### pom
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>cloud2020</artifactId>
+        <groupId>com.atguigu</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>seata-storage-service2022</artifactId>
+
+    <dependencies>
+        <!--nacos-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <!--seata-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+            <!--这个包有自带的，我们需要将他排除在外，我们导入自己包-->
+            <exclusions>
+                <exclusion>
+                    <groupId>io.seata</groupId>
+                    <artifactId>seata-spring-boot-starter</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-alibaba-seata</artifactId>
+            <version>2.1.0.RELEASE</version>
+            <!--这个包有自带的，我们需要将他排除在外，我们导入自己包-->
+            <exclusions>
+                <exclusion>
+                    <groupId>io.seata</groupId>
+                    <artifactId>seata-all</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--我们导入自己包，版本和自己本地服务的一致-->
+        <dependency>
+            <groupId>io.seata</groupId>
+            <artifactId>seata-all</artifactId>
+            <version>1.5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.seata</groupId>
+            <artifactId>seata-spring-boot-starter</artifactId>
+            <version>1.5.1</version>
+        </dependency>
+        
+        <!--feign-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        <!--web-actuator-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!--mysql-druid-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.37</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>1.1.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+</project>
+```
+
+#### yaml
+
+```yaml
+server:
+  port: 2022
+
+spring:
+  application:
+    name: seata-storage-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+    alibaba:
+      seata:
+        tx-service-group: default_tx_group
+        service:
+          vgroup-mapping:
+            default_tx_group: default
+        registry:
+          type: nacos
+          nacos:
+            namespace:
+            group: SEATA_GROUP
+            application: seata-server
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/seata_storage
+    username: root
+    password: 123456
+
+
+feign:
+  hystrix:
+    enabled: false
+
+logging:
+  level:
+    io:
+      seata: info
+
+mybatis:
+  mapperLocations: classpath:mapper/*.xml
+```
+
+#### 主启动
+
+```java
+package com.atguigu.springcloud;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+
+
+@SpringBootApplication
+@EnableDiscoveryClient
+@EnableFeignClients
+public class SeataStorageServiceApplication2022 {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SeataStorageServiceApplication2022.class, args);
+    }
+
+}
+ 
+```
+
+#### 业务类
+
+##### StorageController
+
+```java
+package com.atguigu.springcloud.controller;
+
+
+import com.atguigu.springcloud.domain.CommonResult;
+import com.atguigu.springcloud.service.StorageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class StorageController {
+
+    @Autowired
+    private StorageService storageService;
+
+    /**
+     * 扣减库存
+     */
+    @RequestMapping("/storage/decrease")
+    public CommonResult decrease(Long productId, Integer count) {
+        storageService.decrease(productId, count);
+        return new CommonResult(200, "扣减库存成功！");
+    }
+}
+ 
+```
+
+##### StorageService
+
+```java
+package com.atguigu.springcloud.service;
+
+
+public interface StorageService {
+    /**
+     * 扣减库存
+     */
+    void decrease(Long productId, Integer count);
+}
+ 
+ 
+```
+
+##### StorageServiceImpl
+
+```java
+package com.atguigu.springcloud.service.impl;
+
+
+import com.atguigu.springcloud.dao.StorageDao;
+import com.atguigu.springcloud.service.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+
+
+@Service
+public class StorageServiceImpl implements StorageService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(StorageServiceImpl.class);
+
+    @Resource
+    private StorageDao storageDao;
+
+    /**
+     * 扣减库存
+     */
+    @Override
+    public void decrease(Long productId, Integer count) {
+        LOGGER.info("------->storage-service中扣减库存开始");
+        storageDao.decrease(productId, count);
+        LOGGER.info("------->storage-service中扣减库存结束");
+    }
+}
+ 
+ 
+```
+
+##### StorageDao
+
+```java
+package com.atguigu.springcloud.dao;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+@Mapper
+public interface StorageDao {
+
+    /**
+     * 扣减库存
+     */
+    void decrease(@Param("productId") Long productId, @Param("count") Integer count);
+}
+ 
+ 
+```
+
+##### StorageMapper.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="com.atguigu.springcloud.dao.StorageDao">
+
+    <resultMap id="BaseResultMap" type="com.atguigu.springcloud.domain.Storage">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="product_id" property="productId" jdbcType="BIGINT"/>
+        <result column="total" property="total" jdbcType="INTEGER"/>
+        <result column="used" property="used" jdbcType="INTEGER"/>
+        <result column="residue" property="residue" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <update id="decrease">
+        UPDATE t_storage
+        SET used    = used + #{count},
+            residue = residue - #{count}
+        WHERE product_id = #{productId}
+    </update>
+
+</mapper>
+```
+
+#### 其他类
+
+##### 实体类
+
+```java
+package com.atguigu.springcloud.domain;
+
+import lombok.Data;
+
+@Data
+public class Storage {
+
+    private Long id;
+
+    /**
+     * 产品id
+     */
+    private Long productId;
+
+    /**
+     * 总库存
+     */
+    private Integer total;
+
+    /**
+     * 已用库存
+     */
+    private Integer used;
+
+    /**
+     * 剩余库存
+     */
+    private Integer residue;
+}
+ 
+```
+
+##### CommonResult统一返回类
+
+```java
+package com.atguigu.springcloud.domain;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class CommonResult<T>
+{
+    private Integer code;
+    private String  message;
+    private T       data;
+
+    public CommonResult(Integer code, String message)
+    {
+        this(code,message,null);
+    }
+}
+
+```
+
+### 新建账户Account-Module
+
+> seata-account-service2023
+
+#### pom
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>cloud2020</artifactId>
+        <groupId>com.atguigu</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>seata-account-service2023</artifactId>
+
+    <dependencies>
+        <!--nacos-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <!--seata-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+            <!--这个包有自带的，我们需要将他排除在外，我们导入自己包-->
+            <exclusions>
+                <exclusion>
+                    <groupId>io.seata</groupId>
+                    <artifactId>seata-spring-boot-starter</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-alibaba-seata</artifactId>
+            <version>2.1.0.RELEASE</version>
+            <!--这个包有自带的，我们需要将他排除在外，我们导入自己包-->
+            <exclusions>
+                <exclusion>
+                    <groupId>io.seata</groupId>
+                    <artifactId>seata-all</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--我们导入自己包，版本和自己本地服务的一致-->
+        <dependency>
+            <groupId>io.seata</groupId>
+            <artifactId>seata-all</artifactId>
+            <version>1.5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.seata</groupId>
+            <artifactId>seata-spring-boot-starter</artifactId>
+            <version>1.5.1</version>
+        </dependency>
+        
+        <!--feign-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        <!--web-actuator-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!--mysql-druid-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.37</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>1.1.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+</project>
+```
+
+#### yaml
+
+```yaml
+server:
+  port: 2023
+
+spring:
+  application:
+    name: seata-account-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+    alibaba:
+      seata:
+        tx-service-group: default_tx_group
+        service:
+          vgroup-mapping:
+            default_tx_group: default
+        registry:
+          type: nacos
+          nacos:
+            namespace:
+            group: SEATA_GROUP
+            application: seata-server
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/seata_account
+    username: root
+    password: 123456
+
+
+feign:
+  hystrix:
+    enabled: false
+
+logging:
+  level:
+    io:
+      seata: info
+
+mybatis:
+  mapperLocations: classpath:mapper/*.xml
+```
+
+#### 主启动
+
+```java
+package com.atguigu.springcloud;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+
+@SpringBootApplication
+@EnableDiscoveryClient
+@EnableFeignClients
+public class SeataAccountMainApp2023
+{
+    public static void main(String[] args)
+    {
+        SpringApplication.run(SeataAccountMainApp2023.class, args);
+    }
+}
+ 
+```
+
+#### 业务类
+
+##### AccountController
+
+```java
+package com.atguigu.springcloud.controller;
+
+
+import com.atguigu.springcloud.domain.CommonResult;
+import com.atguigu.springcloud.service.AccountService;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+
+@RestController
+public class AccountController {
+
+    @Resource
+    AccountService accountService;
+
+    /**
+     * 扣减账户余额
+     */
+    @RequestMapping("/account/decrease")
+    public CommonResult decrease(@RequestParam("userId") Long userId, @RequestParam("money") BigDecimal money) {
+        accountService.decrease(userId, money);
+        return new CommonResult(200, "扣减账户余额成功！");
+    }
+}
+ 
+ 
+```
+
+##### AccountService
+
+```java
+package com.atguigu.springcloud.service;
+
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.math.BigDecimal;
+
+
+public interface AccountService {
+
+    /**
+     * 扣减账户余额
+     * @param userId 用户id
+     * @param money 金额
+     */
+    void decrease(@RequestParam("userId") Long userId, @RequestParam("money") BigDecimal money);
+}
+ 
+ 
+```
+
+##### AccountServiceImpl
+
+```java
+package com.atguigu.springcloud.service.impl;
+
+
+import com.atguigu.springcloud.dao.AccountDao;
+import com.atguigu.springcloud.service.AccountService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * 账户业务实现类
+ * Created by zzyy on 2019/11/11.
+ */
+@Service
+public class AccountServiceImpl implements AccountService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountServiceImpl.class);
+
+
+    @Resource
+    AccountDao accountDao;
+
+    /**
+     * 扣减账户余额
+     */
+    @Override
+    public void decrease(Long userId, BigDecimal money) {
+        LOGGER.info("------->account-service中扣减账户余额开始");
+        //模拟超时异常，全局事务回滚
+        //暂停几秒钟线程
+        try {
+            TimeUnit.SECONDS.sleep(30);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        accountDao.decrease(userId, money);
+        LOGGER.info("------->account-service中扣减账户余额结束");
+    }
+}
+  
+```
+
+##### AccountDao
+
+```java
+package com.atguigu.springcloud.dao;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+
+import java.math.BigDecimal;
+
+@Mapper
+public interface AccountDao {
+
+    /**
+     * 扣减账户余额
+     */
+    void decrease(@Param("userId") Long userId, @Param("money") BigDecimal money);
+}
+ 
+ 
+```
+
+##### AccountMapper.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.atguigu.springcloud.dao.AccountDao">
+
+    <resultMap id="BaseResultMap" type="com.atguigu.springcloud.domain.Account">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="total" property="total" jdbcType="DECIMAL"/>
+        <result column="used" property="used" jdbcType="DECIMAL"/>
+        <result column="residue" property="residue" jdbcType="DECIMAL"/>
+    </resultMap>
+
+    <update id="decrease">
+        UPDATE t_account
+        SET
+          residue = residue - #{money},used = used + #{money}
+        WHERE
+          user_id = #{userId};
+    </update>
+
+</mapper>
+```
+
+#### 其他类
+
+##### Account实体类
+
+```java
+package com.atguigu.springcloud.domain;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Account {
+
+    private Long id;
+
+    /**
+     * 用户id
+     */
+    private Long userId;
+
+    /**
+     * 总额度
+     */
+    private BigDecimal total;
+
+    /**
+     * 已用额度
+     */
+    private BigDecimal used;
+
+    /**
+     * 剩余额度
+     */
+    private BigDecimal residue;
+}
+ 
+ 
+```
+
+##### CommonResult统一返回类
+
+```java
+package com.atguigu.springcloud.domain;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class CommonResult<T>
+{
+    private Integer code;
+    private String  message;
+    private T       data;
+
+    public CommonResult(Integer code, String message)
+    {
+        this(code,message,null);
+    }
+}
+
+```
+
+##### 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```
+ERROR 7080 --- [eoutChecker_2_1] i.s.c.r.netty.NettyClientChannelManager  : can not get cluster name in registry config 'service.vgroupMapping.default_tx_group', please make sure registry config correct
+```
+
