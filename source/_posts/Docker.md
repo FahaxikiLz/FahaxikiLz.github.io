@@ -1151,3 +1151,225 @@ docker commit -m="描述信息" -a="作者" 容器id 目标镜像名:[TAG]docker
 ![在这里插入图片描述](Docker/20210721171339835.png)
 
 > 如果你想要保存当前容器的状态，就可以通过commit来提交，获得一个镜像，就好比我们我们使用虚拟机的快照。
+
+# 容器数据卷
+
+## 什么是容器数据卷？
+
+> docker的理念回顾
+>
+> 将应用和环境打包成一个镜像！
+>
+> 数据？如果数据都在容器中，那么我们容器删除，数据就会丢失！需求：数据可以持久化
+>
+> MySQL，容器删除了，删库跑路！需求：MySQL数据可以存储在本地！
+>
+> 容器之间可以有一个数据共享的技术！Docker容器中产生的数据，同步到本地！
+>
+> 这就是卷技术！目录的挂载，将我们容器内的目录，挂载到Linux上面！
+
+![在这里插入图片描述](Docker/20210721201603322.png)
+
+> 总结一句话：容器的持久化和同步操作！容器间也是可以数据共享的！
+
+## 使用数据卷
+
+> 方式一 ：直接使用命令挂载 -v
+
+```shell
+-v, --volume list Bind mount a volume
+
+docker run -it -v 主机目录:容器内目录    
+
+[root@iZ8vbgc3u6dvwrjyp45lyrZ home]# docker run -it -v /home/ceshi:/home centos /bin/bash
+
+#通过 docker inspect 容器id 查看
+```
+
+![在这里插入图片描述](Docker/20210721203421418.png)
+
+> 测试文件的同步
+
+![在这里插入图片描述](Docker/20210722090336334.png)
+
+> 再来测试！
+> 1、停止容器
+> 2、宿主机修改文件
+> 3、启动容器
+> 4、容器内的数据依旧是同步的
+
+![在这里插入图片描述](Docker/20210722090353939.png)
+
+## 实战：安装MySQL
+
+> 思考：MySQL的数据持久化的问题
+
+```shell
+# 获取mysql镜像
+➜ ~ docker pull mysql:5.7
+
+# 运行容器,需要做数据挂载 #安装启动mysql，需要配置密码的，这是要注意点！
+# 参考官网hub
+docker run --name some-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:tag
+
+#启动我们得
+-d 后台运行
+-p 端口映射
+-v 卷挂载
+-e 环境配置
+-- name 容器名字
+➜ ~ docker run -d -p 3306:3306 -v /home/mysql/conf:/etc/mysql/conf.d -v /home/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 --name mysql01 mysql:5.7
+
+# 启动成功之后，我们在本地使用sqlyog来测试一下
+
+# sqlyog-连接到服务器的3306--和容器内的3306映射
+
+# 在本地测试创建一个数据库，查看一下我们映射的路径是否ok！
+```
+
+![在这里插入图片描述](Docker/202107221051539.png)
+
+## 具名和匿名挂载
+
+```shell
+# 匿名挂载
+-v 容器内路径！
+docker run -d -p --name nginx01 -v /etc/nginx nginx
+
+# 查看所有的volume的情况
+[root@iZ8vbgc3u6dvwrjyp45lyrZ lib]# docker volume ls
+DRIVER    VOLUME NAME
+local     3df3ebf883092323908b31e21c761b56c937ee04ed51d418eedcc10df8d5f20a
+
+# 这里发现，这种就是匿名挂载，我们在 -v 只写了容器内的路径，没有写容器外的路径！
+
+# 具名挂载
+➜ ~ docker run -d -P --name nginx02 -v juming-nginx:/etc/nginx nginx
+➜ ~ docker volume ls
+DRIVER         VOLUME NAME
+local         juming-nginx
+
+# 通过 -v 卷名：容器内路径
+
+# 查看一下这个卷
+```
+
+![在这里插入图片描述](Docker/20210722142200514.png)
+
+> 所有的docker容器内的卷，没有指定目录的情况下都是在 `/var/lib/docker/volumes/xxx/_data`
+>
+> 我们通过具名挂载可以方便的找到我们的 一个卷，大多数情况使用的是 具名挂载
+
+```shell
+# 如何确定是具名挂载还是匿名挂载，还是指定路径挂载！
+
+-v 容器内路径          # 匿名挂载
+
+-v 卷名:容器内路径      # 具名挂载
+
+-v /宿主机路径:容器路径  # 指定路径挂载！
+```
+
+### 拓展
+
+```shell
+# 通过 -v 容器内路径： ro rw 改变读写权限
+ro readonly  # 只读
+rw readwrite # 可读可写
+
+# 一旦设置了容器权限，容器对我们挂载出来的内容就有限定了！
+docker run -d -P --name nginx05 -v juming:/etc/nginx:ro nginx
+docker run -d -P --name nginx05 -v juming:/etc/nginx:rw nginx
+
+# ro 只要看到ro就说明这个路径只能通过宿主机来操作，容器内部是无法操作！
+```
+
+## 在Dockerfile中挂载卷
+
+> Dockerfile 就是用来构建docker镜像的构建文件！
+>
+> 通过这个脚本可以生成镜像，镜像是一层一层的，脚本就是一个一个的命令
+
+```shell
+# 创建一个dockerfile文件，名字可以随机 建议 Dockerfile
+
+# 文件中的内容 指令（大写）参数
+FROM centos
+VOLUME ["/volume01", "/volume02"]
+CMD echo  "----end----------"
+CMD /bin/bash
+
+# 这里的每个命令，就是镜像的一层！
+docker build -f 构建镜像的构建文件地址 -t 镜像名称 .   #最后有一个 . 千万不要忘记
+```
+
+![在这里插入图片描述](Docker/20210722152622819.png)
+
+> 启动自己写的镜像
+
+![在这里插入图片描述](Docker/20210722153212255.png)
+
+> 这个卷和外部一定有一个同步的目录！
+
+![在这里插入图片描述](Docker/20210722155132469.png)
+
+> 查看一下卷挂载的路径
+
+```
+docker inspect 容器id
+```
+
+![在这里插入图片描述](Docker/20210722155018897.png)
+
+> 测试一下刚才的文件是否同步出去了！
+>
+> 这种方式使用的十分多，因为我们通常会构建自己的镜像！
+>
+> 假设构建镜像时候没有挂载卷，要手动镜像挂载 -v 卷名：容器内路径！
+
+## 数据卷容器
+
+> 多个MySQL同步数据！
+>
+> 命名的容器挂载数据卷！
+
+![在这里插入图片描述](Docker/509123ae482041b594dff90c81dd799c.png)
+
+> 启动3个容器，通过我们刚才自己写的镜像启动
+>
+> docker01是使用Dockerfile的挂载卷，共享是的volume01、volume02两个文件夹
+
+![在这里插入图片描述](Docker/dc3bb97cccc7034b8860dd00c9fcdf09.png)
+
+```shell
+--volumes-from list                Mount volumes from the specified container(s)
+# 测试，
+```
+
+![在这里插入图片描述](Docker/ade6838d7b0150f2678468edc41bf86c.png)
+
+![在这里插入图片描述](Docker/8f25073b40f7320ed453cadd9701ab43.png)
+
+![在这里插入图片描述](Docker/4d1a976f0ff841e5a046a37d999303a9.png)
+
+```shell
+# 串联
+# 测试，可以删除docker01，查看一下docker02 和 docker03 是否还可以访问这个文件
+
+# 测试，删除docker02，docker01hedocker02还可以共享数据
+```
+
+> 多个mysql实现数据共享
+
+```shell
+➜ ~ docker run -d -p 3306:3306 -v /home/mysql/conf:/etc/mysql/conf.d -v /home/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 --name mysql01 mysql:5.7
+
+➜ ~ docker run -d -p 3307:3306 -e MYSQL_ROOT_PASSWORD=123456 --name mysql02 --volumes-from mysql01 mysql:5.7
+# 这个时候，可以实现两个容器数据同步！
+```
+
+> 结论：
+>
+> 容器之间的配置信息的传递，数据卷容器的生命周期一直持续到没有容器使用为止。
+>
+> 但是一旦你持久化到了本地，这个时候，本地的数据是不会删除的！
