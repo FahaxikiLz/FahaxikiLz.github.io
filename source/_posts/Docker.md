@@ -9,7 +9,7 @@ categories:
 
 # Docker概述
 
-> 官网地址：[www.docker.com](https://www.docker.com/)
+> 官网地址：[Docker: Accelerated, Containerized Application Development](https://www.docker.com/)
 >
 > 文档地址：[Docker Documentation | Docker Documentation](https://docs.docker.com/)
 >
@@ -503,7 +503,7 @@ docker kill 容器id        # 强制停止当前容器
 ### 后台启动容器
 
 ```shell
-# 命令docker run -d 镜像名
+# 命令docker run -d 镜像名[:tag]    不加tag，默认找最近的版本
 [root@iZbp13qr3mm4ucsjumrlgqZ ~]# docker run -d centos
 
 # 问题：docker ps发现centos停止了
@@ -1373,3 +1373,304 @@ docker inspect 容器id
 > 容器之间的配置信息的传递，数据卷容器的生命周期一直持续到没有容器使用为止。
 >
 > 但是一旦你持久化到了本地，这个时候，本地的数据是不会删除的！
+
+# DockerFile
+
+## DockerFile介绍
+
+> dockerfile 是用来构建docker镜像的文件！命令参数脚本！
+>
+> 构建步骤：
+>
+> 1、 编写一个dockerfile文件
+>
+> 2、 docker build 构建称为一个镜像
+>
+> 3、 docker run运行镜像
+>
+> 4、 docker push发布镜像（DockerHub 、阿里云仓库)
+
+![在这里插入图片描述](Docker/3e9dde477bcd4f10a93d106af5501e81.png)
+
+![在这里插入图片描述](Docker/765a0bd85ff947fcb008bfc88ecf9cab.png)
+
+> 但是很多官方镜像都是基础包，很多功能没有，我们通常会自己搭建自己的镜像！
+>
+> 官方既然可以制作镜像，那我们也可以！
+
+## DockerFile构建过程
+
+> 基础知识：
+>
+> 1、每个保留关键字(指令）都是必须是大写字母
+>
+> 2、执行从上到下顺序
+>
+> 3、# 表示注释
+>
+> 4、每一个指令都会创建提交一个新的镜像层，并提交！
+
+![在这里插入图片描述](Docker/c40a1beeb33140e687c92a3ef54a0680.png)
+
+> Dockerfile是面向开发的，我们以后要发布项目，做镜像，就需要编写dockerfile文件，这个文件十分简单！
+>
+> Docker镜像逐渐成企业交付的标准，必须要掌握！
+>
+> DockerFile：构建文件，定义了一切的步骤，源代码
+>
+> DockerImages：通过DockerFile构建生成的镜像，最终发布和运行产品。
+>
+> Docker容器：容器就是镜像运行起来提供服务。
+
+## DockerFile常用指令
+
+```shell
+FROM             	# 基础镜像，一切从这里开始构建
+MAINTAINER        	# 镜像是谁写的， 姓名+邮箱
+RUN            		# 镜像构建的时候需要运行的命令
+ADD             	# 步骤，tomcat镜像，这个tomcat压缩包！添加内容 添加同目录
+WORKDIR         	# 镜像的工作目录
+VOLUME             	# 挂载的目录
+EXPOSE             	# 暴露端口配置
+CMD             	# 指定这个容器启动的时候要运行的命令，只有最后一个会生效，可被替代。
+ENTRYPOINT         	# 指定这个容器启动的时候要运行的命令，可以追加命令
+ONBUILD         	# 当构建一个被继承 DockerFile 这个时候就会运行ONBUILD的指令，触发指令。
+COPY             	# 类似ADD，将我们文件拷贝到镜像中
+ENV             	# 构建的时候设置环境变量！
+```
+
+### CMD 和 ENTRYPOINT区别
+
+```shell
+CMD             	# 指定这个容器启动的时候要运行的命令，只有最后一个会生效，可被替代。
+ENTRYPOINT         	# 指定这个容器启动的时候要运行的命令，可以追加命令
+```
+
+#### 测试cmd
+
+```shell
+# 编写dockerfile文件
+$ vim dockerfile-test-cmd
+FROM centos
+CMD ["ls","-a"]
+
+# 构建镜像
+$ docker build -f dockerfile-test-cmd -t cmd-test:0.1 .
+
+# 运行镜像
+$ docker run cmd-test:0.1
+.
+..
+.dockerenv
+bin
+dev
+
+# 想追加一个命令 -l 成为ls -al
+$ docker run cmd-test:0.1 -l
+docker: Error response from daemon: OCI runtime create failed:container_linux.go:349: starting container process caused "exec: \"-l\":executable file not found in $PATH": unknown.
+ERRO[0000] error waiting for container: context canceled
+
+# cmd的情况下 -l 替换了CMD["ls","-l"]。 -l 不是命令所有报错
+```
+
+#### 测试ENTRYPOINT
+
+```shell
+# 编写dockerfile文件
+$ vim dockerfile-test-entrypoint
+
+FROM centos
+ENTRYPOINT ["ls","-a"]
+
+$ docker run entrypoint-test:0.1
+.
+..
+.dockerenv
+bin
+dev
+etc
+home
+lib
+lib64
+lost+found ...
+
+# 我们的命令，是直接拼接在我们得ENTRYPOINT命令后面的
+$ docker run entrypoint-test:0.1 -l
+total 56
+drwxr-xr-x 1 root root 4096 May 16 06:32 .
+drwxr-xr-x 1 root root 4096 May 16 06:32 ..
+-rwxr-xr-x 1 root root 0 May 16 06:32 .dockerenv
+lrwxrwxrwx 1 root root 7 May 11 2019 bin -> usr/bin
+drwxr-xr-x 5 root root 340 May 16 06:32 dev
+drwxr-xr-x 1 root root 4096 May 16 06:32 etc
+drwxr-xr-x 2 root root 4096 May 11 2019 home
+lrwxrwxrwx 1 root root 7 May 11 2019 lib -> usr/lib
+lrwxrwxrwx 1 root root 9 May 11 2019 lib64 -> usr/lib64 ....
+```
+
+## 练习
+
+> Docker Hub中 99% 镜像都是从这个基础镜像过来的`FROM scratch` , 然后配置需要的软件和配置来进行的构建
+
+![在这里插入图片描述](Docker/1e323c4feaf9415cbc0a79e7e2418c90.png)
+
+> 创建一个自己的centos
+
+```shell
+# 1.编写Dockerfile文件
+vim mydockerfile-centos
+
+FROM centos
+MAINTAINER cheng<1204598429@qq.com>
+ENV MYPATH /usr/local
+WORKDIR $MYPATH
+RUN yum -y install vim
+RUN yum -y install net-tools
+EXPOSE 80
+CMD echo $MYPATH
+CMD echo "-----end----"
+CMD /bin/bash
+
+# 2、通过这个文件构建镜像
+# 命令 docker build -f 文件路径 -t 镜像名:[tag] .
+docker build -f mydockerfile-centos -t mycentos:0.1 .
+Successfully built f22b7b27d5d2
+Successfully tagged mycentos:0.1
+
+# 3、测试运行
+docker images
+docker run -it mycentos:0.1  #我们构建的时候写版本号了，使用镜像名运行不加版本号就是运行最新的，加版本号，是运行我们刚才制作的
+```
+
+> 对比：之前的原生的centos
+
+![在这里插入图片描述](Docker/77f72fde47d945708933e95b6bb2fb7a.png)
+
+> 我们增加之后的镜像
+
+![在这里插入图片描述](Docker/886c3935a4e74b8198ba8750866fe32c.png)
+
+> 我们平时拿到一个镜像，可以研究一下它是怎么做的？
+
+![在这里插入图片描述](Docker/0911c9df057342489a5ed0318a68d494.png)
+
+## 实战：Tomcat镜像
+
+> 1、准备镜像文件
+>
+> 准备tomcat 和 jdk到当前目录，编写好README 。
+>
+> 2、编写dokerfile
+
+```shell
+ FROM centos:7
+ MAINTAINER sywl<xxxx@qq.com>
+ COPY readme.txt /usr/local/readme.txt
+ ADD jdk-8u271-linux-x64.tar.gz /usr/local/
+ ADD apache-tomcat-9.0.5.tar.gz /usr/local/
+ RUN yum -y install vim
+ ENV MYPATH /usr/local
+ WORKDIR $MYPATH
+ ENV JAVA_HOME /usr/local/jdk1.8.0_271
+ ENV CLASS_PATH $JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+ ENV CATALINA_HOME /usr/local/apache-tomcat-9.0.5
+ ENV CATALINA_BASH /usr/local/apache-tomcat-9.0.5
+ ENV PATH $PATH:$JAVA_HOME/bin:$CATALINA_HOME/lib:$CATALINA_HOME/bin
+ EXPOSE 8080
+ CMD /usr/local/apache-tomcat-9.0.5/bin/startup.sh && tail -F /usr/local/apache-tomcat-9.0.5/bin/logs/catalina.out
+```
+
+> 3、构建镜像
+
+```shell
+# 因为dockerfile命名使用默认命名 因此不用使用-f 指定文件
+
+$ docker build -t mytomcat:0.1 .
+```
+
+> 4、run镜像
+
+```shell
+$ docker run -d -p 8080:8080 --name tomcat01 -v /home/kuangshen/build/tomcat/test:/usr/local/apache-tomcat-9.0.35/webapps/test -v /home/kuangshen/build/tomcat/tomcatlogs/:/usr/local/apache-tomcat-9.0.35/logs
+mytomcat:0.1
+```
+
+> 5、访问测试
+>
+> 6、发布项目(由于做了卷挂载，我们直接在本地编写项目就可以发布了！)
+>
+> 发现：项目部署成功，可以直接访问！
+>
+> 我们以后开发的步骤：需要掌握Dockerfile的编写！我们之后的一切都是使用docker镜像来发布运行！
+
+# 发布自己的镜像
+
+## 发布到Docker Hub上
+
+> 1、地址 https://hub.docker.com/
+>
+> 2、确定这个账号可以登录
+>
+> 3、登录
+
+```shell
+$ docker login --help
+Usage: docker login [OPTIONS] [SERVER]
+Log in to a Docker registry.
+If no server is specified, the default is defined by the daemon.
+Options:
+-p, --password string Password
+--password-stdin Take the password from stdin
+-u, --username string Username
+```
+
+> 4、提交 push镜像.
+
+```shell
+# push自己的镜像到服务器上！
+$ docker push diytomcat
+```
+
+![在这里插入图片描述](Docker/33e5c9d809c049e59bf62d2e455535cd.png)
+
+```shell
+# 会发现push不上去，因为如果没有前缀的话默认是push到 官方的library
+# 解决方法
+
+# 第一种 build的时候添加你的dockerhub用户名，然后在push就可以放到自己的仓库了
+$ docker build -t chengcoder/mytomcat:0.1 .
+
+# 第二种,增加一个tag
+[root@iZbp13qr3mm4ucsjumrlgqZ tomcat]# docker tag 6a5eb12e1252 账号id/tomcat:1.0
+# docker push即可；自己发布的镜像尽量带上版本号
+[root@iZbp13qr3mm4ucsjumrlgqZ tomcat]# docker push 账号id/tomcat:1.0
+```
+
+![在这里插入图片描述](Docker/5e8f3ade8f7947f2a154c40c4b58d5ca.png)
+
+> 提交的时候也是按照镜像的层级来提交的！
+
+## 阿里云镜像服务上
+
+> 1、登录阿里云
+>
+> 2、找到容器镜像服务
+>
+> 3、创建命名空间
+>
+> 4、创建容器镜像
+>
+> 看官网 很详细https://cr.console.aliyun.com/repository/
+
+```shell
+$ sudo docker login --username=zchengx registry.cn-shenzhen.aliyuncs.com
+$ sudo docker tag [ImageId] registry.cn-shenzhen.aliyuncs.com/dsadxzc/cheng:[镜像版本号]
+# 修改id 和 版本
+sudo docker tag a5ef1f32aaae registry.cn-shenzhen.aliyuncs.com/dsadxzc/cheng:1.0
+# 修改版本
+$ sudo docker push registry.cn-shenzhen.aliyuncs.com/dsadxzc/cheng:[镜像版本号]
+```
+
+## 小结
+
+![在这里插入图片描述](Docker/ad5af27b75304b8ba2a4bf7a7163a9cd.png)
