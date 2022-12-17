@@ -1638,7 +1638,7 @@ $ docker push diytomcat
 # 解决方法
 
 # 第一种 build的时候添加你的dockerhub用户名，然后在push就可以放到自己的仓库了
-$ docker build -t chengcoder/mytomcat:0.1 .
+$ docker build -t 账号id/mytomcat:0.1 .
 
 # 第二种,增加一个tag
 [root@iZbp13qr3mm4ucsjumrlgqZ tomcat]# docker tag 6a5eb12e1252 账号id/tomcat:1.0
@@ -1674,3 +1674,323 @@ $ sudo docker push registry.cn-shenzhen.aliyuncs.com/dsadxzc/cheng:[镜像版本
 ## 小结
 
 ![在这里插入图片描述](Docker/ad5af27b75304b8ba2a4bf7a7163a9cd.png)
+
+# Docker 网络
+
+## 理解Docker 0
+
+![在这里插入图片描述](Docker/94d1f7f7ffd74e13a8f055ce6dc9c6e4.png)
+
+>问题： docker 是如果处理容器网络访问的？
+
+```shell
+# 测试 运行一个tomcat
+$ docker run -d --name tomcat01 tomcat
+
+$ ip addr
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether 00:16:3e:13:78:90 brd ff:ff:ff:ff:ff:ff
+    inet 172.23.104.112/20 brd 172.23.111.255 scope global dynamic eth0
+       valid_lft 314146894sec preferred_lft 314146894sec
+3: docker0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether 02:42:c9:5a:27:6c brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
+       valid_lft forever preferred_lft forever
+441: veth049f362@if440: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master docker0 state UP group default 
+    link/ether ea:55:6c:48:c4:7e brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    
+$ docker exec -it 容器id
+$ ip addr
+# 查看容器内部网络地址 发现容器启动的时候会得到一个 eth0@if551 ip地址，docker分配的！
+550: eth0@if551: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue
+state UP group default
+link/ether 02:42:ac:11:00:02 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+inet 172.17.0.2/16 brd 172.17.255.255 scope global eth0
+valid_lft forever preferred_lft forever
+
+# 思考？ linux能不能ping通容器内部！ 可以 容器内部可以ping通外界吗？ 可以！
+$ ping 172.17.0.2
+PING 172.17.0.2 (172.17.0.2) 56(84) bytes of data.
+64 bytes from 172.17.0.2: icmp_seq=1 ttl=64 time=0.069 ms
+64 bytes from 172.17.0.2: icmp_seq=2 ttl=64 time=0.074 ms
+
+# linux 可以ping 通docker容器内部
+```
+
+### 原理
+
+> 1、我们每启动一个docker容器，Docker就会给docker容器分配一个ip，我们只要安装了docker，就会有一个docker0桥接模式，使用的技术是 veth-pair 技术！
+>
+> https://www.cnblogs.com/bakari/p/10613710.html
+>
+> 再次测试ip addr
+
+![在这里插入图片描述](Docker/7c612b1f3ff949e587e96a48a6ab584f.png)
+
+> 2 、在启动一个容器测试，发现又多了一对网络
+
+![在这里插入图片描述](Docker/f170b48be44743ae9877c723fc7248a2.png)
+
+> 我们发现这个容器带来网卡，都是一对对的
+>
+> **veth-pair** 就是一对的虚拟设备接口，他们都是成对出现的，一端连着协议，一端彼此相连，正因为有这个特性 veth-pair 充当一个桥梁，连接各种虚拟网络设备的OpenStac,Docker容器之间的连接，OVS的连接，都是使用evth-pair技术
+>
+> 3、我们来测试下tomcat01和tomcat02是否可以ping通
+
+```SHELL
+$ docker-tomcat docker exec -it tomcat01 ip addr #获取 tomcat01 的ip
+172.17.0.2
+550: eth0@if551: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue
+state UP group default
+link/ether 02:42:ac:11:00:02 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+inet 172.17.0.2/16 brd 172.17.255.255 scope global eth0
+valid_lft forever preferred_lft forever
+$ docker-tomcat docker exec -it tomcat02 ping 172.17.0.2 #让tomcat02 ping tomcat01
+PING 172.17.0.2 (172.17.0.2) 56(84) bytes of data.
+64 bytes from 172.17.0.2: icmp_seq=1 ttl=64 time=0.098 ms
+64 bytes from 172.17.0.2: icmp_seq=2 ttl=64 time=0.071 ms
+
+#  结论：容器和容器之间是可以互相ping通的
+```
+
+![在这里插入图片描述](Docker/cce22e1584b349f69aa07c6a01ad9d1e.png)
+
+> **结论**：tomcat01和tomcat02公用一个路由器，docker0。
+>
+> 所有的容器不指定网络的情况下，都是docker0路由的，docker会给我们的容器分配一个默认的可用ip。
+>
+> 小结： Docker使用的是Linux的桥接，宿主机是一个Docker容器的网桥 docker0
+
+![在这里插入图片描述](Docker/690de016b877403296c0ec5edd23e370.png)
+
+> Docker 中的所有的网络接口都是虚拟的。虚拟的转发效率高！
+>
+> 只要容器删除，对应网桥一对就没了！
+
+![在这里插入图片描述](Docker/16e851ba1eb142059cb0461d5ecc2f30.png)
+
+> 思考一个场景：我们编写了一个微服务，database url=ip: ，项目不重启，数据库ip换了，我们希望可以处理这个问题，可以通过名字来进行访问容器？
+
+## --link
+
+```shell
+# 通过服务名ping不通；如何解决？
+[root@iZbp13qr3mm4ucsjumrlgqZ ~]# docker exec -it tomcat02 ping tomcat01
+ping: tomcat01: Name or service not known
+
+# 通过--link可以解决网络连接问题。
+[root@iZbp13qr3mm4ucsjumrlgqZ ~]# docker run -d -P --name tomcat03 --link tomcat02 tomcat:7.0
+2393eecb870e5755068ea8b7d8bdcdd0f1ff110534c3359384413677c651bec4
+[root@iZbp13qr3mm4ucsjumrlgqZ ~]# docker exec -it tomcat03 ping tomcat02
+PING tomcat02 (172.17.0.3) 56(84) bytes of data.
+64 bytes from tomcat02 (172.17.0.3): icmp_seq=1 ttl=64 time=0.085 ms
+64 bytes from tomcat02 (172.17.0.3): icmp_seq=2 ttl=64 time=0.055 ms
+
+# 反向可以ping通吗？（不可以）
+[root@iZbp13qr3mm4ucsjumrlgqZ ~]# docker exec -it tomcat02 ping tomcat03
+ping: tomcat03: Name or service not known
+```
+
+> **探究：** docker network inspect 网络id 网段相同
+> docker inspect tomcat03
+
+![img](Docker/kuangstudyb4c2cdd5-23f7-4cd0-bbdc-a6c843187c99.jpg)
+
+> 其实这个tomcat03 就是本地配置了tomcat02的配置
+
+![在这里插入图片描述](Docker/ac76669d0bae4229914b73e2ffdf98a9.png)
+
+> –link 本质就是在hosts配置中添加映射
+>
+> 现在使用Docker已经不建议使用–link了！
+>
+> 自定义网络，不使用docker0！
+>
+> docker0问题：不支持容器名连接访问！
+
+## 自定义网络
+
+```shell
+$ docker network --help
+connect -- Connect a container to a network
+create -- Creates a new network with a name specified by the
+disconnect -- Disconnects a container from a network
+inspect -- Displays detailed information on a network
+ls -- Lists all the networks created by the user
+prune -- Remove all unused networks
+rm -- Deletes one or more networks
+```
+
+> 查看所有的docker网络
+
+![在这里插入图片描述](Docker/04d730e68bd844809461e19c9482c9ad.png)
+
+### 网络模式
+
+> bridge ：桥接 docker（默认，自己创建也是使用bridge模式）
+>
+> none ：不配置网络，一般不用
+>
+> host ：和所主机共享网络
+>
+> container ：容器网络连通（用得少！局限很大）
+
+### 测试
+
+```shell
+# 我们直接启动的命令默认添加--net bridge,而这个就是我们得docker0
+# bridge就是docker0
+$ docker run -d -P --name tomcat01 tomcat
+等价于 => docker run -d -P --name tomcat01 --net bridge tomcat
+# docker0，特点：默认，域名不能访问。 --link可以打通连接，但是很麻烦！
+
+# 我们可以 自定义一个网络
+# --driver bridge			桥接模式
+# --subnet 192.168.0.0/16  	子网
+# --gateway 192.168.0.1    	网关
+$ docker network create --driver bridge --subnet 192.168.0.0/16 --gateway 192.168.0.1 mynet
+```
+
+![在这里插入图片描述](Docker/5101c9a64b8844948d2a1f74144db313.png)
+
+```shell
+$ docker network inspect mynet
+```
+
+![在这里插入图片描述](Docker/f7695ce6d1e041e5ad49c5ae36ff3ef9.png)
+
+> 启动两个tomcat,再次查看网络情况
+
+```shell
+[root@iZ8vbgc3u6dvwrjyp45lyrZ ~]# docker run -d -P --name tomcat-net-01 --net mynet tomcat
+8f3b8236b5d9d149612d1dbe6b533c21601cfd7392cb5bf226a8427b5fc1b3e3
+[root@iZ8vbgc3u6dvwrjyp45lyrZ ~]# docker run -d -P --name tomcat-net-02 --net mynet tomcat
+3279bc773cacaa51368f4417e42159732f046c0d300ce881fb0a598663e79779
+
+
+[root@iZ8vbgc3u6dvwrjyp45lyrZ ~]# docker network inspect mynet
+[
+    {
+        "Name": "mynet",
+        "Id": "be05f1f6f6909cee0d1e868acb718c47c3e2efb9f5f33ccc38b6955ae6fb3578",
+        "Created": "2021-07-26T11:11:10.09948571+08:00",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "192.168.0.0/16",
+                    "Gateway": "192.168.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "3279bc773cacaa51368f4417e42159732f046c0d300ce881fb0a598663e79779": {
+                "Name": "tomcat-net-02",
+                "EndpointID": "0d31467ee4bc86d1b55d1889a07b468b57aeb82a9b23bbb2e2df5632d158ac0f",
+                "MacAddress": "02:42:c0:a8:00:03",
+                "IPv4Address": "192.168.0.3/16",
+                "IPv6Address": ""
+            },
+            "8f3b8236b5d9d149612d1dbe6b533c21601cfd7392cb5bf226a8427b5fc1b3e3": {
+                "Name": "tomcat-net-01",
+                "EndpointID": "7ae56746e954749dfd52c5f2965cc667d307b198f792175cca80040aed59eb52",
+                "MacAddress": "02:42:c0:a8:00:02",
+                "IPv4Address": "192.168.0.2/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {},
+        "Labels": {}
+    }
+]
+
+# 再次测试 ping 连接
+[root@iZ8vbgc3u6dvwrjyp45lyrZ ~]# docker exec -it  tomcat-net-01 ping 192.168.0.3
+PING 192.168.0.3 (192.168.0.3) 56(84) bytes of data.
+64 bytes from 192.168.0.3: icmp_seq=1 ttl=64 time=0.135 ms
+64 bytes from 192.168.0.3: icmp_seq=2 ttl=64 time=0.099 ms
+
+# 现在不使用--link也可以ping名字了
+[root@iZ8vbgc3u6dvwrjyp45lyrZ ~]# docker exec -it tomcat-net-01 ping tomcat-net-02
+PING tomcat-net-02 (192.168.0.3) 56(84) bytes of data.
+64 bytes from tomcat-net-02.mynet (192.168.0.3): icmp_seq=1 ttl=64 time=0.095 ms
+64 bytes from tomcat-net-02.mynet (192.168.0.3): icmp_seq=2 ttl=64 time=0.108 ms
+64 bytes from tomcat-net-02.mynet (192.168.0.3): icmp_seq=3 ttl=64 time=0.093 ms
+```
+
+> 在自定义的网络下，服务可以互相ping通，不用使用--link
+>
+> 我们自定义的网络docker当我们维护好了对应的关系，推荐我们平时这样使用网络！
+>
+> 好处：
+>
+> - redis -不同的集群使用不同的网络，保证集群是安全和健康的
+> - mysql-不同的集群使用不同的网络，保证集群是安全和健康的
+
+![在这里插入图片描述](Docker/6184a7c2d3b3460983a5463dafb0f05f.png)
+
+## 网络连通
+
+```shell
+# tomcat01在docker0网络下，tomcat-net-01在mynet网络下；
+# tomcat01 ping tomcat-net-01是ping不通的
+[root@iZbp13qr3mm4ucsjumrlgqZ ~]# docker exec -it tomcat01 ping tomcat-net-01
+ping: tomcat-net-01: Name or service not known
+```
+
+> 容器和mynet网络需要打通
+
+![img](Docker/kuangstudy06b13128-bb64-478b-8f97-5aff19bc2536.jpg)
+
+> 打通命令
+
+<img src="Docker/kuangstudyec3a2bcc-43e6-4081-ae71-55e6c425c046.jpg" alt="img" style="zoom:120%;" />
+
+
+
+![在这里插入图片描述](Docker/44d046a5c4b74e6ebb4e890ba3067a7b.png)
+
+```shell
+# 测试：打通tomcat01连接mynet
+docker network connect mynet tomcat01
+# 连通之后就是将tomcat01放到了mynet网络下
+# 一个容器两个ip地址！I
+# 阿里云服务：公网ip和私网ip
+```
+
+> 要将tomcat01 连通 tomcat—net-01 ，连通就是将 tomcat01加到 mynet网络
+>
+> 一个容器两个ip（tomcat01）
+
+![vv](Docker/74df32fa98d74030bc7543cc36289c69.png)
+
+```shell
+# 01 连通ok
+[root@iZ8vbgc3u6dvwrjyp45lyrZ ~]# docker exec -it tomcat01 ping tomcat-net-01
+PING tomcat-net-01 (192.168.0.2) 56(84) bytes of data.
+64 bytes from tomcat-net-01.mynet (192.168.0.2): icmp_seq=1 ttl=64 time=0.130 ms
+64 bytes from tomcat-net-01.mynet (192.168.0.2): icmp_seq=2 ttl=64 time=0.097 ms
+64 bytes from tomcat-net-01.mynet (192.168.0.2): icmp_seq=3 ttl=64 time=0.106 ms
+64 bytes from tomcat-net-01.mynet (192.168.0.2): icmp_seq=4 ttl=64 time=0.109 ms
+
+# 02 是依旧打不通的
+[root@iZ8vbgc3u6dvwrjyp45lyrZ ~]# docker exec -it tomcat02 ping tomcat-net-01
+ping: tomcat-net-01: Name or service not known
+```
+
+> 结论：假设要跨网络操作别人，就需要使用 docker network connect 连通！
