@@ -1955,13 +1955,11 @@ ping: tomcat-net-01: Name or service not known
 
 > 容器和mynet网络需要打通
 
-![img](Docker/kuangstudy06b13128-bb64-478b-8f97-5aff19bc2536.jpg)
+<img src="Docker/kuangstudy06b13128-bb64-478b-8f97-5aff19bc2536.jpg" alt="img" style="zoom:80%;" />
 
 > 打通命令
 
 <img src="Docker/kuangstudyec3a2bcc-43e6-4081-ae71-55e6c425c046.jpg" alt="img" style="zoom:120%;" />
-
-
 
 ![在这里插入图片描述](Docker/44d046a5c4b74e6ebb4e890ba3067a7b.png)
 
@@ -1994,3 +1992,114 @@ ping: tomcat-net-01: Name or service not known
 ```
 
 > 结论：假设要跨网络操作别人，就需要使用 docker network connect 连通！
+
+## 实战：部署Redis集群
+
+![在这里插入图片描述](Docker/5d90a471e0a34f2bafd51a05be204bf9.png)
+
+```shell
+# 创建网卡
+docker network create redis --subnet 172.38.0.0/16
+
+# 通过脚本创建六个redis配置
+for port in $(seq 1 6);\
+do \
+mkdir -p /mydata/redis/node-${port}/conf
+touch /mydata/redis/node-${port}/conf/redis.conf
+cat << EOF >> /mydata/redis/node-${port}/conf/redis.conf
+port 6379
+bind 0.0.0.0
+cluster-enabled yes
+cluster-config-file nodes.conf
+cluster-node-timeout 5000
+cluster-announce-ip 172.38.0.1${port}
+cluster-announce-port 6379
+cluster-announce-bus-port 16379
+appendonly yes
+EOF
+done
+
+# 通过脚本运行六个redis
+for port in $(seq 1 6);\
+docker run -p 637${port}:6379 -p 1667${port}:16379 --name redis-${port} \
+-v /mydata/redis/node-${port}/data:/data \
+-v /mydata/redis/node-${port}/conf/redis.conf:/etc/redis/redis.conf \
+-d --net redis --ip 172.38.0.1${port} redis:5.0.9-alpine3.11 redis-server /etc/redis/redis.conf
+
+docker run -p 6371:6379 -p 16671:16379 --name redis-1 \
+-v /mydata/redis/node-1/data:/data \
+-v /mydata/redis/node-1/conf/redis.conf:/etc/redis/redis.conf \
+-d --net redis --ip 172.38.0.11 redis:5.0.9-alpine3.11 redis-server /etc/redis/redis.conf
+
+docker exec -it redis-1 /bin/sh #redis默认没有bash
+
+# 创建集群
+redis-cli --cluster create 172.38.0.11:6379 172.38.0.12:6379 172.38.0.13:6379 172.38.0.14:6379 172.38.0.15:6379 172.38.0.16:6379 --cluster-replicas 1
+```
+
+![在这里插入图片描述](Docker/a4779dc7085f417196743829214ed52a.png)
+
+> docker搭建redis集群完成！
+>
+> 我们使用docker之后，所有的技术都会慢慢变得简单起来！
+
+# SpringBoot项目打包Docker镜像
+
+> 1、构建SpringBoot项目
+
+> 2、打包运行
+
+```
+mvn package
+```
+
+.3、编写dockerfile
+
+```
+FROM java:8COPY *.jar /app.jarCMD ["--server.port=8080"]EXPOSE 8080ENTRYPOINT ["java","-jar","app.jar"]
+```
+
+> 4、构建镜像
+
+```
+# 1.复制jar和DockerFIle到服务器
+# 2.构建镜像$ docker build -t xxxxx:xx .$ docker build -t kuangshen666 .
+```
+
+> 5、发布运行
+
+```
+[root@iZ8vbgc3u6dvwrjyp45lyrZ idea]# docker imagesREPOSITORY            TAG                IMAGE ID       CREATED         SIZEkuangshen666          latest             1ce036c6030a   4 minutes ago   660MBdocker run -d -P --name kuangshen-springboot-web kuangshen666
+```
+
+![在这里插入图片描述](Docker/b3dce69cb65f40b293dd4c917ae7b530.png)
+
+> 以后我们使用了Docker之后，给别人交付就是一个镜像即可！
+
+> 数据库怎么弄？
+>
+> docker拉取一个数据库，运行。打包jar之前需要修改数据库地址
+>
+> ssm项目怎么弄？
+>
+> 在dockerfile中添加tomcat，然后在tomcat的下面添加我们打好的war
+>
+> ```shell
+> FROM centos:7
+>  
+> RUN mkdir /usr/local/java
+> ADD jdk-8u231-linux-x64.tar.gz /usr/local/java
+> ENV JAVA_HOME=/usr/local/java/jdk1.8.0_231
+> ENV CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar:$JAVA_HOME/jre/lib/rt.jar
+> ENV PATH=$PATH:$JAVA_HOME/bin
+>  
+> RUN mkdir /usr/local/tomcat
+> ADD apache-tomcat-8.5.58.tar.gz /usr/local/tomcat
+> ENV CATALINA_HOME=/usr/local/tomcat/apache-tomcat-8.5.58
+> ENV PATH=$PATH:$CATALINA_HOME/bin
+>  
+> COPY fresh.war $CATALINA_HOME/webapps/
+>  
+> EXPOSE 8080
+> ENTRYPOINT ["/usr/local/tomcat/apache-tomcat-8.5.58/bin/catalina.sh","run"]
+> ```
