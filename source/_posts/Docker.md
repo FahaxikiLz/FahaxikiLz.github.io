@@ -1222,7 +1222,7 @@ docker run --name some-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:tag
 
 # 启动成功之后，我们在本地使用sqlyog来测试一下
 
-# sqlyog-连接到服务器的3306--和容器内的3306映射
+# sqlyog-连接到服务器的3306--和容器内的3306映射  本机ip:3306
 
 # 在本地测试创建一个数据库，查看一下我们映射的路径是否ok！
 ```
@@ -2103,3 +2103,222 @@ FROM java:8COPY *.jar /app.jarCMD ["--server.port=8080"]EXPOSE 8080ENTRYPOINT ["
 > EXPOSE 8080
 > ENTRYPOINT ["/usr/local/tomcat/apache-tomcat-8.5.58/bin/catalina.sh","run"]
 > ```
+
+# Docker-compose容器编排
+
+> 使用 **Docker** 的时候，定义 **Dockerfile** 文件，然后使用 `docker build`、`docker run` 等命令操作容器。
+>
+> 然而微服务架构的应用系统一般包含若干个微服务，每个微服务一般都会部署多个实例，如果每个微服务都要手动启停，这样效率很低，也不方便管理。
+>
+> 使用 **Docker Compose** 可以轻松、高效的管理容器，它是一个用于定义和运行多容器 Docker 的应用程序工具。
+
+## 安装
+
+> Docker Compose 是 Docker 的一个开源项目，目前托管到了 GitHub，需要前往 GitHub 下载。
+
+```shell
+sudo curl -L "https://github.com/docker/compose/releases/download/2.2.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+```
+
+>  由于存放在 GitHub，国内网络限制导致不太稳定，**不推荐使用**。
+>
+> 推荐使用 [道客](https://www.daocloud.io/) 提供的 [Docker 极速下载](http://get.daocloud.io/#install-compose) 进行安装：
+
+```shell
+curl -L https://get.daocloud.io/docker/compose/releases/download/v2.2.3/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+```
+
+> 安装：
+
+```shell
+[root@sail ~]# curl -L https://get.daocloud.io/docker/compose/releases/download/v2.2.3/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current                                 Dload  Upload   Total   Spent    Left  Speed100   423  100   423    0     0    394      0  0:00:01  0:00:01 --:--:--   394100 23.5M  100 23.5M    0     0  8670k      0  0:00:02  0:00:02 --:--:-- 20.3M
+[root@sail ~]# cd /usr/local/bin/[root@sail bin]# lsdocker-compose
+```
+
+> 这样即表示安装成功。
+>
+> 授权：
+
+```shell
+[root@sail ~]# chmod +x /usr/local/bin/docker-compose
+```
+
+### 查看版本
+
+> docker-compose version
+
+```shell
+[root@sail bin]# docker-compose versionDocker Compose version v2.2.3
+```
+
+> 显示了版本即代表 Docker Compose 安装完成。
+
+### 卸载
+
+```shell
+rm /usr/local/bin/docker-compose
+```
+
+> 由于 **Linux 一切皆文件**，删除此文件夹即可完成 Docker Compose 的卸载。
+
+## 常用命令
+
+> 执行命令时，需要在对应的docker-compose.yml文件所在目录下执行。
+
+> 1、查看帮助：
+
+```shell
+docker-compose -h
+```
+
+> 2、创建并启动docker-compose服务：（类似 docker run）
+
+```shell
+docker-compose up# 后台运行docker-compose up -d
+```
+
+> 3、停止并删除容器、网络、卷、镜像：（类似 docker stop + docker rm）
+
+```shell
+docker-compose down
+```
+
+> 4、进入容器实例内部：
+
+```shell
+docker-compose exec <yml里面的服务id> /bin/bash
+```
+
+> 5、展示当前docker-compose编排过的运行的所有容器：
+
+```shell
+docker-compose ps
+```
+
+> 6、展示当前docker-compose编排过的容器进程：
+
+```shell
+docker-compose top
+```
+
+> 7、查看容器输出日志：
+
+```shell
+docker-compose log <yml里面的服务id>
+```
+
+> 8、检查配置：
+
+```shell
+docker-compose config# 有问题才输出docker-compose config -q
+```
+
+> 9、重启服务：
+
+```shell
+docker-compose restart
+```
+
+> 10、启动服务：（类似 docker start）
+
+```shell
+docker-compose start
+```
+
+> 11、停止服务：
+
+```
+docker-compose stop
+```
+
+## 示例
+
+> [官方示例](https://docs.docker.com/compose/compose-file/compose-file-v3/#compose-file-structure-and-examples)
+
+```shell
+# docker-compose文件版本号
+version: "3"
+# 配置各个容器服务
+services:
+  microService:
+    image: springboot_docker:1.0
+    container_name: ms01  # 容器名称，如果不指定，会生成一个服务名加上前缀的容器名
+    ports:
+      - "6001:6001"
+    volumes:
+      - /app/microService:/data
+    networks:
+      - springboot_network
+    depends_on:  # 配置该容器服务所依赖的容器服务
+      - redis
+      - mysql
+  redis:
+    image: redis:6.0.8
+    ports:
+      - "6379:6379"
+    volumes:
+      - /app/redis/redis.conf:/etc/redis/redis.conf
+      - /app/redis/data:data
+    networks:
+      - springboot_network
+    command: redis-server /etc/redis/redis.conf
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: '123456'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'no'
+      MYSQL_DATABASE: 'db_springboot'
+      MYSQL_USER: 'springboot'
+      MYSQL_PASSWORD: 'springboot'
+    ports:
+      - "3306:3306"
+    volumes:
+      - /app/mysql/db:/var/lib/mysql
+      - /app/mysql/conf/my.cnf:/etc/my.cnf
+      - /app/mysql/init:/docker-entrypoint-initdb.d
+    networks:
+      - springboot_network
+    command: --default-authentication-plugin=mysql_native_password # 解决外部无法访问
+networks:
+  # 创建 springboot_network 网桥网络
+  springboot_network:
+```
+
+> 在yaml目录下启动即可`docker-compose up`
+
+# Docker Swarm
+
+> Docker Swarm 和 Docker Compose 一样，都是 Docker 官方容器编排项目，但不同的是，Docker Compose 是一个在单个服务器或主机上创建多个容器的工具，而 Docker Swarm 则可以在多个服务器或主机上创建容器集群服务，对于微服务的部署，显然 Docker Swarm 会更加适合。
+
+![image-20221219142721796](Docker/image-20221219142721796.png)
+
+## 搭建集群
+
+> 查看docker swarm的命令
+>
+> - init：初始化
+> - join：加入到集群
+> - leave：离开
+
+![image-20221219142751786](Docker/image-20221219142751786.png)
+
+> adverties-addr：广播地址，后面跟的是我们主机的地址
+
+![image-20221219143141260](Docker/image-20221219143141260.png)
+
+> - docker swarm join 加入一个节点
+>
+> - ```
+>   #获取令牌
+>   docker swarm join-token manager
+>   docker swarm join-token worker
+>   #使用令牌可以加入一个leader节点或者worker节点
+>   ```
+
+![image-20221219143244370](Docker/image-20221219143244370.png)
+
+![image-20221219143354601](Docker/image-20221219143354601.png)
+
+![image-20221219143543234](Docker/image-20221219143543234.png)
