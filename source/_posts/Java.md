@@ -10725,8 +10725,8 @@ class Number implements Runnable {
 > 15. **static boolean interrupted():测试当前线程（即正在执行这个指令的线程)是否被中断。注意，这是一个静态方法。这个调用有一个副作用—它将当前线程的中断状态重置为false。**
 > 16. **boolean isInterrupted():测试线程是否被中断。与static interrupted方法不同，这个调用不改变线程的中断状态。**
 > 17. **setDaemon():守护线程**
-> 18. **sleep(Long millitime):让当前线程睡眠指定的milLitime毫秒。在指定的millitime毫秒时间内，当前线程是阻塞状态。**
-> 19. **wait():一旦执行此方法，当前线程就进入阻塞状态，并释放同步监视器**
+> 18. **sleep(Long millitime):让当前线程睡眠指定的milLitime毫秒。在指定的millitime毫秒时间内，当前线程是阻塞状态。不释放锁，释放cpu执行权**
+> 19. **wait():一旦执行此方法，当前线程就进入阻塞状态，释放锁，释放**
 > 20. **notify():一旦执行此方法，就会唤醒被wait的一个线程。如果有多个线程被wait，就唤醒优先级高的线程**
 > 21. **notifyAll():一旦执行此方法，就会唤醒所有被wait的线程。**
 > 22. **isAlive():判断当前线程是否存活**
