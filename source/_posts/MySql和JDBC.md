@@ -550,6 +550,13 @@ SELECT * from students WHERE not score = 90
 > - 执行时机不同：where是分组之前进行过滤，不满足where条件不参与分组；having是分组后对结果进行过滤。
 > - 判断条件不同：<span style="color:orange">**where不能对聚合函数进行判断，而having可以。**</span>
 
+> mysql中出现 `Unknown column ‘xxx‘ in ‘having clause‘`
+>
+> 这是因为在使用group by分组时，后面如果需要再加一个having进行判断，则所判断的字段需要在select后面出现
+>
+>
+> 例如：`select s.stock_name,s.operation from Stocks s group by s.stock_name HAVING s.operation ="Buy"`
+
 ### DQL执行顺序
 
 > <span style="color:purple">**from > on > join > where > group by > 聚合函数 > having > select > distinct > order by > limit**</span>
