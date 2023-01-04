@@ -7,6 +7,26 @@ categories:
 - LeetCode
 ---
 
+# mysql中语句的执行顺序
+
+from > on > join > where > group by > 聚合函数 > having > select > distinct > order by > limit
+
+# 两字段使用in
+
+```mysql
+...(e.Salary,e.DepartmentId) in (select max(Salary),DepartmentId from Employee group by De
+```
+
+# 取count最大值
+
+```mysql
+select cc.customer_number from (select count(*) c,o.customer_number from Orders o group by o.customer_number) cc order by cc.c desc limit 1
+
+# 求count(*)的最大值
+
+# 获取count(*)，子查询生成的这个表，再对这个count从高到低排序，然后limit 1 取第一个值，就是最大值了，
+```
+
 # mysql中if...else等函数
 
 | 函数                                                         | 功能                                                    |
@@ -75,5 +95,14 @@ categories:
             ELSE "The quantity is under 30"
         END
         FROM OrderDetails;
+```
+
+# mysql中出现`Unknown column ‘xxx‘ in ‘having clause‘`
+
+```mysql
+# 这是因为在使用group by分组时，后面如果需要再加一个having进行判断，则所判断的字段需要在select后面出现
+
+# 查询字段要有operation
+select s.stock_name,s.operation from Stocks s group by s.stock_name HAVING s.operation ="Buy"
 ```
 
