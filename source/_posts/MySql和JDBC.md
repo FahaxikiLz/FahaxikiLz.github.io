@@ -810,9 +810,7 @@ ALTER TABLE 表名 ADD CONSTRAINT 外键名称 FOREIGN KEY (外键字段) REFERE
 >
 > 4. 可选：加上`WHERE`子句、`ORDER BY`等子句。
 >
-> 5. <span style="color:orange">**隐式内连接：`SELECT 字段列表 FROM 表1, 表2 WHERE 条件 ...;`**</span>
->
->    <span style="color:orange">**显式内连接：`SELECT 字段列表 FROM 表1 [ INNER ] JOIN 表2 ON 连接条件 ...;`**</span>
+> 5. <span style="color:orange">**语法：`SELECT 字段列表 FROM 表1 [ INNER ] JOIN 表2 ON 连接条件 ...;`**</span>
 
 ```mysql
 select s.name,s.gender,c.name class_name from students s INNER JOIN classes c on s.class_id = c.id
@@ -834,9 +832,10 @@ select s.name,s.gender,c.name class_name from students s INNER JOIN classes c on
 
 ![](MySql和JDBC/right.png)
 
-> 依赖副表
+> - 依赖副表
 >
-> RIGHT OUTER JOIN返回右表都存在的行。**如果某一行仅在右表存在，那么结果集就会以`NULL`填充剩下的字段。**
+> - RIGHT OUTER JOIN返回右表都存在的行。**如果某一行仅在右表存在，那么结果集就会以`NULL`填充剩下的字段。**
+> - **<span style="color:orange">语法：`SELECT 字段列表 FROM A表 RIGHT [OUTER] JOIN B表 ON 关联条件 WHERE 等其他子句;`</span>**
 
 ```mysql
 select s.id,s.name,s.score,c.name class_name from students s RIGHT OUTER JOIN classes c on s.class_id = c.id
@@ -848,9 +847,10 @@ select s.id,s.name,s.score,c.name class_name from students s RIGHT OUTER JOIN cl
 
 ![](MySql和JDBC/left.png)
 
-> 依赖主表。
+> - 依赖主表。
 >
-> LEFT OUTER JOIN返回左表都存在的行。**如果某一行仅在左表存在，那么结果集就会以`NULL`填充剩下的字段。**
+> - LEFT OUTER JOIN返回左表都存在的行。**如果某一行仅在左表存在，那么结果集就会以`NULL`填充剩下的字段。**
+> - **<span style="color:orange">语法：`SELECT 字段列表 FROM A表 LEFT [OUTER] JOIN B表 ON 关联条件 WHERE 等其他子句;`</span>**
 
 ```mysql
 select s.id,s.name,s.score,c.name class_name from students s LEFT OUTER JOIN classes c on s.class_id = c.id
@@ -863,6 +863,8 @@ select s.id,s.name,s.score,c.name class_name from students s LEFT OUTER JOIN cla
 ![](MySql和JDBC/full.png)
 
 > 把两张表的所有记录全部选择出来，并且，自动把对方不存在的列填充为NULL
+>
+> 满外连接的结果 = 左右表匹配的数据 + 左表没有匹配到的数据 + 右表没有匹配到的数据。
 >
 > <span style="color:orange">**MySQL 不支持全连接，但可以通过左外连接 + UNION + 右外连接实现**</span>
 >
@@ -891,7 +893,7 @@ select s.id,s.name,s.score,c.name class_name from students s LEFT OUTER JOIN cla
 >   ```
 >
 > - **UNION ALL 会有重复结果，UNION 不会**
-> - **联合查询比使用or效率高，不会使索引失效**
+> - <span style="color:blue">**联合查询比使用or效率高，不会使索引失效**</span>
 
 ### 交叉连接
 
