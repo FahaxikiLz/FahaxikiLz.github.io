@@ -106,3 +106,20 @@ select cc.customer_number from (select count(*) c,o.customer_number from Orders 
 select s.stock_name,s.operation from Stocks s group by s.stock_name HAVING s.operation ="Buy"
 ```
 
+# select后无from
+
+```mysql
+	SELECT
+    IFNULL(
+      (SELECT DISTINCT Salary
+       FROM Employee
+       ORDER BY Salary DESC
+        LIMIT 1 OFFSET 1),
+    NULL) AS SecondHighestSalary
+		
+		
+	# 先查出来salary，再select ifnull判断salary是否为空
+	
+	# select后面没有from；mysql中的用法，把值输出的意思    例如：select 1+1
+```
+
