@@ -163,3 +163,5 @@ proxy.$request({//vue3
 ![image-20221119215430066](vue3-%E9%80%9A%E7%94%A8%E5%90%8E%E5%8F%B0%E9%A1%B9%E7%9B%AE/image-20221119215430066.png)
 
 然后在某个初始的地方调用addmenu方法
+
+# [vue配置开发、测试、生产环境（不同环境，不同命令](https://blog.csdn.net/Amy_cloud/article/details/91873507#comments_14313130)
