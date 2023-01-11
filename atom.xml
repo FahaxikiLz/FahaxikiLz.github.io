@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>爱哭的小河豚</title>
+  
+  <subtitle>L ZHEN&#39;s Blog</subtitle>
+  <link href="http://fahaxikilz.github.io/atom.xml" rel="self"/>
+  
+  <link href="http://fahaxikilz.github.io/"/>
+  <updated>2023-01-08T15:53:50.964Z</updated>
+  <id>http://fahaxikilz.github.io/</id>
+  
+  <author>
+    <name>L ZHEN</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>LeetCode_Java</title>
+    <link href="http://fahaxikilz.github.io/2023/01/03/leetcode-java/"/>
+    <id>http://fahaxikilz.github.io/2023/01/03/leetcode-java/</id>
+    <published>2023-01-03T13:25:02.000Z</published>
+    <updated>2023-01-08T15:53:50.964Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h3 id=&quot;Java中-intValue，parseInt，Valueof-这三个关键字的区别&quot;&gt;&lt;a href=&quot;#Java中-intValue，parseInt，Valueof-这三个关键字的区别&quot; class=&quot;headerlink&quot; title=&quot;Java中</summary>
+        
+      
+    
+    
+    
+    <category term="LeetCode" scheme="http://fahaxikilz.github.io/categories/LeetCode/"/>
+    
+    
+    <category term="LeetCode_Java" scheme="http://fahaxikilz.github.io/tags/LeetCode-Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>LeetCode_MySQL</title>
+    <link href="http://fahaxikilz.github.io/2023/01/03/leetcode-mysql/"/>
+    <id>http://fahaxikilz.github.io/2023/01/03/leetcode-mysql/</id>
+    <published>2023-01-03T13:24:59.000Z</published>
+    <updated>2023-01-11T12:30:35.170Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h3 id=&quot;mysql中语句的执行顺序&quot;&gt;&lt;a href=&quot;#mysql中语句的执行顺序&quot; class=&quot;headerlink&quot; title=&quot;mysql中语句的执行顺序&quot;&gt;&lt;/a&gt;mysql中语句的执行顺序&lt;/h3&gt;&lt;p&gt;from &amp;gt; on &amp;gt; join</summary>
+        
+      
+    
+    
+    
+    <category term="LeetCode" scheme="http://fahaxikilz.github.io/categories/LeetCode/"/>
+    
+    
+    <category term="LeetCode_MySQL" scheme="http://fahaxikilz.github.io/tags/LeetCode-MySQL/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Docker</title>
+    <link href="http://fahaxikilz.github.io/2022/12/15/docker/"/>
+    <id>http://fahaxikilz.github.io/2022/12/15/docker/</id>
+    <published>2022-12-15T05:11:24.000Z</published>
+    <updated>2022-12-19T06:43:21.879Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;Docker概述&quot;&gt;&lt;a href=&quot;#Docker概述&quot; class=&quot;headerlink&quot; title=&quot;Docker概述&quot;&gt;&lt;/a&gt;Docker概述&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;官网地址：&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="容器" scheme="http://fahaxikilz.github.io/categories/%E5%AE%B9%E5%99%A8/"/>
+    
+    
+    <category term="Docker" scheme="http://fahaxikilz.github.io/tags/Docker/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spring Cloud</title>
+    <link href="http://fahaxikilz.github.io/2022/11/23/springcloud/"/>
+    <id>http://fahaxikilz.github.io/2022/11/23/springcloud/</id>
+    <published>2022-11-23T10:45:24.000Z</published>
+    <updated>2022-12-13T13:51:57.687Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;1-微服务概述&quot;&gt;&lt;a href=&quot;#1-微服务概述&quot; class=&quot;headerlink&quot; title=&quot;1.微服务概述&quot;&gt;&lt;/a&gt;1.微服务概述&lt;/h1&gt;&lt;h2 id=&quot;什么是微服务？&quot;&gt;&lt;a href=&quot;#什么是微服务？&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="微服务" scheme="http://fahaxikilz.github.io/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/"/>
+    
+    
+    <category term="Spring Cloud" scheme="http://fahaxikilz.github.io/tags/Spring-Cloud/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>vue3_通用后台项目</title>
+    <link href="http://fahaxikilz.github.io/2022/11/18/vue3-tong-yong-hou-tai-xiang-mu/"/>
+    <id>http://fahaxikilz.github.io/2022/11/18/vue3-tong-yong-hou-tai-xiang-mu/</id>
+    <published>2022-11-18T12:42:01.000Z</published>
+    <updated>2023-01-10T10:57:51.979Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;vite&lt;/li&gt;
+&lt;li&gt;vue3&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&quot;引入静态文件&quot;&gt;&lt;a href=&quot;#引入静态文件&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="练手项目" scheme="http://fahaxikilz.github.io/categories/%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE/"/>
+    
+    
+    <category term="vue3_通用后台项目" scheme="http://fahaxikilz.github.io/tags/vue3-%E9%80%9A%E7%94%A8%E5%90%8E%E5%8F%B0%E9%A1%B9%E7%9B%AE/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Nginx</title>
+    <link href="http://fahaxikilz.github.io/2022/11/13/nginx/"/>
+    <id>http://fahaxikilz.github.io/2022/11/13/nginx/</id>
+    <published>2022-11-13T04:23:30.000Z</published>
+    <updated>2022-11-16T02:25:29.445Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;Nginx简介&quot;&gt;&lt;a href=&quot;#Nginx简介&quot; class=&quot;headerlink&quot; title=&quot;Nginx简介&quot;&gt;&lt;/a&gt;Nginx简介&lt;/h1&gt;&lt;h2 id=&quot;什么是Nginx&quot;&gt;&lt;a href=&quot;#什么是Nginx&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="服务器" scheme="http://fahaxikilz.github.io/categories/%E6%9C%8D%E5%8A%A1%E5%99%A8/"/>
+    
+    
+    <category term="Nginx" scheme="http://fahaxikilz.github.io/tags/Nginx/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>RabbitMQ</title>
+    <link href="http://fahaxikilz.github.io/2022/11/08/rabbitmq/"/>
+    <id>http://fahaxikilz.github.io/2022/11/08/rabbitmq/</id>
+    <published>2022-11-08T08:24:22.000Z</published>
+    <updated>2022-12-06T05:35:22.835Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;RabbitMQ-介绍&quot;&gt;&lt;a href=&quot;#RabbitMQ-介绍&quot; class=&quot;headerlink&quot; title=&quot;RabbitMQ 介绍&quot;&gt;&lt;/a&gt;RabbitMQ 介绍&lt;/h1&gt;&lt;h2 id=&quot;RabbitMQ的概念&quot;&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="消息中间件" scheme="http://fahaxikilz.github.io/categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
+    
+    
+    <category term="RabbitMQ" scheme="http://fahaxikilz.github.io/tags/RabbitMQ/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spring Security</title>
+    <link href="http://fahaxikilz.github.io/2022/11/05/springsecurity/"/>
+    <id>http://fahaxikilz.github.io/2022/11/05/springsecurity/</id>
+    <published>2022-11-05T08:36:18.000Z</published>
+    <updated>2022-11-07T13:32:04.312Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;SSM整合Spring-Security&quot;&gt;&lt;a href=&quot;#SSM整合Spring-Security&quot; class=&quot;headerlink&quot; title=&quot;SSM整合Spring Security&quot;&gt;&lt;/a&gt;SSM整合Spring</summary>
+        
+      
+    
+    
+    
+    <category term="后端框架" scheme="http://fahaxikilz.github.io/categories/%E5%90%8E%E7%AB%AF%E6%A1%86%E6%9E%B6/"/>
+    
+    
+    <category term="Spring Security" scheme="http://fahaxikilz.github.io/tags/Spring-Security/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ssm_传智健康项目</title>
+    <link href="http://fahaxikilz.github.io/2022/11/02/ssm-chuan-zhi-jian-kang-xiang-mu/"/>
+    <id>http://fahaxikilz.github.io/2022/11/02/ssm-chuan-zhi-jian-kang-xiang-mu/</id>
+    <published>2022-11-02T06:46:09.000Z</published>
+    <updated>2022-12-07T15:00:53.974Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;前端：vue、axios、elementui、ECharts&lt;/p&gt;
+&lt;p&gt;后端：spring、srping mvc、mybatis、dubbo、七牛云、Redis、Quartz、Apache POI、短信服务、Spring</summary>
+        
+      
+    
+    
+    
+    <category term="练手项目" scheme="http://fahaxikilz.github.io/categories/%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE/"/>
+    
+    
+    <category term="ssm_传智健康项目" scheme="http://fahaxikilz.github.io/tags/ssm-%E4%BC%A0%E6%99%BA%E5%81%A5%E5%BA%B7%E9%A1%B9%E7%9B%AE/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>SpringBoot_智慧校园项目</title>
+    <link href="http://fahaxikilz.github.io/2022/10/27/springboot-zhi-hui-xiao-yuan-xiang-mu/"/>
+    <id>http://fahaxikilz.github.io/2022/10/27/springboot-zhi-hui-xiao-yuan-xiang-mu/</id>
+    <published>2022-10-27T12:22:51.000Z</published>
+    <updated>2022-11-19T12:20:23.791Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;技术栈&quot;&gt;&lt;a href=&quot;#技术栈&quot; class=&quot;headerlink&quot; title=&quot;技术栈&quot;&gt;&lt;/a&gt;技术栈&lt;/h1&gt;&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;Spring Boot&lt;/li&gt;
+&lt;li&gt;Mybatis</summary>
+        
+      
+    
+    
+    
+    <category term="练手项目" scheme="http://fahaxikilz.github.io/categories/%E7%BB%83%E6%89%8B%E9%A1%B9%E7%9B%AE/"/>
+    
+    
+    <category term="SpringBoot_智慧校园项目" scheme="http://fahaxikilz.github.io/tags/SpringBoot-%E6%99%BA%E6%85%A7%E6%A0%A1%E5%9B%AD%E9%A1%B9%E7%9B%AE/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Dubbo</title>
+    <link href="http://fahaxikilz.github.io/2022/10/23/dubbo/"/>
+    <id>http://fahaxikilz.github.io/2022/10/23/dubbo/</id>
+    <published>2022-10-23T08:59:30.000Z</published>
+    <updated>2022-12-03T05:18:33.929Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;官方文档2-7&quot;&gt;&lt;a href=&quot;#官方文档2-7&quot; class=&quot;headerlink&quot; title=&quot;官方文档2.7&quot;&gt;&lt;/a&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="微服务" scheme="http://fahaxikilz.github.io/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/"/>
+    
+    
+    <category term="Dubbo" scheme="http://fahaxikilz.github.io/tags/Dubbo/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Java学习路线</title>
+    <link href="http://fahaxikilz.github.io/2022/10/23/java-xue-xi-lu-xian/"/>
+    <id>http://fahaxikilz.github.io/2022/10/23/java-xue-xi-lu-xian/</id>
+    <published>2022-10-23T08:47:30.000Z</published>
+    <updated>2023-01-10T11:25:34.693Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;Java-学习路线&quot;&gt;&lt;a href=&quot;#Java-学习路线&quot; class=&quot;headerlink&quot; title=&quot;Java 学习路线&quot;&gt;&lt;/a&gt;Java 学习路线&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;Java 学习路线一条龙版 by &lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="学习路线" scheme="http://fahaxikilz.github.io/categories/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF/"/>
+    
+    
+    <category term="Java学习路线" scheme="http://fahaxikilz.github.io/tags/Java%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>hadoop</title>
+    <link href="http://fahaxikilz.github.io/2022/10/16/hadoop/"/>
+    <id>http://fahaxikilz.github.io/2022/10/16/hadoop/</id>
+    <published>2022-10-16T11:55:30.000Z</published>
+    <updated>2022-11-18T09:06:10.311Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;集群搭建&quot;&gt;&lt;a href=&quot;#集群搭建&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="大数据" scheme="http://fahaxikilz.github.io/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/"/>
+    
+    
+    <category term="hadoop" scheme="http://fahaxikilz.github.io/tags/hadoop/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>idea</title>
+    <link href="http://fahaxikilz.github.io/2022/10/16/idea/"/>
+    <id>http://fahaxikilz.github.io/2022/10/16/idea/</id>
+    <published>2022-10-16T11:48:30.000Z</published>
+    <updated>2023-01-11T06:26:59.454Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;idea快捷键&quot;&gt;&lt;a href=&quot;#idea快捷键&quot; class=&quot;headerlink&quot; title=&quot;idea快捷键&quot;&gt;&lt;/a&gt;idea快捷键&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;Alt+回车 导入包,自动修正&lt;/li&gt;
+&lt;li&gt;Ctrl+Alt+O</summary>
+        
+      
+    
+    
+    
+    <category term="开发工具" scheme="http://fahaxikilz.github.io/categories/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/"/>
+    
+    
+    <category term="idea" scheme="http://fahaxikilz.github.io/tags/idea/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>收藏夹</title>
+    <link href="http://fahaxikilz.github.io/2022/10/16/shou-cang-jia/"/>
+    <id>http://fahaxikilz.github.io/2022/10/16/shou-cang-jia/</id>
+    <published>2022-10-16T11:43:33.871Z</published>
+    <updated>2022-10-16T11:48:06.354Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;学习类&quot;&gt;&lt;a href=&quot;#学习类&quot; class=&quot;headerlink&quot; title=&quot;学习类&quot;&gt;&lt;/a&gt;学习类&lt;/h2&gt;&lt;p&gt;&lt;a href=&quot;https://www.code-nav.cn/&quot;&gt;鱼皮——编程导航&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="收藏" scheme="http://fahaxikilz.github.io/categories/%E6%94%B6%E8%97%8F/"/>
+    
+    
+    <category term="收藏" scheme="http://fahaxikilz.github.io/tags/%E6%94%B6%E8%97%8F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JSON和AJAX和Axios</title>
+    <link href="http://fahaxikilz.github.io/2022/08/31/json-he-ajax-he-axios/"/>
+    <id>http://fahaxikilz.github.io/2022/08/31/json-he-ajax-he-axios/</id>
+    <published>2022-08-31T07:10:56.000Z</published>
+    <updated>2022-11-18T12:08:02.406Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;JSON&quot;&gt;&lt;a href=&quot;#JSON&quot; class=&quot;headerlink&quot; title=&quot;JSON&quot;&gt;&lt;/a&gt;JSON&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;数据交换指的是客户端和服务器之间业务数据的传递格式。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2</summary>
+        
+      
+    
+    
+    
+    <category term="前端" scheme="http://fahaxikilz.github.io/categories/%E5%89%8D%E7%AB%AF/"/>
+    
+    
+    <category term="JSON" scheme="http://fahaxikilz.github.io/tags/JSON/"/>
+    
+    <category term="AJAX" scheme="http://fahaxikilz.github.io/tags/AJAX/"/>
+    
+    <category term="Axios" scheme="http://fahaxikilz.github.io/tags/Axios/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ES6-ES11</title>
+    <link href="http://fahaxikilz.github.io/2022/08/31/es6-es11/"/>
+    <id>http://fahaxikilz.github.io/2022/08/31/es6-es11/</id>
+    <published>2022-08-31T07:10:56.000Z</published>
+    <updated>2022-12-05T06:57:50.789Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;ES6新特性&quot;&gt;&lt;a href=&quot;#ES6新特性&quot; class=&quot;headerlink&quot; title=&quot;ES6新特性&quot;&gt;&lt;/a&gt;ES6新特性&lt;/h1&gt;&lt;h2 id=&quot;let&quot;&gt;&lt;a href=&quot;#let&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="前端" scheme="http://fahaxikilz.github.io/categories/%E5%89%8D%E7%AB%AF/"/>
+    
+    
+    <category term="ES" scheme="http://fahaxikilz.github.io/tags/ES/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Mybatis Plus</title>
+    <link href="http://fahaxikilz.github.io/2022/08/31/mybatisplus/"/>
+    <id>http://fahaxikilz.github.io/2022/08/31/mybatisplus/</id>
+    <published>2022-08-31T07:10:56.000Z</published>
+    <updated>2022-11-08T02:01:03.949Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;简介&quot;&gt;&lt;a href=&quot;#简介&quot; class=&quot;headerlink&quot; title=&quot;简介&quot;&gt;&lt;/a&gt;简介&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;MyBatis-Plus（简称 MP）是一个 MyBatis的增强工具，在 MyBatis</summary>
+        
+      
+    
+    
+    
+    <category term="后端框架" scheme="http://fahaxikilz.github.io/categories/%E5%90%8E%E7%AB%AF%E6%A1%86%E6%9E%B6/"/>
+    
+    
+    <category term="Mybatis Plus" scheme="http://fahaxikilz.github.io/tags/Mybatis-Plus/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Mysql和JDBC</title>
+    <link href="http://fahaxikilz.github.io/2022/08/31/mysql-he-jdbc/"/>
+    <id>http://fahaxikilz.github.io/2022/08/31/mysql-he-jdbc/</id>
+    <published>2022-08-31T07:10:56.000Z</published>
+    <updated>2023-01-11T07:47:56.109Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;MySQL基础篇&quot;&gt;&lt;a href=&quot;#MySQL基础篇&quot; class=&quot;headerlink&quot; title=&quot;MySQL基础篇&quot;&gt;&lt;/a&gt;MySQL基础篇&lt;/h1&gt;&lt;h2 id=&quot;Windows安装MySQL&quot;&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="数据库" scheme="http://fahaxikilz.github.io/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
+    
+    
+    <category term="MySql" scheme="http://fahaxikilz.github.io/tags/MySql/"/>
+    
+    <category term="JDBC" scheme="http://fahaxikilz.github.io/tags/JDBC/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Redis</title>
+    <link href="http://fahaxikilz.github.io/2022/08/31/redis/"/>
+    <id>http://fahaxikilz.github.io/2022/08/31/redis/</id>
+    <published>2022-08-31T07:10:56.000Z</published>
+    <updated>2023-01-02T08:20:47.096Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;NoSQL数据库&quot;&gt;&lt;a href=&quot;#NoSQL数据库&quot; class=&quot;headerlink&quot; title=&quot;NoSQL数据库&quot;&gt;&lt;/a&gt;NoSQL数据库&lt;/h1&gt;&lt;h2 id=&quot;NoSQL数据库概述&quot;&gt;&lt;a href=&quot;#NoSQL数据库概述&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="数据库" scheme="http://fahaxikilz.github.io/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
+    
+    
+    <category term="Redis" scheme="http://fahaxikilz.github.io/tags/Redis/"/>
+    
+  </entry>
+  
+</feed>
