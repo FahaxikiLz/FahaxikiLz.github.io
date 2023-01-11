@@ -430,3 +430,21 @@ mysql> SELECT stu_id, lesson_id, score, create_time,
 
 ```
 
+### union和or
+
+使用 or 会使索引会失效，在数据量较大的时候查找效率较低，通常建议使用 union 代替 or
+
+```mysql
+# 方法一：使用 WHERE 子句和 OR
+# select t.name, t.population, t.area from world t
+#     where t.area >= 3000000 or t.population >= 25000000
+
+# 方法二：使用 WHERE 子句和 UNION
+# 使用 or 会使索引会失效，在数据量较大的时候查找效率较低，通常建议使用 union 代替 or
+select t.name, t.population, t.area from world t
+    where t.area >= 3000000
+    union
+select t.name, t.population, t.area from world t
+    where t.population >= 25000000
+```
+

@@ -2116,6 +2116,9 @@ create index idx_user_pro_age_stat on tb_user(profession, age, status);
 -- 为email建立合适的索引来提升查询效率
 create index idx_user_email on tb_user(email);
 
+-- 在bookId字段上建立名称为UniqidIdx的唯一索引
+ALTER TABLE book ADD UNIQUE INDEX UniqidIdx (bookId);
+
 -- 删除索引
 drop index idx_user_email on tb_user;
 ```
