@@ -1,0 +1,72 @@
+[
+{
+    "avatar": "https://www.hello-algo.com/assets/images/logo.svg",
+    "name": "hello 算法",
+    "introduction": "动画图解、一键运行的数据结构与算法教程",
+    "url": "https://www.hello-algo.com/",
+    "title": "前去学习"
+},
+{
+    "avatar": "https://www.javaboy.org/favicon.ico",
+    "name": "江南一点雨",
+    "introduction": "大家好，我是江南一点雨，管理学学士，大学自学 Java 编程，从移动端到前端到后端均有涉猎，现在专注于 Java 微服务。",
+    "url": "http://www.javaboy.org/",
+    "title": "前去学习"
+},
+{
+    "avatar": "https://cdn.tobebetterjavaer.com/tobebetterjavaer/images/logo-01.png",
+    "name": "Java程序员进阶之路",
+    "introduction": "Java程序员进阶之路",
+    "url": "https://itwanger.gitee.io/tobebetterjavaer/#/",
+    "title": "前去学习"
+},
+{
+    "avatar": "https://cdn.tobebetterjavaer.com/tobebetterjavaer/images/logo-01.png",
+    "name": "二哥的Java进阶之路",
+    "introduction": "这是一份通俗易懂、风趣幽默的Java学习指南，内容涵盖Java基础、Java并发编程、Java虚拟机、Java企业级开发、Java面试等核心知识点。学Java，就认准二哥的Java进阶之路😄",
+    "url": "https://javabetter.cn/",
+    "title": "前去学习"
+},
+{
+    "avatar": "JavaPool",
+    "name": "JavaPool",
+    "introduction": "",
+    "url": "https://likanjie.github.io/",
+    "title": "前去学习"
+},
+{
+    "avatar": "https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/githubio/LogoMakr_0zpEzN.png",
+    "name": "CS-Notes",
+    "introduction": "",
+    "url": "http://www.cyc2018.xyz/",
+    "title": "前去学习"
+},
+{
+    "avatar": "廖雪峰的官方网站",
+    "name": "廖雪峰的官方网站",
+    "introduction": "",
+    "url": "https://www.liaoxuefeng.com/",
+    "title": "前去学习"
+},
+{
+	"avatar": "https://636f-codenav-8grj8px727565176-1256524210.tcb.qcloud.la/img/logo.png",
+    "name": "鱼皮编程导航",
+    "introduction": "编程导航，发现优质编程学习资源",
+    "url": "https://www.code-nav.cn/",
+    "title": "前去学习"
+},
+{
+	"avatar": "https://pdai.tech/_images/index-read.gif",
+    "name": "Java 全栈知识体系",
+    "introduction": "Java 全栈知识体系",
+    "url": "https://pdai.tech/",
+    "title": "前去学习"
+},
+{
+    "avatar": "https://www.kuangstudy.com/assert/images/index_topleft_logo_black.png",
+    "name": "遇见狂神说",
+    "introduction": "为每个想学习编程的人提供一个少走弯路的平台",
+    "url": "https://www.kuangstudy.com/",
+    "title": "前去学习"
+}
+]

@@ -1,0 +1,43 @@
+<style type="text/css">
+    /* don't remove. */
+    .about-cover {
+        height: 75vh;
+    }
+
+    /* Ensure the iframe takes up the full space of the content area */
+    iframe {
+        width: 100%;
+        height: 100%;
+        border: none; /* Remove border */
+    }
+
+    /* Ensure the main content area takes up the full height */
+    .content {
+        height: 99vh; /* Adjust based on your layout */
+    }
+</style>
+
+<%- partial('_partial/bg-cover') %>
+
+<main class="content">
+    <iframe src="https://www.hello-algo.com/"></iframe>
+</main>
+
+<script>
+        // 将页面上部和下部隐藏
+        $('.navbar-fixed, .bg-cover.pd-header.about-cover').css('display', 'none');
+		
+		// css不生效，不知道是不是后面又渲染了，试一下定时能不能行
+		var setFooterCss = setInterval(function() {
+			console.log("------样式定时器执行------")
+			$('.page-footer.bg-color').css('display', 'none');
+			checkFooterCss();
+		}, 1000);
+		function checkFooterCss() {
+			if ($('.page-footer.bg-color').css('display') === 'none') {
+				clearInterval(setFooterCss);
+				console.log("------样式定时器结束------")
+			}
+        }
+        
+</script>
