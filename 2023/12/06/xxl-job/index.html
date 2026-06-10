@@ -1,0 +1,2272 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="xxl-job, 爱哭的小河豚">
+    <meta name="description" content="一. XXL-JOB概述1.1 XXL-JOB是什么？
+官方说明：XXL-JOB是一个轻量级分布式任务调度平台，其核心设计目标是开发迅速、学习简单、轻量级、易扩展。现已开放源代码并接入多家公司线上产品线，开箱即用。
+通俗来讲：XXL-JOB">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>xxl-job | 爱哭的小河豚</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    
+
+
+    <!-- bg-cover style     -->
+
+
+
+<link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+<link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+<link rel="stylesheet" type="text/css" href="/css/matery.css">
+<link rel="stylesheet" type="text/css" href="/css/my.css">
+<link rel="stylesheet" type="text/css" href="/css/dark.css" media="none" onload="if(media!='all')media='all'">
+
+
+
+
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+    <link rel="stylesheet" href="/css/post.css">
+
+
+
+
+    
+        <link rel="stylesheet" type="text/css" href="/css/reward.css">
+    
+
+
+
+    <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="爱哭的小河豚" type="application/atom+xml">
+</head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    <div>
+                        
+                        <img src="/medias/loading.gif" data-original="/medias/logo.png" class="logo-img" alt="LOGO">
+                        
+                        <span class="logo-span">爱哭的小河豚</span>
+                    </div>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/hello-algo" class="waves-effect waves-light">
+      
+      <i class="fas fa-anchor" style="zoom: 0.6;"></i>
+      
+      <span>Hello 算法</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/love" class="waves-effect waves-light">
+      
+      <i class="fas fa-heart" style="zoom: 0.6;"></i>
+      
+      <span>写给我家乖乖</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+  <li>
+    <a href="javascript:;" class="waves-effect waves-light" onclick="switchNightMode()" title="深色/浅色模式" >
+      <i id="sum-moon-icon" class="fas fa-sun" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/loading.gif" data-original="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">爱哭的小河豚</div>
+        <div class="logo-desc">
+            
+            谁会不喜欢一只爱哭，生气又圆鼓鼓的小河豚呢？
+            
+        </div>
+    </div>
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/hello-algo" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-anchor"></i>
+			
+			Hello 算法
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/love" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-heart"></i>
+			
+			写给我家乖乖
+		</a>
+          
+        </li>
+        
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/20.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">xxl-job</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/xxl-job/">
+                                <span class="chip bg-color">xxl-job</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E8%BF%9B%E9%98%B6%E6%8A%80%E6%9C%AF/" class="post-category">
+                                进阶技术
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2023-12-06
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2025-07-21
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    10.2k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    41 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.min.css">
+        
+
+        
+        <!-- 代码块折行 -->
+        <style type="text/css">
+            code[class*="language-"], pre[class*="language-"] { white-space: pre-wrap !important; }
+        </style>
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h2 id="一-XXL-JOB概述"><a href="#一-XXL-JOB概述" class="headerlink" title="一. XXL-JOB概述"></a>一. XXL-JOB概述</h2><h3 id="1-1-XXL-JOB是什么？"><a href="#1-1-XXL-JOB是什么？" class="headerlink" title="1.1 XXL-JOB是什么？"></a>1.1 XXL-JOB是什么？</h3><ul>
+<li>官方说明：XXL-JOB是一个轻量级分布式任务调度平台，其核心设计目标是开发迅速、学习简单、轻量级、易扩展。现已开放源代码并接入多家公司线上产品线，开箱即用。</li>
+<li>通俗来讲：XXL-JOB是一个任务调度框架，通过引入XXL-JOB相关的依赖，按照相关格式撰写代码后，可在其可视化界面进行任务的<strong>启动</strong>，<strong>执行</strong>，<strong>中止</strong>以及包含了<strong>日志记录与查询</strong>和<strong>任务状态监控</strong></li>
+<li>如果将XXL-JOB形容为一个人的话，每一个引入xxl-job的微服务就相当于一个独立的人(执行器)，而按照相关约定格式撰写的<code>Handler</code>为餐桌上的<code>食物</code>，可视化界面则可以决定哪个执行器(人)，吃东西或者不吃某个东西(定时任务)，在什么时间吃(Corn表达式控制或者执行或终止或者；立即开始)；</li>
+<li>Quartz的不足：Quartz作为开源任务调度中的佼佼者，是任务调度的首选。但是在集群环境中，Quartz采用API的方式对任务进行管理，这样存在以下问题：<ul>
+<li>通过调用API的方式操作任务，不人性化。</li>
+<li>需要持久化业务的QuartzJobBean到底层数据表中，系统侵入性相当严重。</li>
+<li>调度逻辑和QuartzJobBean耦合在同一个项目中，这将导致一个问题，在调度任务数量逐渐增多，同时调度任务逻辑逐渐加重的情况下，此时调度系统的性能将大大受限于业务。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>XXL-JOB弥补了Quartz的上述不足之处。</p>
+</blockquote>
+<ul>
+<li><p>RemoteHttpJobBean:</p>
+<ul>
+<li><p>常规的Quartz的开发，任务逻辑一般维护在QuartzJobBean中，耦合很严重。</p>
+</li>
+<li><p>XXL-JOB中“调度模块”和“任务模块”完全解耦，调度模块中的所有调度任务使用同一个QuartzJobBean，即RemoteHttpJobBean。不同的调度任务将各自的调度参数维护在各自的扩展表数据中，当触发RemoteHttpJobBean执行时，将会解析不同的调度参数发起远程调用，调用各自的远程执行器服务。</p>
+</li>
+<li><p>这种调用模型类似RPC调用，RemoteHttpJobBean提供调用代理的功能，而执行器提供远程服务的功能。</p>
+</li>
+</ul>
+</li>
+<li><p>架构设计</p>
+<ul>
+<li><p>XL-JOB将调度行为抽象形成“调度中心”公共平台，而平台自身并不承担业务逻辑，“调度中心”只负责发起调度请求。</p>
+</li>
+<li><p>将任务抽象成分散的JobHandler，交由“执行器”统一管理，“执行器”负责接收调度请求并执行对应的JobHandler中的业务逻辑。</p>
+</li>
+<li><p>因此，“调度”和“任务”两部分可以解耦成调度模块和执行模块，提高业务系统的整体稳定性和扩展性：</p>
+</li>
+<li><p>调度模块（调度中心）：负责管理调度信息，按照调度配置发出调度请求，自身不承担业务代码。调度系统与任务解耦，提高了系统可用性和稳定性，同时调度系统的性能不再受限于任务模块；支持可视化、简单且动态的管理调度信息，包括任务的新建、更新、删除，GLUE开发和任务报警等，所有上述操作都会实时生效，同时支持监控调度结果以及执行日志，支持执行器Failover。</p>
+</li>
+<li><p>执行模块（执行器）：负责接收调度请求并执行任务逻辑。任务模块专注于任务的执行等操作，开发和维护更加简单和高效；接收“调度中心”的执行请求、终止请求和日志请求等。</p>
+</li>
+</ul>
+</li>
+<li><p>XXL-JOB的系统架构，如下图所示：</p>
+<p> <img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/99422fb8542241fc95ffe1817b8157ce_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+<h3 id="1-2-特性"><a href="#1-2-特性" class="headerlink" title="1.2 特性"></a>1.2 特性</h3><ol>
+<li>简单：支持通过Web页面对任务进行CRUD操作，操作简单，一分钟上手；</li>
+<li>动态：支持动态修改任务状态、启动/停止任务，以及终止运行中任务，即时生效；</li>
+<li>调度中心HA（中心式）：调度采用中心式设计，“调度中心”自研调度组件并支持集群部署，可保证调度中心HA；</li>
+<li>执行器HA（分布式）：任务分布式执行，任务”执行器”支持集群部署，可保证任务执行HA；</li>
+<li>注册中心: 执行器会周期性自动注册任务, 调度中心将会自动发现注册的任务并触发执行。同时，也支持手动录入执行器地址；</li>
+<li>弹性扩容缩容：一旦有新执行器机器上线或者下线，下次调度时将会重新分配任务；</li>
+<li>路由策略：执行器集群部署时提供丰富的路由策略，包括：第一个、最后一个、轮询、随机、一致性HASH、最不经常使用、最近最久未使用、故障转移、忙碌转移等；</li>
+<li>故障转移：任务路由策略选择”故障转移”情况下，如果执行器集群中某一台机器故障，将会自动Failover切换到一台正常的执行器发送调度请求。</li>
+<li>阻塞处理策略：调度过于密集执行器来不及处理时的处理策略，策略包括：单机串行（默认）、丢弃后续调度、覆盖之前调度；</li>
+<li>任务超时控制：支持自定义任务超时时间，任务运行超时将会主动中断任务；</li>
+<li>任务失败重试：支持自定义任务失败重试次数，当任务失败时将会按照预设的失败重试次数主动进行重试；其中分片任务支持分片粒度的失败重试；</li>
+<li>任务失败告警；默认提供邮件方式失败告警，同时预留扩展接口，可方便的扩展短信、钉钉等告警方式；</li>
+<li>分片广播任务：执行器集群部署时，任务路由策略选择”分片广播”情况下，一次任务调度将会广播触发集群中所有执行器执行一次任务，可根据分片参数开发分片任务；</li>
+<li>动态分片：分片广播任务以执行器为维度进行分片，支持动态扩容执行器集群从而动态增加分片数量，协同进行业务处理；在进行大数据量业务操作时可显著提升任务处理能力和速度。</li>
+<li>事件触发：除了”Cron方式”和”任务依赖方式”触发任务执行之外，支持基于事件的触发任务方式。调度中心提供触发任务单次执行的API服务，可根据业务事件灵活触发。</li>
+<li>任务进度监控：支持实时监控任务进度；</li>
+<li>Rolling实时日志：支持在线查看调度结果，并且支持以Rolling方式实时查看执行器输出的完整的执行日志；</li>
+<li>GLUE：提供Web IDE，支持在线开发任务逻辑代码，动态发布，实时编译生效，省略部署上线的过程。支持30个版本的历史版本回溯。</li>
+<li>脚本任务：支持以GLUE模式开发和运行脚本任务，包括Shell、Python、NodeJS、PHP、PowerShell等类型脚本;</li>
+<li>命令行任务：原生提供通用命令行任务Handler（Bean任务，”CommandJobHandler”）；业务方只需要提供命令行即可；</li>
+<li>任务依赖：支持配置子任务依赖，当父任务执行结束且执行成功后将会主动触发一次子任务的执行, 多个子任务用逗号分隔；</li>
+<li>一致性：“调度中心”通过DB锁保证集群分布式调度的一致性, 一次任务调度只会触发一次执行；</li>
+<li>自定义任务参数：支持在线配置调度任务入参，即时生效；</li>
+<li>调度线程池：调度系统多线程触发调度运行，确保调度精确执行，不被堵塞；</li>
+<li>数据加密：调度中心和执行器之间的通讯进行数据加密，提升调度信息安全性；</li>
+<li>邮件报警：任务失败时支持邮件报警，支持配置多邮件地址群发报警邮件；</li>
+<li>推送maven中央仓库: 将会把最新稳定版推送到maven中央仓库, 方便用户接入和使用;</li>
+<li>运行报表：支持实时查看运行数据，如任务数量、调度次数、执行器数量等；以及调度报表，如调度日期分布图，调度成功分布图等；</li>
+<li>全异步：任务调度流程全异步化设计实现，如异步调度、异步运行、异步回调等，有效对密集调度进行流量削峰，理论上支持任意时长任务的运行；</li>
+<li>跨平台：原生提供通用HTTP任务Handler（Bean任务，”HttpJobHandler”）；业务方只需要提供HTTP链接即可，不限制语言、平台；</li>
+<li>国际化：调度中心支持国际化设置，提供中文、英文两种可选语言，默认为中文；</li>
+<li>容器化：提供官方docker镜像，并实时更新推送dockerhub，进一步实现产品开箱即用；</li>
+<li>线程池隔离：调度线程池进行隔离拆分，慢任务自动降级进入”Slow”线程池，避免耗尽调度线程，提高系统稳定性；；</li>
+<li>用户管理：支持在线管理系统用户，存在管理员、普通用户两种角色；</li>
+<li>权限控制：执行器维度进行权限控制，管理员拥有全量权限，普通用户需要分配执行器权限后才允许相关操作；</li>
+</ol>
+<h3 id="1-3-官方提供的信息："><a href="#1-3-官方提供的信息：" class="headerlink" title="1.3 官方提供的信息："></a>1.3 官方提供的信息：</h3><ul>
+<li>文档地址：<a href="https://link.juejin.cn/?target=http://www.xuxueli.com/xxl-job/%23/" title="http://www.xuxueli.com/xxl-job/#/">www.xuxueli.com/xxl-job/#/</a></li>
+<li>源码地址：<ul>
+<li>GitHub: <a href="https://link.juejin.cn/?target=https://github.com/xuxueli/xxl-job" title="https://github.com/xuxueli/xxl-job">github.com/xuxueli/xxl…</a></li>
+<li>码云： <a href="https://link.juejin.cn/?target=https://gitee.com/xuxueli0323/xxl-job" title="https://gitee.com/xuxueli0323/xxl-job">gitee.com/xuxueli0323…</a></li>
+</ul>
+</li>
+<li>环境：<ul>
+<li>Maven 3+</li>
+<li>Jdk 1.7+</li>
+<li>Mysql 5.6+</li>
+</ul>
+</li>
+<li>快速入门：<ul>
+<li>快速搭建XXL-JOB框架的步骤介绍，请参考官方文档： <a href="https://link.juejin.cn/?target=http://www.xuxueli.com/xxl-job/%23/?id=%25E3%2580%258A%25E5%2588%2586%25E5%25B8%2583%25E5%25BC%258F%25E4%25BB%25BB%25E5%258A%25A1%25E8%25B0%2583%25E5%25BA%25A6%25E5%25B9%25B3%25E5%258F%25B0xxl-job%25E3%2580%258B%25E3%2580%2581" title="http://www.xuxueli.com/xxl-job/#/?id=%E3%80%8A%E5%88%86%E5%B8%83%E5%BC%8F%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E5%B9%B3%E5%8F%B0xxl-job%E3%80%8B%E3%80%81">www.xuxueli.com/xxl-job/#/?…</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="二-XXL-JOB的使用"><a href="#二-XXL-JOB的使用" class="headerlink" title="二. XXL-JOB的使用"></a>二. XXL-JOB的使用</h2><h3 id="2-1-准备工作-配置调度中心"><a href="#2-1-准备工作-配置调度中心" class="headerlink" title="2.1 准备工作- 配置调度中心"></a>2.1 准备工作- 配置调度中心</h3><ol>
+<li>下载官方源码</li>
+<li>将项目中 /xxl-job/doc/db/ 目录下的 tables_xxl_job.sql 的数据库表导入数据库</li>
+</ol>
+<h3 id="2-2-配置执行器"><a href="#2-2-配置执行器" class="headerlink" title="2.2 配置执行器"></a>2.2 配置执行器</h3><ol>
+<li><p>引入依赖包：</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token comment">&lt;!-- xxl-job-core --&gt;</span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>com.cdmtc<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>xxl-job-core<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">&gt;</span></span>2.0.2<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+</li>
+<li><p>配置配置项： </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/e762bd5c1b3f4e799e2a0c14da6ab9cf_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+</ol>
+<blockquote>
+<p>修改了端口号为8888,所以这里的record.xxl.job.admin.address<strong>可视化界面</strong>配置的端口号改为了8888 executor： 执行器的配置信息</p>
+</blockquote>
+<ul>
+<li>XXL-JOB执行器的相关配置项的意义，如下所示：<ul>
+<li><p>xxl.job.admin.addresses 调度中心的部署地址。<strong>若调度中心采用集群部署，存在多个地址，则用逗号分隔。</strong>执行器将会使用该地址进行”执行器心跳注册”和”任务结果回调”。</p>
+</li>
+<li><p>xxl.job.executor.appname 执行器的应用名称，它是执行器心跳注册的分组依据。</p>
+</li>
+<li><p>xxl.job.executor.ip 执行器的IP地址，用于”调度中心请求并触发任务”和”执行器注册”。执行器IP默认为空，表示自动获取IP。多网卡时可手动设置指定IP，手动设置IP时将会绑定Host。</p>
+</li>
+<li><p>xxl.job.executor.port 执行器的端口号，默认值为9999。单机部署多个执行器时，注意要配置不同的执行器端口。</p>
+</li>
+<li><p>xxl.job.accessToken 执行器的通信令牌，非空时启用。</p>
+</li>
+<li><p>xxl.job.executor.logpath 执行器输出的日志文件的存储路径，需要拥有该路径的读写权限。</p>
+</li>
+<li><p>xxl.job.executor.logretentiondays 执行器日志文件的定期清理功能，指定日志保存天数，日志文件过期自动删除。限制至少保存3天，否则功能不生效。</p>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>注意，XXL-JOB执行器的配置文件也可以交给Disconf进行托管。</p>
+</blockquote>
+<ol start="3">
+<li><p>创建XxlJobConfig.java</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>cdmtc<span class="token punctuation">.</span>config</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>xxl<span class="token punctuation">.</span>job<span class="token punctuation">.</span>core<span class="token punctuation">.</span>executor<span class="token punctuation">.</span>impl<span class="token punctuation">.</span></span><span class="token class-name">XxlJobSpringExecutor</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>slf4j<span class="token punctuation">.</span></span><span class="token class-name">Logger</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>slf4j<span class="token punctuation">.</span></span><span class="token class-name">LoggerFactory</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>beans<span class="token punctuation">.</span>factory<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">Value</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>context<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">Bean</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>context<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">Configuration</span></span><span class="token punctuation">;</span>
+
+<span class="token comment">/**
+ * xxl-job config
+ *
+ * @author xuxueli 2017-04-28
+ */</span>
+<span class="token annotation punctuation">@Configuration</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">XxlJobConfig</span> <span class="token punctuation">{</span>
+    <span class="token keyword">private</span> <span class="token class-name">Logger</span> logger <span class="token operator">=</span> <span class="token class-name">LoggerFactory</span><span class="token punctuation">.</span><span class="token function">getLogger</span><span class="token punctuation">(</span><span class="token class-name">XxlJobConfig</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@Value</span><span class="token punctuation">(</span><span class="token string">"${record.xxl.job.admin.addresses}"</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> adminAddresses<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@Value</span><span class="token punctuation">(</span><span class="token string">"${record.xxl.job.executor.appname}"</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> appName<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@Value</span><span class="token punctuation">(</span><span class="token string">"${record.xxl.job.executor.ip}"</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> ip<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@Value</span><span class="token punctuation">(</span><span class="token string">"${record.xxl.job.executor.port}"</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> <span class="token keyword">int</span> port<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@Value</span><span class="token punctuation">(</span><span class="token string">"${record.xxl.job.accessToken}"</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> accessToken<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@Value</span><span class="token punctuation">(</span><span class="token string">"${record.xxl.job.executor.logpath}"</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> logPath<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@Value</span><span class="token punctuation">(</span><span class="token string">"${record.xxl.job.executor.logretentiondays}"</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> <span class="token keyword">int</span> logRetentionDays<span class="token punctuation">;</span>
+
+
+    <span class="token annotation punctuation">@Bean</span><span class="token punctuation">(</span>initMethod <span class="token operator">=</span> <span class="token string">"start"</span><span class="token punctuation">,</span> destroyMethod <span class="token operator">=</span> <span class="token string">"destroy"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">XxlJobSpringExecutor</span> <span class="token function">xxlJobExecutor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        logger<span class="token punctuation">.</span><span class="token function">info</span><span class="token punctuation">(</span><span class="token string">"&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt; xxl-job config init."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">XxlJobSpringExecutor</span> xxlJobSpringExecutor <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">XxlJobSpringExecutor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        xxlJobSpringExecutor<span class="token punctuation">.</span><span class="token function">setAdminAddresses</span><span class="token punctuation">(</span>adminAddresses<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        xxlJobSpringExecutor<span class="token punctuation">.</span><span class="token function">setAppName</span><span class="token punctuation">(</span>appName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        xxlJobSpringExecutor<span class="token punctuation">.</span><span class="token function">setIp</span><span class="token punctuation">(</span>ip<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        xxlJobSpringExecutor<span class="token punctuation">.</span><span class="token function">setPort</span><span class="token punctuation">(</span>port<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        xxlJobSpringExecutor<span class="token punctuation">.</span><span class="token function">setAccessToken</span><span class="token punctuation">(</span>accessToken<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        xxlJobSpringExecutor<span class="token punctuation">.</span><span class="token function">setLogPath</span><span class="token punctuation">(</span>logPath<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        xxlJobSpringExecutor<span class="token punctuation">.</span><span class="token function">setLogRetentionDays</span><span class="token punctuation">(</span>logRetentionDays<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">return</span> xxlJobSpringExecutor<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 针对多网卡、容器内部署等情况，可借助 "spring-cloud-commons" 提供的 "InetUtils" 组件灵活定制注册IP；
+     *
+     *      1、引入依赖：
+     *          &lt;dependency&gt;
+     *             &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+     *             &lt;artifactId&gt;spring-cloud-commons&lt;/artifactId&gt;
+     *             &lt;version&gt;${version}&lt;/version&gt;
+     *         &lt;/dependency&gt;
+     *
+     *      2、配置文件，或者容器启动变量
+     *          spring.cloud.inetutils.preferred-networks: 'xxx.xxx.xxx.'
+     *
+     *      3、获取IP
+     *          String ip_ = inetUtils.findFirstNonLoopbackHostInfo().getIpAddress();
+     */</span>
+
+
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+</ol>
+<blockquote>
+<p>这是一个执行器配置类，用来读取执行器的配置信息</p>
+</blockquote>
+<ul>
+<li><p>XxlJobConfig配置类有两点需要注意：</p>
+</li>
+<li><p>组件扫描</p>
+<ul>
+<li>第2行使用@ComponentScan注解，扫描com.example.demo.jobhandler包，将其中的任务处理器加载至Spring容器。</li>
+</ul>
+</li>
+<li><p>获取执行器实例</p>
+<ul>
+<li>第29行的xxlJobExecutor()方法会实例化一个XXL-JOB执行器对象，执行器初始化时调用它的start()方法，执行器销毁时调用它的destroy()方法。</li>
+</ul>
+</li>
+</ul>
+<ol start="4">
+<li><p>添加定时任务： </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/48b283b2ef434c1cb507db09ebbde689_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+</ol>
+<h3 id="2-3-配置可视化界面"><a href="#2-3-配置可视化界面" class="headerlink" title="2.3 配置可视化界面"></a>2.3 配置可视化界面</h3><ol>
+<li><p>配置数据库路径以及其他信息 </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/58a64035939249da959b2cbd8f345cf4_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+<li><p>配置登陆账号密码 </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/2cf9ae7e103c4dafabed61951728dc1d_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+</ol>
+<blockquote>
+<p>可修改为其他账号密码</p>
+</blockquote>
+<ol start="3">
+<li>启动项目：XxlJobAdminApplication.java</li>
+<li>登陆可视化界面 地址： <a href="https://link.juejin.cn/?target=http://10.4.7.214:8080/xxl-job-admin/jobinfo" title="http://10.4.7.214:8080/xxl-job-admin/jobinfo">http://10.4.7.214:8080/xxl-job-admin/jobinfo</a> 【可先等配置好了执行器再进行登陆，端口可自行配置或修改，默认是8080,这里演示的端口号为8888】</li>
+</ol>
+<blockquote>
+<p>如需配置集群等其他操作可参考官方文档</p>
+</blockquote>
+<h3 id="2-4-开发第一个任务-Hello-world"><a href="#2-4-开发第一个任务-Hello-world" class="headerlink" title="2.4 开发第一个任务 Hello,world"></a>2.4 开发第一个任务 Hello,world</h3><ol>
+<li><p>首先在配置好了执行器的微服务下创建定时任务代码： </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/060ea8edaa3d49c59d41dc8a84193712_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+<li><p>依次启动微服务项目(Eureka,config…等)</p>
+</li>
+<li><p>启动调度中心： XxlJobAdminApplication.java</p>
+</li>
+<li><p>登录调度中心，输入账号密码，然后配置执行器 </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/7e530c7641de48068036491f1046a2c4_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"> </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/f4035f4e44b24f1f8a274bc6da0d5c34_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+<li><p>进入任务管理页面 </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/df8524c0c0f649b9a2638c3e971659ce_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+<li><p>点击新增任务,配置对应相关参数 </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/a57a7cafe55240ff9355c71ff48160c2_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="v"></p>
+</li>
+<li><p>返回任务管理页面 </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/91f020f8280f465d904e83738ccef3c6_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+<li><p>如果点击<strong>执行任务</strong>，则会只执行一次 </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/ab5f20fbdb364522b0ada36199e435a2_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+<li><p>如果点击<strong>日志</strong>，则跳转至调度日志页面 </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/63364410b6d041568d7dd394d73e384f_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+<li><p>如果点击<strong>启动</strong>，则直接启动定时任务(按照Corn表达式定时执行任务)，并且启动按钮会变成停止按钮 </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/e534f79805814fcaa7ecf4c74d6c50b0_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+<p>如果没有点击停止按钮的话，则会一直是启动状态，如果点击了停止按钮，则定时任务停止，Corn表达式不再生效</p>
+</li>
+<li><p>如果点击<strong>编辑</strong>，则进入定时任务的更新页面 </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/c808eb0dbd364b66b3ef3fbe4551bd17_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+<li><p>如果点击<strong>删除</strong>，则直接删除此定时任务配置；</p>
+</li>
+<li><p>如果点击<strong>执行器</strong>，则展示该执行器下的对应定时任务。</p>
+</li>
+<li><p>任务描述和JobHandler则为搜索条件，对定时任务配置进行搜索；</p>
+</li>
+</ol>
+<h3 id="2-5-运行报表"><a href="#2-5-运行报表" class="headerlink" title="2.5 运行报表"></a>2.5 运行报表</h3><ul>
+<li><p>可视化直观展示定时任务运行情况</p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/65f243a6aefa47afb630ce2c0b4c11fa_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+<h2 id="三-可视化界面各功能详细介绍"><a href="#三-可视化界面各功能详细介绍" class="headerlink" title="三. 可视化界面各功能详细介绍"></a>三. 可视化界面各功能详细介绍</h2><h3 id="3-1-新增执行器时，需要填写的信息，如下所示："><a href="#3-1-新增执行器时，需要填写的信息，如下所示：" class="headerlink" title="3.1 新增执行器时，需要填写的信息，如下所示："></a>3.1 新增执行器时，需要填写的信息，如下所示：</h3><ul>
+<li>AppName：这是用来唯一标识每个执行器集群的应用名称，执行器会周期性地以AppName为参数进行自动注册。可通过该配置自动发现注册成功的执行器，供任务调度时使用。</li>
+<li>名称：执行器的名称，因为AppName限制字母数字等组成，可读性不强，名称可以提高执行器的可读性。</li>
+<li>排序：执行器的排序，系统中需要执行器的地方，如任务新增，将会按照该排序读取可用的执行器列表。</li>
+<li>注册方式：调度中心获取执行器地址的方式，有以下两种：</li>
+<li>自动注册：执行器自动进行执行器注册，调度中心通过底层注册表可以动态发现执行器机器地址。</li>
+<li>手动录入：人工手动录入执行器的地址信息，多地址逗号分隔，供调度中心使用。</li>
+<li>机器地址：只有在“注册方式”为“手动录入”时可编辑，支持人工维护执行器的地址信息。 <img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/8c3070bdfc744d05b60b629e5e5030bb_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></li>
+</ul>
+<blockquote>
+<p>注意，AppName的取值应该和示例工程的application.properties文件中的xxl.job.executor.appname字段的取值相同，注册方式应该选择自动注册。新增完成之后，就可以在执行器列表中看到新建的执行器， 而我在写入的时候将applcation.properties替换为了bootstrap.yml，但内容不变；</p>
+</blockquote>
+<h3 id="3-2-新增任务时，需要填写的信息，如下所示："><a href="#3-2-新增任务时，需要填写的信息，如下所示：" class="headerlink" title="3.2 新增任务时，需要填写的信息，如下所示："></a>3.2 新增任务时，需要填写的信息，如下所示：</h3><ul>
+<li>执行器：任务绑定的执行器，任务触发调度时将会自动发现注册成功的执行器，实现任务自动发现功能；另一方面，也可以方便地进行任务分组。每个任务必须绑定一个执行器，可以在“执行器管理”页面进行设置。</li>
+<li>任务描述：任务的描述信息，便于任务管理。</li>
+<li>路由策略：当执行器集群部署时，提供丰富的路由策略，包括：<ul>
+<li>FIRST（第一个）：固定选择第一个机器。</li>
+<li>LAST（最后一个）：固定选择最后一个机器。</li>
+<li>ROUND（轮询）：轮流选择每台机器。</li>
+<li>RANDOM（随机）：随机选择在线的机器。</li>
+<li>CONSISTENT_HASH（一致性HASH）：每个任务按照Hash算法固定选择某一台机器，且所有任务均匀散列在不同机器上。</li>
+<li>LEAST_FREQUENTLY_USED（最不经常使用）：使用频率最低的机器优先被选举。</li>
+<li>LEAST_RECENTLY_USED（最近最久未使用）：最久为使用的机器优先被选举。</li>
+<li>FAILOVER（故障转移）：按照顺序依次进行心跳检测，第一个心跳检测成功的机器选定为目标执行器并发起调度。</li>
+<li>BUSYOVER（忙碌转移）：按照顺序依次进行空闲检测，第一个空闲检测成功的机器选定为目标执行器并发起调度。</li>
+<li>SHARDING_BROADCAST(分片广播)：广播触发对应集群中所有机器执行一次任务，同时传递分片参数；可根据分片参数开发分片任务。</li>
+</ul>
+</li>
+<li>Cron：触发任务执行的Cron表达式，具体可百度。</li>
+<li>运行模式：<ul>
+<li>BEAN模式：任务以JobHandler的方式维护在执行器端；需要结合 “JobHandler”属性匹配执行器中的任务；</li>
+<li>GLUE模式(Java)：任务以源码方式维护在调度中心；该模式的任务实际上是一段继承自IJobHandler的Java类代码并以“groovy”源码的方式维护，它在执行器项目中运行，可使用@Resource/@Autowire注入执行器里中的其他服务；</li>
+<li>GLUE模式(Shell)：任务以源码方式维护在调度中心；该模式的任务实际上是一段“shell”脚本；</li>
+<li>GLUE模式(Python)：任务以源码方式维护在调度中心；该模式的任务实际上是一段“python”脚本；</li>
+<li>GLUE模式(NodeJS)：任务以源码方式维护在调度中心；该模式的任务实际上是一段“nodejs”脚本；</li>
+</ul>
+</li>
+<li>JobHandler：<ul>
+<li>只有在运行模式为“BEAN模式”时生效，对应执行器中新开发的JobHandler类的“@JobHandler”注解自定义的value值。</li>
+</ul>
+</li>
+<li>子任务：<ul>
+<li>每个任务都拥有一个唯一的任务ID（任务ID可以从任务列表获取），当本任务执行结束并且执行成功时，将会触发子任务ID所对应的任务的一次主动调度。</li>
+</ul>
+</li>
+<li>阻塞处理策略：调度过于密集，执行器来不及处理时的处理策略：<ul>
+<li>失败告警（默认）：调度失败和执行失败时，都将会触发失败报警，默认会发送报警邮件。</li>
+<li>失败重试：调度失败时，除了进行失败告警之外，将会自动重试一次；注意在执行失败时不会重试，而是根据回调返回值判断是否重试。</li>
+</ul>
+</li>
+<li>任务参数：任务执行所需的参数，多个参数时用逗号分隔，任务执行时将会把多个参数转换成数组传入。</li>
+<li>报警邮件：任务调度失败时邮件通知的邮箱地址，支持配置多邮箱地址，配置多个邮箱地址时用逗号分隔。</li>
+<li>负责人：任务的负责人。</li>
+</ul>
+<blockquote>
+<p>注意，编辑任务时也会弹出类似的窗口，其中的输入项请参考新增任务窗口。 </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/e484673aca844b12bea58a5f9f112ef0_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</blockquote>
+<h3 id="3-3-BEAN模式任务"><a href="#3-3-BEAN模式任务" class="headerlink" title="3.3 BEAN模式任务"></a>3.3 BEAN模式任务</h3><ul>
+<li>BEAN模式：<ul>
+<li>任务逻辑以JobHandler的形式存在于“执行器”所在项目中，如我们刚刚所演示的<strong>Hello,World</strong> 的入门案例</li>
+</ul>
+</li>
+<li>上述代码有三点需要注意：<ul>
+<li>必须使用XXL-JOB的@JobHandler注解（第1行），指定JobHandler的名称为“demoJobHandler”，在调度中心新建任务的JobHandler字段的取值要与此相同。</li>
+<li>必须继承IJobHandler抽象类（第3行），并且实现它的execute()方法，这是实现任务逻辑的方法。</li>
+<li>IJobHandler抽象类还有init()方法和destroy()方法，这两个方法是空方法，在任务实例初始化和销毁时调用，任务实现类可以选择性地覆盖这两个方法。</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-4-GLUE（Java）模式任务，"><a href="#3-4-GLUE（Java）模式任务，" class="headerlink" title="3.4 GLUE（Java）模式任务，"></a>3.4 GLUE（Java）模式任务，</h3><ul>
+<li><p>任务以源码方式维护在调度中心，支持通过Web IDE在线更新，实时编译和生效，因此不需要指定JobHandler。开发流程如下:</p>
+</li>
+<li><p>Step-1 新建调度任务</p>
+<ul>
+<li><p>参考上文“任务调度属性”对新建的任务进行参数配置，运行模式选择“GLUE模式(Java)”，如下图所示： </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/101d07127dec48808ca0864fdd47707f_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>调度中心会每隔15分钟调度一次这个任务。</p>
+</blockquote>
+<ul>
+<li><p>Step-2 开发任务代码</p>
+</li>
+<li><p>在任务列表中选中指定的GLUE（Java）任务，点击该任务右侧的“GLUE”按钮，将会前往GLUE任务的Web IDE界面，在该界面支持对任务代码进行开发（也可以在IDE中开发完成后，复制粘贴到编辑中）。</p>
+</li>
+<li><p>版本回溯功能：在GLUE任务的Web IDE界面，选择右上角下拉框“版本回溯”，会列出该GLUE任务的更新历史（支持30个版本的版本回溯），选择相应版本即可显示该版本代码，保存后GLUE代码即回退到对应的历史版本。GLUE任务代码和Web IDE界面，如下图所示： </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/fd33b840af97445e84e36fcdb4a7bf81_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+<h3 id="3-5-分片广播任务"><a href="#3-5-分片广播任务" class="headerlink" title="3.5 分片广播任务"></a>3.5 分片广播任务</h3><ul>
+<li><p>执行器集群部署时，任务路由策略选择“分片广播”的情况下，一次任务调度将会广播触发对应集群中所有执行器执行一次任务，同时传递分片参数，可以根据分片参数开发分片任务。</p>
+</li>
+<li><p>“分片广播”以执行器为维度进行分片，支持动态扩容执行器集群从而动态增加分片数量，协同进行业务处理；在进行大数据量业务操作时可显著提升任务处理能力和速度。</p>
+</li>
+<li><p>“分片广播”和普通任务开发流程一致，不同之处在于可以获取分片参数，通过分片参数进行分片业务处理。开发流程如下：</p>
+<ul>
+<li><p>Step-1 开发JobHandler代码</p>
+</li>
+<li><p>在示例工程的com.example.demo.jobhandler包中，新建ShardingJobHandler任务类，关键代码如下所示：</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@JobHandler</span><span class="token punctuation">(</span>value <span class="token operator">=</span> <span class="token string">"shardingJobHandler"</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Service</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">ShardingJobHandler</span> <span class="token keyword">extends</span> <span class="token class-name">IJobHandler</span> <span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token class-name">ReturnT</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> <span class="token function">execute</span><span class="token punctuation">(</span><span class="token class-name">String</span> param<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span> <span class="token punctuation">{</span>
+        <span class="token comment">// 分片参数</span>
+        <span class="token class-name">ShardingUtil<span class="token punctuation">.</span>ShardingVO</span> shardingVO <span class="token operator">=</span> <span class="token class-name">ShardingUtil</span><span class="token punctuation">.</span><span class="token function">getShardingVo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">XxlJobLogger</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"分片参数：当前分片序号 = {0}, 总分片数 = {1}"</span><span class="token punctuation">,</span> shardingVO<span class="token punctuation">.</span><span class="token function">getIndex</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> shardingVO<span class="token punctuation">.</span><span class="token function">getTotal</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// 业务逻辑</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> shardingVO<span class="token punctuation">.</span><span class="token function">getTotal</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>i <span class="token operator">==</span> shardingVO<span class="token punctuation">.</span><span class="token function">getIndex</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token class-name">XxlJobLogger</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"第 {0} 片, 命中分片开始处理"</span><span class="token punctuation">,</span> i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token class-name">XxlJobLogger</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"第 {0} 片, 忽略"</span><span class="token punctuation">,</span> i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> <span class="token constant">SUCCESS</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+</ul>
+</li>
+<li><p>上述代码的第9行获取分片参数，第10行获取分片参数的两个属性：</p>
+<ul>
+<li>shardingVO.getIndex() 当前分片序号（从0开始），执行器集群列表中当前执行器的序号。</li>
+<li>shardingVO.getTotal() 总分片数，执行器集群的总机器数量。</li>
+</ul>
+</li>
+<li><p>Step-2 新建调度任务</p>
+<ul>
+<li><p>参考上文“任务调度属性”对新建的任务进行参数配置，运行模式选择“BEAN模式”，路由策略选择“分片广播”，JobHandler属性填写任务注解@JobHandler中定义的值，如下图所示： </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/81b75ea3b5804ec49524b384c212b2fb_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>调度中心会每隔15分钟广播调度一次shardingJobHandler任务(因为Corn表达式设置了15分钟执行一次)。</p>
+</blockquote>
+<ul>
+<li>分片广播的路由策略不仅适用于BEAN运行模式，而且也适用于GLUE（Java）运行模式。这项功能适用于以下业务场景：</li>
+<li>分片任务场景<ul>
+<li>10个执行器的集群来处理10w条数据，每台机器只需要处理1w条数据，耗时降低10倍。</li>
+</ul>
+</li>
+<li>广播任务场景<ul>
+<li>广播执行器机器运行shell脚本、广播集群节点进行缓存更新等。</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-6-任务管理"><a href="#3-6-任务管理" class="headerlink" title="3.6 任务管理"></a>3.6 任务管理</h3><p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/8de04c29c61e460a967fb658d9e32697_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+<ul>
+<li>在任务列表中，可以看到每个任务的任务ID、任务描述、运行模式、Cron、负责人和状态等信息。用户可以对任务进行以下几种操作：<ul>
+<li>执行：手动触发一次任务调度，不影响原有调度规则。</li>
+<li>暂停/恢复：可对任务进行“暂停”和“恢复”操作。需要注意的是，此处的暂停/恢复仅针对任务的后续调度触发行为，不会影响到已经触发的调度任务。</li>
+<li>日志：可以查看任务历史调度日志。在历史调入日志界面可查看每次任务调度的调度结果、执行结果等，点击“执行日志”按钮可查看执行器完整日志。</li>
+<li>编辑：在弹出的“编辑任务”界面更新任务属性后保存即可，可以修改设置的任务属性信息。</li>
+<li>GLUE：该操作仅针对GLUE任务。将会前往GLUE任务的Web IDE界面，在该界面支持对任务代码进行开发。</li>
+<li>删除：删除这个任务。</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-7-任务调度日志"><a href="#3-7-任务调度日志" class="headerlink" title="3.7 任务调度日志"></a>3.7 任务调度日志</h3><ul>
+<li>在XXL-JOB调度中心，点击进入“调度日志”页面。</li>
+</ul>
+<ol>
+<li><p>查看调度日志</p>
+<ul>
+<li><p>在“调度日志”页面可以查看每次任务调度的调度结果、执行结果等信息，如下图所示： </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/3c493839017f490bb6418cc5968cfcf0_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+<li><p>从调度日志可以获取以下信息：<br>- 调度时间：“调度中心”触发本次调度并向“执行器”发送任务执行信号的时间。<br>- 调度结果：“调度中心”触发本次调度的结果，200表示成功，500或其他表示失败。<br>- 调度备注：“调度中心”触发本次调度的日志信息。<br>- 执行时间：“执行器”中本次任务执行结束后回调的时间。<br>- 执行结果：“执行器”中本次任务执行的结果，200表示成功，500或其他表示失败。<br>- 执行备注：“执行器”中本次任务执行的日志信息。<br>- 在示例工程中，调度日志位于/data/applogs/xxl-job/xxl-job-demo.log，可以在logback.xml文件中进行配置。</p>
+</li>
+</ul>
+</li>
+<li><p>查看执行日志</p>
+<ul>
+<li><p>点击某行日志右侧的 “执行日志” 按钮，可跳转至执行日志界面，可以查看业务代码中打印的完整日志，如下图： </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/98d7e3816ebb4e59ab0dc2c425dfc47b_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+</li>
+<li><p>终止运行中的任务</p>
+</li>
+</ol>
+<ul>
+<li><p>这项功能只针对执行中的任务。在任务日志页面，点击右侧的“终止任务”按钮，将会向本次任务对应的执行器发送任务终止请求，将会终止掉本次任务，同时会清空掉整个任务执行队列，如下图所示： </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/ef3ca89b903946f7b17ef70e0edd6596_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+<li><p><strong>任务终止是通过“interrupt”执行线程的方式实现的，将会触发“InterruptedException”异常。因此，如果JobHandler内部捕获到该异常并消化掉的话，任务终止功能将不起作用。</strong></p>
+</li>
+<li><p><strong>因此, 如果遇到上述任务终止不起作用的情况, 需要在JobHandler中针对“InterruptedException”异常进行特殊处理（向上抛出）。另外，在JobHandler中开启子线程时，子线程也不可捕获处理“InterruptedException”，应该主动向上抛出。</strong></p>
+</li>
+</ul>
+<ol start="4">
+<li><p>删除执行日志 在任务日志页面，选择执行器和任务之后，点击右侧的“清理”按钮将会出现“日志清理”弹框，弹框中支持选择不同类型的日志清理策略，选中后点击“确定”按钮即可进行日志清理操作，如下图所示： </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/fb4d0e744a384f698f2244bfce1ada67_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+</ol>
+<h3 id="3-8-执行失败报警"><a href="#3-8-执行失败报警" class="headerlink" title="3.8 执行失败报警"></a>3.8 执行失败报警</h3><ul>
+<li><p>概述： 当定时任务执行失败的时候，日志会自动记录失败结果，并且在cdmtc.xxl-job里面的application.properties中配置了email邮箱时，可邮件提醒；</p>
+</li>
+<li><p>效果演示： </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/e3266e535c73496c985b42039926636c_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+<li><p>每一次执行失败均可提醒 </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/d676a64801f744249c1ea227bc059af6_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+<li><p>开启短信提醒功能，需要从邮箱中获取授权码，每个邮箱的获取方式可能不同，可具体百度；qq邮箱为从 <strong>设置</strong> 按钮中的 <strong>账户</strong> ，然后选择<strong>POP3/SMTP</strong> 服务，点击开启，按提示获取授权码即可；</p>
+</li>
+</ul>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/9da93b0f7b0144c9b8df8a692851e2a1_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+<ul>
+<li><p>获取授权码图示： </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/0a39422271814a5cabebed1e388e0327_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+<blockquote>
+<p>授权码就是配置文件中的password</p>
+</blockquote>
+<h2 id="四-远程调用XXL-JOB"><a href="#四-远程调用XXL-JOB" class="headerlink" title="四. 远程调用XXL-JOB"></a>四. 远程调用XXL-JOB</h2><h3 id="4-1-远程调用API说明"><a href="#4-1-远程调用API说明" class="headerlink" title="4.1 远程调用API说明"></a>4.1 远程调用API说明</h3><ul>
+<li>这里是使用RestTemplate实现的，也可以使用其他方式实现，后期也需要考虑集群的问题，这里仅以RestTemplate作为示例远程调用接口</li>
+</ul>
+<h3 id="4-2-环境准备"><a href="#4-2-环境准备" class="headerlink" title="4.2 环境准备"></a>4.2 环境准备</h3><ul>
+<li><p>pom.xml:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token prolog">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>project</span> <span class="token attr-name">xmlns</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://maven.apache.org/POM/4.0.0<span class="token punctuation">"</span></span>
+         <span class="token attr-name"><span class="token namespace">xmlns:</span>xsi</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://www.w3.org/2001/XMLSchema-instance<span class="token punctuation">"</span></span>
+         <span class="token attr-name"><span class="token namespace">xsi:</span>schemaLocation</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>modelVersion</span><span class="token punctuation">&gt;</span></span>4.0.0<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>modelVersion</span><span class="token punctuation">&gt;</span></span>
+
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>parent</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>org.springframework.boot<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>spring-boot-starter-parent<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">&gt;</span></span>2.1.2.RELEASE<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>parent</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>com.demo<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>springboot_quick<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">&gt;</span></span>1.0-SNAPSHOT<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">&gt;</span></span>
+
+
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>properties</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>project.build.sourceEncoding</span><span class="token punctuation">&gt;</span></span>UTF-8<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>project.build.sourceEncoding</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>xdocreport.version</span><span class="token punctuation">&gt;</span></span>1.0.5<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>xdocreport.version</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>properties</span><span class="token punctuation">&gt;</span></span>
+
+
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependencies</span><span class="token punctuation">&gt;</span></span>
+        <span class="token comment">&lt;!--web功能的起步依赖--&gt;</span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>org.springframework.boot<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>spring-boot-starter-web<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">&gt;</span></span>
+
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>org.springframework.boot<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>spring-boot-starter-test<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>scope</span><span class="token punctuation">&gt;</span></span>test<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>scope</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependencies</span><span class="token punctuation">&gt;</span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>project</span><span class="token punctuation">&gt;</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+</ul>
+<h3 id="4-3-启动类"><a href="#4-3-启动类" class="headerlink" title="4.3 启动类"></a>4.3 启动类</h3><ul>
+<li><p>MySpringBootApplication.java</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>demo</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>boot<span class="token punctuation">.</span></span><span class="token class-name">SpringApplication</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>boot<span class="token punctuation">.</span>autoconfigure<span class="token punctuation">.</span></span><span class="token class-name">SpringBootApplication</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>boot<span class="token punctuation">.</span>web<span class="token punctuation">.</span>client<span class="token punctuation">.</span></span><span class="token class-name">RestTemplateBuilder</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>context<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">Bean</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>client<span class="token punctuation">.</span></span><span class="token class-name">RestTemplate</span></span><span class="token punctuation">;</span>
+
+<span class="token comment">/**
+ * create by: zhanglei
+ */</span>
+<span class="token comment">//@EnableFeignClients</span>
+<span class="token annotation punctuation">@SpringBootApplication</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">MySpringBootApplication</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+        <span class="token class-name">SpringApplication</span><span class="token punctuation">.</span><span class="token function">run</span><span class="token punctuation">(</span><span class="token class-name">MySpringBootApplication</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token annotation punctuation">@Bean</span>
+    <span class="token class-name">RestTemplate</span> <span class="token function">restTemplate</span><span class="token punctuation">(</span><span class="token class-name">RestTemplateBuilder</span> restTemplateBuilder<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> restTemplateBuilder<span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+</ul>
+<h3 id="4-4-测试类"><a href="#4-4-测试类" class="headerlink" title="4.4 测试类"></a>4.4 测试类</h3><ul>
+<li><p>TestDemo.java</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>demo<span class="token punctuation">.</span></span><span class="token class-name">MySpringBootApplication</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>junit<span class="token punctuation">.</span></span><span class="token class-name">Test</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>junit<span class="token punctuation">.</span>runner<span class="token punctuation">.</span></span><span class="token class-name">RunWith</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>beans<span class="token punctuation">.</span>factory<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">Autowired</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>boot<span class="token punctuation">.</span>test<span class="token punctuation">.</span>context<span class="token punctuation">.</span></span><span class="token class-name">SpringBootTest</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>http<span class="token punctuation">.</span></span><span class="token class-name">HttpEntity</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>http<span class="token punctuation">.</span></span><span class="token class-name">HttpHeaders</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>http<span class="token punctuation">.</span></span><span class="token class-name">ResponseEntity</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>test<span class="token punctuation">.</span>context<span class="token punctuation">.</span>junit4<span class="token punctuation">.</span></span><span class="token class-name">SpringRunner</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">LinkedMultiValueMap</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">MultiValueMap</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>client<span class="token punctuation">.</span></span><span class="token class-name">RestTemplate</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">ArrayList</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">List</span></span><span class="token punctuation">;</span>
+
+<span class="token comment">/**
+ * @create_by: zhanglei
+ * @craete_time 2019/7/2
+ */</span>
+<span class="token annotation punctuation">@SpringBootTest</span><span class="token punctuation">(</span>classes <span class="token operator">=</span> <span class="token class-name">MySpringBootApplication</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@RunWith</span><span class="token punctuation">(</span><span class="token class-name">SpringRunner</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">TestDemo</span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@Test</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">test</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"hello,world"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">private</span> <span class="token class-name">RestTemplate</span> restTemplate<span class="token punctuation">;</span>
+
+    <span class="token comment">/* Cookie 是根据用户名密码生成的，基本不变，可直接保存数据库或者Redis，然后读取即不必反复登录 */</span>
+    <span class="token comment">/* Cookie 如果后期Cookie有失效时间了，则可用定时任务定时刷新或者失效重登重新保存即可 */</span>
+
+    <span class="token comment">/**
+     * 模拟登录并拿到Cookie
+     */</span>
+    <span class="token annotation punctuation">@Test</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">login</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token class-name">HttpHeaders</span> headers <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpHeaders</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">MultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> map <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LinkedMultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"userName"</span><span class="token punctuation">,</span> <span class="token string">"admin"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"password"</span><span class="token punctuation">,</span><span class="token string">"123456"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span> request <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span>map<span class="token punctuation">,</span> headers<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> response <span class="token operator">=</span> restTemplate<span class="token punctuation">.</span><span class="token function">postForEntity</span><span class="token punctuation">(</span><span class="token string">"http://localhost:8888/xxl-job-admin/login"</span><span class="token punctuation">,</span> request<span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>response<span class="token punctuation">.</span><span class="token function">getHeaders</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"Set-Cookie"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                <span class="token comment">//      XXL_JOB_LOGIN_IDENTITY=6333303830376536353837616465323835626137616465396638383162336437; Path=/; HttpOnly</span>
+    <span class="token punctuation">}</span>
+
+
+<span class="token comment">/*   组操作---&gt; 对执行器进行操作  */</span>
+
+    <span class="token comment">/**
+     * 保存组Group
+     */</span>
+    <span class="token annotation punctuation">@Test</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">saveGroup</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token class-name">HttpHeaders</span> headers <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpHeaders</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> cookies <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">/* 登录获取Cookie 这里是直接给Cookie，可使用下方的login方法拿到Cookie给入*/</span>
+        cookies<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"XXL_JOB_LOGIN_IDENTITY=6333303830376536353837616465323835626137616465396638383162336437; Path=/; HttpOnly"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        headers<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token class-name">HttpHeaders</span><span class="token punctuation">.</span><span class="token constant">COOKIE</span><span class="token punctuation">,</span>cookies<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">MultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> map <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LinkedMultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"appName"</span><span class="token punctuation">,</span> <span class="token string">"xxl-job-executor-cdmtc-record"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token comment">//应用名称</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"title"</span><span class="token punctuation">,</span> <span class="token string">"测试执行器"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>      <span class="token comment">//执行器名称</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"order"</span><span class="token punctuation">,</span> <span class="token string">"1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>          <span class="token comment">//排序方式</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"addressType"</span><span class="token punctuation">,</span> <span class="token string">"1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token comment">//注册方式 ：  0为</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"addressList"</span><span class="token punctuation">,</span> <span class="token string">"10.4.7.214:9999,10.4.7.214:9999"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>          <span class="token comment">//多地址逗号分隔</span>
+        <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span> request <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span>map<span class="token punctuation">,</span> headers<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> response <span class="token operator">=</span> restTemplate<span class="token punctuation">.</span><span class="token function">postForEntity</span><span class="token punctuation">(</span><span class="token string">"http://localhost:8888/xxl-job-admin/jobgroup/save"</span><span class="token punctuation">,</span> request<span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>response<span class="token punctuation">.</span><span class="token function">getBody</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token comment">// {"code":200,"msg":null,"content":null}   返回此，且数据库增加数据即为成功</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 修改组
+     */</span>
+    <span class="token annotation punctuation">@Test</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">updateGroup</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token class-name">HttpHeaders</span> headers <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpHeaders</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> cookies <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">/* 登录获取Cookie 这里是直接给Cookie，可使用下方的login方法拿到Cookie给入*/</span>
+        cookies<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"XXL_JOB_LOGIN_IDENTITY=6333303830376536353837616465323835626137616465396638383162336437; Path=/; HttpOnly"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        headers<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token class-name">HttpHeaders</span><span class="token punctuation">.</span><span class="token constant">COOKIE</span><span class="token punctuation">,</span>cookies<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">MultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> map <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LinkedMultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"id"</span><span class="token punctuation">,</span><span class="token string">"4"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>          <span class="token comment">//修改的，id一定不能为空</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"appName"</span><span class="token punctuation">,</span> <span class="token string">"xxl-job-executor-cdmtc-record"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token comment">//应用名称</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"title"</span><span class="token punctuation">,</span> <span class="token string">"测试执行器323223"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>      <span class="token comment">//执行器名称</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"order"</span><span class="token punctuation">,</span> <span class="token string">"1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>          <span class="token comment">//排序方式</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"addressType"</span><span class="token punctuation">,</span> <span class="token string">"1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token comment">//注册方式 ：  0为</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"addressList"</span><span class="token punctuation">,</span> <span class="token string">"10.4.7.214:9999"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>          <span class="token comment">//多地址逗号分隔</span>
+        <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span> request <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span>map<span class="token punctuation">,</span> headers<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> response <span class="token operator">=</span> restTemplate<span class="token punctuation">.</span><span class="token function">postForEntity</span><span class="token punctuation">(</span><span class="token string">"http://localhost:8888/xxl-job-admin/jobgroup/update"</span><span class="token punctuation">,</span> request<span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>response<span class="token punctuation">.</span><span class="token function">getBody</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>         <span class="token comment">//{"code":200,"msg":null,"content":null}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 删除组
+     */</span>
+    <span class="token annotation punctuation">@Test</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">removeGroup</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token class-name">HttpHeaders</span> headers <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpHeaders</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> cookies <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">/* 登录获取Cookie 这里是直接给Cookie，可使用下方的login方法拿到Cookie给入*/</span>
+        cookies<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"XXL_JOB_LOGIN_IDENTITY=6333303830376536353837616465323835626137616465396638383162336437; Path=/; HttpOnly"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        headers<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token class-name">HttpHeaders</span><span class="token punctuation">.</span><span class="token constant">COOKIE</span><span class="token punctuation">,</span>cookies<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">MultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> map <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LinkedMultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"id"</span><span class="token punctuation">,</span><span class="token string">"4"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>          <span class="token comment">//删除的，id一定不能为空</span>
+        <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span> request <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span>map<span class="token punctuation">,</span> headers<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> response <span class="token operator">=</span> restTemplate<span class="token punctuation">.</span><span class="token function">postForEntity</span><span class="token punctuation">(</span><span class="token string">"http://localhost:8888/xxl-job-admin/jobgroup/remove"</span><span class="token punctuation">,</span> request<span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>response<span class="token punctuation">.</span><span class="token function">getBody</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>         <span class="token comment">//{"code":200,"msg":null,"content":null}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/* 定时任务操作：查询，新增,编辑，启动，停止，删除等*/</span>
+    <span class="token comment">/**
+     * 获取指定的执行器下的任务列表
+     */</span>
+    <span class="token annotation punctuation">@Test</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">pageList</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token class-name">HttpHeaders</span> headers <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpHeaders</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> cookies <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">/* 登录获取Cookie 这里是直接给Cookie，可使用下方的login方法拿到Cookie给入*/</span>
+        cookies<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"XXL_JOB_LOGIN_IDENTITY=6333303830376536353837616465323835626137616465396638383162336437; Path=/; HttpOnly"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        headers<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token class-name">HttpHeaders</span><span class="token punctuation">.</span><span class="token constant">COOKIE</span><span class="token punctuation">,</span>cookies<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">MultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> map <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LinkedMultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"jobGroup"</span><span class="token punctuation">,</span> <span class="token string">"2"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span> request <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span>map<span class="token punctuation">,</span> headers<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> response <span class="token operator">=</span> restTemplate<span class="token punctuation">.</span><span class="token function">postForEntity</span><span class="token punctuation">(</span><span class="token string">"http://localhost:8888/xxl-job-admin/jobinfo/pageList"</span><span class="token punctuation">,</span> request<span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>response<span class="token punctuation">.</span><span class="token function">getBody</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>             <span class="token comment">//{"recordsFiltered":4,"data":[{"id":13,"jobGroup":2,"jobCron":"0/1 * * * * ? ","jobDesc":"测试HelloWorld","addTime":1561687650000,"updateTime":1562037928000,"author":"zhanglei","alarmEmail":"1326209681@qq.com","executorRouteStrategy":"FIRST","executorHandler":"firstJobHandler","executorParam":"456464564","executorBlockStrategy":"SERIAL_EXECUTION","executorTimeout":0,"executorFailRetryCount":0,"glueType":"BEAN","glueSource":"","glueRemark":"GLUE代码初始化","glueUpdatetime":1561687650000,"childJobId":"","jobStatus":"NONE"},{"id":12,"jobGroup":2,"jobCron":"0/1 * * * * ? ","jobDesc":"测试HelloWorld","addTime":1561612429000,"updateTime":1561612429000,"author":"zhanglei","alarmEmail":"","executorRouteStrategy":"FIRST","executorHandler":"firstJobHandler","executorParam":"","executorBlockStrategy":"SERIAL_EXECUTION","executorTimeout":0,"executorFailRetryCount":0,"glueType":"BEAN","glueSource":"","glueRemark":"GLUE代码初始化","glueUpdatetime":1561612429000,"childJobId":"","jobStatus":"NONE"},{"id":4,"jobGroup":2,"jobCron":"0/1 * * * * ? ","jobDesc":"测试任务1","addTime":1561538414000,"updateTime":1561538431000,"author":"XXL","alarmEmail":"","executorRouteStrategy":"FIRST","executorHandler":"firstJobHandler","executorParam":"123","executorBlockStrategy":"SERIAL_EXECUTION","executorTimeout":100,"executorFailRetryCount":0,"glueType":"BEAN","glueSource":"","glueRemark":"GLUE代码初始化","glueUpdatetime":1561538414000,"childJobId":"","jobStatus":"NONE"},{"id":2,"jobGroup":2,"jobCron":"0/1 * * * * ? ","jobDesc":"测试任务1","addTime":1561532680000,"updateTime":1561612757000,"author":"XXL","alarmEmail":"","executorRouteStrategy":"FIRST","executorHandler":"demoJobHandler","executorParam":"123","executorBlockStrategy":"SERIAL_EXECUTION","executorTimeout":101,"executorFailRetryCount":1,"glueType":"BEAN","glueSource":"","glueRemark":"GLUE代码初始化","glueUpdatetime":1561532680000,"childJobId":"","jobStatus":"NONE"}],"recordsTotal":4}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 增加定时任务配置
+     */</span>
+    <span class="token annotation punctuation">@Test</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">addInfo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token class-name">HttpHeaders</span> headers <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpHeaders</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> cookies <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">/* 登录获取Cookie 这里是直接给Cookie，可使用下方的login方法拿到Cookie给入*/</span>
+        cookies<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"XXL_JOB_LOGIN_IDENTITY=6333303830376536353837616465323835626137616465396638383162336437; Path=/; HttpOnly"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        headers<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token class-name">HttpHeaders</span><span class="token punctuation">.</span><span class="token constant">COOKIE</span><span class="token punctuation">,</span>cookies<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">MultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> map <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LinkedMultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"jobGroup"</span><span class="token punctuation">,</span><span class="token string">"1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token comment">//执行器主键id</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"jobCron"</span><span class="token punctuation">,</span><span class="token string">"0/1 * * * * ? "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token comment">//表达式</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"jobDesc"</span><span class="token punctuation">,</span><span class="token string">"测试任务我是最新的测试任务啊啊啊啊啊啊"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>         <span class="token comment">//任务描述</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"author"</span><span class="token punctuation">,</span><span class="token string">"zhanglei"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>           <span class="token comment">//负责人</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"alarmEmail"</span><span class="token punctuation">,</span><span class="token string">"1326209681@qq.com"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>     <span class="token comment">//报警邮件</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"executorRouteStrategy"</span><span class="token punctuation">,</span><span class="token string">"FIRST"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>            <span class="token comment">//执行器路由策略</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"executorHandler"</span><span class="token punctuation">,</span><span class="token string">"测试JobHandler"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>              <span class="token comment">//执行器，任务Handler名称</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"executorParam"</span><span class="token punctuation">,</span><span class="token string">"121454"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>            <span class="token comment">//执行器，任务参数</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"executorBlockStrategy"</span><span class="token punctuation">,</span><span class="token string">"SERIAL_EXECUTION"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token comment">//阻塞处理策略</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"executorTimeout"</span><span class="token punctuation">,</span><span class="token string">"101"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>          <span class="token comment">//任务执行超时时间，单位秒</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"executorFailRetryCount"</span><span class="token punctuation">,</span><span class="token string">"1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>       <span class="token comment">//失败重试次数</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"glueType"</span><span class="token punctuation">,</span><span class="token string">"BEAN"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                 <span class="token comment">//GLUE类型	#com.xxl.job.core.glue.GlueTypeEnum</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"glueSource"</span><span class="token punctuation">,</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">;</span>               <span class="token comment">//GLUE源代码</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"glueRemark"</span><span class="token punctuation">,</span><span class="token string">"GLUE代码初始化"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>               <span class="token comment">//GLUE备注</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"childJobId"</span><span class="token punctuation">,</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">;</span>               <span class="token comment">//子任务ID,多个逗号分隔</span>
+<span class="token comment">//        map.add("jobStatus","");                //任务状态 【base on quartz】</span>
+        <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span> request <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span>map<span class="token punctuation">,</span> headers<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> response <span class="token operator">=</span> restTemplate<span class="token punctuation">.</span><span class="token function">postForEntity</span><span class="token punctuation">(</span><span class="token string">"http://localhost:8888/xxl-job-admin/jobinfo/add"</span><span class="token punctuation">,</span> request<span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>response<span class="token punctuation">.</span><span class="token function">getBody</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>             <span class="token comment">//{"code":200,"msg":null,"content":"15"}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 修改定时任务配置
+     */</span>
+    <span class="token annotation punctuation">@Test</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">updateInfo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token class-name">HttpHeaders</span> headers <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpHeaders</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> cookies <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">/* 登录获取Cookie 这里是直接给Cookie，可使用下方的login方法拿到Cookie给入*/</span>
+        cookies<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"XXL_JOB_LOGIN_IDENTITY=6333303830376536353837616465323835626137616465396638383162336437; Path=/; HttpOnly"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        headers<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token class-name">HttpHeaders</span><span class="token punctuation">.</span><span class="token constant">COOKIE</span><span class="token punctuation">,</span>cookies<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">MultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> map <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LinkedMultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"id"</span><span class="token punctuation">,</span><span class="token string">"14"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>             <span class="token comment">//注意：修改必须带主键</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"jobGroup"</span><span class="token punctuation">,</span><span class="token string">"1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token comment">//执行器主键id</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"jobCron"</span><span class="token punctuation">,</span><span class="token string">"0/1 * * * * ? "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token comment">//表达式</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"jobDesc"</span><span class="token punctuation">,</span><span class="token string">"测试任务我是最新的测试任务啊啊啊啊啊啊"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>         <span class="token comment">//任务描述</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"author"</span><span class="token punctuation">,</span><span class="token string">"zhanglei"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>           <span class="token comment">//负责人</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"alarmEmail"</span><span class="token punctuation">,</span><span class="token string">"1326209681@qq.com"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>     <span class="token comment">//报警邮件</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"executorRouteStrategy"</span><span class="token punctuation">,</span><span class="token string">"FIRST"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>            <span class="token comment">//执行器路由策略</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"executorHandler"</span><span class="token punctuation">,</span><span class="token string">"测试JobHandler"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>              <span class="token comment">//执行器，任务Handler名称</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"executorParam"</span><span class="token punctuation">,</span><span class="token string">"121454"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>            <span class="token comment">//执行器，任务参数</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"executorBlockStrategy"</span><span class="token punctuation">,</span><span class="token string">"SERIAL_EXECUTION"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token comment">//阻塞处理策略</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"executorTimeout"</span><span class="token punctuation">,</span><span class="token string">"101"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>          <span class="token comment">//任务执行超时时间，单位秒</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"executorFailRetryCount"</span><span class="token punctuation">,</span><span class="token string">"1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>       <span class="token comment">//失败重试次数</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"glueType"</span><span class="token punctuation">,</span><span class="token string">"BEAN"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                 <span class="token comment">//GLUE类型	#com.xxl.job.core.glue.GlueTypeEnum</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"glueSource"</span><span class="token punctuation">,</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">;</span>               <span class="token comment">//GLUE源代码</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"glueRemark"</span><span class="token punctuation">,</span><span class="token string">"GLUE代码初始化"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>               <span class="token comment">//GLUE备注</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"childJobId"</span><span class="token punctuation">,</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">;</span>               <span class="token comment">//子任务ID,多个逗号分隔</span>
+<span class="token comment">//        map.add("jobStatus","");                //任务状态 【base on quartz】</span>
+        <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span> request <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span>map<span class="token punctuation">,</span> headers<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> response <span class="token operator">=</span> restTemplate<span class="token punctuation">.</span><span class="token function">postForEntity</span><span class="token punctuation">(</span><span class="token string">"http://localhost:8888/xxl-job-admin/jobinfo/update"</span><span class="token punctuation">,</span> request<span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>response<span class="token punctuation">.</span><span class="token function">getBody</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>             <span class="token comment">//{"code":200,"msg":null,"content":null}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 删除定时任务配置
+     */</span>
+    <span class="token annotation punctuation">@Test</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">removeInfo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token class-name">HttpHeaders</span> headers <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpHeaders</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> cookies <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">/* 登录获取Cookie 这里是直接给Cookie，可使用下方的login方法拿到Cookie给入*/</span>
+        cookies<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"XXL_JOB_LOGIN_IDENTITY=6333303830376536353837616465323835626137616465396638383162336437; Path=/; HttpOnly"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        headers<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token class-name">HttpHeaders</span><span class="token punctuation">.</span><span class="token constant">COOKIE</span><span class="token punctuation">,</span>cookies<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">MultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> map <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LinkedMultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"id"</span><span class="token punctuation">,</span><span class="token string">"15"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>             <span class="token comment">//注意：删除必须带主键</span>
+        <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span> request <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span>map<span class="token punctuation">,</span> headers<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> response <span class="token operator">=</span> restTemplate<span class="token punctuation">.</span><span class="token function">postForEntity</span><span class="token punctuation">(</span><span class="token string">"http://localhost:8888/xxl-job-admin/jobinfo/remove"</span><span class="token punctuation">,</span> request<span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>response<span class="token punctuation">.</span><span class="token function">getBody</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>             <span class="token comment">//{"code":200,"msg":null,"content":null}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 启动定时任务
+     */</span>
+    <span class="token annotation punctuation">@Test</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">startInfo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token class-name">HttpHeaders</span> headers <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpHeaders</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> cookies <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">/* 登录获取Cookie 这里是直接给Cookie，可使用下方的login方法拿到Cookie给入*/</span>
+        cookies<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"XXL_JOB_LOGIN_IDENTITY=6333303830376536353837616465323835626137616465396638383162336437; Path=/; HttpOnly"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        headers<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token class-name">HttpHeaders</span><span class="token punctuation">.</span><span class="token constant">COOKIE</span><span class="token punctuation">,</span>cookies<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">MultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> map <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LinkedMultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"id"</span><span class="token punctuation">,</span><span class="token string">"13"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>             <span class="token comment">//启动的任务id</span>
+        <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span> request <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span>map<span class="token punctuation">,</span> headers<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> response <span class="token operator">=</span> restTemplate<span class="token punctuation">.</span><span class="token function">postForEntity</span><span class="token punctuation">(</span><span class="token string">"http://localhost:8888/xxl-job-admin/jobinfo/start"</span><span class="token punctuation">,</span> request<span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>response<span class="token punctuation">.</span><span class="token function">getBody</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>             <span class="token comment">//{"code":200,"msg":null,"content":null}</span>
+    <span class="token punctuation">}</span>
+
+
+    <span class="token comment">/**
+     * 停止定时任务
+     */</span>
+    <span class="token annotation punctuation">@Test</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">stopInfo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token class-name">HttpHeaders</span> headers <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpHeaders</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> cookies <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">/* 登录获取Cookie 这里是直接给Cookie，可使用下方的login方法拿到Cookie给入*/</span>
+        cookies<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"XXL_JOB_LOGIN_IDENTITY=6333303830376536353837616465323835626137616465396638383162336437; Path=/; HttpOnly"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        headers<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token class-name">HttpHeaders</span><span class="token punctuation">.</span><span class="token constant">COOKIE</span><span class="token punctuation">,</span>cookies<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">MultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> map <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LinkedMultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"id"</span><span class="token punctuation">,</span><span class="token string">"13"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>             <span class="token comment">//启动的任务id</span>
+        <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span> request <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span>map<span class="token punctuation">,</span> headers<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> response <span class="token operator">=</span> restTemplate<span class="token punctuation">.</span><span class="token function">postForEntity</span><span class="token punctuation">(</span><span class="token string">"http://localhost:8888/xxl-job-admin/jobinfo/stop"</span><span class="token punctuation">,</span> request<span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>response<span class="token punctuation">.</span><span class="token function">getBody</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>             <span class="token comment">//{"code":200,"msg":null,"content":null}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 执行一次定时任务
+     */</span>
+    <span class="token annotation punctuation">@Test</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">startOne</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token class-name">HttpHeaders</span> headers <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpHeaders</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> cookies <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">/* 登录获取Cookie 这里是直接给Cookie，可使用下方的login方法拿到Cookie给入*/</span>
+        cookies<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"XXL_JOB_LOGIN_IDENTITY=6333303830376536353837616465323835626137616465396638383162336437; Path=/; HttpOnly"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        headers<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token class-name">HttpHeaders</span><span class="token punctuation">.</span><span class="token constant">COOKIE</span><span class="token punctuation">,</span>cookies<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">MultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> map <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LinkedMultiValueMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"id"</span><span class="token punctuation">,</span><span class="token string">"13"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>             <span class="token comment">//启动的任务id</span>
+        map<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"executorParam"</span><span class="token punctuation">,</span><span class="token string">"13"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>             <span class="token comment">//启动的任务参数</span>
+        <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span> request <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HttpEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">MultiValueMap</span><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span>map<span class="token punctuation">,</span> headers<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> response <span class="token operator">=</span> restTemplate<span class="token punctuation">.</span><span class="token function">postForEntity</span><span class="token punctuation">(</span><span class="token string">"http://localhost:8888/xxl-job-admin/jobinfo/trigger"</span><span class="token punctuation">,</span> request<span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>response<span class="token punctuation">.</span><span class="token function">getBody</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>             <span class="token comment">//{"code":200,"msg":null,"content":null}</span>
+    <span class="token punctuation">}</span>
+
+
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+</ul>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><ul>
+<li><p>除了本文介绍的常用功能之外，XXL-JOB还有任务依赖、事件触发、访问令牌、故障转移等高级功能</p>
+</li>
+<li><p>通过示例工程可知，XXL-JOB具有相当强大的统一任务调度的功能，能够适用于绝大多数需要任务调度的业务场景。但是，金无足赤人无完人，XXL-JOB也有一个小缺点，那就是缺少用户权限机制，整个系统只有一个用户，它的用户名和密码固化在调度中心（服务器端）的xxl-job-admin.properties文件之中，如下图所示： </p>
+<p><img src="/medias/loading.gif" data-original="/2023/12/06/xxl-job/d275f0aeded24c4e8671c8d1a006cb0a_tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.awebp" alt="在这里插入图片描述"></p>
+</li>
+</ul>
+<blockquote>
+<p>作者在XXL-JOB官方文档的TODO LIST中已经将任务权限管理功能提上日程，后续版本将会越来越完美！</p>
+</blockquote>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">L ZHEN</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="http://fahaxikilz.github.io/2023/12/06/xxl-job/">http://fahaxikilz.github.io/2023/12/06/xxl-job/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">L ZHEN</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/xxl-job/">
+                                    <span class="chip bg-color">xxl-job</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/loading.gif" data-original="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/loading.gif" data-original="/medias/reward/wechat.jpg" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+        <style>
+    .valine-card {
+        margin: 1.5rem auto;
+    }
+
+    .valine-card .card-content {
+        padding: 20px 20px 5px 20px;
+    }
+
+    #vcomments textarea {
+        box-sizing: border-box;
+        background: url("/medias/comment_bg.png") 100% 100% no-repeat;
+    }
+
+    #vcomments p {
+        margin: 2px 2px 10px;
+        font-size: 1.05rem;
+        line-height: 1.78rem;
+    }
+
+    #vcomments blockquote p {
+        text-indent: 0.2rem;
+    }
+
+    #vcomments a {
+        padding: 0 2px;
+        color: #4cbf30;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    #vcomments img {
+        max-width: 100%;
+        height: auto;
+        cursor: pointer;
+    }
+
+    #vcomments ol li {
+        list-style-type: decimal;
+    }
+
+    #vcomments ol,
+    ul {
+        display: block;
+        padding-left: 2em;
+        word-spacing: 0.05rem;
+    }
+
+    #vcomments ul li,
+    ol li {
+        display: list-item;
+        line-height: 1.8rem;
+        font-size: 1rem;
+    }
+
+    #vcomments ul li {
+        list-style-type: disc;
+    }
+
+    #vcomments ul ul li {
+        list-style-type: circle;
+    }
+
+    #vcomments table, th, td {
+        padding: 12px 13px;
+        border: 1px solid #dfe2e5;
+    }
+
+    #vcomments table, th, td {
+        border: 0;
+    }
+
+    table tr:nth-child(2n), thead {
+        background-color: #fafafa;
+    }
+
+    #vcomments table th {
+        background-color: #f2f2f2;
+        min-width: 80px;
+    }
+
+    #vcomments table td {
+        min-width: 80px;
+    }
+
+    #vcomments h1 {
+        font-size: 1.85rem;
+        font-weight: bold;
+        line-height: 2.2rem;
+    }
+
+    #vcomments h2 {
+        font-size: 1.65rem;
+        font-weight: bold;
+        line-height: 1.9rem;
+    }
+
+    #vcomments h3 {
+        font-size: 1.45rem;
+        font-weight: bold;
+        line-height: 1.7rem;
+    }
+
+    #vcomments h4 {
+        font-size: 1.25rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    #vcomments h5 {
+        font-size: 1.1rem;
+        font-weight: bold;
+        line-height: 1.4rem;
+    }
+
+    #vcomments h6 {
+        font-size: 1rem;
+        line-height: 1.3rem;
+    }
+
+    #vcomments p {
+        font-size: 1rem;
+        line-height: 1.5rem;
+    }
+
+    #vcomments hr {
+        margin: 12px 0;
+        border: 0;
+        border-top: 1px solid #ccc;
+    }
+
+    #vcomments blockquote {
+        margin: 15px 0;
+        border-left: 5px solid #42b983;
+        padding: 1rem 0.8rem 0.3rem 0.8rem;
+        color: #666;
+        background-color: rgba(66, 185, 131, .1);
+    }
+
+    #vcomments pre {
+        font-family: monospace, monospace;
+        padding: 1.2em;
+        margin: .5em 0;
+        background: #272822;
+        overflow: auto;
+        border-radius: 0.3em;
+        tab-size: 4;
+    }
+
+    #vcomments code {
+        font-family: monospace, monospace;
+        padding: 1px 3px;
+        font-size: 0.92rem;
+        color: #e96900;
+        background-color: #f8f8f8;
+        border-radius: 2px;
+    }
+
+    #vcomments pre code {
+        font-family: monospace, monospace;
+        padding: 0;
+        color: #e8eaf6;
+        background-color: #272822;
+    }
+
+    #vcomments pre[class*="language-"] {
+        padding: 1.2em;
+        margin: .5em 0;
+    }
+
+    #vcomments code[class*="language-"],
+    pre[class*="language-"] {
+        color: #e8eaf6;
+    }
+
+    #vcomments [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: inherit;
+        margin-left: -1.3rem;
+        margin-right: 0.4rem;
+        margin-top: -1px;
+        vertical-align: middle;
+        left: unset;
+        visibility: visible;
+    }
+
+    #vcomments b,
+    strong {
+        font-weight: bold;
+    }
+
+    #vcomments dfn {
+        font-style: italic;
+    }
+
+    #vcomments small {
+        font-size: 85%;
+    }
+
+    #vcomments cite {
+        font-style: normal;
+    }
+
+    #vcomments mark {
+        background-color: #fcf8e3;
+        padding: .2em;
+    }
+
+    #vcomments table, th, td {
+        padding: 12px 13px;
+        border: 1px solid #dfe2e5;
+    }
+
+    table tr:nth-child(2n), thead {
+        background-color: #fafafa;
+    }
+
+    #vcomments table th {
+        background-color: #f2f2f2;
+        min-width: 80px;
+    }
+
+    #vcomments table td {
+        min-width: 80px;
+    }
+
+    #vcomments [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: inherit;
+        margin-left: -1.3rem;
+        margin-right: 0.4rem;
+        margin-top: -1px;
+        vertical-align: middle;
+        left: unset;
+        visibility: visible;
+    }
+</style>
+
+<div class="card valine-card" data-aos="fade-up">
+    <div class="comment_headling" style="font-size: 20px; font-weight: 700; position: relative; padding-left: 20px; top: 15px; padding-bottom: 5px;">
+        <i class="fas fa-comments fa-fw" aria-hidden="true"></i>
+        <span>评论</span>
+    </div>
+    <div id="vcomments" class="card-content" style="display: grid">
+    </div>
+</div>
+
+<script src="/libs/valine/av-min.js"></script>
+<script src="/libs/valine/Valine.min.js"></script>
+<script>
+    new Valine({
+        el: '#vcomments',
+        appId: 'sxNXQ2L9Yj1y9VxBDX2sA6d8-gzGzoHsz',
+        appKey: 'YgMUSzSrmuxo97dKBzjIl5dy',
+        serverURLs: 'https://sxnxq2l9.lc-cn-n1-shared.com',
+        notify: 'true, // 邮件提醒!!!' === 'true',
+        verify: '' === 'true',
+        visitor: 'true' === 'true',
+        avatar: 'robohash',
+        pageSize: '10',
+        lang: 'zh-cn',
+        placeholder: 'ヾﾉ≧∀≦)o来啊，快活啊!'
+    });
+</script>
+
+<!--酷Q推送-->
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2023/12/11/netty/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/loading.gif" data-original="/medias/featureimages/10.jpg" class="responsive-img" alt="Netty">
+                        
+                        <span class="card-title">Netty</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2023-12-11
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E8%BF%9B%E9%98%B6%E6%8A%80%E6%9C%AF/" class="post-category">
+                                    进阶技术
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Netty/">
+                        <span class="chip bg-color">Netty</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2023/11/21/uni-app/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/loading.gif" data-original="/medias/featureimages/20.jpg" class="responsive-img" alt="uni-app">
+                        
+                        <span class="card-title">uni-app</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2023-11-21
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%89%8D%E7%AB%AF%E6%A1%86%E6%9E%B6/" class="post-category">
+                                    前端框架
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/uni-app/">
+                        <span class="chip bg-color">uni-app</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+
+  <!-- 是否加载使用自带的 prismjs. -->
+  <script type="text/javascript" src="/libs/prism/prism.min.js"></script>
+
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('8'),
+            headingSelector: 'h1,h2,h3, h4,h5,h6,h7,h8'
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2022-2026</span>
+            
+            <a href="/about" target="_blank">L ZHEN</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1184.3k</span>
+            
+            
+            
+                
+            
+            
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
+            </span>
+            
+            
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
+            </span>
+            
+            <br>
+
+            <!-- 运行天数提醒. -->
+            
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2022";
+                        var startMonth = "10";
+                        var startDate = "16";
+                        var startHour = "12";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
+                    }
+
+                    calcSiteTime();
+                </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+
+
+    <a href="mailto:1390211724@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1390211724" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1390211724" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 白天和黑夜主题 -->
+<div class="stars-con">
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>  
+</div>
+
+<script>
+    function switchNightMode() {
+        $('<div class="Cuteen_DarkSky"><div class="Cuteen_DarkPlanet"></div></div>').appendTo($('body')),
+        setTimeout(function () {
+            $('body').hasClass('DarkMode') 
+            ? ($('body').removeClass('DarkMode'), localStorage.setItem('isDark', '0'), $('#sum-moon-icon').removeClass("fa-sun").addClass('fa-moon')) 
+            : ($('body').addClass('DarkMode'), localStorage.setItem('isDark', '1'), $('#sum-moon-icon').addClass("fa-sun").removeClass('fa-moon')),
+            
+            setTimeout(function () {
+            $('.Cuteen_DarkSky').fadeOut(1e3, function () {
+                $(this).remove()
+            })
+            }, 2e3)
+        })
+    }
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    
+        <!-- <script src='https://unpkg.com/mermaid@latest/dist/mermaid.min.js'></script> -->
+        <script src='/libs/mermaid/mermaid.min.js'></script>
+        <script>
+          if (window.mermaid) {
+            mermaid.initialize({theme: 'forest'});
+          }
+        </script>
+    
+
+    
+
+    <!-- 雪花特效 -->
+    
+
+    <!-- 鼠标星星特效 -->
+    
+
+     
+        <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+        <script src="/libs/others/TencentCaptcha.js"></script>
+        <button id="TencentCaptcha" data-appid="197482151" data-cbfn="callback" type="button" hidden></button>
+    
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(e.href.match(t)||e.href.match(r))&&(e.href=a.dataset.original)})});</script><script>(r=>{r.imageLazyLoadSetting.processImages=t;var a=r.imageLazyLoadSetting.isSPA,o=r.imageLazyLoadSetting.preloadRatio||1,d=i();function i(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(t){(a||t)&&(d=i());for(var e,n=0;n<d.length;n++)0<=(e=(e=d[n]).getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(r.innerHeight*o||document.documentElement.clientHeight*o)&&(()=>{var t,e,a,o,i=d[n];e=function(){d=d.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).dataset.loaded||(t.hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(a=new Image,o=t.getAttribute("data-original"),a.onload=function(){t.src=o,t.removeAttribute("data-original"),t.setAttribute("data-loaded",!0),e&&e()},a.onerror=function(){t.removeAttribute("data-original"),t.setAttribute("data-loaded",!1),t.src=o},t.src!==o&&(a.src=o)))})()}function e(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",e),r.addEventListener("resize",e),r.addEventListener("orientationchange",e)})(this);</script></body>
+
+</html>

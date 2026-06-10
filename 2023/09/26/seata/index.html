@@ -1,0 +1,2425 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="Seata, 爱哭的小河豚">
+    <meta name="description" content="0.seata的部署和集成1、部署Seata的tc-server1.1.下载首先我们要下载seata-server包，地址在http://seata.io/zh-cn/blog/download.html 
+当然，课前资料也准备好了：
+
+1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Seata | 爱哭的小河豚</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    
+
+
+    <!-- bg-cover style     -->
+
+
+
+<link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+<link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+<link rel="stylesheet" type="text/css" href="/css/matery.css">
+<link rel="stylesheet" type="text/css" href="/css/my.css">
+<link rel="stylesheet" type="text/css" href="/css/dark.css" media="none" onload="if(media!='all')media='all'">
+
+
+
+
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+    <link rel="stylesheet" href="/css/post.css">
+
+
+
+
+    
+        <link rel="stylesheet" type="text/css" href="/css/reward.css">
+    
+
+
+
+    <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="爱哭的小河豚" type="application/atom+xml">
+</head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    <div>
+                        
+                        <img src="/medias/loading.gif" data-original="/medias/logo.png" class="logo-img" alt="LOGO">
+                        
+                        <span class="logo-span">爱哭的小河豚</span>
+                    </div>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/hello-algo" class="waves-effect waves-light">
+      
+      <i class="fas fa-anchor" style="zoom: 0.6;"></i>
+      
+      <span>Hello 算法</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/love" class="waves-effect waves-light">
+      
+      <i class="fas fa-heart" style="zoom: 0.6;"></i>
+      
+      <span>写给我家乖乖</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+  <li>
+    <a href="javascript:;" class="waves-effect waves-light" onclick="switchNightMode()" title="深色/浅色模式" >
+      <i id="sum-moon-icon" class="fas fa-sun" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/loading.gif" data-original="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">爱哭的小河豚</div>
+        <div class="logo-desc">
+            
+            谁会不喜欢一只爱哭，生气又圆鼓鼓的小河豚呢？
+            
+        </div>
+    </div>
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/hello-algo" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-anchor"></i>
+			
+			Hello 算法
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/love" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-heart"></i>
+			
+			写给我家乖乖
+		</a>
+          
+        </li>
+        
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/20.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Seata</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Seata/">
+                                <span class="chip bg-color">Seata</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" class="post-category">
+                                微服务
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2023-09-26
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2025-07-21
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    8.8k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    36 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.min.css">
+        
+
+        
+        <!-- 代码块折行 -->
+        <style type="text/css">
+            code[class*="language-"], pre[class*="language-"] { white-space: pre-wrap !important; }
+        </style>
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h1 id="0-seata的部署和集成"><a href="#0-seata的部署和集成" class="headerlink" title="0.seata的部署和集成"></a>0.seata的部署和集成</h1><h2 id="1、部署Seata的tc-server"><a href="#1、部署Seata的tc-server" class="headerlink" title="1、部署Seata的tc-server"></a>1、部署Seata的tc-server</h2><h3 id="1-1-下载"><a href="#1-1-下载" class="headerlink" title="1.1.下载"></a>1.1.下载</h3><p>首先我们要下载seata-server包，地址在<a target="_blank" rel="noopener" href="http://seata.io/zh-cn/blog/download.html">http</a><a target="_blank" rel="noopener" href="http://seata.io/zh-cn/blog/download.html">://seata.io/zh-cn/blog/download</a><a target="_blank" rel="noopener" href="http://seata.io/zh-cn/blog/download.html">.</a><a target="_blank" rel="noopener" href="http://seata.io/zh-cn/blog/download.html">html</a> </p>
+<p>当然，课前资料也准备好了：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210622202357640.png" alt="image-20210622202357640"></p>
+<h3 id="1-2-解压"><a href="#1-2-解压" class="headerlink" title="1.2.解压"></a>1.2.解压</h3><p>在非中文目录解压缩这个zip包，其目录结构如下：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210622202515014.png" alt="image-20210622202515014"></p>
+<h3 id="1-3-修改配置"><a href="#1-3-修改配置" class="headerlink" title="1.3.修改配置"></a>1.3.修改配置</h3><p>修改conf目录下的registry.conf文件：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210622202622874.png" alt="image-20210622202622874"></p>
+<p>内容如下：</p>
+<pre class="line-numbers language-properties" data-language="properties"><code class="language-properties"><span class="token key attr-name">registry</span> <span class="token value attr-value">{</span>
+<span class="token comment">  ## tc服务的注册中心类，这里选择nacos，也可以是eureka、zookeeper等</span>
+<span class="token key attr-name">  type</span> <span class="token punctuation">=</span> <span class="token value attr-value">"nacos"</span>
+
+<span class="token key attr-name">  nacos</span> <span class="token value attr-value">{</span>
+<span class="token comment">    ## seata tc 服务注册到 nacos的服务名称，可以自定义</span>
+<span class="token key attr-name">    application</span> <span class="token punctuation">=</span> <span class="token value attr-value">"seata-tc-server"</span>
+<span class="token key attr-name">    serverAddr</span> <span class="token punctuation">=</span> <span class="token value attr-value">"127.0.0.1:8848"</span>
+<span class="token key attr-name">    group</span> <span class="token punctuation">=</span> <span class="token value attr-value">"DEFAULT_GROUP"</span>
+<span class="token key attr-name">    namespace</span> <span class="token punctuation">=</span> <span class="token value attr-value">""</span>
+<span class="token key attr-name">    cluster</span> <span class="token punctuation">=</span> <span class="token value attr-value">"SH"</span>
+<span class="token key attr-name">    username</span> <span class="token punctuation">=</span> <span class="token value attr-value">"nacos"</span>
+<span class="token key attr-name">    password</span> <span class="token punctuation">=</span> <span class="token value attr-value">"nacos"</span>
+  }
+}
+
+<span class="token key attr-name">config</span> <span class="token value attr-value">{</span>
+<span class="token comment">  ## 读取tc服务端的配置文件的方式，这里是从nacos配置中心读取，这样如果tc是集群，可以共享配置</span>
+<span class="token key attr-name">  type</span> <span class="token punctuation">=</span> <span class="token value attr-value">"nacos"</span>
+<span class="token comment">  ## 配置nacos地址等信息</span>
+<span class="token key attr-name">  nacos</span> <span class="token value attr-value">{</span>
+<span class="token key attr-name">    serverAddr</span> <span class="token punctuation">=</span> <span class="token value attr-value">"127.0.0.1:8848"</span>
+<span class="token key attr-name">    namespace</span> <span class="token punctuation">=</span> <span class="token value attr-value">""</span>
+<span class="token key attr-name">    group</span> <span class="token punctuation">=</span> <span class="token value attr-value">"SEATA_GROUP"</span>
+<span class="token key attr-name">    username</span> <span class="token punctuation">=</span> <span class="token value attr-value">"nacos"</span>
+<span class="token key attr-name">    password</span> <span class="token punctuation">=</span> <span class="token value attr-value">"nacos"</span>
+<span class="token key attr-name">    dataId</span> <span class="token punctuation">=</span> <span class="token value attr-value">"seataServer.properties"</span>
+  }
+}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+
+
+<h3 id="1-4-在nacos添加配置"><a href="#1-4-在nacos添加配置" class="headerlink" title="1.4.在nacos添加配置"></a>1.4.在nacos添加配置</h3><p>特别注意，为了让tc服务的集群可以共享配置，我们选择了nacos作为统一配置中心。因此服务端配置文件seataServer.properties文件需要在nacos中配好。</p>
+<p>格式如下：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210622203609227.png" alt="image-20210622203609227"></p>
+<p>配置内容如下：</p>
+<pre class="line-numbers language-properties" data-language="properties"><code class="language-properties"><span class="token comment">## 数据存储方式，db代表数据库</span>
+<span class="token key attr-name">store.mode</span><span class="token punctuation">=</span><span class="token value attr-value">db</span>
+<span class="token key attr-name">store.db.datasource</span><span class="token punctuation">=</span><span class="token value attr-value">druid</span>
+<span class="token key attr-name">store.db.dbType</span><span class="token punctuation">=</span><span class="token value attr-value">mysql</span>
+<span class="token key attr-name">store.db.driverClassName</span><span class="token punctuation">=</span><span class="token value attr-value">com.mysql.jdbc.Driver</span>
+<span class="token key attr-name">store.db.url</span><span class="token punctuation">=</span><span class="token value attr-value">jdbc:mysql://127.0.0.1:3306/seata?useUnicode=true&amp;rewriteBatchedStatements=true</span>
+<span class="token key attr-name">store.db.user</span><span class="token punctuation">=</span><span class="token value attr-value">root</span>
+<span class="token key attr-name">store.db.password</span><span class="token punctuation">=</span><span class="token value attr-value">123</span>
+<span class="token key attr-name">store.db.minConn</span><span class="token punctuation">=</span><span class="token value attr-value">5</span>
+<span class="token key attr-name">store.db.maxConn</span><span class="token punctuation">=</span><span class="token value attr-value">30</span>
+<span class="token key attr-name">store.db.globalTable</span><span class="token punctuation">=</span><span class="token value attr-value">global_table</span>
+<span class="token key attr-name">store.db.branchTable</span><span class="token punctuation">=</span><span class="token value attr-value">branch_table</span>
+<span class="token key attr-name">store.db.queryLimit</span><span class="token punctuation">=</span><span class="token value attr-value">100</span>
+<span class="token key attr-name">store.db.lockTable</span><span class="token punctuation">=</span><span class="token value attr-value">lock_table</span>
+<span class="token key attr-name">store.db.maxWait</span><span class="token punctuation">=</span><span class="token value attr-value">5000</span>
+<span class="token comment">## 事务、日志等配置</span>
+<span class="token key attr-name">server.recovery.committingRetryPeriod</span><span class="token punctuation">=</span><span class="token value attr-value">1000</span>
+<span class="token key attr-name">server.recovery.asynCommittingRetryPeriod</span><span class="token punctuation">=</span><span class="token value attr-value">1000</span>
+<span class="token key attr-name">server.recovery.rollbackingRetryPeriod</span><span class="token punctuation">=</span><span class="token value attr-value">1000</span>
+<span class="token key attr-name">server.recovery.timeoutRetryPeriod</span><span class="token punctuation">=</span><span class="token value attr-value">1000</span>
+<span class="token key attr-name">server.maxCommitRetryTimeout</span><span class="token punctuation">=</span><span class="token value attr-value">-1</span>
+<span class="token key attr-name">server.maxRollbackRetryTimeout</span><span class="token punctuation">=</span><span class="token value attr-value">-1</span>
+<span class="token key attr-name">server.rollbackRetryTimeoutUnlockEnable</span><span class="token punctuation">=</span><span class="token value attr-value">false</span>
+<span class="token key attr-name">server.undo.logSaveDays</span><span class="token punctuation">=</span><span class="token value attr-value">7</span>
+<span class="token key attr-name">server.undo.logDeletePeriod</span><span class="token punctuation">=</span><span class="token value attr-value">86400000</span>
+
+<span class="token comment">## 客户端与服务端传输方式</span>
+<span class="token key attr-name">transport.serialization</span><span class="token punctuation">=</span><span class="token value attr-value">seata</span>
+<span class="token key attr-name">transport.compressor</span><span class="token punctuation">=</span><span class="token value attr-value">none</span>
+<span class="token comment">## 关闭metrics功能，提高性能</span>
+<span class="token key attr-name">metrics.enabled</span><span class="token punctuation">=</span><span class="token value attr-value">false</span>
+<span class="token key attr-name">metrics.registryType</span><span class="token punctuation">=</span><span class="token value attr-value">compact</span>
+<span class="token key attr-name">metrics.exporterList</span><span class="token punctuation">=</span><span class="token value attr-value">prometheus</span>
+<span class="token key attr-name">metrics.exporterPrometheusPort</span><span class="token punctuation">=</span><span class="token value attr-value">9898</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>==其中的数据库地址、用户名、密码都需要修改成你自己的数据库信息。==</p>
+<h3 id="1-5-创建数据库表"><a href="#1-5-创建数据库表" class="headerlink" title="1.5.创建数据库表"></a>1.5.创建数据库表</h3><p>特别注意：tc服务在管理分布式事务时，需要记录事务相关数据到数据库中，你需要提前创建好这些表。</p>
+<p>新建一个名为seata的数据库，运行课前资料提供的sql文件：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210622204145159.png" alt="image-20210622204145159"></p>
+<p>这些表主要记录全局事务、分支事务、全局锁信息：</p>
+<pre class="line-numbers language-mysql" data-language="mysql"><code class="language-mysql">SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- 分支事务表
+-- ----------------------------
+DROP TABLE IF EXISTS `branch_table`;
+CREATE TABLE `branch_table`  (
+  `branch_id` bigint(20) NOT NULL,
+  `xid` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `transaction_id` bigint(20) NULL DEFAULT NULL,
+  `resource_group_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `resource_id` varchar(256) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `branch_type` varchar(8) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `status` tinyint(4) NULL DEFAULT NULL,
+  `client_id` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `application_data` varchar(2000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `gmt_create` datetime(6) NULL DEFAULT NULL,
+  `gmt_modified` datetime(6) NULL DEFAULT NULL,
+  PRIMARY KEY (`branch_id`) USING BTREE,
+  INDEX `idx_xid`(`xid`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+
+-- ----------------------------
+-- 全局事务表
+-- ----------------------------
+DROP TABLE IF EXISTS `global_table`;
+CREATE TABLE `global_table`  (
+  `xid` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `transaction_id` bigint(20) NULL DEFAULT NULL,
+  `status` tinyint(4) NOT NULL,
+  `application_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `transaction_service_group` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `transaction_name` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `timeout` int(11) NULL DEFAULT NULL,
+  `begin_time` bigint(20) NULL DEFAULT NULL,
+  `application_data` varchar(2000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `gmt_create` datetime NULL DEFAULT NULL,
+  `gmt_modified` datetime NULL DEFAULT NULL,
+  PRIMARY KEY (`xid`) USING BTREE,
+  INDEX `idx_gmt_modified_status`(`gmt_modified`, `status`) USING BTREE,
+  INDEX `idx_transaction_id`(`transaction_id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+
+SET FOREIGN_KEY_CHECKS = 1;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<h3 id="1-6-启动TC服务"><a href="#1-6-启动TC服务" class="headerlink" title="1.6.启动TC服务"></a>1.6.启动TC服务</h3><p>进入bin目录，运行其中的seata-server.bat即可：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210622205427318.png" alt="image-20210622205427318"></p>
+<p>启动成功后，seata-server应该已经注册到nacos注册中心了。</p>
+<p>打开浏览器，访问nacos地址：<a href="http://localhost:8848，然后进入服务列表页面，可以看到seata-tc-server的信息：">http://localhost:8848，然后进入服务列表页面，可以看到seata-tc-server的信息：</a></p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210622205901450.png" alt="image-20210622205901450"></p>
+<h2 id="2、微服务集成seata"><a href="#2、微服务集成seata" class="headerlink" title="2、微服务集成seata"></a>2、微服务集成seata</h2><h3 id="2-1-引入依赖"><a href="#2-1-引入依赖" class="headerlink" title="2.1.引入依赖"></a>2.1.引入依赖</h3><p>首先，我们需要在微服务中引入seata依赖：</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>com.alibaba.cloud<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>spring-cloud-starter-alibaba-seata<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>exclusions</span><span class="token punctuation">&gt;</span></span>
+        <span class="token comment">&lt;!--版本较低，1.3.0，因此排除--&gt;</span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>exclusion</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>seata-spring-boot-starter<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>io.seata<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>exclusion</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>exclusions</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">&gt;</span></span>
+<span class="token comment">&lt;!--seata starter 采用1.4.2版本--&gt;</span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>io.seata<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>seata-spring-boot-starter<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">&gt;</span></span>${seata.version}<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<h3 id="2-2-修改配置文件"><a href="#2-2-修改配置文件" class="headerlink" title="2.2.修改配置文件"></a>2.2.修改配置文件</h3><p>需要修改application.yml文件，添加一些配置：</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token key atrule">seata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">registry</span><span class="token punctuation">:</span> <span class="token comment">## TC服务注册中心的配置，微服务根据这些信息去注册中心获取tc服务地址</span>
+    <span class="token comment">## 参考tc服务自己的registry.conf中的配置</span>
+    <span class="token key atrule">type</span><span class="token punctuation">:</span> nacos
+    <span class="token key atrule">nacos</span><span class="token punctuation">:</span> <span class="token comment">## tc</span>
+      <span class="token key atrule">server-addr</span><span class="token punctuation">:</span> 127.0.0.1<span class="token punctuation">:</span><span class="token number">8848</span>
+      <span class="token key atrule">namespace</span><span class="token punctuation">:</span> <span class="token string">""</span>
+      <span class="token key atrule">group</span><span class="token punctuation">:</span> DEFAULT_GROUP
+      <span class="token key atrule">application</span><span class="token punctuation">:</span> seata<span class="token punctuation">-</span>tc<span class="token punctuation">-</span>server <span class="token comment">## tc服务在nacos中的服务名称</span>
+      <span class="token key atrule">cluster</span><span class="token punctuation">:</span> SH
+  <span class="token key atrule">tx-service-group</span><span class="token punctuation">:</span> seata<span class="token punctuation">-</span>demo <span class="token comment">## 事务组，根据这个获取tc服务的cluster名称</span>
+  <span class="token key atrule">service</span><span class="token punctuation">:</span>
+    <span class="token key atrule">vgroup-mapping</span><span class="token punctuation">:</span> <span class="token comment">## 事务组与TC服务cluster的映射关系</span>
+      <span class="token key atrule">seata-demo</span><span class="token punctuation">:</span> SH<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h1 id="1-分布式事务问题"><a href="#1-分布式事务问题" class="headerlink" title="1.分布式事务问题"></a>1.分布式事务问题</h1><h2 id="1-1-本地事务"><a href="#1-1-本地事务" class="headerlink" title="1.1.本地事务"></a>1.1.本地事务</h2><p>本地事务，也就是传统的<strong>单机事务</strong>。在传统数据库事务中，必须要满足四个原则：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724165045186.png" alt="image-20210724165045186"></p>
+<h2 id="1-2-分布式事务"><a href="#1-2-分布式事务" class="headerlink" title="1.2.分布式事务"></a>1.2.分布式事务</h2><p><strong>分布式事务</strong>，就是指不是在单个服务或单个数据库架构下，产生的事务，例如：</p>
+<ul>
+<li>跨数据源的分布式事务</li>
+<li>跨服务的分布式事务</li>
+<li>综合情况</li>
+</ul>
+<p>在数据库水平拆分、服务垂直拆分之后，一个业务操作通常要跨多个数据库、服务才能完成。例如电商行业中比较常见的下单付款案例，包括下面几个行为：</p>
+<ul>
+<li>创建新订单</li>
+<li>扣减商品库存</li>
+<li>从用户账户余额扣除金额</li>
+</ul>
+<p>完成上面的操作需要访问三个不同的微服务和三个不同的数据库。</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724165338958.png" alt="image-20210724165338958"></p>
+<p>订单的创建、库存的扣减、账户扣款在每一个服务和数据库内是一个本地事务，可以保证ACID原则。</p>
+<p>但是当我们把三件事情看做一个”业务”，要满足保证“业务”的原子性，要么所有操作全部成功，要么全部失败，不允许出现部分成功部分失败的现象，这就是<strong>分布式系统下的事务</strong>了。</p>
+<p>此时ACID难以满足，这是分布式事务要解决的问题</p>
+<h2 id="1-3-演示分布式事务问题"><a href="#1-3-演示分布式事务问题" class="headerlink" title="1.3.演示分布式事务问题"></a>1.3.演示分布式事务问题</h2><p>我们通过一个案例来演示分布式事务的问题：</p>
+<p>1）<strong>创建数据库，名为seata_demo，然后导入课前资料提供的SQL文件：</strong></p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724165634571.png" alt="image-20210724165634571"> </p>
+<p>2）<strong>导入课前资料提供的微服务：</strong></p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724165709994.png" alt="image-20210724165709994"> </p>
+<p>微服务结构如下：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724165729273.png" alt="image-20210724165729273"> </p>
+<p>其中：</p>
+<p>seata-demo：父工程，负责管理项目依赖</p>
+<ul>
+<li>account-service：账户服务，负责管理用户的资金账户。提供扣减余额的接口</li>
+<li>storage-service：库存服务，负责管理商品库存。提供扣减库存的接口</li>
+<li>order-service：订单服务，负责管理订单。创建订单时，需要调用account-service和storage-service</li>
+</ul>
+<p><strong>3）启动nacos、所有微服务</strong></p>
+<p><strong>4）测试下单功能，发出Post请求：</strong></p>
+<p>请求如下：</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">curl</span> <span class="token parameter variable">--location</span> <span class="token parameter variable">--request</span> POST <span class="token string">'http://localhost:8082/order?userId=user202103032042012&amp;commodityCode=100202003032041&amp;count=20&amp;money=200'</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>如图：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724170113404.png" alt="image-20210724170113404"></p>
+<p>测试发现，当库存不足时，如果余额已经扣减，并不会回滚，出现了分布式事务问题。</p>
+<h1 id="2-理论基础"><a href="#2-理论基础" class="headerlink" title="2.理论基础"></a>2.理论基础</h1><p>解决分布式事务问题，需要一些分布式系统的基础知识作为理论指导。</p>
+<h2 id="2-1-CAP定理"><a href="#2-1-CAP定理" class="headerlink" title="2.1.CAP定理"></a>2.1.CAP定理</h2><p>1998年，加州大学的计算机科学家 Eric Brewer 提出，分布式系统有三个指标。</p>
+<blockquote>
+<ul>
+<li>Consistency（一致性）</li>
+<li>Availability（可用性）</li>
+<li>Partition tolerance （分区容错性）</li>
+</ul>
+</blockquote>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724170517944.png" alt="image-20210724170517944"></p>
+<p>它们的第一个字母分别是 C、A、P。</p>
+<p>Eric Brewer 说，这三个指标不可能同时做到。这个结论就叫做 CAP 定理。</p>
+<h3 id="2-1-1-一致性"><a href="#2-1-1-一致性" class="headerlink" title="2.1.1.一致性"></a>2.1.1.一致性</h3><p>Consistency（一致性）：用户访问分布式系统中的任意节点，得到的数据必须一致。</p>
+<p>比如现在包含两个节点，其中的初始数据是一致的：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724170704694.png" alt="image-20210724170704694"></p>
+<p>当我们修改其中一个节点的数据时，两者的数据产生了差异：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724170735847.png" alt="image-20210724170735847"></p>
+<p>要想保住一致性，就必须实现node01 到 node02的数据 同步：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724170834855.png" alt="image-20210724170834855"></p>
+<h3 id="2-1-2-可用性"><a href="#2-1-2-可用性" class="headerlink" title="2.1.2.可用性"></a>2.1.2.可用性</h3><p>Availability （可用性）：用户访问集群中的任意健康节点，必须能得到响应，而不是超时或拒绝。</p>
+<p>如图，有三个节点的集群，访问任何一个都可以及时得到响应：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724170932072.png" alt="image-20210724170932072"></p>
+<p>当有部分节点因为网络故障或其它原因无法访问时，代表节点不可用：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724171007516.png" alt="image-20210724171007516"></p>
+<h3 id="2-1-3-分区容错"><a href="#2-1-3-分区容错" class="headerlink" title="2.1.3.分区容错"></a>2.1.3.分区容错</h3><p><strong>Partition（分区）</strong>：因为网络故障或其它原因导致分布式系统中的部分节点与其它节点失去连接，形成独立分区。</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724171041210.png" alt="image-20210724171041210"></p>
+<p><strong>Tolerance（容错）</strong>：在集群出现分区时，整个系统也要持续对外提供服务</p>
+<h3 id="2-1-4-矛盾"><a href="#2-1-4-矛盾" class="headerlink" title="2.1.4.矛盾"></a>2.1.4.矛盾</h3><p>在分布式系统中，系统间的网络不能100%保证健康，一定会有故障的时候，而服务有必须对外保证服务。因此Partition Tolerance不可避免。</p>
+<p>当节点接收到新的数据变更时，就会出现问题了：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724171546472.png" alt="image-20210724171546472"></p>
+<p>如果此时要保证<strong>一致性</strong>，就必须等待网络恢复，完成数据同步后，整个集群才对外提供服务，服务处于阻塞状态，不可用。</p>
+<p>如果此时要保证<strong>可用性</strong>，就不能等待网络恢复，那node01、node02与node03之间就会出现数据不一致。</p>
+<p>也就是说，在P一定会出现的情况下，A和C之间只能实现一个。</p>
+<h2 id="2-2-BASE理论"><a href="#2-2-BASE理论" class="headerlink" title="2.2.BASE理论"></a>2.2.BASE理论</h2><p>BASE理论是对CAP的一种解决思路，包含三个思想：</p>
+<ul>
+<li><strong>Basically Available</strong> <strong>（基本可用）</strong>：分布式系统在出现故障时，允许损失部分可用性，即保证核心可用。</li>
+<li><strong>Soft State（软状态）：</strong>在一定时间内，允许出现中间状态，比如临时的不一致状态。</li>
+<li><strong>Eventually Consistent（最终一致性）</strong>：虽然无法保证强一致性，但是在软状态结束后，最终达到数据一致。</li>
+</ul>
+<h2 id="2-3-解决分布式事务的思路"><a href="#2-3-解决分布式事务的思路" class="headerlink" title="2.3.解决分布式事务的思路"></a>2.3.解决分布式事务的思路</h2><p>分布式事务最大的问题是各个子事务的一致性问题，因此可以借鉴CAP定理和BASE理论，有两种解决思路：</p>
+<ul>
+<li><p>AP模式：各子事务分别执行和提交，允许出现结果不一致，然后采用弥补措施恢复数据即可，实现最终一致。</p>
+</li>
+<li><p>CP模式：各个子事务执行后互相等待，同时提交，同时回滚，达成强一致。但事务等待过程中，处于弱可用状态。</p>
+</li>
+</ul>
+<p>但不管是哪一种模式，都需要在子系统事务之间互相通讯，协调事务状态，也就是需要一个**事务协调者(TC)**：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724172123567.png" alt="image-20210724172123567"></p>
+<p>这里的子系统事务，称为<strong>分支事务</strong>；有关联的各个分支事务在一起称为<strong>全局事务</strong>。</p>
+<h1 id="3-初识Seata"><a href="#3-初识Seata" class="headerlink" title="3.初识Seata"></a>3.初识Seata</h1><p>Seata是 2019 年 1 月份蚂蚁金服和阿里巴巴共同开源的分布式事务解决方案。致力于提供高性能和简单易用的分布式事务服务，为用户打造一站式的分布式解决方案。</p>
+<p>官网地址：<a target="_blank" rel="noopener" href="http://seata.io/%EF%BC%8C%E5%85%B6%E4%B8%AD%E7%9A%84%E6%96%87%E6%A1%A3%E3%80%81%E6%92%AD%E5%AE%A2%E4%B8%AD%E6%8F%90%E4%BE%9B%E4%BA%86%E5%A4%A7%E9%87%8F%E7%9A%84%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E%E3%80%81%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E3%80%82">http://seata.io/，其中的文档、播客中提供了大量的使用说明、源码分析。</a></p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724172225817.png" alt="image-20210724172225817"></p>
+<h2 id="3-1-Seata的架构"><a href="#3-1-Seata的架构" class="headerlink" title="3.1.Seata的架构"></a>3.1.Seata的架构</h2><p>Seata事务管理中有三个重要的角色：</p>
+<ul>
+<li><p><strong>TC (Transaction Coordinator) -</strong> <strong>事务协调者：</strong>维护全局和分支事务的状态，协调全局事务提交或回滚。</p>
+</li>
+<li><p><strong>TM (Transaction Manager) -</strong> <strong>事务管理器：</strong>定义全局事务的范围、开始全局事务、提交或回滚全局事务。</p>
+</li>
+<li><p><strong>RM (Resource Manager) -</strong> <strong>资源管理器：</strong>管理分支事务处理的资源，与TC交谈以注册分支事务和报告分支事务的状态，并驱动分支事务提交或回滚。</p>
+</li>
+</ul>
+<p>整体的架构如图：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724172326452.png" alt="image-20210724172326452"></p>
+<p>Seata基于上述架构提供了四种不同的分布式事务解决方案：</p>
+<ul>
+<li>XA模式：强一致性分阶段事务模式，牺牲了一定的可用性，无业务侵入</li>
+<li>TCC模式：最终一致的分阶段事务模式，有业务侵入</li>
+<li>AT模式：最终一致的分阶段事务模式，无业务侵入，也是Seata的默认模式</li>
+<li>SAGA模式：长事务模式，有业务侵入</li>
+</ul>
+<p>无论哪种方案，都离不开TC，也就是事务的协调者。</p>
+<h2 id="3-2-部署TC服务"><a href="#3-2-部署TC服务" class="headerlink" title="3.2.部署TC服务"></a>3.2.部署TC服务</h2><h3 id="3-2-1-部署Seata的tc-server"><a href="#3-2-1-部署Seata的tc-server" class="headerlink" title="3.2.1.部署Seata的tc-server"></a>3.2.1.部署Seata的tc-server</h3><h4 id="1-下载"><a href="#1-下载" class="headerlink" title="1.下载"></a>1.下载</h4><p>首先我们要下载seata-server包，地址在<a target="_blank" rel="noopener" href="http://seata.io/zh-cn/blog/download.html">http</a><a target="_blank" rel="noopener" href="http://seata.io/zh-cn/blog/download.html">://seata.io/zh-cn/blog/download</a><a target="_blank" rel="noopener" href="http://seata.io/zh-cn/blog/download.html">.</a><a target="_blank" rel="noopener" href="http://seata.io/zh-cn/blog/download.html">html</a> </p>
+<p>当然，课前资料也准备好了：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210622202357640-1698742394372.png" alt="image-20210622202357640"></p>
+<h4 id="2-解压"><a href="#2-解压" class="headerlink" title="2.解压"></a>2.解压</h4><p>在非中文目录解压缩这个zip包，其目录结构如下：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210622202515014-1698742394372.png" alt="image-20210622202515014"></p>
+<h4 id="3-修改配置"><a href="#3-修改配置" class="headerlink" title="3.修改配置"></a>3.修改配置</h4><p>修改conf目录下的registry.conf文件：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210622202622874-1698742394372.png" alt="image-20210622202622874"></p>
+<p>内容如下：</p>
+<pre class="line-numbers language-properties" data-language="properties"><code class="language-properties"><span class="token key attr-name">registry</span> <span class="token value attr-value">{</span>
+<span class="token comment">  # tc服务的注册中心类，这里选择nacos，也可以是eureka、zookeeper等</span>
+<span class="token key attr-name">  type</span> <span class="token punctuation">=</span> <span class="token value attr-value">"nacos"</span>
+
+<span class="token key attr-name">  nacos</span> <span class="token value attr-value">{</span>
+<span class="token comment">    # seata tc 服务注册到 nacos的服务名称，可以自定义</span>
+<span class="token key attr-name">    application</span> <span class="token punctuation">=</span> <span class="token value attr-value">"seata-tc-server"</span>
+<span class="token key attr-name">    serverAddr</span> <span class="token punctuation">=</span> <span class="token value attr-value">"127.0.0.1:8848"</span>
+<span class="token key attr-name">    group</span> <span class="token punctuation">=</span> <span class="token value attr-value">"DEFAULT_GROUP"</span>
+<span class="token key attr-name">    namespace</span> <span class="token punctuation">=</span> <span class="token value attr-value">""</span>
+<span class="token key attr-name">    cluster</span> <span class="token punctuation">=</span> <span class="token value attr-value">"SH"</span>
+<span class="token key attr-name">    username</span> <span class="token punctuation">=</span> <span class="token value attr-value">"nacos"</span>
+<span class="token key attr-name">    password</span> <span class="token punctuation">=</span> <span class="token value attr-value">"nacos"</span>
+  }
+}
+
+<span class="token key attr-name">config</span> <span class="token value attr-value">{</span>
+<span class="token comment">  # 读取tc服务端的配置文件的方式，这里是从nacos配置中心读取，这样如果tc是集群，可以共享配置</span>
+<span class="token key attr-name">  type</span> <span class="token punctuation">=</span> <span class="token value attr-value">"nacos"</span>
+<span class="token comment">  # 配置nacos地址等信息</span>
+<span class="token key attr-name">  nacos</span> <span class="token value attr-value">{</span>
+<span class="token key attr-name">    serverAddr</span> <span class="token punctuation">=</span> <span class="token value attr-value">"127.0.0.1:8848"</span>
+<span class="token key attr-name">    namespace</span> <span class="token punctuation">=</span> <span class="token value attr-value">""</span>
+<span class="token key attr-name">    group</span> <span class="token punctuation">=</span> <span class="token value attr-value">"SEATA_GROUP"</span>
+<span class="token key attr-name">    username</span> <span class="token punctuation">=</span> <span class="token value attr-value">"nacos"</span>
+<span class="token key attr-name">    password</span> <span class="token punctuation">=</span> <span class="token value attr-value">"nacos"</span>
+<span class="token key attr-name">    dataId</span> <span class="token punctuation">=</span> <span class="token value attr-value">"seataServer.properties"</span>
+  }
+}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="4-在nacos添加配置"><a href="#4-在nacos添加配置" class="headerlink" title="4.在nacos添加配置"></a>4.在nacos添加配置</h4><p>特别注意，为了让tc服务的集群可以共享配置，我们选择了nacos作为统一配置中心。因此服务端配置文件seataServer.properties文件需要在nacos中配好。</p>
+<p>格式如下：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210622203609227-1698742394372.png" alt="image-20210622203609227"></p>
+<p>配置内容如下：</p>
+<pre class="line-numbers language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># 数据存储方式，db代表数据库</span>
+<span class="token key attr-name">store.mode</span><span class="token punctuation">=</span><span class="token value attr-value">db</span>
+<span class="token key attr-name">store.db.datasource</span><span class="token punctuation">=</span><span class="token value attr-value">druid</span>
+<span class="token key attr-name">store.db.dbType</span><span class="token punctuation">=</span><span class="token value attr-value">mysql</span>
+<span class="token key attr-name">store.db.driverClassName</span><span class="token punctuation">=</span><span class="token value attr-value">com.mysql.jdbc.Driver</span>
+<span class="token key attr-name">store.db.url</span><span class="token punctuation">=</span><span class="token value attr-value">jdbc:mysql://127.0.0.1:3306/seata?useUnicode=true&amp;rewriteBatchedStatements=true</span>
+<span class="token key attr-name">store.db.user</span><span class="token punctuation">=</span><span class="token value attr-value">root</span>
+<span class="token key attr-name">store.db.password</span><span class="token punctuation">=</span><span class="token value attr-value">123</span>
+<span class="token key attr-name">store.db.minConn</span><span class="token punctuation">=</span><span class="token value attr-value">5</span>
+<span class="token key attr-name">store.db.maxConn</span><span class="token punctuation">=</span><span class="token value attr-value">30</span>
+<span class="token key attr-name">store.db.globalTable</span><span class="token punctuation">=</span><span class="token value attr-value">global_table</span>
+<span class="token key attr-name">store.db.branchTable</span><span class="token punctuation">=</span><span class="token value attr-value">branch_table</span>
+<span class="token key attr-name">store.db.queryLimit</span><span class="token punctuation">=</span><span class="token value attr-value">100</span>
+<span class="token key attr-name">store.db.lockTable</span><span class="token punctuation">=</span><span class="token value attr-value">lock_table</span>
+<span class="token key attr-name">store.db.maxWait</span><span class="token punctuation">=</span><span class="token value attr-value">5000</span>
+<span class="token comment"># 事务、日志等配置</span>
+<span class="token key attr-name">server.recovery.committingRetryPeriod</span><span class="token punctuation">=</span><span class="token value attr-value">1000</span>
+<span class="token key attr-name">server.recovery.asynCommittingRetryPeriod</span><span class="token punctuation">=</span><span class="token value attr-value">1000</span>
+<span class="token key attr-name">server.recovery.rollbackingRetryPeriod</span><span class="token punctuation">=</span><span class="token value attr-value">1000</span>
+<span class="token key attr-name">server.recovery.timeoutRetryPeriod</span><span class="token punctuation">=</span><span class="token value attr-value">1000</span>
+<span class="token key attr-name">server.maxCommitRetryTimeout</span><span class="token punctuation">=</span><span class="token value attr-value">-1</span>
+<span class="token key attr-name">server.maxRollbackRetryTimeout</span><span class="token punctuation">=</span><span class="token value attr-value">-1</span>
+<span class="token key attr-name">server.rollbackRetryTimeoutUnlockEnable</span><span class="token punctuation">=</span><span class="token value attr-value">false</span>
+<span class="token key attr-name">server.undo.logSaveDays</span><span class="token punctuation">=</span><span class="token value attr-value">7</span>
+<span class="token key attr-name">server.undo.logDeletePeriod</span><span class="token punctuation">=</span><span class="token value attr-value">86400000</span>
+
+<span class="token comment"># 客户端与服务端传输方式</span>
+<span class="token key attr-name">transport.serialization</span><span class="token punctuation">=</span><span class="token value attr-value">seata</span>
+<span class="token key attr-name">transport.compressor</span><span class="token punctuation">=</span><span class="token value attr-value">none</span>
+<span class="token comment"># 关闭metrics功能，提高性能</span>
+<span class="token key attr-name">metrics.enabled</span><span class="token punctuation">=</span><span class="token value attr-value">false</span>
+<span class="token key attr-name">metrics.registryType</span><span class="token punctuation">=</span><span class="token value attr-value">compact</span>
+<span class="token key attr-name">metrics.exporterList</span><span class="token punctuation">=</span><span class="token value attr-value">prometheus</span>
+<span class="token key attr-name">metrics.exporterPrometheusPort</span><span class="token punctuation">=</span><span class="token value attr-value">9898</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>==其中的数据库地址、用户名、密码都需要修改成你自己的数据库信息。==</p>
+<h4 id="5-创建数据库表"><a href="#5-创建数据库表" class="headerlink" title="5.创建数据库表"></a>5.创建数据库表</h4><p>特别注意：tc服务在管理分布式事务时，需要记录事务相关数据到数据库中，你需要提前创建好这些表。</p>
+<p>新建一个名为seata的数据库，运行课前资料提供的sql文件：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210622204145159-1698742394372.png" alt="image-20210622204145159"></p>
+<p>这些表主要记录全局事务、分支事务、全局锁信息：</p>
+<pre class="line-numbers language-mysql" data-language="mysql"><code class="language-mysql">SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- 分支事务表
+-- ----------------------------
+DROP TABLE IF EXISTS `branch_table`;
+CREATE TABLE `branch_table`  (
+  `branch_id` bigint(20) NOT NULL,
+  `xid` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `transaction_id` bigint(20) NULL DEFAULT NULL,
+  `resource_group_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `resource_id` varchar(256) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `branch_type` varchar(8) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `status` tinyint(4) NULL DEFAULT NULL,
+  `client_id` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `application_data` varchar(2000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `gmt_create` datetime(6) NULL DEFAULT NULL,
+  `gmt_modified` datetime(6) NULL DEFAULT NULL,
+  PRIMARY KEY (`branch_id`) USING BTREE,
+  INDEX `idx_xid`(`xid`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+
+-- ----------------------------
+-- 全局事务表
+-- ----------------------------
+DROP TABLE IF EXISTS `global_table`;
+CREATE TABLE `global_table`  (
+  `xid` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `transaction_id` bigint(20) NULL DEFAULT NULL,
+  `status` tinyint(4) NOT NULL,
+  `application_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `transaction_service_group` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `transaction_name` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `timeout` int(11) NULL DEFAULT NULL,
+  `begin_time` bigint(20) NULL DEFAULT NULL,
+  `application_data` varchar(2000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `gmt_create` datetime NULL DEFAULT NULL,
+  `gmt_modified` datetime NULL DEFAULT NULL,
+  PRIMARY KEY (`xid`) USING BTREE,
+  INDEX `idx_gmt_modified_status`(`gmt_modified`, `status`) USING BTREE,
+  INDEX `idx_transaction_id`(`transaction_id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+
+SET FOREIGN_KEY_CHECKS = 1;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<h4 id="6-启动TC服务"><a href="#6-启动TC服务" class="headerlink" title="6.启动TC服务"></a>6.启动TC服务</h4><p>进入bin目录，运行其中的seata-server.bat即可：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210622205427318-1698742394372.png" alt="image-20210622205427318"></p>
+<p>启动成功后，seata-server应该已经注册到nacos注册中心了。</p>
+<p>打开浏览器，访问nacos地址：<a href="http://localhost:8848，然后进入服务列表页面，可以看到seata-tc-server的信息：">http://localhost:8848，然后进入服务列表页面，可以看到seata-tc-server的信息：</a></p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210622205901450-1698742394372.png" alt="image-20210622205901450"></p>
+<h3 id="3-2-2-微服务集成seata"><a href="#3-2-2-微服务集成seata" class="headerlink" title="3.2.2.微服务集成seata"></a>3.2.2.微服务集成seata</h3><h4 id="1-引入依赖"><a href="#1-引入依赖" class="headerlink" title="1.引入依赖"></a>1.引入依赖</h4><p>首先，我们需要在微服务中引入seata依赖：</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>com.alibaba.cloud<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>spring-cloud-starter-alibaba-seata<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>exclusions</span><span class="token punctuation">&gt;</span></span>
+        <span class="token comment">&lt;!--版本较低，1.3.0，因此排除--&gt;</span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>exclusion</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>seata-spring-boot-starter<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>io.seata<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>exclusion</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>exclusions</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">&gt;</span></span>
+<span class="token comment">&lt;!--seata starter 采用1.4.2版本--&gt;</span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>io.seata<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>seata-spring-boot-starter<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">&gt;</span></span>${seata.version}<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<h4 id="2-修改配置文件"><a href="#2-修改配置文件" class="headerlink" title="2.修改配置文件"></a>2.修改配置文件</h4><p>需要修改application.yml文件，添加一些配置：</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token key atrule">seata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">registry</span><span class="token punctuation">:</span> <span class="token comment"># TC服务注册中心的配置，微服务根据这些信息去注册中心获取tc服务地址</span>
+    <span class="token comment"># 参考tc服务自己的registry.conf中的配置</span>
+    <span class="token key atrule">type</span><span class="token punctuation">:</span> nacos
+    <span class="token key atrule">nacos</span><span class="token punctuation">:</span> <span class="token comment"># tc</span>
+      <span class="token key atrule">server-addr</span><span class="token punctuation">:</span> 127.0.0.1<span class="token punctuation">:</span><span class="token number">8848</span>
+      <span class="token key atrule">namespace</span><span class="token punctuation">:</span> <span class="token string">""</span>
+      <span class="token key atrule">group</span><span class="token punctuation">:</span> DEFAULT_GROUP
+      <span class="token key atrule">application</span><span class="token punctuation">:</span> seata<span class="token punctuation">-</span>tc<span class="token punctuation">-</span>server <span class="token comment"># tc服务在nacos中的服务名称</span>
+      <span class="token key atrule">cluster</span><span class="token punctuation">:</span> SH
+  <span class="token key atrule">tx-service-group</span><span class="token punctuation">:</span> seata<span class="token punctuation">-</span>demo <span class="token comment"># 事务组，根据这个获取tc服务的cluster名称</span>
+  <span class="token key atrule">service</span><span class="token punctuation">:</span>
+    <span class="token key atrule">vgroup-mapping</span><span class="token punctuation">:</span> <span class="token comment"># 事务组与TC服务cluster的映射关系</span>
+      <span class="token key atrule">seata-demo</span><span class="token punctuation">:</span> SH<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="3-3-微服务集成Seata"><a href="#3-3-微服务集成Seata" class="headerlink" title="3.3.微服务集成Seata"></a>3.3.微服务集成Seata</h2><p>我们以order-service为例来演示。</p>
+<h3 id="3-3-1-引入依赖"><a href="#3-3-1-引入依赖" class="headerlink" title="3.3.1.引入依赖"></a>3.3.1.引入依赖</h3><p>首先，在order-service中引入依赖：</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token comment">&lt;!--seata--&gt;</span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>com.alibaba.cloud<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>spring-cloud-starter-alibaba-seata<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>exclusions</span><span class="token punctuation">&gt;</span></span>
+        <span class="token comment">&lt;!--版本较低，1.3.0，因此排除--&gt;</span> 
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>exclusion</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>seata-spring-boot-starter<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>io.seata<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>exclusion</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>exclusions</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>io.seata<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>seata-spring-boot-starter<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token comment">&lt;!--seata starter 采用1.4.2版本--&gt;</span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">&gt;</span></span>${seata.version}<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<h3 id="3-3-2-配置TC地址"><a href="#3-3-2-配置TC地址" class="headerlink" title="3.3.2.配置TC地址"></a>3.3.2.配置TC地址</h3><p>在order-service中的application.yml中，配置TC服务信息，通过注册中心nacos，结合服务名称获取TC地址：</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token key atrule">seata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">registry</span><span class="token punctuation">:</span> <span class="token comment"># TC服务注册中心的配置，微服务根据这些信息去注册中心获取tc服务地址</span>
+    <span class="token key atrule">type</span><span class="token punctuation">:</span> nacos <span class="token comment"># 注册中心类型 nacos</span>
+    <span class="token key atrule">nacos</span><span class="token punctuation">:</span>
+      <span class="token key atrule">server-addr</span><span class="token punctuation">:</span> 127.0.0.1<span class="token punctuation">:</span><span class="token number">8848</span> <span class="token comment"># nacos地址</span>
+      <span class="token key atrule">namespace</span><span class="token punctuation">:</span> <span class="token string">""</span> <span class="token comment"># namespace，默认为空</span>
+      <span class="token key atrule">group</span><span class="token punctuation">:</span> DEFAULT_GROUP <span class="token comment"># 分组，默认是DEFAULT_GROUP</span>
+      <span class="token key atrule">application</span><span class="token punctuation">:</span> seata<span class="token punctuation">-</span>tc<span class="token punctuation">-</span>server <span class="token comment"># seata服务名称</span>
+      <span class="token key atrule">username</span><span class="token punctuation">:</span> nacos
+      <span class="token key atrule">password</span><span class="token punctuation">:</span> nacos
+  <span class="token key atrule">tx-service-group</span><span class="token punctuation">:</span> seata<span class="token punctuation">-</span>demo <span class="token comment"># 事务组名称</span>
+  <span class="token key atrule">service</span><span class="token punctuation">:</span>
+    <span class="token key atrule">vgroup-mapping</span><span class="token punctuation">:</span> <span class="token comment"># 事务组与cluster的映射关系</span>
+      <span class="token key atrule">seata-demo</span><span class="token punctuation">:</span> SH<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>微服务如何根据这些配置寻找TC的地址呢？</p>
+<p>我们知道注册到Nacos中的微服务，确定一个具体实例需要四个信息：</p>
+<ul>
+<li>namespace：命名空间</li>
+<li>group：分组</li>
+<li>application：服务名</li>
+<li>cluster：集群名</li>
+</ul>
+<p>以上四个信息，在刚才的yaml文件中都能找到：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724173654258.png" alt="image-20210724173654258"></p>
+<p>namespace为空，就是默认的public</p>
+<p>结合起来，TC服务的信息就是：public@DEFAULT_GROUP@seata-tc-server@SH，这样就能确定TC服务集群了。然后就可以去Nacos拉取对应的实例信息了。</p>
+<h3 id="3-3-3-其它服务"><a href="#3-3-3-其它服务" class="headerlink" title="3.3.3.其它服务"></a>3.3.3.其它服务</h3><p>其它两个微服务也都参考order-service的步骤来做，完全一样。</p>
+<h1 id="4-动手实践"><a href="#4-动手实践" class="headerlink" title="4.动手实践"></a>4.动手实践</h1><p>下面我们就一起学习下Seata中的四种不同的事务模式。</p>
+<h2 id="4-1-XA模式"><a href="#4-1-XA模式" class="headerlink" title="4.1.XA模式"></a>4.1.XA模式</h2><p>XA 规范 是 X/Open 组织定义的分布式事务处理（DTP，Distributed Transaction Processing）标准，XA 规范 描述了全局的TM与局部的RM之间的接口，几乎所有主流的数据库都对 XA 规范 提供了支持。</p>
+<h3 id="4-1-1-两阶段提交"><a href="#4-1-1-两阶段提交" class="headerlink" title="4.1.1.两阶段提交"></a>4.1.1.两阶段提交</h3><p>XA是规范，目前主流数据库都实现了这种规范，实现的原理都是基于两阶段提交。</p>
+<p>正常情况：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724174102768.png" alt="image-20210724174102768"></p>
+<p>异常情况：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724174234987.png" alt="image-20210724174234987"></p>
+<p>一阶段：</p>
+<ul>
+<li>事务协调者通知每个事物参与者执行本地事务</li>
+<li>本地事务执行完成后报告事务执行状态给事务协调者，此时事务不提交，继续持有数据库锁</li>
+</ul>
+<p>二阶段：</p>
+<ul>
+<li>事务协调者基于一阶段的报告来判断下一步操作<ul>
+<li>如果一阶段都成功，则通知所有事务参与者，提交事务</li>
+<li>如果一阶段任意一个参与者失败，则通知所有事务参与者回滚事务</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-1-2-Seata的XA模型"><a href="#4-1-2-Seata的XA模型" class="headerlink" title="4.1.2.Seata的XA模型"></a>4.1.2.Seata的XA模型</h3><p>Seata对原始的XA模式做了简单的封装和改造，以适应自己的事务模型，基本架构如图：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724174424070.png" alt="image-20210724174424070"></p>
+<p>RM一阶段的工作：</p>
+<p>​	① 注册分支事务到TC</p>
+<p>​	② 执行分支业务sql但不提交</p>
+<p>​	③ 报告执行状态到TC</p>
+<p>TC二阶段的工作：</p>
+<ul>
+<li><p>TC检测各分支事务执行状态</p>
+<p>a.如果都成功，通知所有RM提交事务</p>
+<p>b.如果有失败，通知所有RM回滚事务</p>
+</li>
+</ul>
+<p>RM二阶段的工作：</p>
+<ul>
+<li>接收TC指令，提交或回滚事务</li>
+</ul>
+<h3 id="4-1-3-优缺点"><a href="#4-1-3-优缺点" class="headerlink" title="4.1.3.优缺点"></a>4.1.3.优缺点</h3><p>XA模式的优点是什么？</p>
+<ul>
+<li>事务的强一致性，满足ACID原则。</li>
+<li>常用数据库都支持，实现简单，并且没有代码侵入</li>
+</ul>
+<p>XA模式的缺点是什么？</p>
+<ul>
+<li>因为一阶段需要锁定数据库资源，等待二阶段结束才释放，性能较差</li>
+<li>依赖关系型数据库实现事务</li>
+</ul>
+<h3 id="4-1-4-实现XA模式"><a href="#4-1-4-实现XA模式" class="headerlink" title="4.1.4.实现XA模式"></a>4.1.4.实现XA模式</h3><p>Seata的starter已经完成了XA模式的自动装配，实现非常简单，步骤如下：</p>
+<p>1）修改application.yml文件（每个参与事务的微服务），开启XA模式：</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token key atrule">seata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">data-source-proxy-mode</span><span class="token punctuation">:</span> XA<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+
+
+<p>2）给发起全局事务的入口方法添加@GlobalTransactional注解:</p>
+<p>本例中是OrderServiceImpl中的create方法.</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724174859556.png" alt="image-20210724174859556"></p>
+<p>3）重启服务并测试</p>
+<p>重启order-service，再次测试，发现无论怎样，三个微服务都能成功回滚。</p>
+<h2 id="4-2-AT模式"><a href="#4-2-AT模式" class="headerlink" title="4.2.AT模式"></a>4.2.AT模式</h2><p>AT模式同样是分阶段提交的事务模型，不过缺弥补了XA模型中资源锁定周期过长的缺陷。</p>
+<h3 id="4-2-1-Seata的AT模型"><a href="#4-2-1-Seata的AT模型" class="headerlink" title="4.2.1.Seata的AT模型"></a>4.2.1.Seata的AT模型</h3><p>基本流程图：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724175327511.png" alt="image-20210724175327511"></p>
+<p>阶段一RM的工作：</p>
+<ul>
+<li>注册分支事务</li>
+<li>记录undo-log（数据快照）</li>
+<li>执行业务sql并提交</li>
+<li>报告事务状态</li>
+</ul>
+<p>阶段二提交时RM的工作：</p>
+<ul>
+<li>删除undo-log即可</li>
+</ul>
+<p>阶段二回滚时RM的工作：</p>
+<ul>
+<li>根据undo-log恢复数据到更新前</li>
+</ul>
+<h3 id="4-2-2-流程梳理"><a href="#4-2-2-流程梳理" class="headerlink" title="4.2.2.流程梳理"></a>4.2.2.流程梳理</h3><p>我们用一个真实的业务来梳理下AT模式的原理。</p>
+<p>比如，现在又一个数据库表，记录用户余额：</p>
+<table>
+<thead>
+<tr>
+<th><strong>id</strong></th>
+<th><strong>money</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>100</td>
+</tr>
+</tbody></table>
+<p>其中一个分支业务要执行的SQL为：</p>
+<pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">update</span> tb_account <span class="token keyword">set</span> money <span class="token operator">=</span> money <span class="token operator">-</span> <span class="token number">10</span> <span class="token keyword">where</span> id <span class="token operator">=</span> <span class="token number">1</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+
+
+<p>AT模式下，当前分支事务执行流程如下：</p>
+<p>一阶段：</p>
+<p>1）TM发起并注册全局事务到TC</p>
+<p>2）TM调用分支事务</p>
+<p>3）分支事务准备执行业务SQL</p>
+<p>4）RM拦截业务SQL，根据where条件查询原始数据，形成快照。</p>
+<pre class="line-numbers language-json" data-language="json"><code class="language-json"><span class="token punctuation">{</span>
+    <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token property">"money"</span><span class="token operator">:</span> <span class="token number">100</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>5）RM执行业务SQL，提交本地事务，释放数据库锁。此时 <code>money = 90</code></p>
+<p>6）RM报告本地事务状态给TC</p>
+<p>二阶段：</p>
+<p>1）TM通知TC事务结束</p>
+<p>2）TC检查分支事务状态</p>
+<p>​	 a）如果都成功，则立即删除快照</p>
+<p>​	 b）如果有分支事务失败，需要回滚。读取快照数据（<code>{"id": 1, "money": 100}</code>），将快照恢复到数据库。此时数据库再次恢复为100</p>
+<p>流程图：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724180722921.png" alt="image-20210724180722921"></p>
+<h3 id="4-2-3-AT与XA的区别"><a href="#4-2-3-AT与XA的区别" class="headerlink" title="4.2.3.AT与XA的区别"></a>4.2.3.AT与XA的区别</h3><p>简述AT模式与XA模式最大的区别是什么？</p>
+<ul>
+<li>XA模式一阶段不提交事务，锁定资源；AT模式一阶段直接提交，不锁定资源。</li>
+<li>XA模式依赖数据库机制实现回滚；AT模式利用数据快照实现数据回滚。</li>
+<li>XA模式强一致；AT模式最终一致</li>
+</ul>
+<h3 id="4-2-4-脏写问题"><a href="#4-2-4-脏写问题" class="headerlink" title="4.2.4.脏写问题"></a>4.2.4.脏写问题</h3><p>在多线程并发访问AT模式的分布式事务时，有可能出现脏写问题，如图：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724181541234.png" alt="image-20210724181541234"></p>
+<p>解决思路就是引入了全局锁的概念。在释放DB锁之前，先拿到全局锁。避免同一时刻有另外一个事务来操作当前数据。</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724181843029.png" alt="image-20210724181843029"></p>
+<h3 id="4-2-5-优缺点"><a href="#4-2-5-优缺点" class="headerlink" title="4.2.5.优缺点"></a>4.2.5.优缺点</h3><p>AT模式的优点：</p>
+<ul>
+<li>一阶段完成直接提交事务，释放数据库资源，性能比较好</li>
+<li>利用全局锁实现读写隔离</li>
+<li>没有代码侵入，框架自动完成回滚和提交</li>
+</ul>
+<p>AT模式的缺点：</p>
+<ul>
+<li>两阶段之间属于软状态，属于最终一致</li>
+<li>框架的快照功能会影响性能，但比XA模式要好很多</li>
+</ul>
+<h3 id="4-2-6-实现AT模式"><a href="#4-2-6-实现AT模式" class="headerlink" title="4.2.6.实现AT模式"></a>4.2.6.实现AT模式</h3><p>AT模式中的快照生成、回滚等动作都是由框架自动完成，没有任何代码侵入，因此实现非常简单。</p>
+<p>只不过，AT模式需要一个表来记录全局锁、另一张表来记录数据快照undo_log。</p>
+<p>1）导入数据库表，记录全局锁</p>
+<p>导入课前资料提供的Sql文件：seata-at.sql，其中lock_table导入到TC服务关联的数据库，undo_log表导入到微服务关联的数据库：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724182217272.png" alt="image-20210724182217272"></p>
+<p>2）修改application.yml文件，将事务模式修改为AT模式即可：</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token key atrule">seata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">data-source-proxy-mode</span><span class="token punctuation">:</span> AT <span class="token comment"># 默认就是AT</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+
+
+<p>3）重启服务并测试</p>
+<h2 id="4-3-TCC模式"><a href="#4-3-TCC模式" class="headerlink" title="4.3.TCC模式"></a>4.3.TCC模式</h2><p>TCC模式与AT模式非常相似，每阶段都是独立事务，不同的是TCC通过人工编码来实现数据恢复。需要实现三个方法：</p>
+<ul>
+<li><p>Try：资源的检测和预留； </p>
+</li>
+<li><p>Confirm：完成资源操作业务；要求 Try 成功 Confirm 一定要能成功。</p>
+</li>
+<li><p>Cancel：预留资源释放，可以理解为try的反向操作。</p>
+</li>
+</ul>
+<h3 id="4-3-1-流程分析"><a href="#4-3-1-流程分析" class="headerlink" title="4.3.1.流程分析"></a>4.3.1.流程分析</h3><p>举例，一个扣减用户余额的业务。假设账户A原来余额是100，需要余额扣减30元。</p>
+<ul>
+<li><strong>阶段一（ Try ）</strong>：检查余额是否充足，如果充足则冻结金额增加30元，可用余额扣除30</li>
+</ul>
+<p>初识余额：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724182424907.png" alt="image-20210724182424907"></p>
+<p>余额充足，可以冻结：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724182457951.png" alt="image-20210724182457951"></p>
+<p>此时，总金额 = 冻结金额 + 可用金额，数量依然是100不变。事务直接提交无需等待其它事务。</p>
+<ul>
+<li>**阶段二（Confirm)**：假如要提交（Confirm），则冻结金额扣减30</li>
+</ul>
+<p>确认可以提交，不过之前可用金额已经扣减过了，这里只要清除冻结金额就好了：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724182706011.png" alt="image-20210724182706011"></p>
+<p>此时，总金额 = 冻结金额 + 可用金额 = 0 + 70  = 70元</p>
+<ul>
+<li>**阶段二(Canncel)**：如果要回滚（Cancel），则冻结金额扣减30，可用余额增加30</li>
+</ul>
+<p>需要回滚，那么就要释放冻结金额，恢复可用金额：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724182810734.png" alt="image-20210724182810734"></p>
+<h3 id="4-3-2-Seata的TCC模型"><a href="#4-3-2-Seata的TCC模型" class="headerlink" title="4.3.2.Seata的TCC模型"></a>4.3.2.Seata的TCC模型</h3><p>Seata中的TCC模型依然延续之前的事务架构，如图：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724182937713.png" alt="image-20210724182937713"></p>
+<h3 id="4-3-3-优缺点"><a href="#4-3-3-优缺点" class="headerlink" title="4.3.3.优缺点"></a>4.3.3.优缺点</h3><p>TCC模式的每个阶段是做什么的？</p>
+<ul>
+<li>Try：资源检查和预留</li>
+<li>Confirm：业务执行和提交</li>
+<li>Cancel：预留资源的释放</li>
+</ul>
+<p>TCC的优点是什么？</p>
+<ul>
+<li>一阶段完成直接提交事务，释放数据库资源，性能好</li>
+<li>相比AT模型，无需生成快照，无需使用全局锁，性能最强</li>
+<li>不依赖数据库事务，而是依赖补偿操作，可以用于非事务型数据库</li>
+</ul>
+<p>TCC的缺点是什么？</p>
+<ul>
+<li>有代码侵入，需要人为编写try、Confirm和Cancel接口，太麻烦</li>
+<li>软状态，事务是最终一致</li>
+<li>需要考虑Confirm和Cancel的失败情况，做好幂等处理</li>
+</ul>
+<h3 id="4-3-4-事务悬挂和空回滚"><a href="#4-3-4-事务悬挂和空回滚" class="headerlink" title="4.3.4.事务悬挂和空回滚"></a>4.3.4.事务悬挂和空回滚</h3><h4 id="1）空回滚"><a href="#1）空回滚" class="headerlink" title="1）空回滚"></a>1）空回滚</h4><p>当某分支事务的try阶段<strong>阻塞</strong>时，可能导致全局事务超时而触发二阶段的cancel操作。在未执行try操作时先执行了cancel操作，这时cancel不能做回滚，就是<strong>空回滚</strong>。</p>
+<p>如图：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724183426891.png" alt="image-20210724183426891"></p>
+<p>执行cancel操作时，应当判断try是否已经执行，如果尚未执行，则应该空回滚。</p>
+<h4 id="2）业务悬挂"><a href="#2）业务悬挂" class="headerlink" title="2）业务悬挂"></a>2）业务悬挂</h4><p>对于已经空回滚的业务，之前被阻塞的try操作恢复，继续执行try，就永远不可能confirm或cancel ，事务一直处于中间状态，这就是<strong>业务悬挂</strong>。</p>
+<p>执行try操作时，应当判断cancel是否已经执行过了，如果已经执行，应当阻止空回滚后的try操作，避免悬挂</p>
+<h3 id="4-3-5-实现TCC模式"><a href="#4-3-5-实现TCC模式" class="headerlink" title="4.3.5.实现TCC模式"></a>4.3.5.实现TCC模式</h3><p>解决空回滚和业务悬挂问题，必须要记录当前事务状态，是在try、还是cancel？</p>
+<h4 id="1）思路分析"><a href="#1）思路分析" class="headerlink" title="1）思路分析"></a>1）思路分析</h4><p>这里我们定义一张表：</p>
+<pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> <span class="token identifier"><span class="token punctuation">`</span>account_freeze_tbl<span class="token punctuation">`</span></span> <span class="token punctuation">(</span>
+  <span class="token identifier"><span class="token punctuation">`</span>xid<span class="token punctuation">`</span></span> <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">128</span><span class="token punctuation">)</span> <span class="token operator">NOT</span> <span class="token boolean">NULL</span><span class="token punctuation">,</span>
+  <span class="token identifier"><span class="token punctuation">`</span>user_id<span class="token punctuation">`</span></span> <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">)</span> <span class="token keyword">DEFAULT</span> <span class="token boolean">NULL</span> <span class="token keyword">COMMENT</span> <span class="token string">'用户id'</span><span class="token punctuation">,</span>
+  <span class="token identifier"><span class="token punctuation">`</span>freeze_money<span class="token punctuation">`</span></span> <span class="token keyword">int</span><span class="token punctuation">(</span><span class="token number">11</span><span class="token punctuation">)</span> <span class="token keyword">unsigned</span> <span class="token keyword">DEFAULT</span> <span class="token string">'0'</span> <span class="token keyword">COMMENT</span> <span class="token string">'冻结金额'</span><span class="token punctuation">,</span>
+  <span class="token identifier"><span class="token punctuation">`</span>state<span class="token punctuation">`</span></span> <span class="token keyword">int</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token keyword">DEFAULT</span> <span class="token boolean">NULL</span> <span class="token keyword">COMMENT</span> <span class="token string">'事务状态，0:try，1:confirm，2:cancel'</span><span class="token punctuation">,</span>
+  <span class="token keyword">PRIMARY</span> <span class="token keyword">KEY</span> <span class="token punctuation">(</span><span class="token identifier"><span class="token punctuation">`</span>xid<span class="token punctuation">`</span></span><span class="token punctuation">)</span> <span class="token keyword">USING</span> <span class="token keyword">BTREE</span>
+<span class="token punctuation">)</span> <span class="token keyword">ENGINE</span><span class="token operator">=</span><span class="token keyword">InnoDB</span> <span class="token keyword">DEFAULT</span> <span class="token keyword">CHARSET</span><span class="token operator">=</span>utf8 ROW_FORMAT<span class="token operator">=</span>COMPACT<span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>其中：</p>
+<ul>
+<li>xid：是全局事务id</li>
+<li>freeze_money：用来记录用户冻结金额</li>
+<li>state：用来记录事务状态</li>
+</ul>
+<p>那此时，我们的业务开怎么做呢？</p>
+<ul>
+<li>Try业务：<ul>
+<li>记录冻结金额和事务状态到account_freeze表</li>
+<li>扣减account表可用金额</li>
+</ul>
+</li>
+<li>Confirm业务<ul>
+<li>根据xid删除account_freeze表的冻结记录</li>
+</ul>
+</li>
+<li>Cancel业务<ul>
+<li>修改account_freeze表，冻结金额为0，state为2</li>
+<li>修改account表，恢复可用金额</li>
+</ul>
+</li>
+<li>如何判断是否空回滚？<ul>
+<li>cancel业务中，根据xid查询account_freeze，如果为null则说明try还没做，需要空回滚</li>
+</ul>
+</li>
+<li>如何避免业务悬挂？<ul>
+<li>try业务中，根据xid查询account_freeze ，如果已经存在则证明Cancel已经执行，拒绝执行try业务</li>
+</ul>
+</li>
+</ul>
+<p>接下来，我们改造account-service，利用TCC实现余额扣减功能。</p>
+<h4 id="2）声明TCC接口"><a href="#2）声明TCC接口" class="headerlink" title="2）声明TCC接口"></a>2）声明TCC接口</h4><p>TCC的Try、Confirm、Cancel方法都需要在接口中基于注解来声明，</p>
+<p>我们在account-service项目中的<code>cn.itcast.account.service</code>包中新建一个接口，声明TCC三个接口：</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">cn<span class="token punctuation">.</span>itcast<span class="token punctuation">.</span>account<span class="token punctuation">.</span>service</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">io<span class="token punctuation">.</span>seata<span class="token punctuation">.</span>rm<span class="token punctuation">.</span>tcc<span class="token punctuation">.</span>api<span class="token punctuation">.</span></span><span class="token class-name">BusinessActionContext</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">io<span class="token punctuation">.</span>seata<span class="token punctuation">.</span>rm<span class="token punctuation">.</span>tcc<span class="token punctuation">.</span>api<span class="token punctuation">.</span></span><span class="token class-name">BusinessActionContextParameter</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">io<span class="token punctuation">.</span>seata<span class="token punctuation">.</span>rm<span class="token punctuation">.</span>tcc<span class="token punctuation">.</span>api<span class="token punctuation">.</span></span><span class="token class-name">LocalTCC</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">io<span class="token punctuation">.</span>seata<span class="token punctuation">.</span>rm<span class="token punctuation">.</span>tcc<span class="token punctuation">.</span>api<span class="token punctuation">.</span></span><span class="token class-name">TwoPhaseBusinessAction</span></span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@LocalTCC</span>
+<span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">AccountTCCService</span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@TwoPhaseBusinessAction</span><span class="token punctuation">(</span>name <span class="token operator">=</span> <span class="token string">"deduct"</span><span class="token punctuation">,</span> commitMethod <span class="token operator">=</span> <span class="token string">"confirm"</span><span class="token punctuation">,</span> rollbackMethod <span class="token operator">=</span> <span class="token string">"cancel"</span><span class="token punctuation">)</span>
+    <span class="token keyword">void</span> <span class="token function">deduct</span><span class="token punctuation">(</span><span class="token annotation punctuation">@BusinessActionContextParameter</span><span class="token punctuation">(</span>paramName <span class="token operator">=</span> <span class="token string">"userId"</span><span class="token punctuation">)</span> <span class="token class-name">String</span> userId<span class="token punctuation">,</span>
+                <span class="token annotation punctuation">@BusinessActionContextParameter</span><span class="token punctuation">(</span>paramName <span class="token operator">=</span> <span class="token string">"money"</span><span class="token punctuation">)</span><span class="token keyword">int</span> money<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">boolean</span> <span class="token function">confirm</span><span class="token punctuation">(</span><span class="token class-name">BusinessActionContext</span> ctx<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">boolean</span> <span class="token function">cancel</span><span class="token punctuation">(</span><span class="token class-name">BusinessActionContext</span> ctx<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<h4 id="3）编写实现类"><a href="#3）编写实现类" class="headerlink" title="3）编写实现类"></a>3）编写实现类</h4><p>在account-service服务中的<code>cn.itcast.account.service.impl</code>包下新建一个类，实现TCC业务：</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">cn<span class="token punctuation">.</span>itcast<span class="token punctuation">.</span>account<span class="token punctuation">.</span>service<span class="token punctuation">.</span>impl</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">cn<span class="token punctuation">.</span>itcast<span class="token punctuation">.</span>account<span class="token punctuation">.</span>entity<span class="token punctuation">.</span></span><span class="token class-name">AccountFreeze</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">cn<span class="token punctuation">.</span>itcast<span class="token punctuation">.</span>account<span class="token punctuation">.</span>mapper<span class="token punctuation">.</span></span><span class="token class-name">AccountFreezeMapper</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">cn<span class="token punctuation">.</span>itcast<span class="token punctuation">.</span>account<span class="token punctuation">.</span>mapper<span class="token punctuation">.</span></span><span class="token class-name">AccountMapper</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">cn<span class="token punctuation">.</span>itcast<span class="token punctuation">.</span>account<span class="token punctuation">.</span>service<span class="token punctuation">.</span></span><span class="token class-name">AccountTCCService</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">io<span class="token punctuation">.</span>seata<span class="token punctuation">.</span>core<span class="token punctuation">.</span>context<span class="token punctuation">.</span></span><span class="token class-name">RootContext</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">io<span class="token punctuation">.</span>seata<span class="token punctuation">.</span>rm<span class="token punctuation">.</span>tcc<span class="token punctuation">.</span>api<span class="token punctuation">.</span></span><span class="token class-name">BusinessActionContext</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">lombok<span class="token punctuation">.</span>extern<span class="token punctuation">.</span>slf4j<span class="token punctuation">.</span></span><span class="token class-name">Slf4j</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>beans<span class="token punctuation">.</span>factory<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">Autowired</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>stereotype<span class="token punctuation">.</span></span><span class="token class-name">Service</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>transaction<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">Transactional</span></span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@Service</span>
+<span class="token annotation punctuation">@Slf4j</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">AccountTCCServiceImpl</span> <span class="token keyword">implements</span> <span class="token class-name">AccountTCCService</span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">private</span> <span class="token class-name">AccountMapper</span> accountMapper<span class="token punctuation">;</span>
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">private</span> <span class="token class-name">AccountFreezeMapper</span> freezeMapper<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token annotation punctuation">@Transactional</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">deduct</span><span class="token punctuation">(</span><span class="token class-name">String</span> userId<span class="token punctuation">,</span> <span class="token keyword">int</span> money<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// 0.获取事务id</span>
+        <span class="token class-name">String</span> xid <span class="token operator">=</span> <span class="token class-name">RootContext</span><span class="token punctuation">.</span><span class="token function">getXID</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// 1.扣减可用余额</span>
+        accountMapper<span class="token punctuation">.</span><span class="token function">deduct</span><span class="token punctuation">(</span>userId<span class="token punctuation">,</span> money<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// 2.记录冻结金额，事务状态</span>
+        <span class="token class-name">AccountFreeze</span> freeze <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">AccountFreeze</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        freeze<span class="token punctuation">.</span><span class="token function">setUserId</span><span class="token punctuation">(</span>userId<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        freeze<span class="token punctuation">.</span><span class="token function">setFreezeMoney</span><span class="token punctuation">(</span>money<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        freeze<span class="token punctuation">.</span><span class="token function">setState</span><span class="token punctuation">(</span><span class="token class-name">AccountFreeze<span class="token punctuation">.</span>State</span><span class="token punctuation">.</span><span class="token constant">TRY</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        freeze<span class="token punctuation">.</span><span class="token function">setXid</span><span class="token punctuation">(</span>xid<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        freezeMapper<span class="token punctuation">.</span><span class="token function">insert</span><span class="token punctuation">(</span>freeze<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">confirm</span><span class="token punctuation">(</span><span class="token class-name">BusinessActionContext</span> ctx<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// 1.获取事务id</span>
+        <span class="token class-name">String</span> xid <span class="token operator">=</span> ctx<span class="token punctuation">.</span><span class="token function">getXid</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// 2.根据id删除冻结记录</span>
+        <span class="token keyword">int</span> count <span class="token operator">=</span> freezeMapper<span class="token punctuation">.</span><span class="token function">deleteById</span><span class="token punctuation">(</span>xid<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> count <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">cancel</span><span class="token punctuation">(</span><span class="token class-name">BusinessActionContext</span> ctx<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// 0.查询冻结记录</span>
+        <span class="token class-name">String</span> xid <span class="token operator">=</span> ctx<span class="token punctuation">.</span><span class="token function">getXid</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">AccountFreeze</span> freeze <span class="token operator">=</span> freezeMapper<span class="token punctuation">.</span><span class="token function">selectById</span><span class="token punctuation">(</span>xid<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// 1.恢复可用余额</span>
+        accountMapper<span class="token punctuation">.</span><span class="token function">refund</span><span class="token punctuation">(</span>freeze<span class="token punctuation">.</span><span class="token function">getUserId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> freeze<span class="token punctuation">.</span><span class="token function">getFreezeMoney</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// 2.将冻结金额清零，状态改为CANCEL</span>
+        freeze<span class="token punctuation">.</span><span class="token function">setFreezeMoney</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        freeze<span class="token punctuation">.</span><span class="token function">setState</span><span class="token punctuation">(</span><span class="token class-name">AccountFreeze<span class="token punctuation">.</span>State</span><span class="token punctuation">.</span><span class="token constant">CANCEL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> count <span class="token operator">=</span> freezeMapper<span class="token punctuation">.</span><span class="token function">updateById</span><span class="token punctuation">(</span>freeze<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> count <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+
+
+
+
+<h2 id="4-4-SAGA模式"><a href="#4-4-SAGA模式" class="headerlink" title="4.4.SAGA模式"></a>4.4.SAGA模式</h2><p>Saga 模式是 Seata 即将开源的长事务解决方案，将由蚂蚁金服主要贡献。</p>
+<p>其理论基础是Hector &amp; Kenneth  在1987年发表的论文<a target="_blank" rel="noopener" href="https://microservices.io/patterns/data/saga.html">Sagas</a>。</p>
+<p>Seata官网对于Saga的指南：<a target="_blank" rel="noopener" href="https://seata.io/zh-cn/docs/user/saga.html">https://seata.io/zh-cn/docs/user/saga.html</a></p>
+<h3 id="4-4-1-原理"><a href="#4-4-1-原理" class="headerlink" title="4.4.1.原理"></a>4.4.1.原理</h3><p>在 Saga 模式下，分布式事务内有多个参与者，每一个参与者都是一个冲正补偿服务，需要用户根据业务场景实现其正向操作和逆向回滚操作。</p>
+<p>分布式事务执行过程中，依次执行各参与者的正向操作，如果所有正向操作均执行成功，那么分布式事务提交。如果任何一个正向操作执行失败，那么分布式事务会去退回去执行前面各参与者的逆向回滚操作，回滚已提交的参与者，使分布式事务回到初始状态。</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724184846396.png" alt="image-20210724184846396"></p>
+<p>Saga也分为两个阶段：</p>
+<ul>
+<li>一阶段：直接提交本地事务</li>
+<li>二阶段：成功则什么都不做；失败则通过编写补偿业务来回滚</li>
+</ul>
+<h3 id="4-4-2-优缺点"><a href="#4-4-2-优缺点" class="headerlink" title="4.4.2.优缺点"></a>4.4.2.优缺点</h3><p>优点：</p>
+<ul>
+<li>事务参与者可以基于事件驱动实现异步调用，吞吐高</li>
+<li>一阶段直接提交事务，无锁，性能好</li>
+<li>不用编写TCC中的三个阶段，实现简单</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>软状态持续时间不确定，时效性差</li>
+<li>没有锁，没有事务隔离，会有脏写</li>
+</ul>
+<h2 id="4-5-四种模式对比"><a href="#4-5-四种模式对比" class="headerlink" title="4.5.四种模式对比"></a>4.5.四种模式对比</h2><p>我们从以下几个方面来对比四种实现：</p>
+<ul>
+<li>一致性：能否保证事务的一致性？强一致还是最终一致？</li>
+<li>隔离性：事务之间的隔离性如何？</li>
+<li>代码侵入：是否需要对业务代码改造？</li>
+<li>性能：有无性能损耗？</li>
+<li>场景：常见的业务场景</li>
+</ul>
+<p>如图：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724185021819.png" alt="image-20210724185021819"></p>
+<h1 id="5-高可用和异地容灾"><a href="#5-高可用和异地容灾" class="headerlink" title="5.高可用和异地容灾"></a>5.高可用和异地容灾</h1><p>Seata的TC服务作为分布式事务核心，一定要保证集群的高可用性。</p>
+<h2 id="5-1-高可用架构模型"><a href="#5-1-高可用架构模型" class="headerlink" title="5.1.高可用架构模型"></a>5.1.高可用架构模型</h2><p>搭建TC服务集群非常简单，启动多个TC服务，注册到nacos即可。</p>
+<p>但集群并不能确保100%安全，万一集群所在机房故障怎么办？所以如果要求较高，一般都会做异地多机房容灾。</p>
+<p>比如一个TC集群在上海，另一个TC集群在杭州：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210724185240957.png" alt="image-20210724185240957"></p>
+<p>微服务基于事务组（tx-service-group)与TC集群的映射关系，来查找当前应该使用哪个TC集群。当SH集群故障时，只需要将vgroup-mapping中的映射关系改成HZ。则所有微服务就会切换到HZ的TC集群了。</p>
+<h2 id="5-2-实现高可用和异地容灾"><a href="#5-2-实现高可用和异地容灾" class="headerlink" title="5.2.实现高可用和异地容灾"></a>5.2.实现高可用和异地容灾</h2><h3 id="5-2-1-模拟异地容灾的TC集群"><a href="#5-2-1-模拟异地容灾的TC集群" class="headerlink" title="5.2.1.模拟异地容灾的TC集群"></a>5.2.1.模拟异地容灾的TC集群</h3><p>计划启动两台seata的tc服务节点：</p>
+<table>
+<thead>
+<tr>
+<th>节点名称</th>
+<th>ip地址</th>
+<th>端口号</th>
+<th>集群名称</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>seata</td>
+<td>127.0.0.1</td>
+<td>8091</td>
+<td>SH</td>
+</tr>
+<tr>
+<td>seata2</td>
+<td>127.0.0.1</td>
+<td>8092</td>
+<td>HZ</td>
+</tr>
+</tbody></table>
+<p>之前我们已经启动了一台seata服务，端口是8091，集群名为SH。</p>
+<p>现在，将seata目录复制一份，起名为seata2</p>
+<p>修改seata2/conf/registry.conf内容如下：</p>
+<pre class="line-numbers language-nginx" data-language="nginx"><code class="language-nginx"><span class="token directive"><span class="token keyword">registry</span></span> <span class="token punctuation">{</span>
+  <span class="token comment">## tc服务的注册中心类，这里选择nacos，也可以是eureka、zookeeper等</span>
+  <span class="token directive"><span class="token keyword">type</span> = <span class="token string">"nacos"</span>
+
+  nacos</span> <span class="token punctuation">{</span>
+    <span class="token comment">## seata tc 服务注册到 nacos的服务名称，可以自定义</span>
+    application = "seata-tc-server"
+    serverAddr = "127.0.0.1:8848"
+    group = "DEFAULT_GROUP"
+    namespace = ""
+    cluster = "HZ"
+    username = "nacos"
+    password = "nacos"
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token directive"><span class="token keyword">config</span></span> <span class="token punctuation">{</span>
+  <span class="token comment">## 读取tc服务端的配置文件的方式，这里是从nacos配置中心读取，这样如果tc是集群，可以共享配置</span>
+  <span class="token directive"><span class="token keyword">type</span> = <span class="token string">"nacos"</span>
+  <span class="token comment">## 配置nacos地址等信息</span>
+  nacos</span> <span class="token punctuation">{</span>
+    serverAddr = "127.0.0.1:8848"
+    namespace = ""
+    group = "SEATA_GROUP"
+    username = "nacos"
+    password = "nacos"
+    dataId = "seataServer.properties"
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>进入seata2/bin目录，然后运行命令：</p>
+<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">seata-server<span class="token punctuation">.</span>bat <span class="token operator">-</span>p 8092<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+
+
+<p>打开nacos控制台，查看服务列表：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210624151150840.png" alt="image-20210624151150840"></p>
+<p>点进详情查看：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210624151221747.png" alt="image-20210624151221747"></p>
+<h3 id="5-2-2-将事务组映射配置到nacos"><a href="#5-2-2-将事务组映射配置到nacos" class="headerlink" title="5.2.2.将事务组映射配置到nacos"></a>5.2.2.将事务组映射配置到nacos</h3><p>接下来，我们需要将tx-service-group与cluster的映射关系都配置到nacos配置中心。</p>
+<p>新建一个配置：</p>
+<p><img src="/medias/loading.gif" data-original="/2023/09/26/seata/image-20210624151507072.png" alt="image-20210624151507072"></p>
+<p>配置的内容如下：</p>
+<pre class="line-numbers language-properties" data-language="properties"><code class="language-properties"><span class="token comment">## 事务组映射关系</span>
+<span class="token key attr-name">service.vgroupMapping.seata-demo</span><span class="token punctuation">=</span><span class="token value attr-value">SH</span>
+
+<span class="token key attr-name">service.enableDegrade</span><span class="token punctuation">=</span><span class="token value attr-value">false</span>
+<span class="token key attr-name">service.disableGlobalTransaction</span><span class="token punctuation">=</span><span class="token value attr-value">false</span>
+<span class="token comment">## 与TC服务的通信配置</span>
+<span class="token key attr-name">transport.type</span><span class="token punctuation">=</span><span class="token value attr-value">TCP</span>
+<span class="token key attr-name">transport.server</span><span class="token punctuation">=</span><span class="token value attr-value">NIO</span>
+<span class="token key attr-name">transport.heartbeat</span><span class="token punctuation">=</span><span class="token value attr-value">true</span>
+<span class="token key attr-name">transport.enableClientBatchSendRequest</span><span class="token punctuation">=</span><span class="token value attr-value">false</span>
+<span class="token key attr-name">transport.threadFactory.bossThreadPrefix</span><span class="token punctuation">=</span><span class="token value attr-value">NettyBoss</span>
+<span class="token key attr-name">transport.threadFactory.workerThreadPrefix</span><span class="token punctuation">=</span><span class="token value attr-value">NettyServerNIOWorker</span>
+<span class="token key attr-name">transport.threadFactory.serverExecutorThreadPrefix</span><span class="token punctuation">=</span><span class="token value attr-value">NettyServerBizHandler</span>
+<span class="token key attr-name">transport.threadFactory.shareBossWorker</span><span class="token punctuation">=</span><span class="token value attr-value">false</span>
+<span class="token key attr-name">transport.threadFactory.clientSelectorThreadPrefix</span><span class="token punctuation">=</span><span class="token value attr-value">NettyClientSelector</span>
+<span class="token key attr-name">transport.threadFactory.clientSelectorThreadSize</span><span class="token punctuation">=</span><span class="token value attr-value">1</span>
+<span class="token key attr-name">transport.threadFactory.clientWorkerThreadPrefix</span><span class="token punctuation">=</span><span class="token value attr-value">NettyClientWorkerThread</span>
+<span class="token key attr-name">transport.threadFactory.bossThreadSize</span><span class="token punctuation">=</span><span class="token value attr-value">1</span>
+<span class="token key attr-name">transport.threadFactory.workerThreadSize</span><span class="token punctuation">=</span><span class="token value attr-value">default</span>
+<span class="token key attr-name">transport.shutdown.wait</span><span class="token punctuation">=</span><span class="token value attr-value">3</span>
+<span class="token comment">## RM配置</span>
+<span class="token key attr-name">client.rm.asyncCommitBufferLimit</span><span class="token punctuation">=</span><span class="token value attr-value">10000</span>
+<span class="token key attr-name">client.rm.lock.retryInterval</span><span class="token punctuation">=</span><span class="token value attr-value">10</span>
+<span class="token key attr-name">client.rm.lock.retryTimes</span><span class="token punctuation">=</span><span class="token value attr-value">30</span>
+<span class="token key attr-name">client.rm.lock.retryPolicyBranchRollbackOnConflict</span><span class="token punctuation">=</span><span class="token value attr-value">true</span>
+<span class="token key attr-name">client.rm.reportRetryCount</span><span class="token punctuation">=</span><span class="token value attr-value">5</span>
+<span class="token key attr-name">client.rm.tableMetaCheckEnable</span><span class="token punctuation">=</span><span class="token value attr-value">false</span>
+<span class="token key attr-name">client.rm.tableMetaCheckerInterval</span><span class="token punctuation">=</span><span class="token value attr-value">60000</span>
+<span class="token key attr-name">client.rm.sqlParserType</span><span class="token punctuation">=</span><span class="token value attr-value">druid</span>
+<span class="token key attr-name">client.rm.reportSuccessEnable</span><span class="token punctuation">=</span><span class="token value attr-value">false</span>
+<span class="token key attr-name">client.rm.sagaBranchRegisterEnable</span><span class="token punctuation">=</span><span class="token value attr-value">false</span>
+<span class="token comment">## TM配置</span>
+<span class="token key attr-name">client.tm.commitRetryCount</span><span class="token punctuation">=</span><span class="token value attr-value">5</span>
+<span class="token key attr-name">client.tm.rollbackRetryCount</span><span class="token punctuation">=</span><span class="token value attr-value">5</span>
+<span class="token key attr-name">client.tm.defaultGlobalTransactionTimeout</span><span class="token punctuation">=</span><span class="token value attr-value">60000</span>
+<span class="token key attr-name">client.tm.degradeCheck</span><span class="token punctuation">=</span><span class="token value attr-value">false</span>
+<span class="token key attr-name">client.tm.degradeCheckAllowTimes</span><span class="token punctuation">=</span><span class="token value attr-value">10</span>
+<span class="token key attr-name">client.tm.degradeCheckPeriod</span><span class="token punctuation">=</span><span class="token value attr-value">2000</span>
+
+<span class="token comment">## undo日志配置</span>
+<span class="token key attr-name">client.undo.dataValidation</span><span class="token punctuation">=</span><span class="token value attr-value">true</span>
+<span class="token key attr-name">client.undo.logSerialization</span><span class="token punctuation">=</span><span class="token value attr-value">jackson</span>
+<span class="token key attr-name">client.undo.onlyCareUpdateColumns</span><span class="token punctuation">=</span><span class="token value attr-value">true</span>
+<span class="token key attr-name">client.undo.logTable</span><span class="token punctuation">=</span><span class="token value attr-value">undo_log</span>
+<span class="token key attr-name">client.undo.compress.enable</span><span class="token punctuation">=</span><span class="token value attr-value">true</span>
+<span class="token key attr-name">client.undo.compress.type</span><span class="token punctuation">=</span><span class="token value attr-value">zip</span>
+<span class="token key attr-name">client.undo.compress.threshold</span><span class="token punctuation">=</span><span class="token value attr-value">64k</span>
+<span class="token key attr-name">client.log.exceptionRate</span><span class="token punctuation">=</span><span class="token value attr-value">100</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="5-2-3-微服务读取nacos配置"><a href="#5-2-3-微服务读取nacos配置" class="headerlink" title="5.2.3.微服务读取nacos配置"></a>5.2.3.微服务读取nacos配置</h3><p>接下来，需要修改每一个微服务的application.yml文件，让微服务读取nacos中的client.properties文件：</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token key atrule">seata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">config</span><span class="token punctuation">:</span>
+    <span class="token key atrule">type</span><span class="token punctuation">:</span> nacos
+    <span class="token key atrule">nacos</span><span class="token punctuation">:</span>
+      <span class="token key atrule">server-addr</span><span class="token punctuation">:</span> 127.0.0.1<span class="token punctuation">:</span><span class="token number">8848</span>
+      <span class="token key atrule">username</span><span class="token punctuation">:</span> nacos
+      <span class="token key atrule">password</span><span class="token punctuation">:</span> nacos
+      <span class="token key atrule">group</span><span class="token punctuation">:</span> SEATA_GROUP
+      <span class="token key atrule">data-id</span><span class="token punctuation">:</span> client.properties<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>重启微服务，现在微服务到底是连接tc的SH集群，还是tc的HZ集群，都统一由nacos的client.properties来决定了。</p>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">L ZHEN</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="http://fahaxikilz.github.io/2023/09/26/seata/">http://fahaxikilz.github.io/2023/09/26/seata/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">L ZHEN</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Seata/">
+                                    <span class="chip bg-color">Seata</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/loading.gif" data-original="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/loading.gif" data-original="/medias/reward/wechat.jpg" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+        <style>
+    .valine-card {
+        margin: 1.5rem auto;
+    }
+
+    .valine-card .card-content {
+        padding: 20px 20px 5px 20px;
+    }
+
+    #vcomments textarea {
+        box-sizing: border-box;
+        background: url("/medias/comment_bg.png") 100% 100% no-repeat;
+    }
+
+    #vcomments p {
+        margin: 2px 2px 10px;
+        font-size: 1.05rem;
+        line-height: 1.78rem;
+    }
+
+    #vcomments blockquote p {
+        text-indent: 0.2rem;
+    }
+
+    #vcomments a {
+        padding: 0 2px;
+        color: #4cbf30;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    #vcomments img {
+        max-width: 100%;
+        height: auto;
+        cursor: pointer;
+    }
+
+    #vcomments ol li {
+        list-style-type: decimal;
+    }
+
+    #vcomments ol,
+    ul {
+        display: block;
+        padding-left: 2em;
+        word-spacing: 0.05rem;
+    }
+
+    #vcomments ul li,
+    ol li {
+        display: list-item;
+        line-height: 1.8rem;
+        font-size: 1rem;
+    }
+
+    #vcomments ul li {
+        list-style-type: disc;
+    }
+
+    #vcomments ul ul li {
+        list-style-type: circle;
+    }
+
+    #vcomments table, th, td {
+        padding: 12px 13px;
+        border: 1px solid #dfe2e5;
+    }
+
+    #vcomments table, th, td {
+        border: 0;
+    }
+
+    table tr:nth-child(2n), thead {
+        background-color: #fafafa;
+    }
+
+    #vcomments table th {
+        background-color: #f2f2f2;
+        min-width: 80px;
+    }
+
+    #vcomments table td {
+        min-width: 80px;
+    }
+
+    #vcomments h1 {
+        font-size: 1.85rem;
+        font-weight: bold;
+        line-height: 2.2rem;
+    }
+
+    #vcomments h2 {
+        font-size: 1.65rem;
+        font-weight: bold;
+        line-height: 1.9rem;
+    }
+
+    #vcomments h3 {
+        font-size: 1.45rem;
+        font-weight: bold;
+        line-height: 1.7rem;
+    }
+
+    #vcomments h4 {
+        font-size: 1.25rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    #vcomments h5 {
+        font-size: 1.1rem;
+        font-weight: bold;
+        line-height: 1.4rem;
+    }
+
+    #vcomments h6 {
+        font-size: 1rem;
+        line-height: 1.3rem;
+    }
+
+    #vcomments p {
+        font-size: 1rem;
+        line-height: 1.5rem;
+    }
+
+    #vcomments hr {
+        margin: 12px 0;
+        border: 0;
+        border-top: 1px solid #ccc;
+    }
+
+    #vcomments blockquote {
+        margin: 15px 0;
+        border-left: 5px solid #42b983;
+        padding: 1rem 0.8rem 0.3rem 0.8rem;
+        color: #666;
+        background-color: rgba(66, 185, 131, .1);
+    }
+
+    #vcomments pre {
+        font-family: monospace, monospace;
+        padding: 1.2em;
+        margin: .5em 0;
+        background: #272822;
+        overflow: auto;
+        border-radius: 0.3em;
+        tab-size: 4;
+    }
+
+    #vcomments code {
+        font-family: monospace, monospace;
+        padding: 1px 3px;
+        font-size: 0.92rem;
+        color: #e96900;
+        background-color: #f8f8f8;
+        border-radius: 2px;
+    }
+
+    #vcomments pre code {
+        font-family: monospace, monospace;
+        padding: 0;
+        color: #e8eaf6;
+        background-color: #272822;
+    }
+
+    #vcomments pre[class*="language-"] {
+        padding: 1.2em;
+        margin: .5em 0;
+    }
+
+    #vcomments code[class*="language-"],
+    pre[class*="language-"] {
+        color: #e8eaf6;
+    }
+
+    #vcomments [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: inherit;
+        margin-left: -1.3rem;
+        margin-right: 0.4rem;
+        margin-top: -1px;
+        vertical-align: middle;
+        left: unset;
+        visibility: visible;
+    }
+
+    #vcomments b,
+    strong {
+        font-weight: bold;
+    }
+
+    #vcomments dfn {
+        font-style: italic;
+    }
+
+    #vcomments small {
+        font-size: 85%;
+    }
+
+    #vcomments cite {
+        font-style: normal;
+    }
+
+    #vcomments mark {
+        background-color: #fcf8e3;
+        padding: .2em;
+    }
+
+    #vcomments table, th, td {
+        padding: 12px 13px;
+        border: 1px solid #dfe2e5;
+    }
+
+    table tr:nth-child(2n), thead {
+        background-color: #fafafa;
+    }
+
+    #vcomments table th {
+        background-color: #f2f2f2;
+        min-width: 80px;
+    }
+
+    #vcomments table td {
+        min-width: 80px;
+    }
+
+    #vcomments [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: inherit;
+        margin-left: -1.3rem;
+        margin-right: 0.4rem;
+        margin-top: -1px;
+        vertical-align: middle;
+        left: unset;
+        visibility: visible;
+    }
+</style>
+
+<div class="card valine-card" data-aos="fade-up">
+    <div class="comment_headling" style="font-size: 20px; font-weight: 700; position: relative; padding-left: 20px; top: 15px; padding-bottom: 5px;">
+        <i class="fas fa-comments fa-fw" aria-hidden="true"></i>
+        <span>评论</span>
+    </div>
+    <div id="vcomments" class="card-content" style="display: grid">
+    </div>
+</div>
+
+<script src="/libs/valine/av-min.js"></script>
+<script src="/libs/valine/Valine.min.js"></script>
+<script>
+    new Valine({
+        el: '#vcomments',
+        appId: 'sxNXQ2L9Yj1y9VxBDX2sA6d8-gzGzoHsz',
+        appKey: 'YgMUSzSrmuxo97dKBzjIl5dy',
+        serverURLs: 'https://sxnxq2l9.lc-cn-n1-shared.com',
+        notify: 'true, // 邮件提醒!!!' === 'true',
+        verify: '' === 'true',
+        visitor: 'true' === 'true',
+        avatar: 'robohash',
+        pageSize: '10',
+        lang: 'zh-cn',
+        placeholder: 'ヾﾉ≧∀≦)o来啊，快活啊!'
+    });
+</script>
+
+<!--酷Q推送-->
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2023/11/21/uni-app/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/loading.gif" data-original="/medias/featureimages/20.jpg" class="responsive-img" alt="uni-app">
+                        
+                        <span class="card-title">uni-app</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2023-11-21
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%89%8D%E7%AB%AF%E6%A1%86%E6%9E%B6/" class="post-category">
+                                    前端框架
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/uni-app/">
+                        <span class="chip bg-color">uni-app</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2023/09/21/java-xin-te-xing/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/loading.gif" data-original="/medias/featureimages/12.jpg" class="responsive-img" alt="Java新特性">
+                        
+                        <span class="card-title">Java新特性</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2023-09-21
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E8%BF%9B%E9%98%B6%E6%8A%80%E6%9C%AF/" class="post-category">
+                                    进阶技术
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Java%E6%96%B0%E7%89%B9%E6%80%A7/">
+                        <span class="chip bg-color">Java新特性</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+
+  <!-- 是否加载使用自带的 prismjs. -->
+  <script type="text/javascript" src="/libs/prism/prism.min.js"></script>
+
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('8'),
+            headingSelector: 'h1,h2,h3, h4,h5,h6,h7,h8'
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2022-2026</span>
+            
+            <a href="/about" target="_blank">L ZHEN</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1184.3k</span>
+            
+            
+            
+                
+            
+            
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
+            </span>
+            
+            
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
+            </span>
+            
+            <br>
+
+            <!-- 运行天数提醒. -->
+            
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2022";
+                        var startMonth = "10";
+                        var startDate = "16";
+                        var startHour = "12";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
+                    }
+
+                    calcSiteTime();
+                </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+
+
+    <a href="mailto:1390211724@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1390211724" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1390211724" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 白天和黑夜主题 -->
+<div class="stars-con">
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>  
+</div>
+
+<script>
+    function switchNightMode() {
+        $('<div class="Cuteen_DarkSky"><div class="Cuteen_DarkPlanet"></div></div>').appendTo($('body')),
+        setTimeout(function () {
+            $('body').hasClass('DarkMode') 
+            ? ($('body').removeClass('DarkMode'), localStorage.setItem('isDark', '0'), $('#sum-moon-icon').removeClass("fa-sun").addClass('fa-moon')) 
+            : ($('body').addClass('DarkMode'), localStorage.setItem('isDark', '1'), $('#sum-moon-icon').addClass("fa-sun").removeClass('fa-moon')),
+            
+            setTimeout(function () {
+            $('.Cuteen_DarkSky').fadeOut(1e3, function () {
+                $(this).remove()
+            })
+            }, 2e3)
+        })
+    }
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    
+        <!-- <script src='https://unpkg.com/mermaid@latest/dist/mermaid.min.js'></script> -->
+        <script src='/libs/mermaid/mermaid.min.js'></script>
+        <script>
+          if (window.mermaid) {
+            mermaid.initialize({theme: 'forest'});
+          }
+        </script>
+    
+
+    
+
+    <!-- 雪花特效 -->
+    
+
+    <!-- 鼠标星星特效 -->
+    
+
+     
+        <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+        <script src="/libs/others/TencentCaptcha.js"></script>
+        <button id="TencentCaptcha" data-appid="197482151" data-cbfn="callback" type="button" hidden></button>
+    
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(e.href.match(t)||e.href.match(r))&&(e.href=a.dataset.original)})});</script><script>(r=>{r.imageLazyLoadSetting.processImages=t;var a=r.imageLazyLoadSetting.isSPA,o=r.imageLazyLoadSetting.preloadRatio||1,d=i();function i(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(t){(a||t)&&(d=i());for(var e,n=0;n<d.length;n++)0<=(e=(e=d[n]).getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(r.innerHeight*o||document.documentElement.clientHeight*o)&&(()=>{var t,e,a,o,i=d[n];e=function(){d=d.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).dataset.loaded||(t.hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(a=new Image,o=t.getAttribute("data-original"),a.onload=function(){t.src=o,t.removeAttribute("data-original"),t.setAttribute("data-loaded",!0),e&&e()},a.onerror=function(){t.removeAttribute("data-original"),t.setAttribute("data-loaded",!1),t.src=o},t.src!==o&&(a.src=o)))})()}function e(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",e),r.addEventListener("resize",e),r.addEventListener("orientationchange",e)})(this);</script></body>
+
+</html>

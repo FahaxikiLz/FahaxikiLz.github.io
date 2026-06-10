@@ -1,0 +1,2186 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="Electron, 爱哭的小河豚">
+    <meta name="description" content="禹神：一小时快速上手Electron
+⚠️注意：1️⃣原视频打包时，是使用electron-builder打包，使用electron-builder打包，打包时要访问github需要修仙术才能访问。2️⃣本笔记，使用Electron For">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Electron | 爱哭的小河豚</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    
+
+
+    <!-- bg-cover style     -->
+
+
+
+<link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+<link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+<link rel="stylesheet" type="text/css" href="/css/matery.css">
+<link rel="stylesheet" type="text/css" href="/css/my.css">
+<link rel="stylesheet" type="text/css" href="/css/dark.css" media="none" onload="if(media!='all')media='all'">
+
+
+
+
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+    <link rel="stylesheet" href="/css/post.css">
+
+
+
+
+    
+        <link rel="stylesheet" type="text/css" href="/css/reward.css">
+    
+
+
+
+    <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="爱哭的小河豚" type="application/atom+xml">
+</head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    <div>
+                        
+                        <img src="/medias/loading.gif" data-original="/medias/logo.png" class="logo-img" alt="LOGO">
+                        
+                        <span class="logo-span">爱哭的小河豚</span>
+                    </div>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/hello-algo" class="waves-effect waves-light">
+      
+      <i class="fas fa-anchor" style="zoom: 0.6;"></i>
+      
+      <span>Hello 算法</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/love" class="waves-effect waves-light">
+      
+      <i class="fas fa-heart" style="zoom: 0.6;"></i>
+      
+      <span>写给我家乖乖</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+  <li>
+    <a href="javascript:;" class="waves-effect waves-light" onclick="switchNightMode()" title="深色/浅色模式" >
+      <i id="sum-moon-icon" class="fas fa-sun" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/loading.gif" data-original="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">爱哭的小河豚</div>
+        <div class="logo-desc">
+            
+            谁会不喜欢一只爱哭，生气又圆鼓鼓的小河豚呢？
+            
+        </div>
+    </div>
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/hello-algo" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-anchor"></i>
+			
+			Hello 算法
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/love" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-heart"></i>
+			
+			写给我家乖乖
+		</a>
+          
+        </li>
+        
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/18.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Electron</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Electron/">
+                                <span class="chip bg-color">Electron</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E4%B8%9C%E6%90%9E%E6%90%9E%EF%BC%8C%E8%A5%BF%E6%90%9E%E6%90%9E/" class="post-category">
+                                东搞搞，西搞搞
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2025-01-23
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2025-07-21
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    5.1k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    22 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.min.css">
+        
+
+        
+        <!-- 代码块折行 -->
+        <style type="text/css">
+            code[class*="language-"], pre[class*="language-"] { white-space: pre-wrap !important; }
+        </style>
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h1 id="禹神：一小时快速上手Electron"><a href="#禹神：一小时快速上手Electron" class="headerlink" title="禹神：一小时快速上手Electron"></a>禹神：一小时快速上手Electron</h1><blockquote>
+<p>⚠️注意：<br>1️⃣原视频打包时，是使用<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=electron&amp;spm=1001.2101.3001.7020">electron</a>-builder打包，使用electron-builder打包，打包时要访问<code>github</code>需要<code>修仙术</code>才能访问。<br>2️⃣本笔记，使用Electron Forge进行打包，使用Electron Forge不需要访问<code>github</code>更友好。在Electron 官网中也推荐使用这种方式 👉<a target="_blank" rel="noopener" href="https://www.electronjs.org/zh/docs/latest/tutorial/forge-overview">Electron</a></p>
+</blockquote>
+<h2 id="一、Electron是什么"><a href="#一、Electron是什么" class="headerlink" title="一、Electron是什么"></a>一、Electron是什么</h2><p><strong>简单的一句话，就是用html+css+js+nodejs+（Native Api）做兼容多个系统（Windows、Linux、Mac）的软件。</strong></p>
+<p><strong>官网解释如下(有点像绕口令)：</strong><br>Electron是一个使用 JavaScript、HTML 和 CSS 构建桌面应用程序的框架。 嵌入 Chromium 和 Node.js 到 二进制的 Electron 允许您保持一个 JavaScript 代码代码库并创建 在Windows上运行的跨平台应用 macOS和Linux——不需要本地开发 经验。<br><img src="/medias/loading.gif" data-original="/2025/01/23/electron/56c8173be72e4d209331f75bdd8a61de.png" alt="在这里插入图片描述"><br><img src="/medias/loading.gif" data-original="/2025/01/23/electron/98a68bb9ebd844e0892551902eb052dd.png" alt="在这里插入图片描述"></p>
+<h2 id="二、Elemtron流程模型"><a href="#二、Elemtron流程模型" class="headerlink" title="二、Elemtron流程模型"></a>二、Elemtron流程模型</h2><p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/e30957e6aec44ac789aa2bef9995a4d2.jpeg" alt="Electron流程模型图"></p>
+<h2 id="三、Electron搭建工程，若成功则输出123"><a href="#三、Electron搭建工程，若成功则输出123" class="headerlink" title="三、Electron搭建工程，若成功则输出123"></a>三、Electron搭建工程，若成功则输出123</h2><h3 id="3-1-准备"><a href="#3-1-准备" class="headerlink" title="3.1 准备"></a>3.1 准备</h3><p><a target="_blank" rel="noopener" href="https://www.electronjs.org/zh/docs/latest/tutorial/quick-start">可参考Electron官网地址</a><br>需要node和npm，先检测是否安装。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">node <span class="token operator">-</span>v
+npm <span class="token operator">-</span>v<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/1e90284ec8824a6b8f9b127ba0d045a7.png" alt="在这里插入图片描述"></p>
+<h3 id="3-2-项目初始化"><a href="#3-2-项目初始化" class="headerlink" title="3.2 项目初始化"></a>3.2 项目初始化</h3><p>命令行创建</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">mkdir my<span class="token operator">-</span>electron<span class="token operator">-</span>app <span class="token operator">&amp;&amp;</span> cd my<span class="token operator">-</span>electron<span class="token operator">-</span>app
+npm init<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>或者，手动快速创建<br><img src="/medias/loading.gif" data-original="/2025/01/23/electron/fc65b7569427475d897bd0e7f8dcd149.gif" alt="在这里插入图片描述"></p>
+<p>package.json文件</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token punctuation">{</span>
+  <span class="token string-property property">"name"</span><span class="token operator">:</span> <span class="token string">"my-electron-app"</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"version"</span><span class="token operator">:</span> <span class="token string">"1.0.0"</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"description"</span><span class="token operator">:</span> <span class="token string">"test Electron"</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"main"</span><span class="token operator">:</span> <span class="token string">"main.js"</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"author"</span><span class="token operator">:</span> <span class="token string">"Bin9153"</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"license"</span><span class="token operator">:</span> <span class="token string">"MIT"</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>有几条规则需要遵循：</p>
+<p>entry point 应为 main.js.<br>author 与 description 可为任意值，但对于应用打包是必填项。<br><img src="/medias/loading.gif" data-original="/2025/01/23/electron/76370426455046eca155c1b55d37eb6c.png" alt="在这里插入图片描述"></p>
+<h3 id="3-3-安装-Electron"><a href="#3-3-安装-Electron" class="headerlink" title="3.3 安装 Electron"></a>3.3 安装 Electron</h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">npm install <span class="token operator">--</span>save<span class="token operator">-</span>dev electron
+<span class="token comment">//或者</span>
+npm install electron <span class="token operator">-</span><span class="token constant">D</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="3-4-配置并启动"><a href="#3-4-配置并启动" class="headerlink" title="3.4 配置并启动"></a>3.4 配置并启动</h3><p><strong>在 package.json配置文件中的scripts字段下增加一条start命令：</strong></p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token punctuation">{</span>
+  <span class="token string-property property">"scripts"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token string-property property">"start"</span><span class="token operator">:</span> <span class="token string">"electron ."</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><strong>这一步，完整的package.json</strong></p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token punctuation">{</span>
+  <span class="token string-property property">"name"</span><span class="token operator">:</span> <span class="token string">"my-electron-app"</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"version"</span><span class="token operator">:</span> <span class="token string">"1.0.0"</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"main"</span><span class="token operator">:</span> <span class="token string">"main.js"</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"scripts"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token string-property property">"start"</span><span class="token operator">:</span> <span class="token string">"electron ."</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"author"</span><span class="token operator">:</span> <span class="token string">"bin9153"</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"license"</span><span class="token operator">:</span> <span class="token string">"ISC"</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"description"</span><span class="token operator">:</span> <span class="token string">"electron test"</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"dependencies"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token string-property property">"electron"</span><span class="token operator">:</span> <span class="token string">"^31.2.0"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>代码解析：<br><img src="/medias/loading.gif" data-original="/2025/01/23/electron/5f64769e690443348e31e0bce143916e.png" alt="package代码解析"><br><strong>创建main.js</strong>。<br><img src="/medias/loading.gif" data-original="/2025/01/23/electron/1e4b78e3bb2e46d3ba37a86362e2b706.png" alt="在这里插入图片描述"><br><strong>在main.js里写入</strong></p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token number">123</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/1e9794354c9547048f8368577b1fde6b.png" alt="在这里插入图片描述"></p>
+<p><strong>再运行！</strong></p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">npm start<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><strong>注意：</strong></p>
+<ol>
+<li>先创建main.js，否则报错</li>
+<li>如果main.js里没写输出（或其他代码）则，启动了运行窗口也不容易看出变化</li>
+</ol>
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/39a584e507824d35bc6a229533c1bb4c.png" alt="启动输出123"><br><strong>成功输出123，工程搭建完成。</strong></p>
+<h2 id="四、开始制作程序"><a href="#四、开始制作程序" class="headerlink" title="四、开始制作程序"></a>四、开始制作程序</h2><h3 id="4-1-案例1：做一个简易网页程序"><a href="#4-1-案例1：做一个简易网页程序" class="headerlink" title="4.1 案例1：做一个简易网页程序"></a>4.1 案例1：做一个简易网页程序</h3><p><a target="_blank" rel="noopener" href="https://www.electronjs.org/zh/docs/latest/api/browser-window">点击可以查看，browser-window配置项的开发文档</a><br>在main.js里写入</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> <span class="token punctuation">{</span>app<span class="token punctuation">,</span> BrowserWindow<span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'electron'</span><span class="token punctuation">)</span>
+
+app<span class="token punctuation">.</span><span class="token function">on</span><span class="token punctuation">(</span><span class="token string">'ready'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token comment">//当app准备好后，执行createWindow创建窗口</span>
+    <span class="token keyword">const</span> win <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BrowserWindow</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        <span class="token literal-property property">width</span><span class="token operator">:</span> <span class="token number">800</span><span class="token punctuation">,</span><span class="token comment">//窗口宽度</span>
+        <span class="token literal-property property">height</span><span class="token operator">:</span> <span class="token number">600</span><span class="token punctuation">,</span><span class="token comment">//窗口高度</span>
+        <span class="token literal-property property">autoHideMenuBar</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span><span class="token comment">//自动隐藏菜单档</span>
+        <span class="token literal-property property">alwaysOnTop</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span><span class="token comment">//置顶</span>
+        <span class="token literal-property property">x</span><span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span><span class="token comment">//窗口位置x坐标</span>
+        <span class="token literal-property property">y</span><span class="token operator">:</span> <span class="token number">0</span><span class="token comment">//窗口位置y坐标</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token comment">//加载一个远程页面</span>
+   win<span class="token punctuation">.</span><span class="token function">loadURL</span><span class="token punctuation">(</span><span class="token string">'https://blog.csdn.net/qq_33650655/article/details/140353815'</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>运行</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">npm start<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/3bd02a1d46294817b8ddd6adbb693c50.png" alt="制作一个远程界面"><br>成功显示页面。<br><img src="/medias/loading.gif" data-original="/2025/01/23/electron/fc3270a3abce443196dc3de42e85ed1e.png" alt="页面成功运行"></p>
+<h3 id="4-2-案例2：做一个本地程序（不是远程链接页面，是自己写的页面）"><a href="#4-2-案例2：做一个本地程序（不是远程链接页面，是自己写的页面）" class="headerlink" title="4.2 案例2：做一个本地程序（不是远程链接页面，是自己写的页面）"></a>4.2 案例2：做一个本地程序（不是远程链接页面，是自己写的页面）</h3><h4 id="4-2-1-是本地程序，所以创建新的页面"><a href="#4-2-1-是本地程序，所以创建新的页面" class="headerlink" title="4.2.1 是本地程序，所以创建新的页面"></a>4.2.1 是本地程序，所以创建新的页面</h4><p>新建pages目录，创建页面，这里就像写前端一样了。index.html,index.css<br><img src="/medias/loading.gif" data-original="/2025/01/23/electron/75e6d075c7644955af297e033d3c2a87.png" alt="在这里插入图片描述"><br>index.html里</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">DOCTYPE</span> <span class="token name">html</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span> <span class="token attr-name">lang</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>en<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">charset</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>UTF-8<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+   
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>title</span><span class="token punctuation">&gt;</span></span>这里是index页面<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>title</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">&gt;</span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h1</span><span class="token punctuation">&gt;</span></span>
+    这里是index里的标题
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h1</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>main.js里引入页面</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> <span class="token punctuation">{</span>app<span class="token punctuation">,</span> BrowserWindow<span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'electron'</span><span class="token punctuation">)</span>
+
+app<span class="token punctuation">.</span><span class="token function">on</span><span class="token punctuation">(</span><span class="token string">'ready'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+
+    <span class="token comment">//当app准备好后，执行createWindow创建窗口</span>
+    <span class="token keyword">const</span> win <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BrowserWindow</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        <span class="token literal-property property">width</span><span class="token operator">:</span> <span class="token number">800</span><span class="token punctuation">,</span><span class="token comment">//窗口宽度</span>
+        <span class="token literal-property property">height</span><span class="token operator">:</span> <span class="token number">600</span><span class="token punctuation">,</span><span class="token comment">//窗口高度</span>
+        <span class="token literal-property property">autoHideMenuBar</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span><span class="token comment">//自动隐藏菜单档</span>
+        <span class="token literal-property property">alwaysOnTop</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span><span class="token comment">//置顶</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token comment">//引入页面</span>
+    win<span class="token punctuation">.</span><span class="token function">loadFile</span><span class="token punctuation">(</span><span class="token string">'./pages/index/index.html'</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>运行</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">npm start<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h4 id="4-2-2-解决内容安全策略"><a href="#4-2-2-解决内容安全策略" class="headerlink" title="4.2.2 解决内容安全策略"></a>4.2.2 解决内容安全策略</h4><p>有安全提示<br><img src="/medias/loading.gif" data-original="/2025/01/23/electron/e3fbe4f087614869bc53e309fab621fe.png" alt="在这里插入图片描述"><br>在index.html里加入，如下代码，内容安全策略警告提示消失。</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup">//electron 提供的配置 成功运行
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">http-equiv</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>Content-Security-Policy<span class="token punctuation">"</span></span> <span class="token attr-name">content</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>default-src 'self'; script-src 'self'<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+//electron 提供的配置2 引入js后也会报错
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">http-equiv</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>Content-Security-Policy<span class="token punctuation">"</span></span> <span class="token attr-name">content</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>default-src none<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+//视频教程里的配置 会报错
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">http-equiv</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>Content-Security-Policy<span class="token punctuation">"</span></span> <span class="token attr-name">content</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>default-src 'self';style-src 'self''unsafe-inline';img-src self'data:;<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+//我自己写的组合的配置更全 加了一个script的限制,有事儿后期再改， 刚试了会报错，可能哪里没写对，先记录在这里
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">http-equiv</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>Content-Security-Policy<span class="token punctuation">"</span></span> <span class="token attr-name">content</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>default-src 'self'; script-src 'self';style-src 'self''unsafe-inline';img-src self'data:;<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/e414c42f625a4a768975cba96efe755f.png" alt="安全策略代码详解"></p>
+<p>关于CSP的详细说明：<a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/CSP">MDN内容安全策略详解</a> 、<a target="_blank" rel="noopener" href="https://www.electronjs.org/zh/docs/latest/tutorial/security">Electron安全策略规范</a></p>
+<h2 id="五、增加多系统的兼容代码"><a href="#五、增加多系统的兼容代码" class="headerlink" title="五、增加多系统的兼容代码"></a>五、增加多系统的兼容代码</h2><p>兼容mac(完善窗口行为）<br>electron文档：<br><a target="_blank" rel="noopener" href="https://www.electronjs.org/zh/docs/latest/tutorial/quick-start#%E5%85%B3%E9%97%AD%E6%89%80%E6%9C%89%E7%AA%97%E5%8F%A3%E6%97%B6%E9%80%80%E5%87%BA%E5%BA%94%E7%94%A8-windows--linux">关闭所有窗口时退出应用 (Windows &amp; Linux)</a><br><a target="_blank" rel="noopener" href="https://www.electronjs.org/zh/docs/latest/tutorial/quick-start#%E5%A6%82%E6%9E%9C%E6%B2%A1%E6%9C%89%E7%AA%97%E5%8F%A3%E6%89%93%E5%BC%80%E5%88%99%E6%89%93%E5%BC%80%E4%B8%80%E4%B8%AA%E7%AA%97%E5%8F%A3-macos">如果没有窗口打开则打开一个窗口 (macOS)</a><br>在main.js里写入兼容各个系统平台的代码</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> <span class="token punctuation">{</span>app<span class="token punctuation">,</span> BrowserWindow<span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'electron'</span><span class="token punctuation">)</span>
+
+<span class="token keyword">function</span> <span class="token function">createWindow</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token comment">//当app准备好后，执行createWindow创建窗口</span>
+    <span class="token keyword">const</span> win <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BrowserWindow</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        <span class="token literal-property property">width</span><span class="token operator">:</span> <span class="token number">800</span><span class="token punctuation">,</span><span class="token comment">//窗口宽度</span>
+        <span class="token literal-property property">height</span><span class="token operator">:</span> <span class="token number">600</span><span class="token punctuation">,</span><span class="token comment">//窗口高度</span>
+        <span class="token literal-property property">autoHideMenuBar</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span><span class="token comment">//自动隐藏菜单档</span>
+        <span class="token literal-property property">alwaysOnTop</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span><span class="token comment">//置顶</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    win<span class="token punctuation">.</span><span class="token function">loadFile</span><span class="token punctuation">(</span><span class="token string">'./pages/index/index.html'</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+app<span class="token punctuation">.</span><span class="token function">on</span><span class="token punctuation">(</span><span class="token string">'ready'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token function">createWindow</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token comment">//兼容核心代码 1</span>
+    <span class="token comment">//mac 应⽤即使在没有打开任何窗⼝的情况下也继续运⾏，并且在没有窗⼝可⽤的情况下激活应⽤时会打开新的窗⼝。</span>
+    app<span class="token punctuation">.</span><span class="token function">on</span><span class="token punctuation">(</span><span class="token string">'activate'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>BrowserWindow<span class="token punctuation">.</span><span class="token function">getAllWindows</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>length <span class="token operator">===</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token function">createWindow</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+<span class="token comment">//兼容核心代码 2</span>
+<span class="token comment">//Windows 和 Linux 平台窗⼝特点是：关闭所有窗⼝时退出应⽤。</span>
+app<span class="token punctuation">.</span><span class="token function">on</span><span class="token punctuation">(</span><span class="token string">'window-all-closed'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>process<span class="token punctuation">.</span>platform <span class="token operator">!==</span> <span class="token string">'darwin'</span><span class="token punctuation">)</span> app<span class="token punctuation">.</span><span class="token function">quit</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>代码解析<br><img src="/medias/loading.gif" data-original="/2025/01/23/electron/c9f8d952ff7143f285b6bdb6ce253fb6.png" alt="在这里插入图片描述"></p>
+<p>下面两句代码相等</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">app<span class="token punctuation">.</span><span class="token function">on</span><span class="token punctuation">(</span><span class="token string">'ready'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+   <span class="token comment">// 写核心代码</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token comment">// 或者</span>
+app<span class="token punctuation">.</span><span class="token function">whenReady</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+  <span class="token comment">//写核心代码</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="六、热部署"><a href="#六、热部署" class="headerlink" title="六、热部署"></a>六、热部署</h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">npm i nodemon <span class="token operator">-</span><span class="token constant">D</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>package.json里重写start</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token string-property property">"start"</span><span class="token operator">:</span> <span class="token string">"nodemon --exec electron ."</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/a1b3f9db6bdd4e27a892fb1845e3f9ae.png" alt="重写start"></p>
+<p>这样保存main.js里的内容，就自动热更新了。<br>但是更新index.html里的代码不能热更新，要加一个nodemon.json，需要手动添加</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token punctuation">{</span>
+  <span class="token string-property property">"ignore"</span><span class="token operator">:</span><span class="token punctuation">[</span>
+    <span class="token string">"node modules"</span><span class="token punctuation">,</span>
+    <span class="token string">"dist"</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"restartable"</span><span class="token operator">:</span><span class="token string">"r"</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"watch"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token string">"*.*"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"ext"</span><span class="token operator">:</span><span class="token string">"html,js,css"</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>增加nodemon.json,  </p>
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/cb7df01ad6e4456e90c99357da97a4d0.png" alt="增加nodemon文件和内容"><br>重启生效</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">npm start<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h2 id="七、主进程和渲染进程"><a href="#七、主进程和渲染进程" class="headerlink" title="七、主进程和渲染进程"></a>七、主进程和渲染进程</h2><p>下图是 Chrome 浏览器的程序架构，图来⾃于<a target="_blank" rel="noopener" href="https://www.google.com/googlebooks/chrome/">Chrome 漫画</a>。</p>
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/image-20250127235732505.png" alt="image-20250127235732505"></p>
+<p>Electron 应⽤的结构与上图⾮常相似，在 Electron 中主要控制两类进程：主进程、渲染器进程。  </p>
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/e30957e6aec44ac789aa2bef9995a4d2-1737985347501.jpeg" alt="Electron流程模型图"></p>
+<h3 id="8-1-主进程"><a href="#8-1-主进程" class="headerlink" title="8.1 主进程"></a>8.1 主进程</h3><p>每个 Electron 应⽤都有⼀个单⼀的主进程，作为应⽤程序的⼊⼝点。 主进程在 Node.js 环境中运⾏，它具有 require 模块和使⽤所有 Node.js API 的能⼒，主进程的核⼼就是：<strong>使用BrowserWindow来创建和管理窗口</strong></p>
+<h3 id="8-2-渲染进程"><a href="#8-2-渲染进程" class="headerlink" title="8.2 渲染进程"></a>8.2 渲染进程</h3><p>每个 BrowserWindow 实例都对应⼀个单独的渲染器进程，运⾏在渲染器进程中的代码，必须遵守⽹⻚标准，这也就意味着： <strong>渲染器进程无权直接访问require或使用任何Node.js的API</strong></p>
+<blockquote>
+<p>问题产⽣：处于渲染器进程的⽤户界⾯，该怎样才与 Node.js 和 Electron 的原⽣桌⾯功能进⾏交互呢？</p>
+</blockquote>
+<h2 id="八、Preload-脚本"><a href="#八、Preload-脚本" class="headerlink" title="八、Preload 脚本"></a>八、Preload 脚本</h2><p>预加载（Preload）脚本是运⾏在渲染进程中的， 但它是在⽹⻚内容加载之前执⾏的，这意味着它 具有⽐普通渲染器代码更⾼的权限，可以访问 Node.js 的 API，同时⼜可以与⽹⻚内容进⾏安全 的交互。 简单说：它是 Node.js 和 Web API 的桥梁，Preload 脚本可以安全地将部分 Node.js 功能暴露给⽹⻚，从⽽减少安全⻛险。    </p>
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/692b424c499e41e483915024f84155e0.png" alt="在这里插入图片描述"></p>
+<blockquote>
+<p>需求：点击按钮后，在⻚⾯呈现当前的 Node 版本。 </p>
+</blockquote>
+<p>  创建预加载脚本 preload.js </p>
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/image-20250128004618050.png" alt="image-20250128004618050"></p>
+<pre class="line-numbers language-JS" data-language="JS"><code class="language-JS">const { contextBridge } = require('electron')
+// 暴露数据给渲染进程
+contextBridge.exposeInMainWorld('myAPI', {
+    n: 666,
+    version: process.version
+})<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>在main.js中定义preload.js为桥梁  </p>
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/d9ee4e3e64184759a61adeaddf0b65c9.png" alt="在main.js里定义桥梁"></p>
+<p>main.js代码：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> <span class="token punctuation">{</span>app<span class="token punctuation">,</span> BrowserWindow<span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'electron'</span><span class="token punctuation">)</span>
+<span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span>
+
+<span class="token keyword">function</span> <span class="token function">createWindow</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token comment">//当app准备好后，执行createWindow创建窗口</span>
+    <span class="token keyword">const</span> win <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BrowserWindow</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        <span class="token literal-property property">width</span><span class="token operator">:</span> <span class="token number">800</span><span class="token punctuation">,</span><span class="token comment">//窗口宽度</span>
+        <span class="token literal-property property">height</span><span class="token operator">:</span> <span class="token number">600</span><span class="token punctuation">,</span><span class="token comment">//窗口高度</span>
+        <span class="token literal-property property">autoHideMenuBar</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span><span class="token comment">//自动隐藏菜单档</span>
+        <span class="token literal-property property">alwaysOnTop</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span><span class="token comment">//置顶</span>
+        <span class="token literal-property property">webPreferences</span><span class="token operator">:</span><span class="token punctuation">{</span>  <span class="token comment">//在main.js中定义preload.js为桥梁</span>
+            <span class="token literal-property property">preload</span><span class="token operator">:</span>path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span><span class="token string">'./preload.js'</span><span class="token punctuation">)</span>
+
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token comment">//引入页面</span>
+    win<span class="token punctuation">.</span><span class="token function">loadFile</span><span class="token punctuation">(</span><span class="token string">'./pages/index/index.html'</span><span class="token punctuation">)</span>
+    win<span class="token punctuation">.</span><span class="token function">openDevTools</span><span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token comment">//自动打开调试窗口</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"main.js里的main.js"</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+app<span class="token punctuation">.</span><span class="token function">on</span><span class="token punctuation">(</span><span class="token string">'ready'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token function">createWindow</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token comment">//兼容核心代码1</span>
+    app<span class="token punctuation">.</span><span class="token function">on</span><span class="token punctuation">(</span><span class="token string">'activate'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>BrowserWindow<span class="token punctuation">.</span><span class="token function">getAllWindows</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>length <span class="token operator">===</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token function">createWindow</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>在 html ⻚⾯中编写对应按钮，并创建专⻔编写⽹⻚脚本的 render.js  ，随后引⼊。</p>
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/image-20250128004249361.png" alt="image-20250128004249361"></p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">DOCTYPE</span> <span class="token name">html</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span> <span class="token attr-name">lang</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>en<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">charset</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>UTF-8<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>viewport<span class="token punctuation">"</span></span> <span class="token attr-name">content</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>width=device-width, initial-scale=1.0<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>title</span><span class="token punctuation">&gt;</span></span>Document<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>title</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">&gt;</span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h1</span><span class="token punctuation">&gt;</span></span>hello electron111!<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h1</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>btn<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>你好<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>./render.js<span class="token punctuation">"</span></span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>text/javascript<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>在渲染进程中使⽤ version <img src="/medias/loading.gif" data-original="/2025/01/23/electron/image-20250128004229234.png" alt="image-20250128004229234"></p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">btn<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'click'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>myAPI<span class="token punctuation">.</span>version<span class="token punctuation">)</span>
+    document<span class="token punctuation">.</span>body<span class="token punctuation">.</span>innerHTML <span class="token operator">+=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">&lt;h2&gt;</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>myAPI<span class="token punctuation">.</span>version<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">&lt;/h2&gt;</span><span class="token template-punctuation string">`</span></span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>效果图</p>
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/image-20250128004319419.png" alt="image-20250128004319419"></p>
+<p>整体结构如下</p>
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/image-20250128004414755.png" alt="image-20250128004414755"></p>
+<h2 id="九、进程通信（IPC）"><a href="#九、进程通信（IPC）" class="headerlink" title="九、进程通信（IPC）"></a>九、进程通信（IPC）</h2><blockquote>
+<p>值得注意的是： 上⽂中的  preload.js  ，⽆法使⽤全部  Node  的  API  ，⽐如：不能使⽤  Node  中的  fs  模 块，但主进程（  main.js  ）是可以的，这时就需要  让  preload.js  通知  main.js  去调⽤  fs  模块去⼲活。 </p>
+</blockquote>
+<p>关于 Electron  进程通信，我们要知道：  </p>
+<ul>
+<li>IPC  全称为：InterProcess Communication，即：进程通信。 </li>
+<li>IPC  是 Electron  中最为核⼼的内容，它是从 UI  调⽤原⽣ API  的唯⼀⽅法！</li>
+<li>Electron  中，主要使⽤ ipcMain 和 ipcRenderer 来定义“ 通道” ，进⾏进程通信。</li>
+</ul>
+<h3 id="9-1-渲染进程-➡-主进程（单向）"><a href="#9-1-渲染进程-➡-主进程（单向）" class="headerlink" title="9.1 渲染进程 ➡  主进程（单向）"></a>9.1 渲染进程 ➡  主进程（单向）</h3><p>概述：在渲染器进程中 ipcRenderer.send 发送消息，在主进程中使⽤ ipcMain.on 接收消息。  常⽤于：在Web中调用主进程的API。  </p>
+<blockquote>
+<p>需求：点击按钮后，在⽤户的 D 盘创建⼀个 hello.txt  ⽂件，⽂件内容来⾃于⽤户输⼊。</p>
+</blockquote>
+<p>⻚⾯中添加相关元素， render.js  中添加对应脚本 </p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">DOCTYPE</span> <span class="token name">html</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span> <span class="token attr-name">lang</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>en<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">charset</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>UTF-8<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>viewport<span class="token punctuation">"</span></span> <span class="token attr-name">content</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>width=device-width, initial-scale=1.0<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>title</span><span class="token punctuation">&gt;</span></span>Document<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>title</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">&gt;</span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>content<span class="token punctuation">"</span></span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>text<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">&gt;</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>btn<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>在⽤户的D盘创建⼀个hello.txt<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>./render.js<span class="token punctuation">"</span></span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>text/javascript<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> btn <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'btn'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> content <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'content'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+
+btn<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'click'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>content<span class="token punctuation">.</span>value<span class="token punctuation">)</span>
+
+    myAPI<span class="token punctuation">.</span><span class="token function">saveFile</span><span class="token punctuation">(</span>content<span class="token punctuation">.</span>value<span class="token punctuation">)</span>
+
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>preload.js  中使⽤ ipcRenderer.send(‘ 信道 ‘, 参数 )  发送消息，与主进程通信。 </p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> <span class="token punctuation">{</span> contextBridge<span class="token punctuation">,</span> ipcRenderer <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'electron'</span><span class="token punctuation">)</span>
+<span class="token comment">// 暴露数据给渲染进程</span>
+contextBridge<span class="token punctuation">.</span><span class="token function">exposeInMainWorld</span><span class="token punctuation">(</span><span class="token string">'myAPI'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+    <span class="token function">saveFile</span><span class="token punctuation">(</span><span class="token parameter">str</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        ipcRenderer<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token string">'create_file'</span><span class="token punctuation">,</span> str<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>主进程中，在加载⻚⾯之前，使⽤ JavaScript ipcMain.on(‘ 信道 ‘, 回调 )  配置对应回调函数，接收 消息。</p>
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/image-20250128010939340.png" alt="image-20250128010939340"></p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> <span class="token punctuation">{</span> app<span class="token punctuation">,</span> BrowserWindow<span class="token punctuation">,</span> ipcMain <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'electron'</span><span class="token punctuation">)</span>
+<span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span>
+<span class="token keyword">const</span> fs <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'fs'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+
+<span class="token keyword">function</span> <span class="token function">createWindow</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> win <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BrowserWindow</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        <span class="token literal-property property">width</span><span class="token operator">:</span> <span class="token number">800</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">height</span><span class="token operator">:</span> <span class="token number">800</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">autoHideMenuBar</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">alwaysOnTop</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">x</span><span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">y</span><span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">webPreferences</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+            <span class="token literal-property property">preload</span><span class="token operator">:</span> path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'./preload.js'</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token comment">// win.loadURL("http://47.116.79.121/2025/01/23/electron")</span>
+    win<span class="token punctuation">.</span><span class="token function">loadFile</span><span class="token punctuation">(</span><span class="token string">'./page/index/index.html'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    win<span class="token punctuation">.</span><span class="token function">openDevTools</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    ipcMain<span class="token punctuation">.</span><span class="token function">on</span><span class="token punctuation">(</span><span class="token string">'create_file'</span><span class="token punctuation">,</span> createFile<span class="token punctuation">)</span>
+
+<span class="token punctuation">}</span>
+
+<span class="token keyword">function</span> <span class="token function">createFile</span><span class="token punctuation">(</span><span class="token parameter">event<span class="token punctuation">,</span> data</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    fs<span class="token punctuation">.</span><span class="token function">writeFileSync</span><span class="token punctuation">(</span><span class="token string">'D:/hello.txt'</span><span class="token punctuation">,</span> data<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+app<span class="token punctuation">.</span><span class="token function">on</span><span class="token punctuation">(</span><span class="token string">'ready'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token function">createWindow</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    app<span class="token punctuation">.</span><span class="token function">on</span><span class="token punctuation">(</span><span class="token string">'activate'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>BrowserWindow<span class="token punctuation">.</span>getAllWindows<span class="token punctuation">.</span>length <span class="token operator">===</span> <span class="token number">0</span><span class="token punctuation">)</span> createWindow
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+app<span class="token punctuation">.</span><span class="token function">on</span><span class="token punctuation">(</span><span class="token string">'window-all-closed'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>process<span class="token punctuation">.</span>platform <span class="token operator">!=</span> <span class="token string">'darwin'</span><span class="token punctuation">)</span> app<span class="token punctuation">.</span><span class="token function">quit</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="9-2-渲染进程↔主进程（双向）"><a href="#9-2-渲染进程↔主进程（双向）" class="headerlink" title="9.2 渲染进程↔主进程（双向）"></a>9.2 渲染进程<strong>↔</strong>主进程（双向）</h3><p>概述：渲染进程通过ipcRenderer.invoke 发送消息，主进程使⽤ ipcMain.handle 接收并处理消息。 </p>
+<p>备注： ipcRender.invoke  的返回值是  Promise  实例。  常⽤于：从渲染器进程调用主进程方法并等待结果。</p>
+<blockquote>
+<p>需求： hello.txt  中的内容，并将结果呈现在⻚⾯上。</p>
+</blockquote>
+<p>⻚⾯中添加相关元素， render.js  中添加对应脚本</p>
+<pre class="line-numbers language-HTML" data-language="HTML"><code class="language-HTML">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Document&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;button id="btn"&gt;读取⽤户D盘的hello.txt&lt;/button&gt;
+&lt;/body&gt;
+&lt;script src="./render.js" type="text/javascript"&gt;&lt;/script&gt;
+
+&lt;/html&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-JS" data-language="JS"><code class="language-JS">const btn = document.getElementById('btn')
+btn.addEventListener('click', async () =&gt; {
+    let data = await myAPI.readFile('D:/hello.txt')
+    document.body.innerHTML += `&lt;h2&gt;${data}&lt;/h2&gt;`
+})<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>preload.js  中使⽤ ipcRenderer.send(‘ 信道 ‘, 参数 )  发送消息，与主进程通信。</p>
+<pre class="line-numbers language-JS" data-language="JS"><code class="language-JS">const { contextBridge, ipcRenderer } = require('electron')
+// 暴露数据给渲染进程
+contextBridge.exposeInMainWorld('myAPI', {
+    readFile(path) {
+        return ipcRenderer.invoke('read-file',path)
+    }
+})<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>主进程中，在加载⻚⾯之前，使⽤ JavaScript ipcMain.on(‘ 信道 ‘, 回调 )  配置对应回调函数，接收 消息。</p>
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/image-20250128012223393.png" alt="image-20250128012223393"></p>
+<pre class="line-numbers language-JS" data-language="JS"><code class="language-JS">const { app, BrowserWindow, ipcMain } = require('electron')
+const path = require('path')
+const fs = require('fs');
+
+
+function createWindow() {
+    const win = new BrowserWindow({
+        width: 800,
+        height: 800,
+        autoHideMenuBar: true,
+        alwaysOnTop: true,
+        x: 0,
+        y: 0,
+        webPreferences: {
+            preload: path.resolve(__dirname, './preload.js')
+        }
+    })
+    // win.loadURL("http://47.116.79.121/2025/01/23/electron")
+    win.loadFile('./page/index/index.html');
+    win.openDevTools();
+    ipcMain.handle('read-file', readFile)
+
+}
+
+function readFile(event, path) {
+    return fs.readFileSync(path).toString()
+}
+
+
+function createFile(event, data) {
+    fs.writeFileSync('D:/hello.txt', data)
+}
+
+app.on('ready', () =&gt; {
+    createWindow();
+
+    app.on('activate', () =&gt; {
+        if (BrowserWindow.getAllWindows.length === 0) createWindow
+    })
+})
+
+app.on('window-all-closed', () =&gt; {
+    if (process.platform != 'darwin') app.quit()
+})<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="9-3-主进程到-➡-渲染进程"><a href="#9-3-主进程到-➡-渲染进程" class="headerlink" title="9.3 主进程到 ➡  渲染进程"></a>9.3 主进程到 ➡  渲染进程</h3><p>概述：主进程使⽤ win.webContents.send 发送消息，渲染进程通过ipcRenderer.on 处理消息，  常⽤于：从主进程主动发送消息给渲染进程。</p>
+<blockquote>
+<p>需求：应⽤加载 6 秒钟后，主动给渲染进程发送⼀个消息，内容是：你好啊！ </p>
+</blockquote>
+<p>⻚⾯中添加相关元素， render.js 中添加对应脚本</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">window<span class="token punctuation">.</span><span class="token function-variable function">onload</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    myAPI<span class="token punctuation">.</span><span class="token function">getMessage</span><span class="token punctuation">(</span>logMessage<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">function</span> <span class="token function">logMessage</span><span class="token punctuation">(</span><span class="token parameter">event<span class="token punctuation">,</span> str</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>event<span class="token punctuation">,</span> str<span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p> preload.js  中使⽤ JavaScript ipcRenderer.on (‘ 信道 ‘, 回调 )  接收消息，并配置回调函数。 </p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> <span class="token punctuation">{</span> contextBridge<span class="token punctuation">,</span> ipcRenderer <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'electron'</span><span class="token punctuation">)</span>
+<span class="token comment">// 暴露数据给渲染进程</span>
+contextBridge<span class="token punctuation">.</span><span class="token function">exposeInMainWorld</span><span class="token punctuation">(</span><span class="token string">'myAPI'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+    <span class="token function-variable function">getMessage</span><span class="token operator">:</span> <span class="token punctuation">(</span><span class="token parameter">callback</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> ipcRenderer<span class="token punctuation">.</span><span class="token function">on</span><span class="token punctuation">(</span><span class="token string">'message'</span><span class="token punctuation">,</span> callback<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>主进程中，在合适的时候，使⽤ JavaScript win.webContents.send(‘ 信道 ‘, 数据 )  发送消息。</p>
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/image-20250128013145904.png" alt="image-20250128013145904"></p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> <span class="token punctuation">{</span> app<span class="token punctuation">,</span> BrowserWindow<span class="token punctuation">,</span> ipcMain <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'electron'</span><span class="token punctuation">)</span>
+<span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span>
+<span class="token keyword">const</span> fs <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'fs'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+
+<span class="token keyword">function</span> <span class="token function">createWindow</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> win <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BrowserWindow</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        <span class="token literal-property property">width</span><span class="token operator">:</span> <span class="token number">800</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">height</span><span class="token operator">:</span> <span class="token number">800</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">autoHideMenuBar</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">alwaysOnTop</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">x</span><span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">y</span><span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">webPreferences</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+            <span class="token literal-property property">preload</span><span class="token operator">:</span> path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'./preload.js'</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token comment">// win.loadURL("http://47.116.79.121/2025/01/23/electron")</span>
+    win<span class="token punctuation">.</span><span class="token function">loadFile</span><span class="token punctuation">(</span><span class="token string">'./page/index/index.html'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    win<span class="token punctuation">.</span><span class="token function">openDevTools</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">setTimeout</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+        win<span class="token punctuation">.</span>webContents<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token string">'message'</span><span class="token punctuation">,</span> <span class="token string">'你好啊！'</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token number">6000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">function</span> <span class="token function">readFile</span><span class="token punctuation">(</span><span class="token parameter">event<span class="token punctuation">,</span> path</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> fs<span class="token punctuation">.</span><span class="token function">readFileSync</span><span class="token punctuation">(</span>path<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+
+<span class="token keyword">function</span> <span class="token function">createFile</span><span class="token punctuation">(</span><span class="token parameter">event<span class="token punctuation">,</span> data</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    fs<span class="token punctuation">.</span><span class="token function">writeFileSync</span><span class="token punctuation">(</span><span class="token string">'D:/hello.txt'</span><span class="token punctuation">,</span> data<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+app<span class="token punctuation">.</span><span class="token function">on</span><span class="token punctuation">(</span><span class="token string">'ready'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token function">createWindow</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    app<span class="token punctuation">.</span><span class="token function">on</span><span class="token punctuation">(</span><span class="token string">'activate'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>BrowserWindow<span class="token punctuation">.</span>getAllWindows<span class="token punctuation">.</span>length <span class="token operator">===</span> <span class="token number">0</span><span class="token punctuation">)</span> createWindow
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+app<span class="token punctuation">.</span><span class="token function">on</span><span class="token punctuation">(</span><span class="token string">'window-all-closed'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>process<span class="token punctuation">.</span>platform <span class="token operator">!=</span> <span class="token string">'darwin'</span><span class="token punctuation">)</span> app<span class="token punctuation">.</span><span class="token function">quit</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<h2 id="十、打包"><a href="#十、打包" class="headerlink" title="十、打包"></a>十、打包</h2><h3 id="10-1-使用electron-builder打包，打包时要访问github需要修仙术"><a href="#10-1-使用electron-builder打包，打包时要访问github需要修仙术" class="headerlink" title="10.1 使用electron-builder打包，打包时要访问github需要修仙术"></a>10.1 使用electron-builder打包，打包时要访问<code>github</code>需要<code>修仙术</code></h3><p>1.安装electron-builder:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">npm install electron<span class="token operator">-</span>builder <span class="token operator">-</span><span class="token constant">D</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>2.在package.json中进行相关配置，具体配置如下：</p>
+<blockquote>
+<p>备注：json文件不支持注释，使用时请去掉所有注释。</p>
+</blockquote>
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/673944632b9d4308b7d1a6b93e15fce2.jpeg" alt="打包配置图"></p>
+<blockquote>
+<p>package.json里的代码</p>
+</blockquote>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token punctuation">{</span>
+  <span class="token string-property property">"name"</span><span class="token operator">:</span> <span class="token string">"video-tools"</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"version"</span><span class="token operator">:</span> <span class="token string">"1.0.0"</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"main"</span><span class="token operator">:</span> <span class="token string">"main.js"</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"scripts"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token string-property property">"start"</span><span class="token operator">:</span> <span class="token string">"electron ."</span><span class="token punctuation">,</span>
+    <span class="token string-property property">"build"</span><span class="token operator">:</span> <span class="token string">"electron-builder"</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"build"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token string-property property">"appId"</span><span class="token operator">:</span> <span class="token string">"com.atguigu.video"</span><span class="token punctuation">,</span>
+    <span class="token string-property property">"win"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token string-property property">"icon"</span><span class="token operator">:</span> <span class="token string">"./logo.ico"</span><span class="token punctuation">,</span>
+      <span class="token string-property property">"target"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">{</span>
+          <span class="token string-property property">"target"</span><span class="token operator">:</span> <span class="token string">"nsis"</span><span class="token punctuation">,</span>
+          <span class="token string-property property">"arch"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"x64"</span><span class="token punctuation">]</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">]</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token string-property property">"nsis"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token string-property property">"oneClick"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+      <span class="token string-property property">"perMachine"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+      <span class="token string-property property">"allowToChangeInstallationDirectory"</span><span class="token operator">:</span> <span class="token boolean">true</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"devDependencies"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token string-property property">"electron"</span><span class="token operator">:</span> <span class="token string">"^30.0.0"</span><span class="token punctuation">,</span>
+    <span class="token string-property property">"electron-builder"</span><span class="token operator">:</span> <span class="token string">"^24.13.3"</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"author"</span><span class="token operator">:</span> <span class="token string">"宝码香车"</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"license"</span><span class="token operator">:</span> <span class="token string">"ISC"</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"description"</span><span class="token operator">:</span> <span class="token string">"A video processing program based on Electron"</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>执行打包命令</p>
+<pre class="line-numbers language-none"><code class="language-none">npm run build<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h3 id="10-2-使用Electron-Forge进行打包（使用这种方式打包的）"><a href="#10-2-使用Electron-Forge进行打包（使用这种方式打包的）" class="headerlink" title="10.2 使用Electron Forge进行打包（使用这种方式打包的）"></a>10.2 使用Electron Forge进行打包（使用这种方式打包的）</h3><p>Electron中文网也推荐使用这种方式。<br>Electron Forge是从建项目开始配置 的，因为项目已经写完了，所以从第五步开始。<br><a target="_blank" rel="noopener" href="https://www.electronjs.org/zh/docs/latest/tutorial/%E6%89%93%E5%8C%85%E6%95%99%E7%A8%8B">Electron Forge 从第五步开始的文档</a></p>
+<h4 id="10-2-1-使用3条命令，完成打包。"><a href="#10-2-1-使用3条命令，完成打包。" class="headerlink" title="10.2.1 使用3条命令，完成打包。"></a>10.2.1 使用3条命令，完成打包。</h4><p>1、运行第1条命令</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">npm install <span class="token operator">--</span>save<span class="token operator">-</span>dev @electron<span class="token operator">-</span>forge<span class="token operator">/</span>cli<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>2、运行第2条命令</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">npx electron<span class="token operator">-</span>forge <span class="token keyword">import</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>这时在packgae.json里会增加一些配置。</p>
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/01baa0b12cfe42c792da79e8eae824cf.png" alt="在package里增加配置"><br>不用管。</p>
+<p>3、直接运行第3条命令</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">npm run make<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<blockquote>
+<p>打包完成。</p>
+</blockquote>
+<h4 id="10-2-2-打包后的位置-在根项目下的out文件里"><a href="#10-2-2-打包后的位置-在根项目下的out文件里" class="headerlink" title="10.2.2 打包后的位置,在根项目下的out文件里"></a>10.2.2 打包后的位置,在根项目下的out文件里</h4><p>打包后的文件,在根项目下的out文件夹里</p>
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/06a68b2cbf0a4471a0098fa85cd03aa6.png" alt="打包后的文件"></p>
+<blockquote>
+<p>可运行程序在 <code>my-electron-app\out\make\squirrel.windows\x64</code></p>
+</blockquote>
+<p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/b96402e105f54bcfa8e9569423992576.png" alt="可运行程序"></p>
+<h4 id="10-2-3-看运行效果，终于完成了。"><a href="#10-2-3-看运行效果，终于完成了。" class="headerlink" title="10.2.3 看运行效果，终于完成了。"></a>10.2.3 看运行效果，终于完成了。</h4><p><img src="/medias/loading.gif" data-original="/2025/01/23/electron/50a4d89dbba24a469353309441f17e6c.gif" alt="完成运行效果"></p>
+<h3 id="10-3electron-vite"><a href="#10-3electron-vite" class="headerlink" title="10.3electron-vite"></a>10.3electron-vite</h3><p>electron-vite 是⼀个新型构建⼯具，旨在为 Electron 提供更快、更精简的体验。主要由五部分 组成：</p>
+<ul>
+<li>⼀套构建指令，它使⽤ Vite 打包你的代码，并且它能够处理 Electron 的独特环境，包括  Node.js 和浏览器环境。  </li>
+<li>集中配置主进程、渲染器和预加载脚本的 Vite 配置，并针对 Electron 的独特环境进⾏预配 置。 </li>
+<li>为渲染器提供快速模块热替换（HMR）⽀持，为主进程和预加载脚本提供热重载⽀持，极⼤ 地提⾼了开发效率。 </li>
+<li>优化 Electron 主进程资源处理。  </li>
+<li>使⽤ V8 字节码保护源代码。</li>
+</ul>
+<p>electron-vite 快速、简单且功能强⼤，旨在开箱即⽤。  </p>
+<p>官⽹地址：<a target="_blank" rel="noopener" href="https://cn-evite.netlify.app/">https://cn-evite.netlify.app/</a></p>
+<h2 id="十一、electron下载失败-解决方案汇总"><a href="#十一、electron下载失败-解决方案汇总" class="headerlink" title="十一、electron下载失败_解决方案汇总"></a>十一、electron下载失败_解决方案汇总</h2><h3 id="node-install-js-出错"><a href="#node-install-js-出错" class="headerlink" title="node install.js 出错"></a><code>node install.js</code> 出错</h3><p>这个错误比较笼统，严格来说<code>npm</code>下载<code>electron</code>出错肯定不是<code>node</code>执行<code>install.js</code>本身的问题，所以这里先提出几个常见的解决方案，下面在说一些比较具体的错误。</p>
+<ol>
+<li><p>删除项目<code>node_modules</code>，首先执行：</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># 太高的版本 如 14.0.0 可能还是会出错</span>
+<span class="token function">npm</span> <span class="token function">install</span> electron@13.1.7 --save-dev --save-exact --unsafe-perm<span class="token operator">=</span>true --allow-root<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p><code>electron</code>的版本自己根据项目使用情况来指定</p>
+<p>先把<code>electron</code>下载下来，然后执行<code>npm i</code>，这样<code>npm</code>下载时就会跳过<code>electron</code>的下载，毕竟包已经下载过了【如果electron下载成功的话】。</p>
+</li>
+<li><p>切换<code>npm</code>镜像源</p>
+<p>众所周知，一般不翻墙的话，我们下载东西很大概率会出错，翻了墙可能也会，所以走一下国内的<code>taobao</code>的镜像源也是不错的。</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># npm 查看镜像源：</span>
+<span class="token function">npm</span> config get registry
+<span class="token comment"># npm 设置淘宝镜像源：</span>
+<span class="token function">npm</span> config <span class="token builtin class-name">set</span> registry https://registry.npm.taobao.org 【持久设置】
+<span class="token comment"># npm 设置淘宝镜像源：</span>
+<span class="token function">npm</span> <span class="token parameter variable">--registry</span> https://registry.npm.taobao.org <span class="token function">install</span> XXX（模块名）【临时设置】
+<span class="token comment"># npm 还原默认镜像源：</span>
+<span class="token function">npm</span> config <span class="token builtin class-name">set</span> registry https://registry.npmjs.org/<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>接下来就还是，删除<code>node_modules</code>，然后执行<code>npm i</code></p>
+</li>
+<li><p>利用<code>cnpm</code></p>
+<p>这个方案有点鸡肋，因为<code>npm</code>切换了镜像源，和<code>cnpm</code>基本效果一样，如果上面那个不行，这个大概率也会死，但是聊胜于无，可以尝试。</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># 下载cnpm</span>
+<span class="token function">npm</span> i cnpm <span class="token parameter variable">-g</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></li>
+</ol>
+<h3 id="RequestError-connect-ETIMEDOUT-20-205-243-166-443"><a href="#RequestError-connect-ETIMEDOUT-20-205-243-166-443" class="headerlink" title="RequestError: connect ETIMEDOUT 20.205.243.166:443"></a><code>RequestError: connect ETIMEDOUT 20.205.243.166:443</code></h3><p>这个问题一般就是请求超时了，验证的话可以在<code>cmd</code>里执行<code>ping github.com</code>试试。大概率就会告诉你请求超时（有时候网站是可以正常打开的）。</p>
+<p>解决这个问题，就是想办法把这个网络给搞通。</p>
+<p>方法就是修改本地的<code>host</code>文件：</p>
+<ul>
+<li>host文件路径：<code>C:\Windows\System32\drivers\etc</code> 【建议使用管理员权限打开文件，不然没有权限修改。】</li>
+</ul>
+<ol>
+<li><p>添加一个可以正常<code>ping</code>通的<code>host</code></p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token number">52.78</span>.231.108 github.com <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>如果发现这个<code>host</code>也无法<code>ping</code>通<code>github</code>，那可以去这个网址： <a target="_blank" rel="noopener" href="http://ping.chinaz.com/https://github.com">Chinaz</a>，自己找一个<code>host</code>地址。</p>
+</li>
+<li><p>修改自己的镜像源：</p>
+<p>此时使用自己的默认镜像源即可：<code>npm config set registry http://registry.npmjs.org/</code></p>
+<p>当然，也可以使用淘宝的，可以都试试😂</p>
+</li>
+</ol>
+<p>接下来的操作就正常了，删除<code>node_modules</code>，执行<code>npm i</code></p>
+<p>此方法来源：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_42634260/article/details/121330269">记一次npm install 报RequestError: connect ETIMEDOUT 20.205.243.166:443和RequestError: socket hang up</a></p>
+<h3 id="RequestError-read-ECONNRESET"><a href="#RequestError-read-ECONNRESET" class="headerlink" title="RequestError: read ECONNRESET"></a><code>RequestError: read ECONNRESET</code></h3><p>这个错误其实还是网络连接出错，electron包下不下来，按照我看的博客的博主的说法，换成淘宝镜像地址就行。</p>
+<p>但是人家玩的比较6，效果还挺好。</p>
+<p>流程：</p>
+<ol>
+<li><p>执行<code>npm i</code>，当执行到<code>node install.js</code>时，<code>ctrl+c</code>中断执行。</p>
+</li>
+<li><p>进入到 electron 文件夹里：</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># 进入到electron文件夹</span>
+<span class="token builtin class-name">cd</span> node_modules/electron
+<span class="token comment"># 在资源管理器中打开</span>
+explorer <span class="token builtin class-name">.</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+</li>
+<li><p>使用编辑器打开<code>electron</code>文件夹中的<code>install.js</code></p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 修改以下代码：</span>
+
+<span class="token comment">// downloads if not cached</span>
+<span class="token function">downloadArtifact</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+version<span class="token punctuation">,</span>
+<span class="token literal-property property">artifactName</span><span class="token operator">:</span> <span class="token string">'electron'</span><span class="token punctuation">,</span>
+<span class="token literal-property property">force</span><span class="token operator">:</span> process<span class="token punctuation">.</span>env<span class="token punctuation">.</span>force_no_cache <span class="token operator">===</span> <span class="token string">'true'</span><span class="token punctuation">,</span>
+<span class="token literal-property property">cacheRoot</span><span class="token operator">:</span> process<span class="token punctuation">.</span>env<span class="token punctuation">.</span>electron_config_cache<span class="token punctuation">,</span>
+<span class="token literal-property property">platform</span><span class="token operator">:</span> process<span class="token punctuation">.</span>env<span class="token punctuation">.</span>npm_config_platform <span class="token operator">||</span> process<span class="token punctuation">.</span>platform<span class="token punctuation">,</span>
+<span class="token literal-property property">arch</span><span class="token operator">:</span> process<span class="token punctuation">.</span>env<span class="token punctuation">.</span>npm_config_arch <span class="token operator">||</span> process<span class="token punctuation">.</span>arch<span class="token punctuation">,</span>
+<span class="token comment">// 注 ：下面的 mirrorOptions 是我加的，也是要修改的地方</span>
+<span class="token literal-property property">mirrorOptions</span><span class="token operator">:</span><span class="token punctuation">{</span>
+<span class="token literal-property property">mirror</span><span class="token operator">:</span> <span class="token string">'https://npm.taobao.org/mirrors/electron/'</span>
+<span class="token punctuation">}</span>
+<span class="token comment">// ----------------------------------------------</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span>extractFile<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">catch</span><span class="token punctuation">(</span><span class="token parameter">err</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+console<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span>err<span class="token punctuation">.</span>stack<span class="token punctuation">)</span>
+process<span class="token punctuation">.</span><span class="token function">exit</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>我这里和我看的博客的博主的文件内容不太一样，但是配置一致。</p>
+</li>
+<li><p>然后在electron目录下执行命令:<code>node install.js</code>，就可以安装了。</p>
+</li>
+<li><p>建议在执行完<code>node install.js</code>之后，可以回到项目根目录下，再次执行一遍<code>npm i</code></p>
+</li>
+</ol>
+<p>此方法来源：<a target="_blank" rel="noopener" href="https://blog.csdn.net/shuaixingrumo/article/details/121653386">electron安装， node install.js报错RequestError: read ECONNRESET问题解决方案</a></p>
+<h2 id="十二、使用-Electron-和-Vue-js-开发桌面应用程序"><a href="#十二、使用-Electron-和-Vue-js-开发桌面应用程序" class="headerlink" title="十二、使用 Electron 和 Vue.js 开发桌面应用程序"></a>十二、使用 Electron 和 Vue.js 开发桌面应用程序</h2><h3 id="1-创建项目"><a href="#1-创建项目" class="headerlink" title="1. 创建项目"></a>1. 创建项目</h3><p>使用 <code>electron-vite</code> 创建项目时，选择 JavaScript 作为开发语言：</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">npm</span> create @quick-start/electron@latest<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>在提示中选择 <code>vue</code> 作为前端框架，并选择 <code>JavaScript</code> 作为语言。</p>
+<hr>
+<h3 id="2-项目结构"><a href="#2-项目结构" class="headerlink" title="2. 项目结构"></a>2. 项目结构</h3><p>生成的项目结构如下：</p>
+<pre class="line-numbers language-none"><code class="language-none">my-electron-vue-app/
+├── src/
+│   ├── main/          # Electron 主进程代码（JavaScript）
+│   ├── preload/       # 预加载脚本（JavaScript）
+│   ├── renderer/      # Vue 渲染进程代码（JavaScript）
+├── electron.vite.config.js # electron-vite 配置文件（JavaScript）
+├── package.json<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<hr>
+<h3 id="3-开发-Vue-组件"><a href="#3-开发-Vue-组件" class="headerlink" title="3. 开发 Vue 组件"></a>3. 开发 Vue 组件</h3><p>在 <code>src/renderer</code> 目录下开发 Vue 组件，例如：</p>
+<pre class="line-numbers language-vue" data-language="vue"><code class="language-vue">&lt;!-- src/renderer/App.vue --&gt;
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h1&gt;Hello Electron + Vue!&lt;/h1&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+export default {
+  name: 'App'
+}
+&lt;/script&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<hr>
+<h3 id="4-配置主进程"><a href="#4-配置主进程" class="headerlink" title="4. 配置主进程"></a>4. 配置主进程</h3><p>在 <code>src/main/index.js</code> 中配置 Electron 主进程：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> <span class="token punctuation">{</span> app<span class="token punctuation">,</span> BrowserWindow <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'electron'</span><span class="token punctuation">)</span>
+<span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span>
+
+<span class="token keyword">function</span> <span class="token function">createWindow</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> win <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BrowserWindow</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token literal-property property">width</span><span class="token operator">:</span> <span class="token number">800</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">height</span><span class="token operator">:</span> <span class="token number">600</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">webPreferences</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token literal-property property">preload</span><span class="token operator">:</span> path<span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'../preload/index.js'</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>process<span class="token punctuation">.</span>env<span class="token punctuation">.</span><span class="token constant">NODE_ENV</span> <span class="token operator">===</span> <span class="token string">'development'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    win<span class="token punctuation">.</span><span class="token function">loadURL</span><span class="token punctuation">(</span><span class="token string">'http://localhost:3000'</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    win<span class="token punctuation">.</span><span class="token function">loadFile</span><span class="token punctuation">(</span>path<span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'../renderer/index.html'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+app<span class="token punctuation">.</span><span class="token function">whenReady</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span>createWindow<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<hr>
+<h3 id="5-配置预加载脚本"><a href="#5-配置预加载脚本" class="headerlink" title="5. 配置预加载脚本"></a>5. 配置预加载脚本</h3><p>在 <code>src/preload/index.js</code> 中配置预加载脚本：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> <span class="token punctuation">{</span> contextBridge<span class="token punctuation">,</span> ipcRenderer <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'electron'</span><span class="token punctuation">)</span>
+
+contextBridge<span class="token punctuation">.</span><span class="token function">exposeInMainWorld</span><span class="token punctuation">(</span><span class="token string">'electron'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  <span class="token function-variable function">sendMessage</span><span class="token operator">:</span> <span class="token punctuation">(</span><span class="token parameter">channel<span class="token punctuation">,</span> data</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> ipcRenderer<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span>channel<span class="token punctuation">,</span> data<span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<hr>
+<h3 id="6-运行项目"><a href="#6-运行项目" class="headerlink" title="6. 运行项目"></a>6. 运行项目</h3><p>启动开发服务器：</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">npm</span> run dev<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<hr>
+<h3 id="7-打包应用"><a href="#7-打包应用" class="headerlink" title="7. 打包应用"></a>7. 打包应用</h3><p>打包应用：</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">npm</span> run build<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<hr>
+<h3 id="8-修改配置文件"><a href="#8-修改配置文件" class="headerlink" title="8. 修改配置文件"></a>8. 修改配置文件</h3><p>如果需要，可以修改 <code>electron.vite.config.js</code> 文件。例如，调整打包选项或插件配置：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">{</span> defineConfig <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'electron-vite'</span>
+<span class="token keyword">import</span> vue <span class="token keyword">from</span> <span class="token string">'@vitejs/plugin-vue'</span>
+
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token function">defineConfig</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  <span class="token literal-property property">main</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 主进程配置</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">preload</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 预加载脚本配置</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">renderer</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token literal-property property">plugins</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token function">vue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token comment">// 使用 Vue 插件</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<hr>
+<h3 id="9-调试"><a href="#9-调试" class="headerlink" title="9. 调试"></a>9. 调试</h3><ul>
+<li><strong>主进程</strong>：使用 <code>console.log</code> 或 VSCode 调试器。</li>
+<li><strong>渲染进程</strong>：使用 Chrome 开发者工具。</li>
+</ul>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">L ZHEN</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="http://fahaxikilz.github.io/2025/01/23/electron/">http://fahaxikilz.github.io/2025/01/23/electron/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">L ZHEN</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Electron/">
+                                    <span class="chip bg-color">Electron</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/loading.gif" data-original="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/loading.gif" data-original="/medias/reward/wechat.jpg" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+        <style>
+    .valine-card {
+        margin: 1.5rem auto;
+    }
+
+    .valine-card .card-content {
+        padding: 20px 20px 5px 20px;
+    }
+
+    #vcomments textarea {
+        box-sizing: border-box;
+        background: url("/medias/comment_bg.png") 100% 100% no-repeat;
+    }
+
+    #vcomments p {
+        margin: 2px 2px 10px;
+        font-size: 1.05rem;
+        line-height: 1.78rem;
+    }
+
+    #vcomments blockquote p {
+        text-indent: 0.2rem;
+    }
+
+    #vcomments a {
+        padding: 0 2px;
+        color: #4cbf30;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    #vcomments img {
+        max-width: 100%;
+        height: auto;
+        cursor: pointer;
+    }
+
+    #vcomments ol li {
+        list-style-type: decimal;
+    }
+
+    #vcomments ol,
+    ul {
+        display: block;
+        padding-left: 2em;
+        word-spacing: 0.05rem;
+    }
+
+    #vcomments ul li,
+    ol li {
+        display: list-item;
+        line-height: 1.8rem;
+        font-size: 1rem;
+    }
+
+    #vcomments ul li {
+        list-style-type: disc;
+    }
+
+    #vcomments ul ul li {
+        list-style-type: circle;
+    }
+
+    #vcomments table, th, td {
+        padding: 12px 13px;
+        border: 1px solid #dfe2e5;
+    }
+
+    #vcomments table, th, td {
+        border: 0;
+    }
+
+    table tr:nth-child(2n), thead {
+        background-color: #fafafa;
+    }
+
+    #vcomments table th {
+        background-color: #f2f2f2;
+        min-width: 80px;
+    }
+
+    #vcomments table td {
+        min-width: 80px;
+    }
+
+    #vcomments h1 {
+        font-size: 1.85rem;
+        font-weight: bold;
+        line-height: 2.2rem;
+    }
+
+    #vcomments h2 {
+        font-size: 1.65rem;
+        font-weight: bold;
+        line-height: 1.9rem;
+    }
+
+    #vcomments h3 {
+        font-size: 1.45rem;
+        font-weight: bold;
+        line-height: 1.7rem;
+    }
+
+    #vcomments h4 {
+        font-size: 1.25rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    #vcomments h5 {
+        font-size: 1.1rem;
+        font-weight: bold;
+        line-height: 1.4rem;
+    }
+
+    #vcomments h6 {
+        font-size: 1rem;
+        line-height: 1.3rem;
+    }
+
+    #vcomments p {
+        font-size: 1rem;
+        line-height: 1.5rem;
+    }
+
+    #vcomments hr {
+        margin: 12px 0;
+        border: 0;
+        border-top: 1px solid #ccc;
+    }
+
+    #vcomments blockquote {
+        margin: 15px 0;
+        border-left: 5px solid #42b983;
+        padding: 1rem 0.8rem 0.3rem 0.8rem;
+        color: #666;
+        background-color: rgba(66, 185, 131, .1);
+    }
+
+    #vcomments pre {
+        font-family: monospace, monospace;
+        padding: 1.2em;
+        margin: .5em 0;
+        background: #272822;
+        overflow: auto;
+        border-radius: 0.3em;
+        tab-size: 4;
+    }
+
+    #vcomments code {
+        font-family: monospace, monospace;
+        padding: 1px 3px;
+        font-size: 0.92rem;
+        color: #e96900;
+        background-color: #f8f8f8;
+        border-radius: 2px;
+    }
+
+    #vcomments pre code {
+        font-family: monospace, monospace;
+        padding: 0;
+        color: #e8eaf6;
+        background-color: #272822;
+    }
+
+    #vcomments pre[class*="language-"] {
+        padding: 1.2em;
+        margin: .5em 0;
+    }
+
+    #vcomments code[class*="language-"],
+    pre[class*="language-"] {
+        color: #e8eaf6;
+    }
+
+    #vcomments [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: inherit;
+        margin-left: -1.3rem;
+        margin-right: 0.4rem;
+        margin-top: -1px;
+        vertical-align: middle;
+        left: unset;
+        visibility: visible;
+    }
+
+    #vcomments b,
+    strong {
+        font-weight: bold;
+    }
+
+    #vcomments dfn {
+        font-style: italic;
+    }
+
+    #vcomments small {
+        font-size: 85%;
+    }
+
+    #vcomments cite {
+        font-style: normal;
+    }
+
+    #vcomments mark {
+        background-color: #fcf8e3;
+        padding: .2em;
+    }
+
+    #vcomments table, th, td {
+        padding: 12px 13px;
+        border: 1px solid #dfe2e5;
+    }
+
+    table tr:nth-child(2n), thead {
+        background-color: #fafafa;
+    }
+
+    #vcomments table th {
+        background-color: #f2f2f2;
+        min-width: 80px;
+    }
+
+    #vcomments table td {
+        min-width: 80px;
+    }
+
+    #vcomments [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: inherit;
+        margin-left: -1.3rem;
+        margin-right: 0.4rem;
+        margin-top: -1px;
+        vertical-align: middle;
+        left: unset;
+        visibility: visible;
+    }
+</style>
+
+<div class="card valine-card" data-aos="fade-up">
+    <div class="comment_headling" style="font-size: 20px; font-weight: 700; position: relative; padding-left: 20px; top: 15px; padding-bottom: 5px;">
+        <i class="fas fa-comments fa-fw" aria-hidden="true"></i>
+        <span>评论</span>
+    </div>
+    <div id="vcomments" class="card-content" style="display: grid">
+    </div>
+</div>
+
+<script src="/libs/valine/av-min.js"></script>
+<script src="/libs/valine/Valine.min.js"></script>
+<script>
+    new Valine({
+        el: '#vcomments',
+        appId: 'sxNXQ2L9Yj1y9VxBDX2sA6d8-gzGzoHsz',
+        appKey: 'YgMUSzSrmuxo97dKBzjIl5dy',
+        serverURLs: 'https://sxnxq2l9.lc-cn-n1-shared.com',
+        notify: 'true, // 邮件提醒!!!' === 'true',
+        verify: '' === 'true',
+        visitor: 'true' === 'true',
+        avatar: 'robohash',
+        pageSize: '10',
+        lang: 'zh-cn',
+        placeholder: 'ヾﾉ≧∀≦)o来啊，快活啊!'
+    });
+</script>
+
+<!--酷Q推送-->
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2025/04/03/prometheus/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/loading.gif" data-original="/medias/featureimages/14.jpg" class="responsive-img" alt="Prometheus">
+                        
+                        <span class="card-title">Prometheus</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2025-04-03
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E8%BF%90%E7%BB%B4/" class="post-category">
+                                    运维
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Prometheus/">
+                        <span class="chip bg-color">Prometheus</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2025/01/03/she-ji-mo-shi/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/loading.gif" data-original="/medias/featureimages/17.jpg" class="responsive-img" alt="设计模式">
+                        
+                        <span class="card-title">设计模式</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2025-01-03
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E8%BF%9B%E9%98%B6%E6%8A%80%E6%9C%AF/" class="post-category">
+                                    进阶技术
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">
+                        <span class="chip bg-color">设计模式</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+
+  <!-- 是否加载使用自带的 prismjs. -->
+  <script type="text/javascript" src="/libs/prism/prism.min.js"></script>
+
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('8'),
+            headingSelector: 'h1,h2,h3, h4,h5,h6,h7,h8'
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2022-2026</span>
+            
+            <a href="/about" target="_blank">L ZHEN</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1184.3k</span>
+            
+            
+            
+                
+            
+            
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
+            </span>
+            
+            
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
+            </span>
+            
+            <br>
+
+            <!-- 运行天数提醒. -->
+            
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2022";
+                        var startMonth = "10";
+                        var startDate = "16";
+                        var startHour = "12";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
+                    }
+
+                    calcSiteTime();
+                </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+
+
+    <a href="mailto:1390211724@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1390211724" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1390211724" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 白天和黑夜主题 -->
+<div class="stars-con">
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>  
+</div>
+
+<script>
+    function switchNightMode() {
+        $('<div class="Cuteen_DarkSky"><div class="Cuteen_DarkPlanet"></div></div>').appendTo($('body')),
+        setTimeout(function () {
+            $('body').hasClass('DarkMode') 
+            ? ($('body').removeClass('DarkMode'), localStorage.setItem('isDark', '0'), $('#sum-moon-icon').removeClass("fa-sun").addClass('fa-moon')) 
+            : ($('body').addClass('DarkMode'), localStorage.setItem('isDark', '1'), $('#sum-moon-icon').addClass("fa-sun").removeClass('fa-moon')),
+            
+            setTimeout(function () {
+            $('.Cuteen_DarkSky').fadeOut(1e3, function () {
+                $(this).remove()
+            })
+            }, 2e3)
+        })
+    }
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    
+        <!-- <script src='https://unpkg.com/mermaid@latest/dist/mermaid.min.js'></script> -->
+        <script src='/libs/mermaid/mermaid.min.js'></script>
+        <script>
+          if (window.mermaid) {
+            mermaid.initialize({theme: 'forest'});
+          }
+        </script>
+    
+
+    
+
+    <!-- 雪花特效 -->
+    
+
+    <!-- 鼠标星星特效 -->
+    
+
+     
+        <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+        <script src="/libs/others/TencentCaptcha.js"></script>
+        <button id="TencentCaptcha" data-appid="197482151" data-cbfn="callback" type="button" hidden></button>
+    
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(e.href.match(t)||e.href.match(r))&&(e.href=a.dataset.original)})});</script><script>(r=>{r.imageLazyLoadSetting.processImages=t;var a=r.imageLazyLoadSetting.isSPA,o=r.imageLazyLoadSetting.preloadRatio||1,d=i();function i(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(t){(a||t)&&(d=i());for(var e,n=0;n<d.length;n++)0<=(e=(e=d[n]).getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(r.innerHeight*o||document.documentElement.clientHeight*o)&&(()=>{var t,e,a,o,i=d[n];e=function(){d=d.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).dataset.loaded||(t.hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(a=new Image,o=t.getAttribute("data-original"),a.onload=function(){t.src=o,t.removeAttribute("data-original"),t.setAttribute("data-loaded",!0),e&&e()},a.onerror=function(){t.removeAttribute("data-original"),t.setAttribute("data-loaded",!1),t.src=o},t.src!==o&&(a.src=o)))})()}function e(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",e),r.addEventListener("resize",e),r.addEventListener("orientationchange",e)})(this);</script></body>
+
+</html>

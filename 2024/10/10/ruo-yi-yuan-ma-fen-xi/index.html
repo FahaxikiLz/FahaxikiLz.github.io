@@ -1,0 +1,2254 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="若依源码分析, 爱哭的小河豚">
+    <meta name="description" content="多数据源切换1.配置数据源spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      # 主库数据源
+      maste">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>若依源码分析 | 爱哭的小河豚</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    
+
+
+    <!-- bg-cover style     -->
+
+
+
+<link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+<link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+<link rel="stylesheet" type="text/css" href="/css/matery.css">
+<link rel="stylesheet" type="text/css" href="/css/my.css">
+<link rel="stylesheet" type="text/css" href="/css/dark.css" media="none" onload="if(media!='all')media='all'">
+
+
+
+
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+    <link rel="stylesheet" href="/css/post.css">
+
+
+
+
+    
+        <link rel="stylesheet" type="text/css" href="/css/reward.css">
+    
+
+
+
+    <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="爱哭的小河豚" type="application/atom+xml">
+</head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    <div>
+                        
+                        <img src="/medias/loading.gif" data-original="/medias/logo.png" class="logo-img" alt="LOGO">
+                        
+                        <span class="logo-span">爱哭的小河豚</span>
+                    </div>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/hello-algo" class="waves-effect waves-light">
+      
+      <i class="fas fa-anchor" style="zoom: 0.6;"></i>
+      
+      <span>Hello 算法</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/love" class="waves-effect waves-light">
+      
+      <i class="fas fa-heart" style="zoom: 0.6;"></i>
+      
+      <span>写给我家乖乖</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+  <li>
+    <a href="javascript:;" class="waves-effect waves-light" onclick="switchNightMode()" title="深色/浅色模式" >
+      <i id="sum-moon-icon" class="fas fa-sun" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/loading.gif" data-original="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">爱哭的小河豚</div>
+        <div class="logo-desc">
+            
+            谁会不喜欢一只爱哭，生气又圆鼓鼓的小河豚呢？
+            
+        </div>
+    </div>
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/hello-algo" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-anchor"></i>
+			
+			Hello 算法
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/love" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-heart"></i>
+			
+			写给我家乖乖
+		</a>
+          
+        </li>
+        
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/21.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">若依源码分析</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/%E8%8B%A5%E4%BE%9D%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">
+                                <span class="chip bg-color">若依源码分析</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E8%BF%9B%E9%98%B6%E6%8A%80%E6%9C%AF/" class="post-category">
+                                进阶技术
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2024-10-10
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2025-07-21
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    6.2k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    26 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.min.css">
+        
+
+        
+        <!-- 代码块折行 -->
+        <style type="text/css">
+            code[class*="language-"], pre[class*="language-"] { white-space: pre-wrap !important; }
+        </style>
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h2 id="多数据源切换"><a href="#多数据源切换" class="headerlink" title="多数据源切换"></a>多数据源切换</h2><h3 id="1-配置数据源"><a href="#1-配置数据源" class="headerlink" title="1.配置数据源"></a>1.配置数据源</h3><pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token key atrule">spring</span><span class="token punctuation">:</span>
+  <span class="token key atrule">datasource</span><span class="token punctuation">:</span>
+    <span class="token key atrule">type</span><span class="token punctuation">:</span> com.alibaba.druid.pool.DruidDataSource
+    <span class="token key atrule">druid</span><span class="token punctuation">:</span>
+      <span class="token comment"># 主库数据源</span>
+      <span class="token key atrule">master</span><span class="token punctuation">:</span>
+        <span class="token key atrule">driverClassName</span><span class="token punctuation">:</span> com.mysql.cj.jdbc.Driver
+        <span class="token key atrule">url</span><span class="token punctuation">:</span> jdbc<span class="token punctuation">:</span>mysql<span class="token punctuation">:</span>//4x.1xx.7x.1xx<span class="token punctuation">:</span>3306/xxx<span class="token punctuation">?</span>useUnicode=true<span class="token important">&amp;characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull&amp;useSSL=true&amp;serverTimezone=Asia/Shanghai</span>
+        <span class="token key atrule">username</span><span class="token punctuation">:</span> root
+        <span class="token key atrule">password</span><span class="token punctuation">:</span> root
+      <span class="token comment"># 从库数据源</span>
+      <span class="token key atrule">slave</span><span class="token punctuation">:</span>
+        <span class="token key atrule">enabled</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+        <span class="token key atrule">driverClassName</span><span class="token punctuation">:</span> com.mysql.cj.jdbc.Driver
+        <span class="token key atrule">url</span><span class="token punctuation">:</span> jdbc<span class="token punctuation">:</span>mysql<span class="token punctuation">:</span>//127.0.0.1<span class="token punctuation">:</span>3306/xxx<span class="token punctuation">?</span>useUnicode=true<span class="token important">&amp;characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull&amp;useSSL=true&amp;serverTimezone=Asia/Shanghai</span>
+        <span class="token key atrule">username</span><span class="token punctuation">:</span> root
+        <span class="token key atrule">password</span><span class="token punctuation">:</span> root<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="2-配置多数据源"><a href="#2-配置多数据源" class="headerlink" title="2.配置多数据源"></a>2.配置多数据源</h3><p>配置数据源的枚举</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">enum</span> <span class="token class-name">DataSourceType</span>
+<span class="token punctuation">{</span>
+    <span class="token comment">/**
+     * 主库
+     */</span>
+    <span class="token constant">MASTER</span><span class="token punctuation">,</span>
+
+    <span class="token comment">/**
+     * 从库
+     */</span>
+    <span class="token constant">SLAVE</span>
+
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>读取yaml配置文件中的数据源，配置动态数据源的默认数据源和所有可能的数据源</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@Bean</span>
+<span class="token annotation punctuation">@ConfigurationProperties</span><span class="token punctuation">(</span><span class="token string">"spring.datasource.druid.master"</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token class-name">DataSource</span> <span class="token function">masterDataSource</span><span class="token punctuation">(</span><span class="token class-name">DruidProperties</span> druidProperties<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token class-name">DruidDataSource</span> dataSource <span class="token operator">=</span> <span class="token class-name">DruidDataSourceBuilder</span><span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> druidProperties<span class="token punctuation">.</span><span class="token function">dataSource</span><span class="token punctuation">(</span>dataSource<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token annotation punctuation">@Bean</span>
+<span class="token annotation punctuation">@ConfigurationProperties</span><span class="token punctuation">(</span><span class="token string">"spring.datasource.druid.slave"</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@ConditionalOnProperty</span><span class="token punctuation">(</span>prefix <span class="token operator">=</span> <span class="token string">"spring.datasource.druid.slave"</span><span class="token punctuation">,</span> name <span class="token operator">=</span> <span class="token string">"enabled"</span><span class="token punctuation">,</span> havingValue <span class="token operator">=</span> <span class="token string">"true"</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token class-name">DataSource</span> <span class="token function">slaveDataSource</span><span class="token punctuation">(</span><span class="token class-name">DruidProperties</span> druidProperties<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token class-name">DruidDataSource</span> dataSource <span class="token operator">=</span> <span class="token class-name">DruidDataSourceBuilder</span><span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> druidProperties<span class="token punctuation">.</span><span class="token function">dataSource</span><span class="token punctuation">(</span>dataSource<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token annotation punctuation">@Bean</span><span class="token punctuation">(</span>name <span class="token operator">=</span> <span class="token string">"dynamicDataSource"</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Primary</span>
+<span class="token keyword">public</span> <span class="token class-name">DynamicDataSource</span> <span class="token function">dataSource</span><span class="token punctuation">(</span><span class="token class-name">DataSource</span> masterDataSource<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token class-name">Map</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Object</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">&gt;</span></span> targetDataSources <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    targetDataSources<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token class-name">DataSourceType</span><span class="token punctuation">.</span><span class="token constant">MASTER</span><span class="token punctuation">.</span><span class="token function">name</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> masterDataSource<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">setDataSource</span><span class="token punctuation">(</span>targetDataSources<span class="token punctuation">,</span> <span class="token class-name">DataSourceType</span><span class="token punctuation">.</span><span class="token constant">SLAVE</span><span class="token punctuation">.</span><span class="token function">name</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"slaveDataSource"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">DynamicDataSource</span><span class="token punctuation">(</span>masterDataSource<span class="token punctuation">,</span> targetDataSources<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">/**
+ * 设置数据源
+ * 
+ * @param targetDataSources 备选数据源集合
+ * @param sourceName 数据源名称
+ * @param beanName bean名称
+ */</span>
+<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setDataSource</span><span class="token punctuation">(</span><span class="token class-name">Map</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Object</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">&gt;</span></span> targetDataSources<span class="token punctuation">,</span> <span class="token class-name">String</span> sourceName<span class="token punctuation">,</span> <span class="token class-name">String</span> beanName<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">try</span>
+    <span class="token punctuation">{</span>
+        <span class="token class-name">DataSource</span> dataSource <span class="token operator">=</span> <span class="token class-name">SpringUtils</span><span class="token punctuation">.</span><span class="token function">getBean</span><span class="token punctuation">(</span>beanName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        targetDataSources<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>sourceName<span class="token punctuation">,</span> dataSource<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>targetDataSources中数据源名为key，配置为value</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/image-20241010160118873.png" alt="image-20241010160118873"></p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">DynamicDataSource</span> <span class="token keyword">extends</span> <span class="token class-name">AbstractRoutingDataSource</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token class-name">DynamicDataSource</span><span class="token punctuation">(</span><span class="token class-name">DataSource</span> defaultTargetDataSource<span class="token punctuation">,</span> <span class="token class-name">Map</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Object</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">&gt;</span></span> targetDataSources<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">setDefaultTargetDataSource</span><span class="token punctuation">(</span>defaultTargetDataSource<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">setTargetDataSources</span><span class="token punctuation">(</span>targetDataSources<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">afterPropertiesSet</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="3-设置注解"><a href="#3-设置注解" class="headerlink" title="3.设置注解"></a>3.设置注解</h3><pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@Target</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token class-name">ElementType</span><span class="token punctuation">.</span><span class="token constant">METHOD</span><span class="token punctuation">,</span> <span class="token class-name">ElementType</span><span class="token punctuation">.</span><span class="token constant">TYPE</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Retention</span><span class="token punctuation">(</span><span class="token class-name">RetentionPolicy</span><span class="token punctuation">.</span><span class="token constant">RUNTIME</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Documented</span>
+<span class="token annotation punctuation">@Inherited</span>
+<span class="token keyword">public</span> <span class="token annotation punctuation">@interface</span> <span class="token class-name">DataSource</span>
+<span class="token punctuation">{</span>
+    <span class="token comment">/**
+     * 切换数据源名称
+     */</span>
+    <span class="token keyword">public</span> <span class="token class-name">DataSourceType</span> <span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">default</span> <span class="token class-name">DataSourceType</span><span class="token punctuation">.</span><span class="token constant">MASTER</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="4-设置AOP"><a href="#4-设置AOP" class="headerlink" title="4.设置AOP"></a>4.设置AOP</h3><p>获取设置<code>@DataSource</code>注解方法的数据源，将数据源名称放到ThreadLocal中。</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@Aspect</span>
+<span class="token annotation punctuation">@Order</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Component</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">DataSourceAspect</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">protected</span> <span class="token class-name">Logger</span> logger <span class="token operator">=</span> <span class="token class-name">LoggerFactory</span><span class="token punctuation">.</span><span class="token function">getLogger</span><span class="token punctuation">(</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@Pointcut</span><span class="token punctuation">(</span><span class="token string">"@annotation(com.ruoyi.common.annotation.DataSource)"</span>
+            <span class="token operator">+</span> <span class="token string">"|| @within(com.ruoyi.common.annotation.DataSource)"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">dsPointCut</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Around</span><span class="token punctuation">(</span><span class="token string">"dsPointCut()"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">Object</span> <span class="token function">around</span><span class="token punctuation">(</span><span class="token class-name">ProceedingJoinPoint</span> point<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Throwable</span>
+    <span class="token punctuation">{</span>
+        <span class="token class-name">DataSource</span> dataSource <span class="token operator">=</span> <span class="token function">getDataSource</span><span class="token punctuation">(</span>point<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token class-name">StringUtils</span><span class="token punctuation">.</span><span class="token function">isNotNull</span><span class="token punctuation">(</span>dataSource<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token class-name">DynamicDataSourceContextHolder</span><span class="token punctuation">.</span><span class="token function">setDataSourceType</span><span class="token punctuation">(</span>dataSource<span class="token punctuation">.</span><span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">name</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">try</span>
+        <span class="token punctuation">{</span>
+            <span class="token comment">// proceed() 方法的作用是继续执行被拦截的方法（即目标方法）。</span>
+            <span class="token keyword">return</span> point<span class="token punctuation">.</span><span class="token function">proceed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">finally</span>
+        <span class="token punctuation">{</span>
+            <span class="token comment">// 销毁数据源 在执行方法之后</span>
+            <span class="token class-name">DynamicDataSourceContextHolder</span><span class="token punctuation">.</span><span class="token function">clearDataSourceType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 获取需要切换的数据源
+     */</span>
+    <span class="token keyword">public</span> <span class="token class-name">DataSource</span> <span class="token function">getDataSource</span><span class="token punctuation">(</span><span class="token class-name">ProceedingJoinPoint</span> point<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token class-name">MethodSignature</span> signature <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">MethodSignature</span><span class="token punctuation">)</span> point<span class="token punctuation">.</span><span class="token function">getSignature</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">DataSource</span> dataSource <span class="token operator">=</span> <span class="token class-name">AnnotationUtils</span><span class="token punctuation">.</span><span class="token function">findAnnotation</span><span class="token punctuation">(</span>signature<span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token class-name">DataSource</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token class-name">Objects</span><span class="token punctuation">.</span><span class="token function">nonNull</span><span class="token punctuation">(</span>dataSource<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> dataSource<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">return</span> <span class="token class-name">AnnotationUtils</span><span class="token punctuation">.</span><span class="token function">findAnnotation</span><span class="token punctuation">(</span>signature<span class="token punctuation">.</span><span class="token function">getDeclaringType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token class-name">DataSource</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">DynamicDataSourceContextHolder</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token class-name">Logger</span> log <span class="token operator">=</span> <span class="token class-name">LoggerFactory</span><span class="token punctuation">.</span><span class="token function">getLogger</span><span class="token punctuation">(</span><span class="token class-name">DynamicDataSourceContextHolder</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">/**
+     * 使用ThreadLocal维护变量，ThreadLocal为每个使用该变量的线程提供独立的变量副本，
+     *  所以每一个线程都可以独立地改变自己的副本，而不会影响其它线程所对应的副本。
+     */</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token class-name">ThreadLocal</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> <span class="token constant">CONTEXT_HOLDER</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ThreadLocal</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">/**
+     * 设置数据源的变量
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">setDataSourceType</span><span class="token punctuation">(</span><span class="token class-name">String</span> dsType<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        log<span class="token punctuation">.</span><span class="token function">info</span><span class="token punctuation">(</span><span class="token string">"切换到{}数据源"</span><span class="token punctuation">,</span> dsType<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token constant">CONTEXT_HOLDER</span><span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>dsType<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 获得数据源的变量
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token class-name">String</span> <span class="token function">getDataSourceType</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token constant">CONTEXT_HOLDER</span><span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 清空数据源变量
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">clearDataSourceType</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token constant">CONTEXT_HOLDER</span><span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="5-切换数据源"><a href="#5-切换数据源" class="headerlink" title="5.切换数据源"></a>5.切换数据源</h3><p>继承AbstractRoutingDataSource重新determineCurrentLookupKey方法，当每次执行数据操作时都会先执行这个方法，就会从ThreadLocal获取数据源从而切换。</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">DynamicDataSource</span> <span class="token keyword">extends</span> <span class="token class-name">AbstractRoutingDataSource</span>
+<span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">protected</span> <span class="token class-name">Object</span> <span class="token function">determineCurrentLookupKey</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">DynamicDataSourceContextHolder</span><span class="token punctuation">.</span><span class="token function">getDataSourceType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="6-使用"><a href="#6-使用" class="headerlink" title="6.使用"></a>6.使用</h3><p>在需要切换数据源的方法上添加上注解标明使用哪个数据源即可。</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@DataSource</span><span class="token punctuation">(</span>value <span class="token operator">=</span> <span class="token class-name">DataSourceType</span><span class="token punctuation">.</span><span class="token constant">SLAVE</span><span class="token punctuation">)</span>
+<span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">UserEntity</span><span class="token punctuation">&gt;</span></span> <span class="token function">getOriginData</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<h3 id="7-关于公司框架中数据源的切换"><a href="#7-关于公司框架中数据源的切换" class="headerlink" title="7.关于公司框架中数据源的切换"></a>7.关于公司框架中数据源的切换</h3><p>我们公司中使用数据源切换大致是一样的，就是获取设置的数据源放到ThreadLocal中，然后继承AbstractRoutingDataSource重写determineCurrentLookupKey方法，然后返回从ThreadLocal中获取的数据源名称。但是在配置数据源时不同，使用起来添加新的数据源更加方便，其实基本意思是一样的。yaml配置文件中配置了多少个数据源，就获取多少配置，以数据源名称为key，配置为value放到Map中，将Map传给targetDataSources。不用像若依中要手写代码将数据源放到targetDataSources中了。</p>
+<p><a target="_blank" rel="noopener" href="http://47.116.79.121/2023/02/21/gong-zuo-ji-lu/#2%E3%80%81%E8%AE%BE%E7%BD%AE%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90%E5%88%87%E6%8D%A2">http://47.116.79.121/2023/02/21/gong-zuo-ji-lu/#2%E3%80%81%E8%AE%BE%E7%BD%AE%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90%E5%88%87%E6%8D%A2</a></p>
+<h2 id="定时任务"><a href="#定时任务" class="headerlink" title="定时任务"></a>定时任务</h2><h2 id="权限"><a href="#权限" class="headerlink" title="权限"></a>权限</h2><h3 id="若依Vue系统中的权限分类"><a href="#若依Vue系统中的权限分类" class="headerlink" title="若依Vue系统中的权限分类"></a>若依Vue系统中的权限分类</h3><p>根据观察，若依Vue系统中的权限分为以下几类</p>
+<ul>
+<li>菜单权限：用户登录系统之后能看到哪些菜单</li>
+<li>按钮权限：用户在一个页面上能看到哪些按钮，比如新增、删除等按钮</li>
+<li>接口权限：用户带着认证信息请求后端接口，是否有权限访问，该接口和前端页面上的按钮一一对应</li>
+<li>数据权限：用户有权限访问后端某个接口，但是不同的用户相同的接口相同的入参，根据权限大小不同，返回的结果应当不一样——权限大的能够看到的数据更多。</li>
+</ul>
+<h4 id="1-菜单权限"><a href="#1-菜单权限" class="headerlink" title="1.菜单权限"></a>1.菜单权限</h4><p>这个比较好理解，拥有不同权限的用户登录系统之后看到的菜单是不一样的，从新建菜单到给一个用户分配菜单权限，上一篇文章已经讲过，不赘述。</p>
+<p>用户登录之后会请求后端的<code>com.ruoyi.web.controller.system.SysLoginController#getRouters</code>接口获取登录用户的菜单数据：</p>
+<pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">select</span> <span class="token keyword">distinct</span> m<span class="token punctuation">.</span>menu_id<span class="token punctuation">,</span> m<span class="token punctuation">.</span>parent_id<span class="token punctuation">,</span> m<span class="token punctuation">.</span>menu_name<span class="token punctuation">,</span> m<span class="token punctuation">.</span>path<span class="token punctuation">,</span> m<span class="token punctuation">.</span>component<span class="token punctuation">,</span> m<span class="token punctuation">.</span>visible<span class="token punctuation">,</span> m<span class="token punctuation">.</span><span class="token keyword">status</span><span class="token punctuation">,</span> ifnull<span class="token punctuation">(</span>m<span class="token punctuation">.</span>perms<span class="token punctuation">,</span><span class="token string">''</span><span class="token punctuation">)</span> <span class="token keyword">as</span> perms<span class="token punctuation">,</span> m<span class="token punctuation">.</span>is_frame<span class="token punctuation">,</span> m<span class="token punctuation">.</span>is_cache<span class="token punctuation">,</span> m<span class="token punctuation">.</span>menu_type<span class="token punctuation">,</span> m<span class="token punctuation">.</span>icon<span class="token punctuation">,</span> m<span class="token punctuation">.</span>order_num<span class="token punctuation">,</span> m<span class="token punctuation">.</span>create_time
+		<span class="token keyword">from</span> sys_menu m
+			 <span class="token keyword">left</span> <span class="token keyword">join</span> sys_role_menu rm <span class="token keyword">on</span> m<span class="token punctuation">.</span>menu_id <span class="token operator">=</span> rm<span class="token punctuation">.</span>menu_id
+			 <span class="token keyword">left</span> <span class="token keyword">join</span> sys_user_role ur <span class="token keyword">on</span> rm<span class="token punctuation">.</span>role_id <span class="token operator">=</span> ur<span class="token punctuation">.</span>role_id
+			 <span class="token keyword">left</span> <span class="token keyword">join</span> sys_role ro <span class="token keyword">on</span> ur<span class="token punctuation">.</span>role_id <span class="token operator">=</span> ro<span class="token punctuation">.</span>role_id
+			 <span class="token keyword">left</span> <span class="token keyword">join</span> sys_user u <span class="token keyword">on</span> ur<span class="token punctuation">.</span>user_id <span class="token operator">=</span> u<span class="token punctuation">.</span>user_id
+		<span class="token keyword">where</span> u<span class="token punctuation">.</span>user_id <span class="token operator">=</span> <span class="token comment">#{userId} and m.menu_type in ('M', 'C') and m.status = 0  AND ro.status = 0</span>
+		<span class="token keyword">order</span> <span class="token keyword">by</span> m<span class="token punctuation">.</span>parent_id<span class="token punctuation">,</span> m<span class="token punctuation">.</span>order_num
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>菜单类型（M目录 C菜单 F按钮）；菜单状态（0显示 1隐藏）</p>
+<p>这是典型的用户-角色-菜单模型。</p>
+<p>前端会根据该接口返回的数据渲染出不同的菜单。</p>
+<p>若依系统初始化SQL已经创建了两个用户：admin和ry，分别作为管理员和普通用户，这里我创建一个新用户kdyzm，用来测试菜单权限。</p>
+<p>首先，创建一个角色“运营角色”，仅允许“新闻”菜单权限。</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210204150939265-1517176105.png" alt="image-20210204131636421"></p>
+<p>接下来，创建一个新用户一枝梅，并将上一步创建的角色赋给该用户</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210204150939408-970577975.png" alt="image-20210204131939309"></p>
+<p>创建完成之后，打开无痕窗口，使用该账户登录若依管理系统，之后看到的菜单就是这样子的了</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210204150939608-1393505159.png" alt="image-20210204132121229"></p>
+<p>可以看到，使用kdyzm账号登陆系统，只能看到新闻菜单了，符合我们的预期；如果这时候输入只有admin才能看到的其它页面地址又会如何呢？比如kdyzm在浏览器上手动输入了地址：<a target="_blank" rel="noopener" href="http://127.0.0.1/system/user">http://127.0.0.1/system/user</a> 这本应当是管理员才有权限看到的页面，kdyzm看到的则是</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210204150939765-612996244.png" alt="image-20210204132338997"></p>
+<p>这说明菜单权限是生效了的，而不仅仅至于看不到，就算知道页面地址也无济于事。</p>
+<h4 id="2-按钮权限"><a href="#2-按钮权限" class="headerlink" title="2.按钮权限"></a>2.按钮权限</h4><p>新增按钮权限和新增菜单差不多，下图是我在新闻列表页面上新增了一个按钮叫做<code>新闻新增</code>，该按钮的权限分配和菜单的权限分配方法是一样的。</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210220092911897-871865201.png" alt="image-20210218164124429"></p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210220092912311-49634302.png" alt="image-20210218164412579"></p>
+<h4 id="3-接口权限"><a href="#3-接口权限" class="headerlink" title="3.接口权限"></a>3.接口权限</h4><p>每一个按钮基本上都会对应着一个后端的接口，前端会根据权限标志显示或者隐藏按钮，但是如果用户不点击按钮，直接通过http请求工具请求后端咋办？所以接口权限也是要有的，该权限和按钮上权限完全一致。</p>
+<p>若依系统使用了SpringSecurity框架，接口权限都是基于注解<code>@PreAuthorize</code>实现的，比如，用户管理页面中的修改用户按钮对应的后端接口长这个样子</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@PreAuthorize</span><span class="token punctuation">(</span><span class="token string">"@ss.hasPermi('system:user:edit')"</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Log</span><span class="token punctuation">(</span>title <span class="token operator">=</span> <span class="token string">"用户管理"</span><span class="token punctuation">,</span> businessType <span class="token operator">=</span> <span class="token class-name">BusinessType</span><span class="token punctuation">.</span><span class="token constant">UPDATE</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@PutMapping</span>
+<span class="token keyword">public</span> <span class="token class-name">AjaxResult</span> <span class="token function">edit</span><span class="token punctuation">(</span><span class="token annotation punctuation">@Validated</span> <span class="token annotation punctuation">@RequestBody</span> <span class="token class-name">SysUser</span> user<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>和其对应的前端按钮权限标志一样</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210220092912565-1420307202.png" alt="image-20210218165254074"></p>
+<p>如果没有权限访问接口，则会返回类似如下信息：</p>
+<pre class="line-numbers language-none"><code class="language-none">{
+"msg": "请求访问：/system/user/list，认证失败，无法访问系统资源",
+"code": 401
+}
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="4-数据权限"><a href="#4-数据权限" class="headerlink" title="4.数据权限"></a>4.数据权限</h4><p>用户有权限访问后端某个接口，但是不同的用户相同的接口相同的入参，根据权限大小不同，返回的结果应当不一样——权限大的能够看到的数据更多。</p>
+<p>体现在若依Vue系统中，举个例子，现在若以系统中有两个用户，一个是超级管理员admin，一个是普通用户kdyzm</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210220092912780-849185298.png" alt="image-20210218173156066"></p>
+<p>它们两者均有用户管理、菜单管理、角色管理权限，所以它们能够看到相应的菜单并作出相应的操作，比如删除、新增、修改等。这里有个问题，kdyzm应当只能看到一部分数据，而超级管理员应当能够看到所有数据，在若依系统中，是通过对角色<code>数据权限</code>修改进行控制的。</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210220092913044-2087596525.png" alt="image-20210218173632200"></p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210220092913260-1489587122.png" alt="image-20210218173725363"></p>
+<p>所以，相同的权限，超级管理员能够看到的用户数量和普通用户kdyzm能够看到的用户数量是不一样的。</p>
+<p>超级管理员看到的用户管理页面：</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210220092913461-95587307.png" alt="image-20210218174025420"></p>
+<p>普通用户kdyzm看到的用户管理页面：</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210220092913711-1306359143.png" alt="image-20210218174122328"></p>
+<h3 id="各种类型权限实现原理"><a href="#各种类型权限实现原理" class="headerlink" title="各种类型权限实现原理"></a>各种类型权限实现原理</h3><h4 id="1-菜单权限-1"><a href="#1-菜单权限-1" class="headerlink" title="1.菜单权限"></a>1.菜单权限</h4><p>菜单权限很简单，实际上就是简单的用户-角色-菜单模型，那么菜单是什么时候加载的呢？<code>ruoyi-ui\src\permission.js</code>，加载的逻辑在这个文件中。</p>
+<p><code>permission.js</code>文件中设置了<a target="_blank" rel="noopener" href="https://router.vuejs.org/zh/guide/advanced/navigation-guards.html">导航守卫</a>，每次路由发生变化的时候就会触发router.beforeEach的回调函数。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">router<span class="token punctuation">.</span><span class="token function">beforeEach</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">to<span class="token punctuation">,</span> from<span class="token punctuation">,</span> next</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+  NProgress<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">getToken</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">/* has token*/</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>to<span class="token punctuation">.</span>path <span class="token operator">===</span> <span class="token string">'/login'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token literal-property property">path</span><span class="token operator">:</span> <span class="token string">'/'</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+      NProgress<span class="token punctuation">.</span><span class="token function">done</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>store<span class="token punctuation">.</span>getters<span class="token punctuation">.</span>roles<span class="token punctuation">.</span>length <span class="token operator">===</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// 判断当前用户是否已拉取完user_info信息</span>
+        store<span class="token punctuation">.</span><span class="token function">dispatch</span><span class="token punctuation">(</span><span class="token string">'GetInfo'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token parameter">res</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+          <span class="token comment">// 拉取user_info</span>
+          <span class="token keyword">const</span> roles <span class="token operator">=</span> res<span class="token punctuation">.</span>roles
+          store<span class="token punctuation">.</span><span class="token function">dispatch</span><span class="token punctuation">(</span><span class="token string">'GenerateRoutes'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> roles <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token parameter">accessRoutes</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+            <span class="token comment">// 根据roles权限生成可访问的路由表</span>
+            router<span class="token punctuation">.</span><span class="token function">addRoutes</span><span class="token punctuation">(</span>accessRoutes<span class="token punctuation">)</span> <span class="token comment">// 动态添加可访问路由表</span>
+            <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token operator">...</span>to<span class="token punctuation">,</span> <span class="token literal-property property">replace</span><span class="token operator">:</span> <span class="token boolean">true</span> <span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token comment">// hack方法 确保addRoutes已完成</span>
+          <span class="token punctuation">}</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">catch</span><span class="token punctuation">(</span><span class="token parameter">err</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+            store<span class="token punctuation">.</span><span class="token function">dispatch</span><span class="token punctuation">(</span><span class="token string">'LogOut'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+              Message<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+              <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token literal-property property">path</span><span class="token operator">:</span> <span class="token string">'/'</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+            <span class="token punctuation">}</span><span class="token punctuation">)</span>
+          <span class="token punctuation">}</span><span class="token punctuation">)</span>
+      <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 没有token</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>whiteList<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span>to<span class="token punctuation">.</span>path<span class="token punctuation">)</span> <span class="token operator">!==</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token comment">// 在免登录白名单，直接进入</span>
+      <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+      <span class="token function">next</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">/login?redirect=</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>to<span class="token punctuation">.</span>fullPath<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span> <span class="token comment">// 否则全部重定向到登录页</span>
+      NProgress<span class="token punctuation">.</span><span class="token function">done</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>注意<code>if (store.getters.roles.length === 0) {</code>这段逻辑，可以看出，如果不刷新当前页面，就算给用户添加了新的菜单权限，用户也看不到新的菜单。</p>
+<h4 id="2-按钮权限-1"><a href="#2-按钮权限-1" class="headerlink" title="2.按钮权限"></a>2.按钮权限</h4><p>按钮权限设置上和菜单权限基本上是一样的，是附着于页面中的细粒度权限。按钮权限体现在如果用户没有相应的权限，则看不到相关的按钮。这个是咋实现的呢？</p>
+<p>先看下系统管理下的菜单管理中的修改、新增和删除按钮前端vue代码</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token operator">&lt;</span>el<span class="token operator">-</span>table<span class="token operator">-</span>column label<span class="token operator">=</span><span class="token string">"操作"</span> align<span class="token operator">=</span><span class="token string">"center"</span> <span class="token keyword">class</span><span class="token operator">-</span>name<span class="token operator">=</span><span class="token string">"small-padding fixed-width"</span><span class="token operator">&gt;</span>
+        <span class="token operator">&lt;</span>template slot<span class="token operator">-</span>scope<span class="token operator">=</span><span class="token string">"scope"</span><span class="token operator">&gt;</span>
+          <span class="token operator">&lt;</span>el<span class="token operator">-</span>button size<span class="token operator">=</span><span class="token string">"mini"</span> 
+            type<span class="token operator">=</span><span class="token string">"text"</span> 
+            icon<span class="token operator">=</span><span class="token string">"el-icon-edit"</span> 
+            @click<span class="token operator">=</span><span class="token string">"handleUpdate(scope.row)"</span>
+            v<span class="token operator">-</span>hasPermi<span class="token operator">=</span><span class="token string">"['system:menu:edit']"</span>
+          <span class="token operator">&gt;</span>修改<span class="token operator">&lt;</span><span class="token operator">/</span>el<span class="token operator">-</span>button<span class="token operator">&gt;</span>
+          <span class="token operator">&lt;</span>el<span class="token operator">-</span>button 
+            size<span class="token operator">=</span><span class="token string">"mini"</span> 
+            type<span class="token operator">=</span><span class="token string">"text"</span> 
+            icon<span class="token operator">=</span><span class="token string">"el-icon-plus"</span> 
+            @click<span class="token operator">=</span><span class="token string">"handleAdd(scope.row)"</span>
+            v<span class="token operator">-</span>hasPermi<span class="token operator">=</span><span class="token string">"['system:menu:add']"</span>
+          <span class="token operator">&gt;</span>新增<span class="token operator">&lt;</span><span class="token operator">/</span>el<span class="token operator">-</span>button<span class="token operator">&gt;</span>
+          <span class="token operator">&lt;</span>el<span class="token operator">-</span>button
+            size<span class="token operator">=</span><span class="token string">"mini"</span>
+            type<span class="token operator">=</span><span class="token string">"text"</span>
+            icon<span class="token operator">=</span><span class="token string">"el-icon-delete"</span>
+            @click<span class="token operator">=</span><span class="token string">"handleDelete(scope.row)"</span>
+            v<span class="token operator">-</span>hasPermi<span class="token operator">=</span><span class="token string">"['system:menu:remove']"</span>
+          <span class="token operator">&gt;</span>删除<span class="token operator">&lt;</span><span class="token operator">/</span>el<span class="token operator">-</span>button<span class="token operator">&gt;</span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>template<span class="token operator">&gt;</span>
+      <span class="token operator">&lt;</span><span class="token operator">/</span>el<span class="token operator">-</span>table<span class="token operator">-</span>column<span class="token operator">&gt;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>el-button上有个属性<code>v-hasPermi</code>，这实际上是vue的自定义指令，属性值就是创建按钮的时候定义的那个<code>权限标志</code>。其定义在<code>src/directive/permission/index.js</code>文件</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> hasRole <span class="token keyword">from</span> <span class="token string">'./hasRole'</span>
+<span class="token keyword">import</span> hasPermi <span class="token keyword">from</span> <span class="token string">'./hasPermi'</span>
+
+<span class="token keyword">const</span> <span class="token function-variable function">install</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">Vue</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  Vue<span class="token punctuation">.</span><span class="token function">directive</span><span class="token punctuation">(</span><span class="token string">'hasRole'</span><span class="token punctuation">,</span> hasRole<span class="token punctuation">)</span>
+  Vue<span class="token punctuation">.</span><span class="token function">directive</span><span class="token punctuation">(</span><span class="token string">'hasPermi'</span><span class="token punctuation">,</span> hasPermi<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span>window<span class="token punctuation">.</span>Vue<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  window<span class="token punctuation">[</span><span class="token string">'hasRole'</span><span class="token punctuation">]</span> <span class="token operator">=</span> hasRole
+  window<span class="token punctuation">[</span><span class="token string">'hasPermi'</span><span class="token punctuation">]</span> <span class="token operator">=</span> hasPermi
+  Vue<span class="token punctuation">.</span><span class="token function">use</span><span class="token punctuation">(</span>install<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// eslint-disable-line</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">export</span> <span class="token keyword">default</span> install
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>其具体实现逻辑就在同目录的<code>hasPermi.js</code>文件中</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> store <span class="token keyword">from</span> <span class="token string">'@/store'</span>
+
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token punctuation">{</span>
+  <span class="token function">inserted</span><span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> binding<span class="token punctuation">,</span> vnode</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> <span class="token punctuation">{</span> value <span class="token punctuation">}</span> <span class="token operator">=</span> binding
+    <span class="token keyword">const</span> all_permission <span class="token operator">=</span> <span class="token string">"*:*:*"</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> permissions <span class="token operator">=</span> store<span class="token punctuation">.</span>getters <span class="token operator">&amp;&amp;</span> store<span class="token punctuation">.</span>getters<span class="token punctuation">.</span>permissions
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>value <span class="token operator">&amp;&amp;</span> value <span class="token keyword">instanceof</span> <span class="token class-name">Array</span> <span class="token operator">&amp;&amp;</span> value<span class="token punctuation">.</span>length <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">const</span> permissionFlag <span class="token operator">=</span> value
+
+      <span class="token keyword">const</span> hasPermissions <span class="token operator">=</span> permissions<span class="token punctuation">.</span><span class="token function">some</span><span class="token punctuation">(</span><span class="token parameter">permission</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> all_permission <span class="token operator">===</span> permission <span class="token operator">||</span> permissionFlag<span class="token punctuation">.</span><span class="token function">includes</span><span class="token punctuation">(</span>permission<span class="token punctuation">)</span>
+      <span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>hasPermissions<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        el<span class="token punctuation">.</span>parentNode <span class="token operator">&amp;&amp;</span> el<span class="token punctuation">.</span>parentNode<span class="token punctuation">.</span><span class="token function">removeChild</span><span class="token punctuation">(</span>el<span class="token punctuation">)</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+      <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">Error</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">请设置操作权限标签值</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>注意代码 <code>el.parentNode &amp;&amp; el.parentNode.removeChild(el)</code>，可以看到，如果没有按钮权限，则会将按钮本身从dom中移除。</p>
+<h4 id="3-接口权限-1"><a href="#3-接口权限-1" class="headerlink" title="3.接口权限"></a>3.接口权限</h4><p>接口权限和前端的按钮权限一一对应。为的是防止用户绕过按钮直接请求后端接口获取数据。在若依Vue系统中，是使用SpringSecurity的注解<code>@PreAuthorize</code>实现的。</p>
+<p>虽然只是一个注解，但是它是SpringSecurity+JWT集成的结晶~这个之后再细谈。</p>
+<h4 id="4-数据权限-1"><a href="#4-数据权限-1" class="headerlink" title="4.数据权限"></a>4.数据权限</h4><p>数据权限实现的关键在于<code>com.ruoyi.framework.aspectj.DataScopeAspect</code>类。该类是一个切面类，凡是加上<code>com.ruoyi.common.annotation.DataScope</code>注解的方法，在执行的时候都会被它拦截。</p>
+<p>该切面定义了五种权限范围</p>
+<table>
+<thead>
+<tr>
+<th>name</th>
+<th>code</th>
+<th>desc</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>DATA_SCOPE_ALL</td>
+<td>1</td>
+<td>全部数据权限</td>
+</tr>
+<tr>
+<td>DATA_SCOPE_CUSTOM</td>
+<td>2</td>
+<td>自定数据权限</td>
+</tr>
+<tr>
+<td>DATA_SCOPE_DEPT</td>
+<td>3</td>
+<td>部门数据权限</td>
+</tr>
+<tr>
+<td>DATA_SCOPE_DEPT_AND_CHILD</td>
+<td>4</td>
+<td>部门及以下数据权限</td>
+</tr>
+<tr>
+<td>DATA_SCOPE_SELF</td>
+<td>5</td>
+<td>仅本人数据权限</td>
+</tr>
+</tbody></table>
+<p>该切面的核心逻辑是“拼SQL”，方法执行之前，会给参数的一个params属性添加一个dataScope键值对，key为”dataScope”，值为<code>AND (" + sqlString.substring(4) + ")"</code>样式的一段SQL，这段SQL会根据当前用户所在的部门以及当前用户角色的权限范围发生变化。</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token class-name">StringBuilder</span> sqlString <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">SysRole</span> role <span class="token operator">:</span> user<span class="token punctuation">.</span><span class="token function">getRoles</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token class-name">String</span> dataScope <span class="token operator">=</span> role<span class="token punctuation">.</span><span class="token function">getDataScope</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token constant">DATA_SCOPE_ALL</span><span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>dataScope<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                sqlString <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">break</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token constant">DATA_SCOPE_CUSTOM</span><span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>dataScope<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                sqlString<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token class-name">StringUtils</span><span class="token punctuation">.</span><span class="token function">format</span><span class="token punctuation">(</span>
+                        <span class="token string">" OR {}.dept_id IN ( SELECT dept_id FROM sys_role_dept WHERE role_id = {} ) "</span><span class="token punctuation">,</span> deptAlias<span class="token punctuation">,</span>
+                        role<span class="token punctuation">.</span><span class="token function">getRoleId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token constant">DATA_SCOPE_DEPT</span><span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>dataScope<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                sqlString<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token class-name">StringUtils</span><span class="token punctuation">.</span><span class="token function">format</span><span class="token punctuation">(</span><span class="token string">" OR {}.dept_id = {} "</span><span class="token punctuation">,</span> deptAlias<span class="token punctuation">,</span> user<span class="token punctuation">.</span><span class="token function">getDeptId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token constant">DATA_SCOPE_DEPT_AND_CHILD</span><span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>dataScope<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                sqlString<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token class-name">StringUtils</span><span class="token punctuation">.</span><span class="token function">format</span><span class="token punctuation">(</span>
+                        <span class="token string">" OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or find_in_set( {} , ancestors ) )"</span><span class="token punctuation">,</span>
+                        deptAlias<span class="token punctuation">,</span> user<span class="token punctuation">.</span><span class="token function">getDeptId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> user<span class="token punctuation">.</span><span class="token function">getDeptId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token constant">DATA_SCOPE_SELF</span><span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>dataScope<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token class-name">StringUtils</span><span class="token punctuation">.</span><span class="token function">isNotBlank</span><span class="token punctuation">(</span>userAlias<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token punctuation">{</span>
+                    sqlString<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token class-name">StringUtils</span><span class="token punctuation">.</span><span class="token function">format</span><span class="token punctuation">(</span><span class="token string">" OR {}.user_id = {} "</span><span class="token punctuation">,</span> userAlias<span class="token punctuation">,</span> user<span class="token punctuation">.</span><span class="token function">getUserId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                <span class="token keyword">else</span>
+                <span class="token punctuation">{</span>
+                    <span class="token comment">// 数据权限为仅本人且没有userAlias别名不查询任何数据</span>
+                    sqlString<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token string">" OR 1=0 "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>简单来说，这段代码的逻辑就是用户所在的部门权限越高，数据权限范围越大，查出来的结果集将会越大。</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210220092913910-2039003075.png" alt="image-20210219105946524"></p>
+<p>DataScope注解分别加到了部门列表查询、角色列表查询、用户列表查询的接口上，很明显，这几个接口需要根据不同的人查出不同的结果。</p>
+<p>以用户列表查询为例，执行sql为</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup">   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>select</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>selectUserList<span class="token punctuation">"</span></span> <span class="token attr-name">parameterType</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>SysUser<span class="token punctuation">"</span></span> <span class="token attr-name">resultMap</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>SysUserResult<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+	select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.password, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader from sys_user u
+	left join sys_dept d on u.dept_id = d.dept_id
+	where u.del_flag = '0'
+	<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>if</span> <span class="token attr-name">test</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>userName != null and userName != ''<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+		AND u.user_name like concat('%', #{userName}, '%')
+	<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>if</span><span class="token punctuation">&gt;</span></span>
+	<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>if</span> <span class="token attr-name">test</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>status != null and status != ''<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+		AND u.status = #{status}
+	<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>if</span><span class="token punctuation">&gt;</span></span>
+	<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>if</span> <span class="token attr-name">test</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>phonenumber != null and phonenumber != ''<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+		AND u.phonenumber like concat('%', #{phonenumber}, '%')
+	<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>if</span><span class="token punctuation">&gt;</span></span>
+	<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>if</span> <span class="token attr-name">test</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>params.beginTime != null and params.beginTime != ''<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token comment">&lt;!-- 开始时间检索 --&gt;</span>
+		AND date_format(u.create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+	<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>if</span><span class="token punctuation">&gt;</span></span>
+	<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>if</span> <span class="token attr-name">test</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>params.endTime != null and params.endTime != ''<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span><span class="token comment">&lt;!-- 结束时间检索 --&gt;</span>
+		AND date_format(u.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+	<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>if</span><span class="token punctuation">&gt;</span></span>
+	<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>if</span> <span class="token attr-name">test</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>deptId != null and deptId != 0<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+		AND (u.dept_id = #{deptId} OR u.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE find_in_set(#{deptId}, ancestors) ))
+	<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>if</span><span class="token punctuation">&gt;</span></span>
+	<span class="token comment">&lt;!-- 数据范围过滤 --&gt;</span>
+	${params.dataScope}
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>select</span><span class="token punctuation">&gt;</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>其中，有这么一段代码</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token comment">&lt;!-- 数据范围过滤 --&gt;</span>
+${params.dataScope}
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>实际上<code>DataScopeAspect</code>切面就只干了填充params的dataScope属性这么一件事情。</p>
+<h3 id="若依Vue系统SpringSecurity-JWT"><a href="#若依Vue系统SpringSecurity-JWT" class="headerlink" title="若依Vue系统SpringSecurity+JWT"></a>若依Vue系统SpringSecurity+JWT</h3><p>若依Vue系统中从用户登录到后端接口权限校验，都是基于SpringSecurity+JWT实现的，其中，SpringSecurity是核心，jwt只是为了保证token合法性的一种手段（签名防止篡改）。spring security集成的相关代码在<code>ruoyi-framework</code>模块的<code>com.ruoyi.framework.security</code>包以及<code>com.ruoyi.framework.config.SecurityConfig</code>类中。</p>
+<p><code>SecurityConfig</code>是核心配置类，所有的配置均在该类中。</p>
+<h4 id="1-用户登录"><a href="#1-用户登录" class="headerlink" title="1.用户登录"></a>1.用户登录</h4><p>用户登录的逻辑在方法<code>com.ruoyi.web.controller.system.SysLoginController#login</code>中，一个典型的登录请求体如下所示</p>
+<pre class="line-numbers language-none"><code class="language-none">{
+	"username": "admin",
+	"password": "admin123",
+	"code": "0",
+	"uuid": "a9fdbcbcb28748b796b5b77ad71bbb97"
+}
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>username和password分别是用户名和密码，code为验证码，uuid为验证码的唯一标识。登录成功之后会返回前端一个jwt令牌</p>
+<pre class="line-numbers language-none"><code class="language-none">{
+	"msg": "操作成功",
+	"code": 200,
+	"token": "eyJhbGciOiJIUzUxMiJ9.eyJsb2dpbl91c2VyX2tleSI6IjIzZjRhNjJjLTY5NzMtNDcxZS04ZmU4LWJmYWQ4YzllNWFkMiJ9.9d3iIaNq62CkjTXlxFOQgdDMOAZiu5tAsEn0cEuV23opT6PAqu_CiaN7kQY8_XhlQrHX5RgZ2bH7LpsiKLLcSw"
+}
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>在登录方法中，做了以下几件事情</p>
+<ul>
+<li>根据uuid获取redis中的验证码并对请求的验证码做验证</li>
+<li>如果验证码没问题，则对用户名和密码进行校验</li>
+<li>如果用户名和密码校验成功，则使用token作为key将用户信息保存到redis</li>
+<li>使用jwt对token签名并返回前端</li>
+</ul>
+<p>在整个过程中，会抛出一些自定义异常，比如</p>
+<pre class="line-numbers language-none"><code class="language-none">throw new CaptchaExpireException();
+throw new CaptchaException();
+throw new UserPasswordNotMatchException();
+throw new CustomException(e.getMessage());
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>这些异常最终会被全局异常处理器处理掉：<code>com.ruoyi.framework.web.exception.GlobalExceptionHandler</code></p>
+<h4 id="2-接口权限校验"><a href="#2-接口权限校验" class="headerlink" title="2.接口权限校验"></a>2.接口权限校验</h4><p>前端请求完成登录接口之后会将token存储到cookie，key为Admin-Token，value是jwt令牌。登录逻辑：<code>user.actions.Login</code>。</p>
+<p>之后，每次请求后端接口的时候都会带上Authentication Header</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210220092914108-1243552764.png" alt="image-20210219140417903"></p>
+<p>这实际上是通过axios的请求拦截器实现的：详情可见<code>src/utils/request.js</code>文件</p>
+<p>带着Authentication Header的请求打到后端的时候会经过过滤器<code>com.ruoyi.framework.security.filter.JwtAuthenticationTokenFilter</code>，该过滤器做了以下几件事情</p>
+<ul>
+<li>从请求头中取出jwt令牌，并对其进行jwt验签，验签若是成功，则取出原始token</li>
+<li>根据token从redis中取出用户数据</li>
+<li>将用户信息封装成<code>UsernamePasswordAuthenticationToken</code>对象，并将该对象填充到Spring Security上下文中</li>
+</ul>
+<p>填充到SpringSecurity上下文才能让Controller接口上的<code>@PreAuthorize</code>注解发挥作用（<strong>存疑，这里若依作者并非使用原生的SpringSecurity提供的spel表达式，也没有用authorities，而是使用了PermissionService类</strong>）。</p>
+<p>接着，Controller接口正式执行之前会进入<code>com.ruoyi.framework.web.service.PermissionService#hasPermi</code>方法判定权限，这里重新从redis中取出用户数据并进行权限校验，权限校验失败则不再执行接口中逻辑（<strong>存疑，这里并没有使用SpringSecurity上下文中的用户数据，那么<code>JwtAuthenticationTokenFilter</code>中的用户信息填充上下文中的代码是干啥用的</strong>）。</p>
+<h3 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h3><p>上一篇文章讲解了如何创建一个菜单并创建页面，但是是个空页面</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210220092914285-1553601342.png" alt="新闻列表"></p>
+<p>这篇文章将会讲解如何实现增删查改功能。</p>
+<p>一切开始之前，新建表news，建表SQL如下</p>
+<pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> <span class="token identifier"><span class="token punctuation">`</span>news<span class="token punctuation">`</span></span> <span class="token punctuation">(</span>
+  <span class="token identifier"><span class="token punctuation">`</span>id<span class="token punctuation">`</span></span> <span class="token keyword">int</span><span class="token punctuation">(</span><span class="token number">11</span><span class="token punctuation">)</span> <span class="token operator">NOT</span> <span class="token boolean">NULL</span> <span class="token keyword">AUTO_INCREMENT</span> <span class="token keyword">COMMENT</span> <span class="token string">'主键'</span><span class="token punctuation">,</span>
+  <span class="token identifier"><span class="token punctuation">`</span>title<span class="token punctuation">`</span></span> <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">128</span><span class="token punctuation">)</span> <span class="token operator">NOT</span> <span class="token boolean">NULL</span> <span class="token keyword">COMMENT</span> <span class="token string">'新闻标题'</span><span class="token punctuation">,</span>
+  <span class="token identifier"><span class="token punctuation">`</span>brief<span class="token punctuation">`</span></span> <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">256</span><span class="token punctuation">)</span> <span class="token keyword">DEFAULT</span> <span class="token boolean">NULL</span> <span class="token keyword">COMMENT</span> <span class="token string">'新闻概述'</span><span class="token punctuation">,</span>
+  <span class="token identifier"><span class="token punctuation">`</span>content<span class="token punctuation">`</span></span> <span class="token keyword">text</span> <span class="token keyword">COMMENT</span> <span class="token string">'新闻正文'</span><span class="token punctuation">,</span>
+  <span class="token identifier"><span class="token punctuation">`</span>create_time<span class="token punctuation">`</span></span> <span class="token keyword">datetime</span> <span class="token keyword">DEFAULT</span> <span class="token boolean">NULL</span><span class="token punctuation">,</span>
+  <span class="token identifier"><span class="token punctuation">`</span>create_by<span class="token punctuation">`</span></span> <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">64</span><span class="token punctuation">)</span> <span class="token keyword">DEFAULT</span> <span class="token boolean">NULL</span><span class="token punctuation">,</span>
+  <span class="token identifier"><span class="token punctuation">`</span>update_time<span class="token punctuation">`</span></span> <span class="token keyword">datetime</span> <span class="token keyword">DEFAULT</span> <span class="token boolean">NULL</span><span class="token punctuation">,</span>
+  <span class="token identifier"><span class="token punctuation">`</span>update_by<span class="token punctuation">`</span></span> <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">64</span><span class="token punctuation">)</span> <span class="token keyword">DEFAULT</span> <span class="token boolean">NULL</span><span class="token punctuation">,</span>
+  <span class="token identifier"><span class="token punctuation">`</span>delete_flag<span class="token punctuation">`</span></span> <span class="token keyword">tinyint</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token keyword">DEFAULT</span> <span class="token boolean">NULL</span><span class="token punctuation">,</span>
+  <span class="token keyword">PRIMARY</span> <span class="token keyword">KEY</span> <span class="token punctuation">(</span><span class="token identifier"><span class="token punctuation">`</span>id<span class="token punctuation">`</span></span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span> <span class="token keyword">ENGINE</span><span class="token operator">=</span><span class="token keyword">InnoDB</span> <span class="token keyword">DEFAULT</span> <span class="token keyword">CHARSET</span><span class="token operator">=</span>utf8mb4
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="1-前端页面修改"><a href="#1-前端页面修改" class="headerlink" title="1.前端页面修改"></a>1.前端页面修改</h4><p>可以仿照角色管理的页面写，直接将角色管理页面的代码直接拷贝到news文件中，效果如下</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210220092914489-244471663.png" alt="image-20210219145313946"></p>
+<p>没错，新闻列表的标题，角色管理的页面。。。</p>
+<p>之后对页面中元素进行修改，使其和上面创建的表结构一致，修改后的页面样子</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210220092914948-2028729040.png" alt="image-20210219154251035"></p>
+<p>这是预期中的样子，但是内容还是角色管理页面的内容。</p>
+<h4 id="2-创建按钮权限"><a href="#2-创建按钮权限" class="headerlink" title="2.创建按钮权限"></a>2.创建按钮权限</h4><p>上一步已经完成了页面外观的改造，接下来需要修改页面内容了，首先需要把按钮权限给加上</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210220092915138-1025251050.png" alt="image-20210219154710009"></p>
+<p>按照这个样子添加按钮权限，之后把权限标志分配到前端页面中</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210220092915331-1670317335.png" alt="image-20210219160705122"></p>
+<h4 id="3-使用代码生成代码"><a href="#3-使用代码生成代码" class="headerlink" title="3.使用代码生成代码"></a>3.使用代码生成代码</h4><p>在系统工具-代码生成页面中生成news表对应的相关实体类、mapper、xml对象等，可以极大的简化开发过程。</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210220092915606-1157802840.png" alt="image-20210219173625548"></p>
+<h4 id="4-准备后端接口"><a href="#4-准备后端接口" class="headerlink" title="4.准备后端接口"></a>4.准备后端接口</h4><p>将上一步代码生成器生成的<code>NewsController</code>拿过来改一改就行，修改后的代码如下所示：</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>ruoyi<span class="token punctuation">.</span>web<span class="token punctuation">.</span>controller<span class="token punctuation">.</span>business</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>ruoyi<span class="token punctuation">.</span>common<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">Log</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>ruoyi<span class="token punctuation">.</span>common<span class="token punctuation">.</span>core<span class="token punctuation">.</span>controller<span class="token punctuation">.</span></span><span class="token class-name">BaseController</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>ruoyi<span class="token punctuation">.</span>common<span class="token punctuation">.</span>core<span class="token punctuation">.</span>domain<span class="token punctuation">.</span></span><span class="token class-name">AjaxResult</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>ruoyi<span class="token punctuation">.</span>common<span class="token punctuation">.</span>core<span class="token punctuation">.</span>page<span class="token punctuation">.</span></span><span class="token class-name">TableDataInfo</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>ruoyi<span class="token punctuation">.</span>common<span class="token punctuation">.</span>enums<span class="token punctuation">.</span></span><span class="token class-name">BusinessType</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>ruoyi<span class="token punctuation">.</span>common<span class="token punctuation">.</span>utils<span class="token punctuation">.</span></span><span class="token class-name">SecurityUtils</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>ruoyi<span class="token punctuation">.</span>common<span class="token punctuation">.</span>utils<span class="token punctuation">.</span>poi<span class="token punctuation">.</span></span><span class="token class-name">ExcelUtil</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>ruoyi<span class="token punctuation">.</span>system<span class="token punctuation">.</span>domain<span class="token punctuation">.</span></span><span class="token class-name">News</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>ruoyi<span class="token punctuation">.</span>system<span class="token punctuation">.</span>mapper<span class="token punctuation">.</span></span><span class="token class-name">NewsMapper</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>beans<span class="token punctuation">.</span>factory<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">Autowired</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>security<span class="token punctuation">.</span>access<span class="token punctuation">.</span>prepost<span class="token punctuation">.</span></span><span class="token class-name">PreAuthorize</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>validation<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">Validated</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token operator">*</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">Date</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">List</span></span><span class="token punctuation">;</span>
+
+<span class="token comment">/**
+ * @author kdyzm
+ */</span>
+<span class="token annotation punctuation">@RestController</span>
+<span class="token annotation punctuation">@RequestMapping</span><span class="token punctuation">(</span><span class="token string">"/business/news"</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">NewsController</span> <span class="token keyword">extends</span> <span class="token class-name">BaseController</span> <span class="token punctuation">{</span>
+
+
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">private</span> <span class="token class-name">NewsMapper</span> newsMapper<span class="token punctuation">;</span>
+
+    <span class="token comment">/**
+     * 获取新闻列表
+     */</span>
+    <span class="token annotation punctuation">@PreAuthorize</span><span class="token punctuation">(</span><span class="token string">"@ss.hasPermi('business:news:list')"</span><span class="token punctuation">)</span>
+    <span class="token annotation punctuation">@GetMapping</span><span class="token punctuation">(</span><span class="token string">"/list"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">TableDataInfo</span> <span class="token function">list</span><span class="token punctuation">(</span><span class="token class-name">News</span> post<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">startPage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">News</span><span class="token punctuation">&gt;</span></span> list <span class="token operator">=</span> newsMapper<span class="token punctuation">.</span><span class="token function">selectNewsList</span><span class="token punctuation">(</span>post<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token function">getDataTable</span><span class="token punctuation">(</span>list<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Log</span><span class="token punctuation">(</span>title <span class="token operator">=</span> <span class="token string">"新闻管理"</span><span class="token punctuation">,</span> businessType <span class="token operator">=</span> <span class="token class-name">BusinessType</span><span class="token punctuation">.</span><span class="token constant">EXPORT</span><span class="token punctuation">)</span>
+    <span class="token annotation punctuation">@PreAuthorize</span><span class="token punctuation">(</span><span class="token string">"@ss.hasPermi('business:news:export')"</span><span class="token punctuation">)</span>
+    <span class="token annotation punctuation">@GetMapping</span><span class="token punctuation">(</span><span class="token string">"/export"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">AjaxResult</span> <span class="token function">export</span><span class="token punctuation">(</span><span class="token class-name">News</span> post<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">News</span><span class="token punctuation">&gt;</span></span> list <span class="token operator">=</span> newsMapper<span class="token punctuation">.</span><span class="token function">selectNewsList</span><span class="token punctuation">(</span>post<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">ExcelUtil</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">News</span><span class="token punctuation">&gt;</span></span> util <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ExcelUtil</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token class-name">News</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> util<span class="token punctuation">.</span><span class="token function">exportExcel</span><span class="token punctuation">(</span>list<span class="token punctuation">,</span> <span class="token string">"新闻数据"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 根据新闻编号获取详细信息
+     */</span>
+    <span class="token annotation punctuation">@PreAuthorize</span><span class="token punctuation">(</span><span class="token string">"@ss.hasPermi('business:news:query')"</span><span class="token punctuation">)</span>
+    <span class="token annotation punctuation">@GetMapping</span><span class="token punctuation">(</span>value <span class="token operator">=</span> <span class="token string">"/{postId}"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">AjaxResult</span> <span class="token function">getInfo</span><span class="token punctuation">(</span><span class="token annotation punctuation">@PathVariable</span> <span class="token class-name">Long</span> postId<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">AjaxResult</span><span class="token punctuation">.</span><span class="token function">success</span><span class="token punctuation">(</span>newsMapper<span class="token punctuation">.</span><span class="token function">selectNewsById</span><span class="token punctuation">(</span>postId<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 新增新闻
+     */</span>
+    <span class="token annotation punctuation">@PreAuthorize</span><span class="token punctuation">(</span><span class="token string">"@ss.hasPermi('business:news:add')"</span><span class="token punctuation">)</span>
+    <span class="token annotation punctuation">@Log</span><span class="token punctuation">(</span>title <span class="token operator">=</span> <span class="token string">"新闻管理"</span><span class="token punctuation">,</span> businessType <span class="token operator">=</span> <span class="token class-name">BusinessType</span><span class="token punctuation">.</span><span class="token constant">INSERT</span><span class="token punctuation">)</span>
+    <span class="token annotation punctuation">@PostMapping</span>
+    <span class="token keyword">public</span> <span class="token class-name">AjaxResult</span> <span class="token function">add</span><span class="token punctuation">(</span><span class="token annotation punctuation">@Validated</span> <span class="token annotation punctuation">@RequestBody</span> <span class="token class-name">News</span> post<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        post<span class="token punctuation">.</span><span class="token function">setCreateBy</span><span class="token punctuation">(</span><span class="token class-name">SecurityUtils</span><span class="token punctuation">.</span><span class="token function">getUsername</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        post<span class="token punctuation">.</span><span class="token function">setCreateTime</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token function">toAjax</span><span class="token punctuation">(</span>newsMapper<span class="token punctuation">.</span><span class="token function">insertNews</span><span class="token punctuation">(</span>post<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 修改新闻
+     */</span>
+    <span class="token annotation punctuation">@PreAuthorize</span><span class="token punctuation">(</span><span class="token string">"@ss.hasPermi('business:news:update')"</span><span class="token punctuation">)</span>
+    <span class="token annotation punctuation">@Log</span><span class="token punctuation">(</span>title <span class="token operator">=</span> <span class="token string">"新闻管理"</span><span class="token punctuation">,</span> businessType <span class="token operator">=</span> <span class="token class-name">BusinessType</span><span class="token punctuation">.</span><span class="token constant">UPDATE</span><span class="token punctuation">)</span>
+    <span class="token annotation punctuation">@PutMapping</span>
+    <span class="token keyword">public</span> <span class="token class-name">AjaxResult</span> <span class="token function">edit</span><span class="token punctuation">(</span><span class="token annotation punctuation">@Validated</span> <span class="token annotation punctuation">@RequestBody</span> <span class="token class-name">News</span> post<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        post<span class="token punctuation">.</span><span class="token function">setUpdateBy</span><span class="token punctuation">(</span><span class="token class-name">SecurityUtils</span><span class="token punctuation">.</span><span class="token function">getUsername</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token function">toAjax</span><span class="token punctuation">(</span>newsMapper<span class="token punctuation">.</span><span class="token function">updateNews</span><span class="token punctuation">(</span>post<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * 删除新闻
+     */</span>
+    <span class="token annotation punctuation">@PreAuthorize</span><span class="token punctuation">(</span><span class="token string">"@ss.hasPermi('business:news:delete')"</span><span class="token punctuation">)</span>
+    <span class="token annotation punctuation">@Log</span><span class="token punctuation">(</span>title <span class="token operator">=</span> <span class="token string">"新闻管理"</span><span class="token punctuation">,</span> businessType <span class="token operator">=</span> <span class="token class-name">BusinessType</span><span class="token punctuation">.</span><span class="token constant">DELETE</span><span class="token punctuation">)</span>
+    <span class="token annotation punctuation">@DeleteMapping</span><span class="token punctuation">(</span><span class="token string">"/{postIds}"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">AjaxResult</span> <span class="token function">remove</span><span class="token punctuation">(</span><span class="token annotation punctuation">@PathVariable</span> <span class="token class-name">Long</span><span class="token punctuation">[</span><span class="token punctuation">]</span> postIds<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token function">toAjax</span><span class="token punctuation">(</span>newsMapper<span class="token punctuation">.</span><span class="token function">deleteNewsByIds</span><span class="token punctuation">(</span>postIds<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="5-修改前端页面请求地址"><a href="#5-修改前端页面请求地址" class="headerlink" title="5.修改前端页面请求地址"></a>5.修改前端页面请求地址</h4><p>将生成的代码中的news.js文件放到api目录，并修改其中的接口路径与后端接口地址一一对应。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> request <span class="token keyword">from</span> <span class="token string">'@/utils/request'</span>
+
+<span class="token comment">// 查询角色列表</span>
+<span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">listNews</span><span class="token punctuation">(</span><span class="token parameter">query</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token function">request</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token literal-property property">url</span><span class="token operator">:</span> <span class="token string">'/business/news/list'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">method</span><span class="token operator">:</span> <span class="token string">'get'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">params</span><span class="token operator">:</span> query
+  <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 查询角色详细</span>
+<span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">getNews</span><span class="token punctuation">(</span><span class="token parameter">roleId</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token function">request</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token literal-property property">url</span><span class="token operator">:</span> <span class="token string">'/business/news/'</span> <span class="token operator">+</span> roleId<span class="token punctuation">,</span>
+    <span class="token literal-property property">method</span><span class="token operator">:</span> <span class="token string">'get'</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 新增角色</span>
+<span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">addNews</span><span class="token punctuation">(</span><span class="token parameter">data</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token function">request</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token literal-property property">url</span><span class="token operator">:</span> <span class="token string">'/business/news'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">method</span><span class="token operator">:</span> <span class="token string">'post'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">data</span><span class="token operator">:</span> data
+  <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 修改角色</span>
+<span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">updateNews</span><span class="token punctuation">(</span><span class="token parameter">data</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token function">request</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token literal-property property">url</span><span class="token operator">:</span> <span class="token string">'/business/news'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">method</span><span class="token operator">:</span> <span class="token string">'put'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">data</span><span class="token operator">:</span> data
+  <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+
+<span class="token comment">// 删除角色</span>
+<span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">delNews</span><span class="token punctuation">(</span><span class="token parameter">roleId</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token function">request</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token literal-property property">url</span><span class="token operator">:</span> <span class="token string">'/business/news/'</span> <span class="token operator">+</span> roleId<span class="token punctuation">,</span>
+    <span class="token literal-property property">method</span><span class="token operator">:</span> <span class="token string">'delete'</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 导出角色</span>
+<span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">exportNews</span><span class="token punctuation">(</span><span class="token parameter">query</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token function">request</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token literal-property property">url</span><span class="token operator">:</span> <span class="token string">'/business/news/export'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">method</span><span class="token operator">:</span> <span class="token string">'get'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">params</span><span class="token operator">:</span> query
+  <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>然后修改页面中的请求地址使用这里的地址。</p>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><h4 id="1-超级管理员测试"><a href="#1-超级管理员测试" class="headerlink" title="1.超级管理员测试"></a>1.超级管理员测试</h4><p>超级管理员拥有最大权限，所有权限校验都会跳过对超级管理员的权限校验。这里先使用超级管理员进行测试可以规避权限问题，大体上先看看能否跑的通。</p>
+<p>下面是演示超级管理员的CRUD操作。</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210220092915844-1904245767.gif" alt="超级管理员演示CRUD操作"></p>
+<h4 id="2-普通用户测试"><a href="#2-普通用户测试" class="headerlink" title="2.普通用户测试"></a>2.普通用户测试</h4><p>这里用用户kdyzm进行测试，在测试之前，先看下kdyzm的角色</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210220092918588-303247302.png" alt="image-20210220090846893"></p>
+<p>可以看到该用户是运营角色，那么修改角色权限，只给查询、修改、新增权限，不给导出和删除权限，如下所示</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210220092918795-1100979659.png" alt="image-20210220091032435"></p>
+<p>这时候切换登录用户为kdyzm，看看新闻列表页面</p>
+<p><img src="/medias/loading.gif" data-original="/2024/10/10/ruo-yi-yuan-ma-fen-xi/516671-20210220092919018-468519097.png" alt="image-20210220091233894"></p>
+<p>可以看到，kdyzm在新闻列表页面中，看不到导出导出按钮和删除按钮，符合预期设想。</p>
+<p>好了，若依Vue权限详解部分到此结束了，下一篇文章将会讲解若依代码生成器生成原理和代码分析</p>
+<p>我的博客原文地址：<a target="_blank" rel="noopener" href="https://blog.kdyzm.cn/post/45">若依管理系统RuoYi-Vue（二）：权限系统设计详解</a> ，欢迎大家关注呀</p>
+<h2 id="防重复提交"><a href="#防重复提交" class="headerlink" title="防重复提交"></a>防重复提交</h2><h3 id="自定义注解"><a href="#自定义注解" class="headerlink" title="自定义注解"></a>自定义注解</h3><pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">/**
+ * 自定义注解防止表单重复提交
+ * 
+ * @author ll
+ *
+ */</span>
+<span class="token annotation punctuation">@Inherited</span>
+<span class="token annotation punctuation">@Target</span><span class="token punctuation">(</span><span class="token class-name">ElementType</span><span class="token punctuation">.</span><span class="token constant">METHOD</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Retention</span><span class="token punctuation">(</span><span class="token class-name">RetentionPolicy</span><span class="token punctuation">.</span><span class="token constant">RUNTIME</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Documented</span>
+<span class="token keyword">public</span> <span class="token annotation punctuation">@interface</span> <span class="token class-name">RepeatSubmit</span>
+<span class="token punctuation">{</span>
+    <span class="token comment">/**
+     * 间隔时间(ms)，小于此时间视为重复提交
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">interval</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">default</span> <span class="token number">5000</span><span class="token punctuation">;</span>
+
+    <span class="token comment">/**
+     * 提示消息
+     */</span>
+    <span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">message</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">default</span> <span class="token string">"不允许重复提交，请稍候再试"</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="创建拦截器"><a href="#创建拦截器" class="headerlink" title="创建拦截器"></a>创建拦截器</h3><p>拦截请求，如果请求的接口带有RepeatSubmit注解，isRepeatSubmit就会判断是否是重复提交。</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">abstract</span> <span class="token keyword">class</span> <span class="token class-name">RepeatSubmitInterceptor</span> <span class="token keyword">implements</span> <span class="token class-name">HandlerInterceptor</span>
+<span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">preHandle</span><span class="token punctuation">(</span><span class="token class-name">HttpServletRequest</span> request<span class="token punctuation">,</span> <span class="token class-name">HttpServletResponse</span> response<span class="token punctuation">,</span> <span class="token class-name">Object</span> handler<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>handler <span class="token keyword">instanceof</span> <span class="token class-name">HandlerMethod</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token class-name">HandlerMethod</span> handlerMethod <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">HandlerMethod</span><span class="token punctuation">)</span> handler<span class="token punctuation">;</span>
+            <span class="token class-name">Method</span> method <span class="token operator">=</span> handlerMethod<span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token class-name">RepeatSubmit</span> annotation <span class="token operator">=</span> method<span class="token punctuation">.</span><span class="token function">getAnnotation</span><span class="token punctuation">(</span><span class="token class-name">RepeatSubmit</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>annotation <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">isRepeatSubmit</span><span class="token punctuation">(</span>request<span class="token punctuation">,</span> annotation<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token punctuation">{</span>
+                    <span class="token class-name">AjaxResult</span> ajaxResult <span class="token operator">=</span> <span class="token class-name">AjaxResult</span><span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span>annotation<span class="token punctuation">.</span><span class="token function">message</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token class-name">ServletUtils</span><span class="token punctuation">.</span><span class="token function">renderString</span><span class="token punctuation">(</span>response<span class="token punctuation">,</span> <span class="token class-name">JSONObject</span><span class="token punctuation">.</span><span class="token function">toJSONString</span><span class="token punctuation">(</span>ajaxResult<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">else</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="重复提交校验"><a href="#重复提交校验" class="headerlink" title="重复提交校验"></a>重复提交校验</h3><p>获取请求的url、请求头、请求参数、当前时间。指定key+请求头组成唯一标识key，判断redis中是否有这个key的数据，如果有就会判断url、请求参数是否相同，并且时间是否超过的重复提交设置的时间。</p>
+<p>再将唯一标识做为redis中的key，url、请求参数、当前时间放到Map中作为redis的value，放入redis中，并设置过期时间。</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@SuppressWarnings</span><span class="token punctuation">(</span><span class="token string">"unchecked"</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Override</span>
+<span class="token keyword">public</span> <span class="token keyword">boolean</span>  <span class="token function">isRepeatSubmit</span><span class="token punctuation">(</span><span class="token class-name">HttpServletRequest</span> request<span class="token punctuation">,</span> <span class="token class-name">RepeatSubmit</span> annotation<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token class-name">String</span> nowParams <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>request <span class="token keyword">instanceof</span> <span class="token class-name">RepeatedlyRequestWrapper</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token class-name">RepeatedlyRequestWrapper</span> repeatedlyRequest <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">RepeatedlyRequestWrapper</span><span class="token punctuation">)</span> request<span class="token punctuation">;</span>
+        nowParams <span class="token operator">=</span> <span class="token class-name">HttpHelper</span><span class="token punctuation">.</span><span class="token function">getBodyString</span><span class="token punctuation">(</span>repeatedlyRequest<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// body参数为空，获取Parameter的数据</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token class-name">StringUtils</span><span class="token punctuation">.</span><span class="token function">isEmpty</span><span class="token punctuation">(</span>nowParams<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        nowParams <span class="token operator">=</span> <span class="token class-name">JSONObject</span><span class="token punctuation">.</span><span class="token function">toJSONString</span><span class="token punctuation">(</span>request<span class="token punctuation">.</span><span class="token function">getParameterMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token class-name">Map</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">&gt;</span></span> nowDataMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    nowDataMap<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token constant">REPEAT_PARAMS</span><span class="token punctuation">,</span> nowParams<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    nowDataMap<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token constant">REPEAT_TIME</span><span class="token punctuation">,</span> <span class="token class-name">System</span><span class="token punctuation">.</span><span class="token function">currentTimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 请求地址（作为存放cache的key值）</span>
+    <span class="token class-name">String</span> url <span class="token operator">=</span> request<span class="token punctuation">.</span><span class="token function">getRequestURI</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 唯一值（没有消息头则使用请求地址）</span>
+    <span class="token class-name">String</span> submitKey <span class="token operator">=</span> request<span class="token punctuation">.</span><span class="token function">getHeader</span><span class="token punctuation">(</span>header<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token class-name">StringUtils</span><span class="token punctuation">.</span><span class="token function">isEmpty</span><span class="token punctuation">(</span>submitKey<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        submitKey <span class="token operator">=</span> url<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// 唯一标识（指定key + 消息头）</span>
+    <span class="token class-name">String</span> cacheRepeatKey <span class="token operator">=</span> <span class="token class-name">Constants</span><span class="token punctuation">.</span><span class="token constant">REPEAT_SUBMIT_KEY</span> <span class="token operator">+</span> submitKey<span class="token punctuation">;</span>
+
+    <span class="token class-name">Object</span> sessionObj <span class="token operator">=</span> redisCache<span class="token punctuation">.</span><span class="token function">getCacheObject</span><span class="token punctuation">(</span>cacheRepeatKey<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>sessionObj <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token class-name">Map</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">&gt;</span></span> sessionMap <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">Map</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">)</span> sessionObj<span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>sessionMap<span class="token punctuation">.</span><span class="token function">containsKey</span><span class="token punctuation">(</span>url<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token class-name">Map</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">&gt;</span></span> preDataMap <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">Map</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">)</span> sessionMap<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>url<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">compareParams</span><span class="token punctuation">(</span>nowDataMap<span class="token punctuation">,</span> preDataMap<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token function">compareTime</span><span class="token punctuation">(</span>nowDataMap<span class="token punctuation">,</span> preDataMap<span class="token punctuation">,</span> annotation<span class="token punctuation">.</span><span class="token function">interval</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token class-name">Map</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">&gt;</span></span> cacheMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    cacheMap<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>url<span class="token punctuation">,</span> nowDataMap<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    redisCache<span class="token punctuation">.</span><span class="token function">setCacheObject</span><span class="token punctuation">(</span>cacheRepeatKey<span class="token punctuation">,</span> cacheMap<span class="token punctuation">,</span> annotation<span class="token punctuation">.</span><span class="token function">interval</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token class-name">TimeUnit</span><span class="token punctuation">.</span><span class="token constant">MILLISECONDS</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">L ZHEN</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="http://fahaxikilz.github.io/2024/10/10/ruo-yi-yuan-ma-fen-xi/">http://fahaxikilz.github.io/2024/10/10/ruo-yi-yuan-ma-fen-xi/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">L ZHEN</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/%E8%8B%A5%E4%BE%9D%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">
+                                    <span class="chip bg-color">若依源码分析</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/loading.gif" data-original="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/loading.gif" data-original="/medias/reward/wechat.jpg" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+        <style>
+    .valine-card {
+        margin: 1.5rem auto;
+    }
+
+    .valine-card .card-content {
+        padding: 20px 20px 5px 20px;
+    }
+
+    #vcomments textarea {
+        box-sizing: border-box;
+        background: url("/medias/comment_bg.png") 100% 100% no-repeat;
+    }
+
+    #vcomments p {
+        margin: 2px 2px 10px;
+        font-size: 1.05rem;
+        line-height: 1.78rem;
+    }
+
+    #vcomments blockquote p {
+        text-indent: 0.2rem;
+    }
+
+    #vcomments a {
+        padding: 0 2px;
+        color: #4cbf30;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    #vcomments img {
+        max-width: 100%;
+        height: auto;
+        cursor: pointer;
+    }
+
+    #vcomments ol li {
+        list-style-type: decimal;
+    }
+
+    #vcomments ol,
+    ul {
+        display: block;
+        padding-left: 2em;
+        word-spacing: 0.05rem;
+    }
+
+    #vcomments ul li,
+    ol li {
+        display: list-item;
+        line-height: 1.8rem;
+        font-size: 1rem;
+    }
+
+    #vcomments ul li {
+        list-style-type: disc;
+    }
+
+    #vcomments ul ul li {
+        list-style-type: circle;
+    }
+
+    #vcomments table, th, td {
+        padding: 12px 13px;
+        border: 1px solid #dfe2e5;
+    }
+
+    #vcomments table, th, td {
+        border: 0;
+    }
+
+    table tr:nth-child(2n), thead {
+        background-color: #fafafa;
+    }
+
+    #vcomments table th {
+        background-color: #f2f2f2;
+        min-width: 80px;
+    }
+
+    #vcomments table td {
+        min-width: 80px;
+    }
+
+    #vcomments h1 {
+        font-size: 1.85rem;
+        font-weight: bold;
+        line-height: 2.2rem;
+    }
+
+    #vcomments h2 {
+        font-size: 1.65rem;
+        font-weight: bold;
+        line-height: 1.9rem;
+    }
+
+    #vcomments h3 {
+        font-size: 1.45rem;
+        font-weight: bold;
+        line-height: 1.7rem;
+    }
+
+    #vcomments h4 {
+        font-size: 1.25rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    #vcomments h5 {
+        font-size: 1.1rem;
+        font-weight: bold;
+        line-height: 1.4rem;
+    }
+
+    #vcomments h6 {
+        font-size: 1rem;
+        line-height: 1.3rem;
+    }
+
+    #vcomments p {
+        font-size: 1rem;
+        line-height: 1.5rem;
+    }
+
+    #vcomments hr {
+        margin: 12px 0;
+        border: 0;
+        border-top: 1px solid #ccc;
+    }
+
+    #vcomments blockquote {
+        margin: 15px 0;
+        border-left: 5px solid #42b983;
+        padding: 1rem 0.8rem 0.3rem 0.8rem;
+        color: #666;
+        background-color: rgba(66, 185, 131, .1);
+    }
+
+    #vcomments pre {
+        font-family: monospace, monospace;
+        padding: 1.2em;
+        margin: .5em 0;
+        background: #272822;
+        overflow: auto;
+        border-radius: 0.3em;
+        tab-size: 4;
+    }
+
+    #vcomments code {
+        font-family: monospace, monospace;
+        padding: 1px 3px;
+        font-size: 0.92rem;
+        color: #e96900;
+        background-color: #f8f8f8;
+        border-radius: 2px;
+    }
+
+    #vcomments pre code {
+        font-family: monospace, monospace;
+        padding: 0;
+        color: #e8eaf6;
+        background-color: #272822;
+    }
+
+    #vcomments pre[class*="language-"] {
+        padding: 1.2em;
+        margin: .5em 0;
+    }
+
+    #vcomments code[class*="language-"],
+    pre[class*="language-"] {
+        color: #e8eaf6;
+    }
+
+    #vcomments [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: inherit;
+        margin-left: -1.3rem;
+        margin-right: 0.4rem;
+        margin-top: -1px;
+        vertical-align: middle;
+        left: unset;
+        visibility: visible;
+    }
+
+    #vcomments b,
+    strong {
+        font-weight: bold;
+    }
+
+    #vcomments dfn {
+        font-style: italic;
+    }
+
+    #vcomments small {
+        font-size: 85%;
+    }
+
+    #vcomments cite {
+        font-style: normal;
+    }
+
+    #vcomments mark {
+        background-color: #fcf8e3;
+        padding: .2em;
+    }
+
+    #vcomments table, th, td {
+        padding: 12px 13px;
+        border: 1px solid #dfe2e5;
+    }
+
+    table tr:nth-child(2n), thead {
+        background-color: #fafafa;
+    }
+
+    #vcomments table th {
+        background-color: #f2f2f2;
+        min-width: 80px;
+    }
+
+    #vcomments table td {
+        min-width: 80px;
+    }
+
+    #vcomments [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: inherit;
+        margin-left: -1.3rem;
+        margin-right: 0.4rem;
+        margin-top: -1px;
+        vertical-align: middle;
+        left: unset;
+        visibility: visible;
+    }
+</style>
+
+<div class="card valine-card" data-aos="fade-up">
+    <div class="comment_headling" style="font-size: 20px; font-weight: 700; position: relative; padding-left: 20px; top: 15px; padding-bottom: 5px;">
+        <i class="fas fa-comments fa-fw" aria-hidden="true"></i>
+        <span>评论</span>
+    </div>
+    <div id="vcomments" class="card-content" style="display: grid">
+    </div>
+</div>
+
+<script src="/libs/valine/av-min.js"></script>
+<script src="/libs/valine/Valine.min.js"></script>
+<script>
+    new Valine({
+        el: '#vcomments',
+        appId: 'sxNXQ2L9Yj1y9VxBDX2sA6d8-gzGzoHsz',
+        appKey: 'YgMUSzSrmuxo97dKBzjIl5dy',
+        serverURLs: 'https://sxnxq2l9.lc-cn-n1-shared.com',
+        notify: 'true, // 邮件提醒!!!' === 'true',
+        verify: '' === 'true',
+        visitor: 'true' === 'true',
+        avatar: 'robohash',
+        pageSize: '10',
+        lang: 'zh-cn',
+        placeholder: 'ヾﾉ≧∀≦)o来啊，快活啊!'
+    });
+</script>
+
+<!--酷Q推送-->
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2025/01/03/she-ji-mo-shi/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/loading.gif" data-original="/medias/featureimages/17.jpg" class="responsive-img" alt="设计模式">
+                        
+                        <span class="card-title">设计模式</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2025-01-03
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E8%BF%9B%E9%98%B6%E6%8A%80%E6%9C%AF/" class="post-category">
+                                    进阶技术
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">
+                        <span class="chip bg-color">设计模式</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2024/09/18/elasticsearch/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/loading.gif" data-original="/medias/featureimages/19.jpg" class="responsive-img" alt="Elasticsearch">
+                        
+                        <span class="card-title">Elasticsearch</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-09-18
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E8%BF%9B%E9%98%B6%E6%8A%80%E6%9C%AF/" class="post-category">
+                                    进阶技术
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Elasticsearch/">
+                        <span class="chip bg-color">Elasticsearch</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+
+  <!-- 是否加载使用自带的 prismjs. -->
+  <script type="text/javascript" src="/libs/prism/prism.min.js"></script>
+
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('8'),
+            headingSelector: 'h1,h2,h3, h4,h5,h6,h7,h8'
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2022-2026</span>
+            
+            <a href="/about" target="_blank">L ZHEN</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1184.3k</span>
+            
+            
+            
+                
+            
+            
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
+            </span>
+            
+            
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
+            </span>
+            
+            <br>
+
+            <!-- 运行天数提醒. -->
+            
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2022";
+                        var startMonth = "10";
+                        var startDate = "16";
+                        var startHour = "12";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
+                    }
+
+                    calcSiteTime();
+                </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+
+
+    <a href="mailto:1390211724@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1390211724" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1390211724" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 白天和黑夜主题 -->
+<div class="stars-con">
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>  
+</div>
+
+<script>
+    function switchNightMode() {
+        $('<div class="Cuteen_DarkSky"><div class="Cuteen_DarkPlanet"></div></div>').appendTo($('body')),
+        setTimeout(function () {
+            $('body').hasClass('DarkMode') 
+            ? ($('body').removeClass('DarkMode'), localStorage.setItem('isDark', '0'), $('#sum-moon-icon').removeClass("fa-sun").addClass('fa-moon')) 
+            : ($('body').addClass('DarkMode'), localStorage.setItem('isDark', '1'), $('#sum-moon-icon').addClass("fa-sun").removeClass('fa-moon')),
+            
+            setTimeout(function () {
+            $('.Cuteen_DarkSky').fadeOut(1e3, function () {
+                $(this).remove()
+            })
+            }, 2e3)
+        })
+    }
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    
+        <!-- <script src='https://unpkg.com/mermaid@latest/dist/mermaid.min.js'></script> -->
+        <script src='/libs/mermaid/mermaid.min.js'></script>
+        <script>
+          if (window.mermaid) {
+            mermaid.initialize({theme: 'forest'});
+          }
+        </script>
+    
+
+    
+
+    <!-- 雪花特效 -->
+    
+
+    <!-- 鼠标星星特效 -->
+    
+
+     
+        <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+        <script src="/libs/others/TencentCaptcha.js"></script>
+        <button id="TencentCaptcha" data-appid="197482151" data-cbfn="callback" type="button" hidden></button>
+    
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(e.href.match(t)||e.href.match(r))&&(e.href=a.dataset.original)})});</script><script>(r=>{r.imageLazyLoadSetting.processImages=t;var a=r.imageLazyLoadSetting.isSPA,o=r.imageLazyLoadSetting.preloadRatio||1,d=i();function i(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(t){(a||t)&&(d=i());for(var e,n=0;n<d.length;n++)0<=(e=(e=d[n]).getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(r.innerHeight*o||document.documentElement.clientHeight*o)&&(()=>{var t,e,a,o,i=d[n];e=function(){d=d.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).dataset.loaded||(t.hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(a=new Image,o=t.getAttribute("data-original"),a.onload=function(){t.src=o,t.removeAttribute("data-original"),t.setAttribute("data-loaded",!0),e&&e()},a.onerror=function(){t.removeAttribute("data-original"),t.setAttribute("data-loaded",!1),t.src=o},t.src!==o&&(a.src=o)))})()}function e(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",e),r.addEventListener("resize",e),r.addEventListener("orientationchange",e)})(this);</script></body>
+
+</html>

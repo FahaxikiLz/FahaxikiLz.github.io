@@ -1,0 +1,1758 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="第三方登录, 爱哭的小河豚">
+    <meta name="description" content="微信扫码登录1.前期准备（获取微信开发者权限）　　我们这里主要讲的是网站（Web）应用，网站应用微信登录是基于OAuth2.0协议标准构建的微信OAuth2.0授权登录系统(即上面的协议)。在微信客户端授权登录(获取用户信息）的可以查看：h">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>第三方登录 | 爱哭的小河豚</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    
+
+
+    <!-- bg-cover style     -->
+
+
+
+<link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+<link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+<link rel="stylesheet" type="text/css" href="/css/matery.css">
+<link rel="stylesheet" type="text/css" href="/css/my.css">
+<link rel="stylesheet" type="text/css" href="/css/dark.css" media="none" onload="if(media!='all')media='all'">
+
+
+
+
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+    <link rel="stylesheet" href="/css/post.css">
+
+
+
+
+    
+        <link rel="stylesheet" type="text/css" href="/css/reward.css">
+    
+
+
+
+    <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="爱哭的小河豚" type="application/atom+xml">
+</head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    <div>
+                        
+                        <img src="/medias/loading.gif" data-original="/medias/logo.png" class="logo-img" alt="LOGO">
+                        
+                        <span class="logo-span">爱哭的小河豚</span>
+                    </div>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/hello-algo" class="waves-effect waves-light">
+      
+      <i class="fas fa-anchor" style="zoom: 0.6;"></i>
+      
+      <span>Hello 算法</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/love" class="waves-effect waves-light">
+      
+      <i class="fas fa-heart" style="zoom: 0.6;"></i>
+      
+      <span>写给我家乖乖</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+  <li>
+    <a href="javascript:;" class="waves-effect waves-light" onclick="switchNightMode()" title="深色/浅色模式" >
+      <i id="sum-moon-icon" class="fas fa-sun" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/loading.gif" data-original="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">爱哭的小河豚</div>
+        <div class="logo-desc">
+            
+            谁会不喜欢一只爱哭，生气又圆鼓鼓的小河豚呢？
+            
+        </div>
+    </div>
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/hello-algo" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-anchor"></i>
+			
+			Hello 算法
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/love" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-heart"></i>
+			
+			写给我家乖乖
+		</a>
+          
+        </li>
+        
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/18.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">第三方登录</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E5%BD%95/">
+                                <span class="chip bg-color">第三方登录</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" class="post-category">
+                                解决方案
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2024-08-22
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2025-07-21
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    3k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    11 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.min.css">
+        
+
+        
+        <!-- 代码块折行 -->
+        <style type="text/css">
+            code[class*="language-"], pre[class*="language-"] { white-space: pre-wrap !important; }
+        </style>
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h2 id="微信扫码登录"><a href="#微信扫码登录" class="headerlink" title="微信扫码登录"></a>微信扫码登录</h2><h3 id="1-前期准备（获取微信开发者权限）"><a href="#1-前期准备（获取微信开发者权限）" class="headerlink" title="1.前期准备（获取微信开发者权限）"></a>1.前期准备（获取微信开发者权限）</h3><p>　　我们这里主要讲的是网站（Web）应用，网站应用微信登录是基于OAuth2.0协议标准构建的微信OAuth2.0授权登录系统(即上面的协议)。在微信客户端授权登录(获取用户信息）的可以查看：<a href="https://cloud.tencent.com/developer/tools/blog-entry?target=http://www.cnblogs.com/0201zcr/p/5131602.html&amp;source=article&amp;objectId=1447723">http://www.cnblogs.com/0201zcr/p/5131602.html</a> </p>
+<p>　　在进行微信OAuth2.在进行微信OAuth2.0授权登录接入之前，在微信<strong>开放平台注册开发者帐号，并拥有一个已审核通过的网站应用，并获得相应的AppID和AppSecret，申请微信登录且通过审核后，可开始接入流程。</strong></p>
+<h4 id="1-1、注册开发者账号"><a href="#1-1、注册开发者账号" class="headerlink" title="1.1、注册开发者账号"></a>1.1、注册开发者账号</h4><p>　　可以在<a href="https://cloud.tencent.com/developer/tools/blog-entry?target=https://open.weixin.qq.com/&amp;source=article&amp;objectId=1447723">https://open.weixin.qq.com/</a> 这里申请开发的账号。由于是腾讯的网页，这里可以直接通过 QQ号进行登录。</p>
+<h4 id="1-2、提交网站应用审核"><a href="#1-2、提交网站应用审核" class="headerlink" title="1.2、提交网站应用审核"></a>1.2、提交网站应用审核</h4><p>　　在已经登录的界面中选择“管理中心” –&gt; 网站应用 –&gt; 创建网站应用</p>
+<p><img src="/medias/loading.gif" data-original="/2024/08/22/di-san-fang-deng-lu/uoj597kbaa.png" alt="img"></p>
+<p> 　将会弹出下面的界面</p>
+<p><img src="/medias/loading.gif" data-original="/2024/08/22/di-san-fang-deng-lu/x0fde0vp9u.png" alt="img"></p>
+<p>　　填写过后，还有有一个页面需要填写，提交一份纸质版申请书扫描件（会提供模板，我们下载再来填写后，需盖章，签名），配置回调域名（扫码登录后会跳转的页面）等。</p>
+<p>　　之后提交审核即可，等微信审核通过，我们即可获得我们需要的网页应用的<strong>appid和AppSecret，并配置后回调的域名了</strong>（这三样是我们开发所必须的）。</p>
+<h4 id="1-3、开发者资质认证"><a href="#1-3、开发者资质认证" class="headerlink" title="1.3、开发者资质认证"></a>1.3、开发者资质认证</h4><p>　　由于我们这里要使用微信登录的接口，所以我们还需要向微信提出认证，只有认证了才能使用微信那些高级的接口。未认证的如下图所示</p>
+<p><img src="/medias/loading.gif" data-original="/2024/08/22/di-san-fang-deng-lu/tnk56tvkd9.png" alt="img"></p>
+<p> 　认证之后是这样子的：</p>
+<p><img src="/medias/loading.gif" data-original="/2024/08/22/di-san-fang-deng-lu/jr03ed6uto.png" alt="img"></p>
+<p>   我现在暂时没有找到可以向公众账号那样子的测试账号的申请。如果有知道怎么可以申请到测试账号的高手，希望能赐教一下。</p>
+<p>　　接下来，我们就可以开始我们的网页微信扫码登录开发了。</p>
+<h3 id="2、授权流程说明"><a href="#2、授权流程说明" class="headerlink" title="2、授权流程说明"></a>2、授权流程说明</h3><p>　　微信OAuth2.0授权登录让微信用户使用微信身份安全登录第三方应用或网站，在微信用户授权登录已接入微信OAuth2.0的第三方应用后，第三方可以获取到用户的接口调用凭证（access_token），通过access_token可以进行微信开放平台授权关系接口调用，从而可实现获取微信用户基本开放信息和帮助用户实现基础开放功能等。 </p>
+<p>　　微信OAuth2.0授权登录目前支持authorization_code模式，适用于拥有server端的应用授权。该模式整体流程为：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token number">1.</span> 第三方发起微信授权登录请求，微信用户允许授权第三方应用后，微信会拉起应用或重定向到第三方网站，并且带上授权临时票据code参数；
+<span class="token number">2.</span> 通过code参数加上AppID和AppSecret等，通过<span class="token constant">API</span>换取access_token；
+<span class="token number">3.</span> 通过access_token进行接口调用，获取用户基本数据资源或帮助用户实现基本操作。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p> 　获取access_token时序图：</p>
+<p><img src="/medias/loading.gif" data-original="/2024/08/22/di-san-fang-deng-lu/m9kd4b9pdm.png" alt="img"></p>
+<h3 id="3、获取网页的二维码"><a href="#3、获取网页的二维码" class="headerlink" title="3、获取网页的二维码"></a>3、获取网页的二维码</h3><p>　　当我们通过微信的认证，获取到了<strong>appid和AppSecret，并配置了回调的域名</strong>。我们就已经可以获取属于我们网页的二维码了，获取的方式很简单，只需打开一个微信的链接，加上我们的appid和回调域名即可在网页上面打开二维码，用户用微信客户端扫码并授权登录之后即会跳转到我们配置的回调域名下。</p>
+<p><strong>注意：</strong></p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token number">1</span>、这里填写的是域名（是一个字符串），而不是<span class="token constant">URL</span><span class="token literal-property property">，因此请勿加http</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>等协议头；
+<span class="token number">2</span>、授权回调域名配置规范为全域名，比如需要网页授权的域名为：www<span class="token punctuation">.</span>qq<span class="token punctuation">.</span>com，配置以后此域名下面的页面http<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>www<span class="token punctuation">.</span>qq<span class="token punctuation">.</span>com<span class="token operator">/</span>music<span class="token punctuation">.</span>html 、 http<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>www<span class="token punctuation">.</span>qq<span class="token punctuation">.</span>com<span class="token operator">/</span>login<span class="token punctuation">.</span>html 都可以进行OAuth2<span class="token punctuation">.</span><span class="token number">0</span><span class="token literal-property property">鉴权。但http</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>pay<span class="token punctuation">.</span>qq<span class="token punctuation">.</span>com 、 http<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>music<span class="token punctuation">.</span>qq<span class="token punctuation">.</span>com 、 http<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>qq<span class="token punctuation">.</span>com无法进行OAuth2<span class="token punctuation">.</span><span class="token number">0</span>鉴权<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<h4 id="3-1、请求url说明"><a href="#3-1、请求url说明" class="headerlink" title="3.1、请求url说明"></a>3.1、请求url说明</h4><p>　　第三方使用网站应用授权登录前请注意已获取相应网页授权作用域（scope=snsapi_login），则可以通过在PC端打开以下链接：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token literal-property property">https</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>open<span class="token punctuation">.</span>weixin<span class="token punctuation">.</span>qq<span class="token punctuation">.</span>com<span class="token operator">/</span>connect<span class="token operator">/</span>qrconnect<span class="token operator">?</span>appid<span class="token operator">=</span><span class="token constant">APPID</span><span class="token operator">&amp;</span>redirect_uri<span class="token operator">=</span><span class="token constant">REDIRECT_URI</span><span class="token operator">&amp;</span>response_type<span class="token operator">=</span>code<span class="token operator">&amp;</span>scope<span class="token operator">=</span><span class="token constant">SCOPE</span><span class="token operator">&amp;</span>state<span class="token operator">=</span><span class="token constant">STATE</span>#wechat_redirect<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p> <strong>参数说明</strong> </p>
+<table>
+<thead>
+<tr>
+<th align="left">参数</th>
+<th align="left">是否必须</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">appid</td>
+<td align="left">是</td>
+<td align="left">应用唯一标识（前面认证网页应用中获得）</td>
+</tr>
+<tr>
+<td align="left">redirect_uri</td>
+<td align="left">是</td>
+<td align="left">重定向地址，需要进行UrlEncode（前面认证网页应用中获得）</td>
+</tr>
+<tr>
+<td align="left">response_type</td>
+<td align="left">是</td>
+<td align="left">填code</td>
+</tr>
+<tr>
+<td align="left">scope</td>
+<td align="left">是</td>
+<td align="left">应用授权作用域，拥有多个作用域用逗号（,）分隔，网页应用目前仅填写snsapi_login即可</td>
+</tr>
+<tr>
+<td align="left">state</td>
+<td align="left">否</td>
+<td align="left">用于保持请求和回调的状态，授权请求后原样带回给第三方。该参数可用于防止csrf攻击（跨站请求伪造攻击），建议第三方带上该参数，可设置为简单的随机数加session进行校验</td>
+</tr>
+</tbody></table>
+<p> <strong>返回说明</strong></p>
+<p> 　用户允许授权后，将会重定向到redirect_uri的网址上，并且带上code和state参数</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">redirect_uri<span class="token operator">?</span>code<span class="token operator">=</span><span class="token constant">CODE</span><span class="token operator">&amp;</span>state<span class="token operator">=</span><span class="token constant">STATE</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p> 　若用户禁止授权，则重定向后不会带上code参数，仅会带上state参数</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">redirect_uri<span class="token operator">?</span>state<span class="token operator">=</span><span class="token constant">STATE</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h4 id="3-2、示例"><a href="#3-2、示例" class="headerlink" title="3.2、示例"></a>3.2、示例</h4><p>　　一号店的微信二维码链接如下：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token literal-property property">https</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>open<span class="token punctuation">.</span>weixin<span class="token punctuation">.</span>qq<span class="token punctuation">.</span>com<span class="token operator">/</span>connect<span class="token operator">/</span>qrconnect<span class="token operator">?</span>appid<span class="token operator">=</span>wxbdc5610cc59c1631<span class="token operator">&amp;</span>redirect_uri<span class="token operator">=</span>https<span class="token operator">%</span>3A<span class="token operator">%</span>2F<span class="token operator">%</span>2Fpassport<span class="token punctuation">.</span>yhd<span class="token punctuation">.</span>com<span class="token operator">%</span>2Fwechat<span class="token operator">%</span>2Fcallback<span class="token punctuation">.</span>do<span class="token operator">&amp;</span>response_type<span class="token operator">=</span>code<span class="token operator">&amp;</span>scope<span class="token operator">=</span>snsapi_login<span class="token operator">&amp;</span>state<span class="token operator">=</span>3d6be0a4035d839573b04816624a415e#wechat_redirect<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p> 　将其复制到浏览器中打开即可获得一号店的二维码，二维码页面如下：</p>
+<p><img src="/medias/loading.gif" data-original="/2024/08/22/di-san-fang-deng-lu/xn1bts2qxe.png" alt="img"></p>
+<p>　　通过使用微信客户端的扫一扫功能，扫描该二维码，即会跳转到上面填写redirect_uri所在的地址上。假如<strong>用户同意授权</strong>，这里就获得了微信返回的<strong>code参数</strong>了。</p>
+<h3 id="4、获取用户信息"><a href="#4、获取用户信息" class="headerlink" title="4、获取用户信息"></a>4、获取用户信息</h3><p>　　假如前面已经获得code。我们可以通过code参数去获取用户openid和access_token,进而获得用户的信息。</p>
+<h4 id="4-1、通过code参数获取access-token"><a href="#4-1、通过code参数获取access-token" class="headerlink" title="4.1、通过code参数获取access_token"></a>4.1、通过code参数获取access_token</h4><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token literal-property property">https</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>api<span class="token punctuation">.</span>weixin<span class="token punctuation">.</span>qq<span class="token punctuation">.</span>com<span class="token operator">/</span>sns<span class="token operator">/</span>oauth2<span class="token operator">/</span>access_token<span class="token operator">?</span>appid<span class="token operator">=</span><span class="token constant">APPID</span><span class="token operator">&amp;</span>secret<span class="token operator">=</span><span class="token constant">SECRET</span><span class="token operator">&amp;</span>code<span class="token operator">=</span><span class="token constant">CODE</span><span class="token operator">&amp;</span>grant_type<span class="token operator">=</span>authorization_code<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p> <strong>参数说明</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">参数</th>
+<th align="left">是否必须</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">appid</td>
+<td align="left">是</td>
+<td align="left">应用唯一标识，在微信开放平台提交应用审核通过后获得</td>
+</tr>
+<tr>
+<td align="left">secret</td>
+<td align="left">是</td>
+<td align="left">应用密钥AppSecret，在微信开放平台提交应用审核通过后获得</td>
+</tr>
+<tr>
+<td align="left">code</td>
+<td align="left">是</td>
+<td align="left">填写第一步获取的code参数</td>
+</tr>
+<tr>
+<td align="left">grant_type</td>
+<td align="left">是</td>
+<td align="left">填authorization_code</td>
+</tr>
+</tbody></table>
+<p><strong>返回说明</strong></p>
+<p>正确的返回：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token punctuation">{</span> 
+<span class="token string-property property">"access_token"</span><span class="token operator">:</span><span class="token string">"ACCESS_TOKEN"</span><span class="token punctuation">,</span> 
+<span class="token string-property property">"expires_in"</span><span class="token operator">:</span><span class="token number">7200</span><span class="token punctuation">,</span> 
+<span class="token string-property property">"refresh_token"</span><span class="token operator">:</span><span class="token string">"REFRESH_TOKEN"</span><span class="token punctuation">,</span>
+<span class="token string-property property">"openid"</span><span class="token operator">:</span><span class="token string">"OPENID"</span><span class="token punctuation">,</span> 
+<span class="token string-property property">"scope"</span><span class="token operator">:</span><span class="token string">"SCOPE"</span><span class="token punctuation">,</span>
+<span class="token string-property property">"unionid"</span><span class="token operator">:</span> <span class="token string">"o6_bmasdasdsad6_2sgVt7hMZOPfL"</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<table>
+<thead>
+<tr>
+<th align="left">参数</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">access_token</td>
+<td align="left">接口调用凭证</td>
+</tr>
+<tr>
+<td align="left">expires_in</td>
+<td align="left">access_token接口调用凭证超时时间，单位（秒）</td>
+</tr>
+<tr>
+<td align="left">refresh_token</td>
+<td align="left">用户刷新access_token</td>
+</tr>
+<tr>
+<td align="left">openid</td>
+<td align="left">授权用户唯一标识</td>
+</tr>
+<tr>
+<td align="left">scope</td>
+<td align="left">用户授权的作用域，使用逗号（,）分隔</td>
+</tr>
+<tr>
+<td align="left">unionid</td>
+<td align="left">当且仅当该网站应用已获得该用户的userinfo授权时，才会出现该字段。</td>
+</tr>
+</tbody></table>
+<p>错误返回样例：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token punctuation">{</span><span class="token string-property property">"errcode"</span><span class="token operator">:</span><span class="token number">40029</span><span class="token punctuation">,</span><span class="token string-property property">"errmsg"</span><span class="token operator">:</span><span class="token string">"invalid code"</span><span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><strong>注意</strong>：</p>
+<ul>
+<li><strong>code参数的超时时间是5分钟，且每次请求的code参数的值都不一样。</strong></li>
+<li><strong>access_token的超时时间是32分钟。</strong></li>
+</ul>
+<h4 id="4-2、通过access-token获取用户的基本信息"><a href="#4-2、通过access-token获取用户的基本信息" class="headerlink" title="4.2、通过access_token获取用户的基本信息"></a>4.2、通过access_token获取用户的基本信息</h4><p>获取的前提条件</p>
+<ul>
+<li>access_token有效且为超时；</li>
+<li>微信用户已授权给第三方应用账号相应接口作用域（scope)【<strong>在二维码生成连接那里填写</strong>】</li>
+</ul>
+<p>对于接口作用域（scope），能调用的接口有以下：</p>
+<table>
+<thead>
+<tr>
+<th align="left">授权作用域（scope）</th>
+<th align="left">接口</th>
+<th align="left">接口说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">snsapi_base</td>
+<td align="left">/sns/oauth2/access_token</td>
+<td align="left">通过code换取access_token、refresh_token和已授权scope</td>
+</tr>
+<tr>
+<td align="left">/sns/oauth2/refresh_token</td>
+<td align="left">刷新或续期access_token使用</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">/sns/auth</td>
+<td align="left">检查access_token有效性</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">snsapi_userinfo</td>
+<td align="left">/sns/userinfo</td>
+<td align="left">获取用户个人信息</td>
+</tr>
+</tbody></table>
+<p>　　使用snsapi_base作用域的授权是扫码之后无需用户点击授权，扫码后直接跳转，用户感觉不到授权了，但这种授权方式能获取的数据量有限，这里我们要获取用户的基本信息，我们需要使用snsapi_userinfo授权。使用snsapi_userinfo授权，扫码后出现类似于下面的授权界面</p>
+<p><img src="/medias/loading.gif" data-original="/2024/08/22/di-san-fang-deng-lu/orsdvkmgnb.jpeg" alt="img"></p>
+<p>　　此接口用于获取用户个人信息。开发者可通过OpenID来获取用户基本信息。特别需要注意的是，<strong>如果开发者拥有多个移动应用、网站应用和公众帐号，可通过获取用户基本信息中的unionid来区分用户的唯一性，因为只要是同一个微信开放平台帐号下的移动应用、网站应用和公众帐号，用户的unionid是唯一的。换句话说，同一用户，对同一个微信开放平台下的不同应用，unionid是相同的。</strong>请注意，在用户修改微信头像后，旧的微信头像URL将会失效，因此开发者应该自己在获取用户信息后，将头像图片保存下来，避免微信头像URL失效后的异常情况。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token literal-property property">https</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>api<span class="token punctuation">.</span>weixin<span class="token punctuation">.</span>qq<span class="token punctuation">.</span>com<span class="token operator">/</span>sns<span class="token operator">/</span>userinfo<span class="token operator">?</span>access_token<span class="token operator">=</span><span class="token constant">ACCESS_TOKEN</span><span class="token operator">&amp;</span>openid<span class="token operator">=</span><span class="token constant">OPENID</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p> <strong>参数说明</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">参数</th>
+<th align="left">是否必须</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">access_token</td>
+<td align="left">是</td>
+<td align="left">调用凭证（上一个请求中获得）</td>
+</tr>
+<tr>
+<td align="left">openid</td>
+<td align="left">是</td>
+<td align="left">普通用户的标识，对当前开发者帐号唯一（上一个请求中获得）</td>
+</tr>
+<tr>
+<td align="left">lang</td>
+<td align="left">否</td>
+<td align="left">国家地区语言版本，zh_CN 简体，zh_TW 繁体，en 英语，默认为zh-CN</td>
+</tr>
+</tbody></table>
+<p><strong>返回说明</strong></p>
+<p>正确的Json返回结果：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token punctuation">{</span> 
+<span class="token string-property property">"openid"</span><span class="token operator">:</span><span class="token string">"OPENID"</span><span class="token punctuation">,</span>
+<span class="token string-property property">"nickname"</span><span class="token operator">:</span><span class="token string">"NICKNAME"</span><span class="token punctuation">,</span>
+<span class="token string-property property">"sex"</span><span class="token operator">:</span><span class="token number">1</span><span class="token punctuation">,</span>
+<span class="token string-property property">"province"</span><span class="token operator">:</span><span class="token string">"PROVINCE"</span><span class="token punctuation">,</span>
+<span class="token string-property property">"city"</span><span class="token operator">:</span><span class="token string">"CITY"</span><span class="token punctuation">,</span>
+<span class="token string-property property">"country"</span><span class="token operator">:</span><span class="token string">"COUNTRY"</span><span class="token punctuation">,</span>
+<span class="token string-property property">"headimgurl"</span><span class="token operator">:</span> <span class="token string">"http://wx.qlogo.cn/mmopen/g3MonUZtNHkdmzicIlibx6iaFqAc56vxLSUfpb6n5WKSYVY0ChQKkiaJSgQ1dZuTOgvLLrhJbERQQ4eMsv84eavHiaiceqxibJxCfHe/0"</span><span class="token punctuation">,</span>
+<span class="token string-property property">"privilege"</span><span class="token operator">:</span><span class="token punctuation">[</span>
+<span class="token string">"PRIVILEGE1"</span><span class="token punctuation">,</span> 
+<span class="token string">"PRIVILEGE2"</span>
+<span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token string-property property">"unionid"</span><span class="token operator">:</span> <span class="token string">" o6_bmasdasdsad6_2sgVt7hMZOPfL"</span>
+
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<table>
+<thead>
+<tr>
+<th align="left">参数</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">openid</td>
+<td align="left">普通用户的标识，对当前开发者帐号唯一</td>
+</tr>
+<tr>
+<td align="left">nickname</td>
+<td align="left">普通用户昵称</td>
+</tr>
+<tr>
+<td align="left">sex</td>
+<td align="left">普通用户性别，1为男性，2为女性</td>
+</tr>
+<tr>
+<td align="left">province</td>
+<td align="left">普通用户个人资料填写的省份</td>
+</tr>
+<tr>
+<td align="left">city</td>
+<td align="left">普通用户个人资料填写的城市</td>
+</tr>
+<tr>
+<td align="left">country</td>
+<td align="left">国家，如中国为CN</td>
+</tr>
+<tr>
+<td align="left">headimgurl</td>
+<td align="left">用户头像，最后一个数值代表正方形头像大小（有0、46、64、96、132数值可选，0代表640*640正方形头像），用户没有头像时该项为空</td>
+</tr>
+<tr>
+<td align="left">privilege</td>
+<td align="left">用户特权信息，json数组，如微信沃卡用户为（chinaunicom）</td>
+</tr>
+<tr>
+<td align="left">unionid</td>
+<td align="left">用户统一标识。针对一个微信开放平台帐号下的应用，同一用户的unionid是唯一的。</td>
+</tr>
+</tbody></table>
+<p>错误的Json返回示例:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token punctuation">{</span> 
+<span class="token string-property property">"errcode"</span><span class="token operator">:</span><span class="token number">40003</span><span class="token punctuation">,</span><span class="token string-property property">"errmsg"</span><span class="token operator">:</span><span class="token string">"invalid openid"</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="4-3、示例"><a href="#4-3、示例" class="headerlink" title="4.3、示例"></a>4.3、示例</h4><p>在用户扫码授权完成，如果redirect_uri=<a target="_blank" rel="noopener" href="http://xxx/wechat/callback%EF%BC%8C%E9%82%A3%E4%B9%88%E5%B0%B1%E5%9C%A8%E7%94%A8%E6%88%B7%E6%8E%88%E6%9D%83%E4%B9%8B%E5%90%8E%E8%B0%83%E7%94%A8http://xxx/wechat/callback?code=CODE&amp;state=STATE%E6%8E%A5%E5%8F%A3">http://xxx/wechat/callback，那么就在用户授权之后调用http://xxx/wechat/callback?code=CODE&amp;state=STATE接口</a></p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@RestController</span>
+<span class="token annotation punctuation">@RequestMapping</span><span class="token punctuation">(</span><span class="token string">"/wechat"</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">WechatController</span> <span class="token punctuation">{</span>
+
+    <span class="token comment">// 省略获取access_token部分...</span>
+
+    <span class="token annotation punctuation">@GetMapping</span><span class="token punctuation">(</span><span class="token string">"/callback"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">wechatCallback</span><span class="token punctuation">(</span><span class="token annotation punctuation">@RequestParam</span><span class="token punctuation">(</span><span class="token string">"code"</span><span class="token punctuation">)</span> <span class="token class-name">String</span> code<span class="token punctuation">,</span> <span class="token class-name">HttpServletResponse</span> response<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">IOException</span> <span class="token punctuation">{</span>
+         <span class="token comment">// Step 1: 用code获取access_token</span>
+        <span class="token class-name">String</span> url <span class="token operator">=</span> <span class="token string">"https://api.weixin.qq.com/sns/oauth2/access_token?appid="</span> <span class="token operator">+</span> appId
+                <span class="token operator">+</span> <span class="token string">"&amp;secret="</span> <span class="token operator">+</span> appSecret
+                <span class="token operator">+</span> <span class="token string">"&amp;code="</span> <span class="token operator">+</span> code
+                <span class="token operator">+</span> <span class="token string">"&amp;grant_type=authorization_code"</span><span class="token punctuation">;</span>
+
+        <span class="token class-name">RestTemplate</span> restTemplate <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">RestTemplate</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">String</span> responseString <span class="token operator">=</span> restTemplate<span class="token punctuation">.</span><span class="token function">getForObject</span><span class="token punctuation">(</span>url<span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token class-name">JSONObject</span> jsonObject <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">JSONObject</span><span class="token punctuation">(</span>responseString<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">String</span> accessToken <span class="token operator">=</span> jsonObject<span class="token punctuation">.</span><span class="token function">getString</span><span class="token punctuation">(</span><span class="token string">"access_token"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">String</span> openid <span class="token operator">=</span> jsonObject<span class="token punctuation">.</span><span class="token function">getString</span><span class="token punctuation">(</span><span class="token string">"openid"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// Step 2: 生成JWT</span>
+        <span class="token class-name">String</span> jwtToken <span class="token operator">=</span> <span class="token class-name">Jwts</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">setSubject</span><span class="token punctuation">(</span>openid<span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">claim</span><span class="token punctuation">(</span><span class="token string">"access_token"</span><span class="token punctuation">,</span> accessToken<span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">setIssuedAt</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">setExpiration</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token class-name">System</span><span class="token punctuation">.</span><span class="token function">currentTimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">3600</span> <span class="token operator">*</span> <span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">// 1小时有效期</span>
+                <span class="token punctuation">.</span><span class="token function">signWith</span><span class="token punctuation">(</span><span class="token class-name">SignatureAlgorithm</span><span class="token punctuation">.</span><span class="token constant">HS512</span><span class="token punctuation">,</span> <span class="token string">"yourSecretKey"</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">compact</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        <span class="token comment">// Step 3: 将JWT存储在Cookie中</span>
+        <span class="token class-name">Cookie</span> cookie <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Cookie</span><span class="token punctuation">(</span><span class="token string">"token"</span><span class="token punctuation">,</span> jwtToken<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        cookie<span class="token punctuation">.</span><span class="token function">setHttpOnly</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">// 防止前端脚本获取</span>
+        cookie<span class="token punctuation">.</span><span class="token function">setSecure</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment">// 仅通过HTTPS传输</span>
+        cookie<span class="token punctuation">.</span><span class="token function">setPath</span><span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>       <span class="token comment">// 整个网站有效</span>
+        cookie<span class="token punctuation">.</span><span class="token function">setMaxAge</span><span class="token punctuation">(</span><span class="token number">3600</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment">// 设置Cookie有效期（单位：秒）</span>
+        response<span class="token punctuation">.</span><span class="token function">addCookie</span><span class="token punctuation">(</span>cookie<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// Step 4: 重定向到前端页面</span>
+        response<span class="token punctuation">.</span><span class="token function">sendRedirect</span><span class="token punctuation">(</span><span class="token string">"http://你的前端域名/success"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>前端再获取acces_token之后可以将acces_token放到cookie或者token中，再重定向前端【http://你的前端域名/success】，在前端挂载时使用钩子来获取cookie或者token，再使用获取到的acces_token获取用户信息。向微信发送获取用户信息的请求可以在前端，也可以在后端，但是再前端可以能不安全。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token punctuation">{</span>
+  <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">"SuccessPage"</span><span class="token punctuation">,</span>
+
+  <span class="token comment">// 页面挂载时触发</span>
+  <span class="token function">mounted</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 发送请求获取用户信息</span>
+    axios<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">'/api/user/info'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+      <span class="token literal-property property">withCredentials</span><span class="token operator">:</span> <span class="token boolean">true</span> <span class="token comment">// 确保请求时发送 cookie</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token parameter">response</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+      console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'用户信息:'</span><span class="token punctuation">,</span> response<span class="token punctuation">.</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>userInfo <span class="token operator">=</span> response<span class="token punctuation">.</span>data<span class="token punctuation">;</span> <span class="token comment">// 存储用户信息</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">catch</span><span class="token punctuation">(</span><span class="token parameter">error</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+      console<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">'获取用户信息失败:'</span><span class="token punctuation">,</span> error<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+  <span class="token function">data</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+      <span class="token literal-property property">userInfo</span><span class="token operator">:</span> <span class="token keyword">null</span> <span class="token comment">// 用于存储用户信息</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">L ZHEN</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="http://fahaxikilz.github.io/2024/08/22/di-san-fang-deng-lu/">http://fahaxikilz.github.io/2024/08/22/di-san-fang-deng-lu/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">L ZHEN</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E5%BD%95/">
+                                    <span class="chip bg-color">第三方登录</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/loading.gif" data-original="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/loading.gif" data-original="/medias/reward/wechat.jpg" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+        <style>
+    .valine-card {
+        margin: 1.5rem auto;
+    }
+
+    .valine-card .card-content {
+        padding: 20px 20px 5px 20px;
+    }
+
+    #vcomments textarea {
+        box-sizing: border-box;
+        background: url("/medias/comment_bg.png") 100% 100% no-repeat;
+    }
+
+    #vcomments p {
+        margin: 2px 2px 10px;
+        font-size: 1.05rem;
+        line-height: 1.78rem;
+    }
+
+    #vcomments blockquote p {
+        text-indent: 0.2rem;
+    }
+
+    #vcomments a {
+        padding: 0 2px;
+        color: #4cbf30;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    #vcomments img {
+        max-width: 100%;
+        height: auto;
+        cursor: pointer;
+    }
+
+    #vcomments ol li {
+        list-style-type: decimal;
+    }
+
+    #vcomments ol,
+    ul {
+        display: block;
+        padding-left: 2em;
+        word-spacing: 0.05rem;
+    }
+
+    #vcomments ul li,
+    ol li {
+        display: list-item;
+        line-height: 1.8rem;
+        font-size: 1rem;
+    }
+
+    #vcomments ul li {
+        list-style-type: disc;
+    }
+
+    #vcomments ul ul li {
+        list-style-type: circle;
+    }
+
+    #vcomments table, th, td {
+        padding: 12px 13px;
+        border: 1px solid #dfe2e5;
+    }
+
+    #vcomments table, th, td {
+        border: 0;
+    }
+
+    table tr:nth-child(2n), thead {
+        background-color: #fafafa;
+    }
+
+    #vcomments table th {
+        background-color: #f2f2f2;
+        min-width: 80px;
+    }
+
+    #vcomments table td {
+        min-width: 80px;
+    }
+
+    #vcomments h1 {
+        font-size: 1.85rem;
+        font-weight: bold;
+        line-height: 2.2rem;
+    }
+
+    #vcomments h2 {
+        font-size: 1.65rem;
+        font-weight: bold;
+        line-height: 1.9rem;
+    }
+
+    #vcomments h3 {
+        font-size: 1.45rem;
+        font-weight: bold;
+        line-height: 1.7rem;
+    }
+
+    #vcomments h4 {
+        font-size: 1.25rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    #vcomments h5 {
+        font-size: 1.1rem;
+        font-weight: bold;
+        line-height: 1.4rem;
+    }
+
+    #vcomments h6 {
+        font-size: 1rem;
+        line-height: 1.3rem;
+    }
+
+    #vcomments p {
+        font-size: 1rem;
+        line-height: 1.5rem;
+    }
+
+    #vcomments hr {
+        margin: 12px 0;
+        border: 0;
+        border-top: 1px solid #ccc;
+    }
+
+    #vcomments blockquote {
+        margin: 15px 0;
+        border-left: 5px solid #42b983;
+        padding: 1rem 0.8rem 0.3rem 0.8rem;
+        color: #666;
+        background-color: rgba(66, 185, 131, .1);
+    }
+
+    #vcomments pre {
+        font-family: monospace, monospace;
+        padding: 1.2em;
+        margin: .5em 0;
+        background: #272822;
+        overflow: auto;
+        border-radius: 0.3em;
+        tab-size: 4;
+    }
+
+    #vcomments code {
+        font-family: monospace, monospace;
+        padding: 1px 3px;
+        font-size: 0.92rem;
+        color: #e96900;
+        background-color: #f8f8f8;
+        border-radius: 2px;
+    }
+
+    #vcomments pre code {
+        font-family: monospace, monospace;
+        padding: 0;
+        color: #e8eaf6;
+        background-color: #272822;
+    }
+
+    #vcomments pre[class*="language-"] {
+        padding: 1.2em;
+        margin: .5em 0;
+    }
+
+    #vcomments code[class*="language-"],
+    pre[class*="language-"] {
+        color: #e8eaf6;
+    }
+
+    #vcomments [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: inherit;
+        margin-left: -1.3rem;
+        margin-right: 0.4rem;
+        margin-top: -1px;
+        vertical-align: middle;
+        left: unset;
+        visibility: visible;
+    }
+
+    #vcomments b,
+    strong {
+        font-weight: bold;
+    }
+
+    #vcomments dfn {
+        font-style: italic;
+    }
+
+    #vcomments small {
+        font-size: 85%;
+    }
+
+    #vcomments cite {
+        font-style: normal;
+    }
+
+    #vcomments mark {
+        background-color: #fcf8e3;
+        padding: .2em;
+    }
+
+    #vcomments table, th, td {
+        padding: 12px 13px;
+        border: 1px solid #dfe2e5;
+    }
+
+    table tr:nth-child(2n), thead {
+        background-color: #fafafa;
+    }
+
+    #vcomments table th {
+        background-color: #f2f2f2;
+        min-width: 80px;
+    }
+
+    #vcomments table td {
+        min-width: 80px;
+    }
+
+    #vcomments [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: inherit;
+        margin-left: -1.3rem;
+        margin-right: 0.4rem;
+        margin-top: -1px;
+        vertical-align: middle;
+        left: unset;
+        visibility: visible;
+    }
+</style>
+
+<div class="card valine-card" data-aos="fade-up">
+    <div class="comment_headling" style="font-size: 20px; font-weight: 700; position: relative; padding-left: 20px; top: 15px; padding-bottom: 5px;">
+        <i class="fas fa-comments fa-fw" aria-hidden="true"></i>
+        <span>评论</span>
+    </div>
+    <div id="vcomments" class="card-content" style="display: grid">
+    </div>
+</div>
+
+<script src="/libs/valine/av-min.js"></script>
+<script src="/libs/valine/Valine.min.js"></script>
+<script>
+    new Valine({
+        el: '#vcomments',
+        appId: 'sxNXQ2L9Yj1y9VxBDX2sA6d8-gzGzoHsz',
+        appKey: 'YgMUSzSrmuxo97dKBzjIl5dy',
+        serverURLs: 'https://sxnxq2l9.lc-cn-n1-shared.com',
+        notify: 'true, // 邮件提醒!!!' === 'true',
+        verify: '' === 'true',
+        visitor: 'true' === 'true',
+        avatar: 'robohash',
+        pageSize: '10',
+        lang: 'zh-cn',
+        placeholder: 'ヾﾉ≧∀≦)o来啊，快活啊!'
+    });
+</script>
+
+<!--酷Q推送-->
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2024/08/24/pa-chong/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/loading.gif" data-original="/medias/featureimages/15.jpg" class="responsive-img" alt="爬虫">
+                        
+                        <span class="card-title">爬虫</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2024-08-24
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E4%B8%9C%E6%90%9E%E6%90%9E%EF%BC%8C%E8%A5%BF%E6%90%9E%E6%90%9E/" class="post-category">
+                                    东搞搞，西搞搞
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/%E7%88%AC%E8%99%AB/">
+                        <span class="chip bg-color">爬虫</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2024/08/11/c-sharp/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/loading.gif" data-original="/medias/featureimages/8.jpg" class="responsive-img" alt="从Java到C#">
+                        
+                        <span class="card-title">从Java到C#</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-08-11
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/" class="post-category">
+                                    编程语言
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/%E4%BB%8EJava%E5%88%B0C/">
+                        <span class="chip bg-color">从Java到C#</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+
+  <!-- 是否加载使用自带的 prismjs. -->
+  <script type="text/javascript" src="/libs/prism/prism.min.js"></script>
+
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('8'),
+            headingSelector: 'h1,h2,h3, h4,h5,h6,h7,h8'
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2022-2026</span>
+            
+            <a href="/about" target="_blank">L ZHEN</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1184.3k</span>
+            
+            
+            
+                
+            
+            
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
+            </span>
+            
+            
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
+            </span>
+            
+            <br>
+
+            <!-- 运行天数提醒. -->
+            
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2022";
+                        var startMonth = "10";
+                        var startDate = "16";
+                        var startHour = "12";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
+                    }
+
+                    calcSiteTime();
+                </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+
+
+    <a href="mailto:1390211724@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1390211724" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1390211724" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 白天和黑夜主题 -->
+<div class="stars-con">
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>  
+</div>
+
+<script>
+    function switchNightMode() {
+        $('<div class="Cuteen_DarkSky"><div class="Cuteen_DarkPlanet"></div></div>').appendTo($('body')),
+        setTimeout(function () {
+            $('body').hasClass('DarkMode') 
+            ? ($('body').removeClass('DarkMode'), localStorage.setItem('isDark', '0'), $('#sum-moon-icon').removeClass("fa-sun").addClass('fa-moon')) 
+            : ($('body').addClass('DarkMode'), localStorage.setItem('isDark', '1'), $('#sum-moon-icon').addClass("fa-sun").removeClass('fa-moon')),
+            
+            setTimeout(function () {
+            $('.Cuteen_DarkSky').fadeOut(1e3, function () {
+                $(this).remove()
+            })
+            }, 2e3)
+        })
+    }
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    
+        <!-- <script src='https://unpkg.com/mermaid@latest/dist/mermaid.min.js'></script> -->
+        <script src='/libs/mermaid/mermaid.min.js'></script>
+        <script>
+          if (window.mermaid) {
+            mermaid.initialize({theme: 'forest'});
+          }
+        </script>
+    
+
+    
+
+    <!-- 雪花特效 -->
+    
+
+    <!-- 鼠标星星特效 -->
+    
+
+     
+        <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+        <script src="/libs/others/TencentCaptcha.js"></script>
+        <button id="TencentCaptcha" data-appid="197482151" data-cbfn="callback" type="button" hidden></button>
+    
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(e.href.match(t)||e.href.match(r))&&(e.href=a.dataset.original)})});</script><script>(r=>{r.imageLazyLoadSetting.processImages=t;var a=r.imageLazyLoadSetting.isSPA,o=r.imageLazyLoadSetting.preloadRatio||1,d=i();function i(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(t){(a||t)&&(d=i());for(var e,n=0;n<d.length;n++)0<=(e=(e=d[n]).getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(r.innerHeight*o||document.documentElement.clientHeight*o)&&(()=>{var t,e,a,o,i=d[n];e=function(){d=d.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).dataset.loaded||(t.hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(a=new Image,o=t.getAttribute("data-original"),a.onload=function(){t.src=o,t.removeAttribute("data-original"),t.setAttribute("data-loaded",!0),e&&e()},a.onerror=function(){t.removeAttribute("data-original"),t.setAttribute("data-loaded",!1),t.src=o},t.src!==o&&(a.src=o)))})()}function e(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",e),r.addEventListener("resize",e),r.addEventListener("orientationchange",e)})(this);</script></body>
+
+</html>

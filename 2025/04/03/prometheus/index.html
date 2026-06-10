@@ -1,0 +1,1629 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="Prometheus, 爱哭的小河豚">
+    <meta name="description" content="一、普罗米修斯监控概述1.1 什么是普罗米修斯监控
+Prometheus(由go语言(golang)开发)是一开源的监控&amp;amp;报警&amp;amp;时间序列数据库的组合。 适合监控docker容器。因为kubernetes(俗称k8s)的流行带">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Prometheus | 爱哭的小河豚</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    
+
+
+    <!-- bg-cover style     -->
+
+
+
+<link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+<link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+<link rel="stylesheet" type="text/css" href="/css/matery.css">
+<link rel="stylesheet" type="text/css" href="/css/my.css">
+<link rel="stylesheet" type="text/css" href="/css/dark.css" media="none" onload="if(media!='all')media='all'">
+
+
+
+
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+    <link rel="stylesheet" href="/css/post.css">
+
+
+
+
+    
+        <link rel="stylesheet" type="text/css" href="/css/reward.css">
+    
+
+
+
+    <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="爱哭的小河豚" type="application/atom+xml">
+</head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    <div>
+                        
+                        <img src="/medias/loading.gif" data-original="/medias/logo.png" class="logo-img" alt="LOGO">
+                        
+                        <span class="logo-span">爱哭的小河豚</span>
+                    </div>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/hello-algo" class="waves-effect waves-light">
+      
+      <i class="fas fa-anchor" style="zoom: 0.6;"></i>
+      
+      <span>Hello 算法</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/love" class="waves-effect waves-light">
+      
+      <i class="fas fa-heart" style="zoom: 0.6;"></i>
+      
+      <span>写给我家乖乖</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+  <li>
+    <a href="javascript:;" class="waves-effect waves-light" onclick="switchNightMode()" title="深色/浅色模式" >
+      <i id="sum-moon-icon" class="fas fa-sun" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/loading.gif" data-original="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">爱哭的小河豚</div>
+        <div class="logo-desc">
+            
+            谁会不喜欢一只爱哭，生气又圆鼓鼓的小河豚呢？
+            
+        </div>
+    </div>
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/hello-algo" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-anchor"></i>
+			
+			Hello 算法
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/love" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-heart"></i>
+			
+			写给我家乖乖
+		</a>
+          
+        </li>
+        
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/14.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Prometheus</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Prometheus/">
+                                <span class="chip bg-color">Prometheus</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E8%BF%90%E7%BB%B4/" class="post-category">
+                                运维
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2025-04-03
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2025-07-21
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    2.6k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    10 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.min.css">
+        
+
+        
+        <!-- 代码块折行 -->
+        <style type="text/css">
+            code[class*="language-"], pre[class*="language-"] { white-space: pre-wrap !important; }
+        </style>
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h2 id="一、普罗米修斯监控概述"><a href="#一、普罗米修斯监控概述" class="headerlink" title="一、普罗米修斯监控概述"></a>一、普罗米修斯监控概述</h2><h3 id="1-1-什么是普罗米修斯监控"><a href="#1-1-什么是普罗米修斯监控" class="headerlink" title="1.1 什么是普罗米修斯监控"></a>1.1 什么是普罗米修斯监控</h3><p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/8a27432d1cea410e17dab98072b92e7b.png" alt="在这里插入图片描述"></p>
+<p>Prometheus(由go语言(golang)开发)是一开源的监控&amp;报警&amp;时间序列数据库的组合。 适合监控docker容器。因为kubernetes(俗称k8s)的流行带动了 prometheus的发展。</p>
+<p>官方网站：<a target="_blank" rel="noopener" href="https://prometheus.io/">https://prometheus.io/</a></p>
+<hr>
+<h2 id="二、时间序列数据"><a href="#二、时间序列数据" class="headerlink" title="二、时间序列数据"></a>二、时间序列数据</h2><h3 id="2-1-什么是序列数据"><a href="#2-1-什么是序列数据" class="headerlink" title="2.1 什么是序列数据"></a>2.1 什么是序列数据</h3><p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/65106d6260656741717a75c923add6b5.png" alt="在这里插入图片描述"></p>
+<p>时间序列数据（TimeSeries Data）：按照时间顺序记录系统，设备状态变化的数据被称为时序数据。</p>
+<p>应用的场景很多，如：</p>
+<ul>
+<li>无人驾驶车辆运行中要记录的经度,纬度,速度,方向,旁边物体的距离等等。每时每刻都要将数据记录下来做分析。</li>
+<li>某一个地区的各车辆的行驶轨迹数据</li>
+<li>传统证券行业实时交易数据</li>
+<li>实时运维监控数据等</li>
+</ul>
+<hr>
+<h3 id="2-2-时间序列数据特点"><a href="#2-2-时间序列数据特点" class="headerlink" title="2.2 时间序列数据特点"></a>2.2 时间序列数据特点</h3><p>● 性能好<br>关系型数据库对于大规模数据的处理性能糟糕。NOSQL 可以比较好的处理大规模数据，让依然比不上时间序列数据库。</p>
+<p>● 存储成本低<br>高效的压缩算法,节省存储空间,有效降低I0</p>
+<p>Prometheus有着非常高效的时间序列数据存储方法，每个采样数据仅仅占用3.5byte左右空间，上百万条时间序列, 30秒间隔,保留60天,大概花了200多G (来自官方数据)</p>
+<hr>
+<h3 id="2-3-普罗米修斯特征"><a href="#2-3-普罗米修斯特征" class="headerlink" title="2.3 普罗米修斯特征"></a>2.3 普罗米修斯特征</h3><ul>
+<li>多维度数据模型</li>
+<li>灵活的查询语言</li>
+<li>不依赖分布式存储,单个服务器节点是自主的</li>
+<li>以HTTP方式,通过pull模型拉去时间序列数据</li>
+<li>也可以通过中间网关支持push模型</li>
+<li>通过服务发现或者静态配置,来发现目标服务对象</li>
+<li>支持多种多样的图表和界面展示</li>
+</ul>
+<hr>
+<h2 id="三、普罗米修斯原理架构图"><a href="#三、普罗米修斯原理架构图" class="headerlink" title="三、普罗米修斯原理架构图"></a>三、普罗米修斯原理架构图</h2><p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/45e931b8511caf440c8415b0136e88dd.png" alt="在这里插入图片描述"><br>____Prometheus 直接或通过中介推送网关从检测的作业中抓取指标，用于短期作业。它将所有抓取的样本存储在本地，并对这些数据运行规则，以从现有数据聚合和记录新的时间序列或生成警报。Grafana或其他 API 使用者可用于可视化收集的数据。</p>
+<hr>
+<h2 id="四、普罗米修斯监控系统的部署"><a href="#四、普罗米修斯监控系统的部署" class="headerlink" title="四、普罗米修斯监控系统的部署"></a>四、普罗米修斯监控系统的部署</h2><h3 id="4-1-环境准备工作"><a href="#4-1-环境准备工作" class="headerlink" title="4.1 环境准备工作"></a>4.1 环境准备工作</h3><p>服务器准备</p>
+<table>
+<thead>
+<tr>
+<th>服务器类型</th>
+<th>系统和IP地址</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Prometheus服务器</td>
+<td>CentOS7.4(64 位) 192.168.80.10</td>
+<td>Prometheus</td>
+</tr>
+<tr>
+<td>grafana服务器</td>
+<td>CentOS7.4(64 位) 192.168.80.20</td>
+<td>mariadb、node_exporter</td>
+</tr>
+<tr>
+<td>被监控服务器</td>
+<td>CentOS7.4(64 位) 192.168.80.30</td>
+<td>Grafana</td>
+</tr>
+</tbody></table>
+<p>所有服务器关闭防火墙和SElinux</p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">systemctl stop firewalld
+setenforce 0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>修改/etc/hosts</p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">192.168.80.10 prometheus
+192.168.80.20 grafana
+192.168.80.30 client<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<hr>
+<h3 id="4-2-普罗米修斯的部署"><a href="#4-2-普罗米修斯的部署" class="headerlink" title="4.2 普罗米修斯的部署"></a>4.2 普罗米修斯的部署</h3><p>1.设置时间同步<br>① 所有服务器安装<code>ntpdate</code></p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">yum install ntpdate -y<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/d23719006d7ff13f04f79f1edfbf5955.png" alt="在这里插入图片描述"><br>② 进行时间同步</p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">ntpdate cn.ntp.org.cn
+date<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/d15e4bef5d407fb9646861edbe77bf79.png" alt="在这里插入图片描述"><br>2.安装普罗米修斯<br>下载地址：<a target="_blank" rel="noopener" href="https://prometheus.io/download/">https://prometheus.io/download/</a> 。我这边之前下载过，直接传入就可以了。<br>① 传入安装包并解压</p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">cd /opt/
+rz -E				##传入安装包
+tar zxvf prometheus-2.29.1.linux-amd64.tar.gz<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/983f863b830f7efe5a299f57b610e742.png" alt="在这里插入图片描述"><br>② 移动并修改名</p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">mv prometheus-2.29.1.linux-amd64 /usr/local/promethues
+cd /usr/local/promethues/<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/868f6249939c6211bace69ccfda5ecef.png" alt="在这里插入图片描述"><br>③ 后台启动普罗米修斯</p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">cd /usr/local/promethues/
+./prometheus --config.file="/usr/local/promethues/prometheus.yml" &amp;
+
+netstat -napt | grep prometheus			#查看服务是否启动 端口为9090
+或
+lsof -i:9090<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/69124597ff098d82daebad925fc43d25.png" alt="在这里插入图片描述"><br>④ 浏览器中进行访问测试</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup">http://192.168.80.10:9090<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/60c1881aa777ed8232dcb610993e2084.png" alt="在这里插入图片描述"></p>
+<p>⑤ 查看 Status 中的 Targets 项。可以看到默认监控的 localhost 也就是本机。<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/b184d9eb6b1ca274e706024fc57faedb.png" alt="在这里插入图片描述"></p>
+<hr>
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/87fb2ee2665ab5b18c602b1cbcf87af1.png" alt="在这里插入图片描述"><br>⑥ 监控接口：通过http://服务器IP:9090/metrics可以查看监控的数据<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/a606e41e9999673212399a102dd25c7f.png" alt="在这里插入图片描述"></p>
+<h3 id="4-3-普罗米修斯的-web-页面操作"><a href="#4-3-普罗米修斯的-web-页面操作" class="headerlink" title="4.3 普罗米修斯的 web 页面操作"></a>4.3 普罗米修斯的 web 页面操作</h3><p>① 查看cpu的运行状态（首页搜索栏中输入process_cpu_seconds_total）<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/ff6bc19239b794fd41b25aedd3a19086.png" alt="在这里插入图片描述"><br>② 点击 Graph 选项<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/a1b07f0787ff60c4c476c3b94b8aa7a3.png" alt="在这里插入图片描述"></p>
+<h3 id="4-4-监控远程-Linux-主机"><a href="#4-4-监控远程-Linux-主机" class="headerlink" title="4.4 监控远程 Linux 主机"></a>4.4 监控远程 Linux 主机</h3><p>① 在远程linux主机（被监控端agent1）上安装 node_exporter 组件，我这边直接上传。<br>官网下载地址为：<a target="_blank" rel="noopener" href="https://github.com/prometheus/node_exporter/releases/download/v1.2.2/node_exporter-1.2.2.linux-amd64.tar.gz">https://github.com/prometheus/node_exporter/releases/download/v1.2.2/node_exporter-1.2.2.linux-amd64.tar.gz</a></p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">cd /opt/
+tar zxvf node_exporter-1.2.2.linux-amd64.tar.gz -C /usr/local/
+cd /usr/local/
+mv node_exporter-1.2.2.linux-amd64/ node_exporter<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/fc4be6c8dcd8164e12ffefc51d876398.png" alt="在这里插入图片描述"><br>② 启动 node_exporter 程序</p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">cd node_exporter/
+nohup /usr/local/node_exporter/node_exporter &amp;		#永久运行并在后台运行
+netstat -natp | grep :9100							#查看端口占用情况  <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>扩展: nohup命令:如果把启动node_exporter的终端给关闭，那么进程也会随之关闭。nohup命令会帮你解决这个问题。</p>
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/3f42f44ed569d00203f1c0e8199ac25e.png" alt="在这里插入图片描述"><br>③ 使用http协议+9100端口收集Linux主机信息<br>通过浏览器访问：<a target="_blank" rel="noopener" href="http://192.168.80.30:9100/metrics">http://192.168.80.30:9100/metrics</a> 就可以看到 node_exporter 在被监控端主机的监控信息<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/a4414e7c5fc352b21534679a428b1bfe.png" alt="在这里插入图片描述"><br>④ 在 Prometheus 服务器的配置文件中添加被监控机器的配置段</p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">vim /usr/local/promethues/prometheus.yml
+
+##添加以下配置项
+  - job_name: "agent1"
+    static_configs:
+      - targets: ["192.168.80.30:9100"]<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/b6dceddb2614be611ea03ac7d3ad34dd.png" alt="在这里插入图片描述"><br>⑤ 重新启动prometheus监控系统</p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">pkill prometheus
+lsof -i:9090
+cd /usr/local/promethues/
+./prometheus --config.file="/usr/local/promethues/prometheus.yml" &amp;
+lsof -i:9090<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/1b47913eda060a460ba7da5478a83199.png" alt="在这里插入图片描述"></p>
+<p>⑥ 重新回到普罗米修斯web端查看 Status 中的 Targets 项，可以看到被监控端 node_exporter 了，并且状态为 up。<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/1f357972c0799e2e82d605683117a8dd.png" alt="在这里插入图片描述"></p>
+<h3 id="4-5-远程监控-MySQL-数据库"><a href="#4-5-远程监控-MySQL-数据库" class="headerlink" title="4.5 远程监控 MySQL 数据库"></a>4.5 远程监控 MySQL 数据库</h3><p>① 在被监控端服务器上安装 mysqld_exporter 组件，我这边直接上传。<br>官方下载地址为：<a target="_blank" rel="noopener" href="https://github.com/prometheus/mysqld_exporter/releases/download/v0.13.0/mysqld_exporter-0.13.0.linux-amd64.tar.gz">https://github.com/prometheus/mysqld_exporter/releases/download/v0.13.0/mysqld_exporter-0.13.0.linux-amd64.tar.gz</a></p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">cd /opt/
+tar zxvf mysqld_exporter-0.13.0.linux-amd64.tar.gz -C /usr/local/
+cd /usr/local/
+mv mysqld_exporter-0.13.0.linux-amd64/ mysqld_exporter<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/e4721ed6eaab86597682c6fa2e44fef0.png" alt="在这里插入图片描述"><br>② 节省时间安装 mariadb 数据库</p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">yum install mariadb\* -y<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/c0b0ad120a6b9968b555d26b2abd045c.png" alt="在这里插入图片描述"><br>③ 开启并设置为开机自启，然后登录 mysql<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/d3c4b53e1c5eddc08d208a004b519530.png" alt="在这里插入图片描述"><br>④ 创建 mysql 账号帮刷新权限用于收集数据</p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">grant select,replication client,process ON *.* to 'mysql_monitor'@'localhost' identified by 'abc123';
+账号为：mysql_monitor
+密码为：abc123
+
+flush privileges;
+exit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/5562f9704f604dd2027adbbcc7099f79.png" alt="在这里插入图片描述"></p>
+<p>⑤ 在mysql_exporter 组件中创建配置文件，配置 mysql 信息</p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">vim /usr/local/mysqld_exporter/.my.cnf
+
+[client]
+user=mysql_monitor
+password=abc123<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/08eb746852e4189194906829f8e7d03b.png" alt="在这里插入图片描述"><br>⑥ 启动 mysql_exporter 组件</p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">cd mysqld_exporter/
+./mysqld_exporter --config.my-cnf=/usr/local/mysqld_exporter/.my.cnf &amp;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/2db1626d4db15376d72fe3c6db0d4deb.png" alt="在这里插入图片描述"><br>⑦ 回到 prometheus 服务器的配置文件里添加被监控的 mariadb 的配置段</p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">vim /usr/local/promethues/prometheus.yml
+## 添加下面三行
+  - job_name: 'agent1_mariadb'
+    static_configs:
+      - targets: ['192.168.80.30:9104']<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/7b2d54dc1a7465fe1c98b3d30929f4ce.png" alt="在这里插入图片描述"></p>
+<p>⑧ 改完配置文件后,重启服务</p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">pkill prometheus
+lsof -i:9090
+./prometheus --config.file="/usr/local/promethues/prometheus.yml" &amp;
+lsof -i:9090<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/f317cc8fa275370bbbf032d18f0882f7.png" alt="在这里插入图片描述"><br>⑨ 回到web管理界面 --》点Status --》点Targets --》可以看到监控mariadb了<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/b855d21ea51bdd22d4a3dbadd371ce98.png" alt="在这里插入图片描述"></p>
+<p>⑩ 查看 mysql 线程连接<br>搜索栏中输入：mysql_global_status_threads_connected 进行查看</p>
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/50e38142824c9ccd3b32117adebc7657.png" alt="在这里插入图片描述"></p>
+<hr>
+<h2 id="五、Grafana可视化图形工具"><a href="#五、Grafana可视化图形工具" class="headerlink" title="五、Grafana可视化图形工具"></a>五、Grafana可视化图形工具</h2><h3 id="5-1-什么是Grafana"><a href="#5-1-什么是Grafana" class="headerlink" title="5.1 什么是Grafana"></a>5.1 什么是Grafana</h3><p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/2faf073a5e1555d3a5e87e802e0768b1.png" alt="在这里插入图片描述"></p>
+<p>Grafana是一个开源的度量分析和可视化工具，可以通过将采集的数据分析，查询，然后进行可视化的展示,并能实现报警。</p>
+<h3 id="5-2-使用Grafana连接Prometheus"><a href="#5-2-使用Grafana连接Prometheus" class="headerlink" title="5.2 使用Grafana连接Prometheus"></a>5.2 使用Grafana连接Prometheus</h3><p>① 在grafana服务器上安装 grafana，我这边之前下载过，直接上传<br>官方下载地址:<a target="_blank" rel="noopener" href="https://grafana.com/grafana/download">https://grafana.com/grafana/download</a></p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">cd /opt/
+rz -E
+rpm -ivh grafana-5.3.4-1.x86_64.rpm 
+systemctl start grafana-server
+systemctl enable grafana-server
+lsof -i:3000<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/c1494863bbdea877253f3f7d24addd1b.png" alt="在这里插入图片描述"><br>② 通过浏览器访问 http:// grafana服务器IP:3000就到了登录界面,使用默认的admin用户,admin密码就可以登陆了<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/1d8e2cb2b791f98b1e3c803841c382f7.png" alt="在这里插入图片描述"></p>
+<p>③ 重新修改密码为：abc123<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/482f016f369f7c2b82b3f756434e255b.png" alt="在这里插入图片描述"><br>④ 把 prometheus 服务器收集的数据做为一个数据源添加到 grafana,让 grafana 可以得到 prometheus 的数据<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/f0fc73ee1bdace9cd8aa376abc07c4f8.png" alt="在这里插入图片描述"><br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/511d3b998666448c7dd941e681be3ff7.png" alt="在这里插入图片描述"></p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup">部分选项解释
+Auth项：公网传输数据加密与验证用的，我们这边暂时不需要设置
+Advanced HTTP Settings项：15秒获取一次数据，GET方式<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/3e0702ef03b5144c8fcee9b8ef44b453.png" alt="在这里插入图片描述"><br>⑤ 为添加好的数据源做图形显示（查看被监控端1分钟、5分钟和15分钟的负载情况）<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/6a7fc803286bef3e4afaea26f5c1e1ba.png" alt="在这里插入图片描述"><br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/a261737370526e2e72c36d22cd0d9c7a.png" alt="在这里插入图片描述"><br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/dd9c4fcd026fdc211455be7a0bddac10.png" alt="在这里插入图片描述"><br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/5cfdf5b6d322b8a84a0dd263bbe7efcb.png" alt="在这里插入图片描述"><br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/2a0b64a5001bbc38f288c296bac41737.png" alt="在这里插入图片描述"><br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/cbe512b82abe088a8ef01ab72eb7279e.png" alt="在这里插入图片描述"><br>⑥ 匹配条件显示（根据IP或普罗米修斯里面设置的job）<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/09d4930e594eef5a88d8b1781ec1d56e.png" alt="在这里插入图片描述"></p>
+<h3 id="5-3-Grafana图形显示MySQL监控数据"><a href="#5-3-Grafana图形显示MySQL监控数据" class="headerlink" title="5.3 Grafana图形显示MySQL监控数据"></a>5.3 Grafana图形显示MySQL监控数据</h3><p>① 在 grafana 上修改配置文件,并下载安装mysql监控的 dashboard（包含相关json文件，这些json文件可以看作是开发人员开发的一个监控模板)，我这边直接上传。<br>官方下载网址: <a target="_blank" rel="noopener" href="https://github.com/percona/grafana-dashboards">https://github.com/percona/grafana-dashboards</a></p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">vim /etc/grafana/grafana.ini
+
+[dashboards.json] 
+enabled = true 
+path = /var/lib/grafana/dashboards
+
+
+git clone https://github.com/percona/grafana-dashboards.git<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/9020b36bedee9c21fbf8ab01b0ae42c7.png" alt="在这里插入图片描述"></p>
+<p>② 下载json模板并上传到 grafana 服务器后解压缩<br>参考网址: <a target="_blank" rel="noopener" href="https://github.com/percona/grafana-dashboards">https://github.com/percona/grafana-dashboards</a><br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/b49d96e3323e3b57a68084d461c6f1c2.png" alt="在这里插入图片描述"></p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">unzip grafana-dashboards-main.zip<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/067534440924b216c33090f55b33a47d.png" alt="在这里插入图片描述"></p>
+<p>③ 复制到/var/lib/grafana目录下并改名，然后重启服务</p>
+<pre class="line-numbers language-handlebars" data-language="handlebars"><code class="language-handlebars">cp -r grafana-dashboards-1.17.4/ /usr/lib/grafana/
+systemctl restart grafana-server.service <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/fee03c97645d89579614acbbf15ba516.png" alt="在这里插入图片描述"><br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/b3df6b97417ae84e90a27be7cceae035.png" alt="在这里插入图片描述"></p>
+<p>④ 把下载压缩包在本地解压<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/4b3f9c380dd5c20a941c979341a192b9.png" alt="在这里插入图片描述"><br>⑤ 在grafana图形界面导入相关json文件<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/a4c18cc73907075a7f5440909a479105.png" alt="在这里插入图片描述"><br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/3c05667b992b3b379e4e72924c38987e.png" alt="在这里插入图片描述"></p>
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/0792c6dda4b20fb429cf9d7e4e997482.png" alt="在这里插入图片描述"></p>
+<p>⑥ 点import导入后,报prometheus数据源找不到,因为这些json文件里默认要找的就是叫Prometheus的数据源，但我们前面建立的数据源却是叫 prometheus_data ，修改之前数据源的名称即可。</p>
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/80f1ddb331731dbbc790e16e241145fe.png" alt="在这里插入图片描述"><br>⑦ 修改完数据源名称后再次查看<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/596aed5248fb7c80d17d0b33fb2445f7.png" alt="在这里插入图片描述"><br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/b137bdeb471003e3b8453629a7489b73.png" alt="在这里插入图片描述"><br>⑧ 数据展示完成（过段时间再看，加载完成就会数据显示了）<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/af1af9501536b8326bd4533f0c17995c.png" alt="在这里插入图片描述"></p>
+<h2 id="六、-Grafana-onealert报警"><a href="#六、-Grafana-onealert报警" class="headerlink" title="六、 Grafana+onealert报警"></a>六、 Grafana+onealert报警</h2><p>prometheus报警需要使用alertmanager这个组件，而且报警规则需要手动编写(对运维来说不友好)。所以我这里选用grafana+onealert报警。<br>注意: 实现报警前把所有机器时间同步再检查一遍.</p>
+<p>再次所有服务器同步时间<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/c867e0da8c719c95a02d2ba93c7591be.png" alt="在这里插入图片描述"></p>
+<h3 id="6-1-注册账号并获取key"><a href="#6-1-注册账号并获取key" class="headerlink" title="6.1 注册账号并获取key"></a>6.1 注册账号并获取key</h3><p>② 先在onealert里添加grafana应用，需要先申请onealert账号。<br>官方网站：<a target="_blank" rel="noopener" href="https://caweb.aiops.com/#/">https://caweb.aiops.com/#/</a><br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/4368fc4cdae8f51c5eb812523f02cc2b.png" alt="在这里插入图片描述"></p>
+<p>③ 在新建应用中找到 grafana 应用 ，填好名字后保存获取应用key</p>
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/d9a11eca9789effb5308ad76b211c8ed.png" alt="在这里插入图片描述"><br>然后可以看到配置步骤<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/2c124b8f81009e263a8ba9a74bf6a8a4.png" alt="在这里插入图片描述"></p>
+<h3 id="6-2-配置通知策略"><a href="#6-2-配置通知策略" class="headerlink" title="6.2 配置通知策略"></a>6.2 配置通知策略</h3><p>① 在 Grafana 中创建 Notification channel，选择类型为 Webhook；<br>a. 将第一步中生成的Webhook URL填入Webhook settings Url；</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup">URL格式：
+http://api.aiops.com/alert/api/event/grafana/v1/4065f3ce446841ca859d41c675286833/<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>b. Http Method选择POST；<br>c. Send Test&amp;Save；</p>
+<p><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/240617a49d0a2f9e1df6b27f0ba22cc3.png" alt="在这里插入图片描述"><br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/34f93121d28a43f2aa22b7b6efe0910a.png" alt="在这里插入图片描述"></p>
+<h3 id="6-3-将配置的Webhook-Notification-Channel添加到Grafana-Alert中"><a href="#6-3-将配置的Webhook-Notification-Channel添加到Grafana-Alert中" class="headerlink" title="6.3 将配置的Webhook Notification Channel添加到Grafana Alert中"></a>6.3 将配置的Webhook Notification Channel添加到Grafana Alert中</h3><p>① 选择我们之前创建的cpu监控，点击Edit进行编辑<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/38c521fc76f5d2bdd08b4ad17e196d0b.png" alt="在这里插入图片描述"><br>② 填写name 和 IS above<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/937a94dc9216b7588933b5c25308e649.png" alt="在这里插入图片描述"><br>③ 现在发送的对象和发送的信息<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/5ca7c8a6644183b354a25d1538643834.png" alt="在这里插入图片描述"><br>④ 保存并自定义个名字<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/f07a34f6659126327031f477889195bb.png" alt="在这里插入图片描述"></p>
+<h3 id="6-4-CPU告警测试"><a href="#6-4-CPU告警测试" class="headerlink" title="6.4 CPU告警测试"></a>6.4 CPU告警测试</h3><p>⑤ 现在可以去设置一个报警来测试了(这里以我们前面加的cpu负载监控来做测试)<br>在被监控端的agent执行测试命令<code>cat /dev/urandom | md5sum</code><br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/12d7feb2b98c25351c9b81796233fbfc.png" alt="在这里插入图片描述"></p>
+<p>⑥ 等待一会，可以看到grafana监控页面CPU负载超过0.5了<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/cd7184d8cc510f3eff96333cc3683ff3.png" alt="在这里插入图片描述"><br>⑦ 这个时候会收到邮件提示<br><img src="/medias/loading.gif" data-original="/2025/04/03/prometheus/601dfbcb552b798bd2d2b4aa237c8b06.png" alt="在这里插入图片描述"></p>
+<h2 id="七、总结报警不成功的可能原因"><a href="#七、总结报警不成功的可能原因" class="headerlink" title="七、总结报警不成功的可能原因"></a>七、总结报警不成功的可能原因</h2><ol>
+<li>各服务器之间时间不同步，这样时序数据会出问题，也会造成报警出问题</li>
+<li>必须写通知内容，留空内容是不会发报警的</li>
+<li>修改完报警配置后，记得要点右上角的保存</li>
+<li>保存配置后，需要由OK状态变为alerting状态才会报警(也就是说，你配置保存后，就已经是alerting状态是不会报警的)</li>
+<li>grafana与onealert通信有问题</li>
+</ol>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">L ZHEN</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="http://fahaxikilz.github.io/2025/04/03/prometheus/">http://fahaxikilz.github.io/2025/04/03/prometheus/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">L ZHEN</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Prometheus/">
+                                    <span class="chip bg-color">Prometheus</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/loading.gif" data-original="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/loading.gif" data-original="/medias/reward/wechat.jpg" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+        <style>
+    .valine-card {
+        margin: 1.5rem auto;
+    }
+
+    .valine-card .card-content {
+        padding: 20px 20px 5px 20px;
+    }
+
+    #vcomments textarea {
+        box-sizing: border-box;
+        background: url("/medias/comment_bg.png") 100% 100% no-repeat;
+    }
+
+    #vcomments p {
+        margin: 2px 2px 10px;
+        font-size: 1.05rem;
+        line-height: 1.78rem;
+    }
+
+    #vcomments blockquote p {
+        text-indent: 0.2rem;
+    }
+
+    #vcomments a {
+        padding: 0 2px;
+        color: #4cbf30;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    #vcomments img {
+        max-width: 100%;
+        height: auto;
+        cursor: pointer;
+    }
+
+    #vcomments ol li {
+        list-style-type: decimal;
+    }
+
+    #vcomments ol,
+    ul {
+        display: block;
+        padding-left: 2em;
+        word-spacing: 0.05rem;
+    }
+
+    #vcomments ul li,
+    ol li {
+        display: list-item;
+        line-height: 1.8rem;
+        font-size: 1rem;
+    }
+
+    #vcomments ul li {
+        list-style-type: disc;
+    }
+
+    #vcomments ul ul li {
+        list-style-type: circle;
+    }
+
+    #vcomments table, th, td {
+        padding: 12px 13px;
+        border: 1px solid #dfe2e5;
+    }
+
+    #vcomments table, th, td {
+        border: 0;
+    }
+
+    table tr:nth-child(2n), thead {
+        background-color: #fafafa;
+    }
+
+    #vcomments table th {
+        background-color: #f2f2f2;
+        min-width: 80px;
+    }
+
+    #vcomments table td {
+        min-width: 80px;
+    }
+
+    #vcomments h1 {
+        font-size: 1.85rem;
+        font-weight: bold;
+        line-height: 2.2rem;
+    }
+
+    #vcomments h2 {
+        font-size: 1.65rem;
+        font-weight: bold;
+        line-height: 1.9rem;
+    }
+
+    #vcomments h3 {
+        font-size: 1.45rem;
+        font-weight: bold;
+        line-height: 1.7rem;
+    }
+
+    #vcomments h4 {
+        font-size: 1.25rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    #vcomments h5 {
+        font-size: 1.1rem;
+        font-weight: bold;
+        line-height: 1.4rem;
+    }
+
+    #vcomments h6 {
+        font-size: 1rem;
+        line-height: 1.3rem;
+    }
+
+    #vcomments p {
+        font-size: 1rem;
+        line-height: 1.5rem;
+    }
+
+    #vcomments hr {
+        margin: 12px 0;
+        border: 0;
+        border-top: 1px solid #ccc;
+    }
+
+    #vcomments blockquote {
+        margin: 15px 0;
+        border-left: 5px solid #42b983;
+        padding: 1rem 0.8rem 0.3rem 0.8rem;
+        color: #666;
+        background-color: rgba(66, 185, 131, .1);
+    }
+
+    #vcomments pre {
+        font-family: monospace, monospace;
+        padding: 1.2em;
+        margin: .5em 0;
+        background: #272822;
+        overflow: auto;
+        border-radius: 0.3em;
+        tab-size: 4;
+    }
+
+    #vcomments code {
+        font-family: monospace, monospace;
+        padding: 1px 3px;
+        font-size: 0.92rem;
+        color: #e96900;
+        background-color: #f8f8f8;
+        border-radius: 2px;
+    }
+
+    #vcomments pre code {
+        font-family: monospace, monospace;
+        padding: 0;
+        color: #e8eaf6;
+        background-color: #272822;
+    }
+
+    #vcomments pre[class*="language-"] {
+        padding: 1.2em;
+        margin: .5em 0;
+    }
+
+    #vcomments code[class*="language-"],
+    pre[class*="language-"] {
+        color: #e8eaf6;
+    }
+
+    #vcomments [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: inherit;
+        margin-left: -1.3rem;
+        margin-right: 0.4rem;
+        margin-top: -1px;
+        vertical-align: middle;
+        left: unset;
+        visibility: visible;
+    }
+
+    #vcomments b,
+    strong {
+        font-weight: bold;
+    }
+
+    #vcomments dfn {
+        font-style: italic;
+    }
+
+    #vcomments small {
+        font-size: 85%;
+    }
+
+    #vcomments cite {
+        font-style: normal;
+    }
+
+    #vcomments mark {
+        background-color: #fcf8e3;
+        padding: .2em;
+    }
+
+    #vcomments table, th, td {
+        padding: 12px 13px;
+        border: 1px solid #dfe2e5;
+    }
+
+    table tr:nth-child(2n), thead {
+        background-color: #fafafa;
+    }
+
+    #vcomments table th {
+        background-color: #f2f2f2;
+        min-width: 80px;
+    }
+
+    #vcomments table td {
+        min-width: 80px;
+    }
+
+    #vcomments [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: inherit;
+        margin-left: -1.3rem;
+        margin-right: 0.4rem;
+        margin-top: -1px;
+        vertical-align: middle;
+        left: unset;
+        visibility: visible;
+    }
+</style>
+
+<div class="card valine-card" data-aos="fade-up">
+    <div class="comment_headling" style="font-size: 20px; font-weight: 700; position: relative; padding-left: 20px; top: 15px; padding-bottom: 5px;">
+        <i class="fas fa-comments fa-fw" aria-hidden="true"></i>
+        <span>评论</span>
+    </div>
+    <div id="vcomments" class="card-content" style="display: grid">
+    </div>
+</div>
+
+<script src="/libs/valine/av-min.js"></script>
+<script src="/libs/valine/Valine.min.js"></script>
+<script>
+    new Valine({
+        el: '#vcomments',
+        appId: 'sxNXQ2L9Yj1y9VxBDX2sA6d8-gzGzoHsz',
+        appKey: 'YgMUSzSrmuxo97dKBzjIl5dy',
+        serverURLs: 'https://sxnxq2l9.lc-cn-n1-shared.com',
+        notify: 'true, // 邮件提醒!!!' === 'true',
+        verify: '' === 'true',
+        visitor: 'true' === 'true',
+        avatar: 'robohash',
+        pageSize: '10',
+        lang: 'zh-cn',
+        placeholder: 'ヾﾉ≧∀≦)o来啊，快活啊!'
+    });
+</script>
+
+<!--酷Q推送-->
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2025/05/21/shardingsphere5/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/loading.gif" data-original="/medias/featureimages/12.jpg" class="responsive-img" alt="ShardingSphere5">
+                        
+                        <span class="card-title">ShardingSphere5</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2025-05-21
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/" class="post-category">
+                                    中间件
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/ShardingSphere5/">
+                        <span class="chip bg-color">ShardingSphere5</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2025/01/23/electron/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/loading.gif" data-original="/medias/featureimages/18.jpg" class="responsive-img" alt="Electron">
+                        
+                        <span class="card-title">Electron</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2025-01-23
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E4%B8%9C%E6%90%9E%E6%90%9E%EF%BC%8C%E8%A5%BF%E6%90%9E%E6%90%9E/" class="post-category">
+                                    东搞搞，西搞搞
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Electron/">
+                        <span class="chip bg-color">Electron</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+
+  <!-- 是否加载使用自带的 prismjs. -->
+  <script type="text/javascript" src="/libs/prism/prism.min.js"></script>
+
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('8'),
+            headingSelector: 'h1,h2,h3, h4,h5,h6,h7,h8'
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2022-2026</span>
+            
+            <a href="/about" target="_blank">L ZHEN</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">1184.3k</span>
+            
+            
+            
+                
+            
+            
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
+            </span>
+            
+            
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
+            </span>
+            
+            <br>
+
+            <!-- 运行天数提醒. -->
+            
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2022";
+                        var startMonth = "10";
+                        var startDate = "16";
+                        var startHour = "12";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
+                    }
+
+                    calcSiteTime();
+                </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+
+
+    <a href="mailto:1390211724@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1390211724" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1390211724" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 白天和黑夜主题 -->
+<div class="stars-con">
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>  
+</div>
+
+<script>
+    function switchNightMode() {
+        $('<div class="Cuteen_DarkSky"><div class="Cuteen_DarkPlanet"></div></div>').appendTo($('body')),
+        setTimeout(function () {
+            $('body').hasClass('DarkMode') 
+            ? ($('body').removeClass('DarkMode'), localStorage.setItem('isDark', '0'), $('#sum-moon-icon').removeClass("fa-sun").addClass('fa-moon')) 
+            : ($('body').addClass('DarkMode'), localStorage.setItem('isDark', '1'), $('#sum-moon-icon').addClass("fa-sun").removeClass('fa-moon')),
+            
+            setTimeout(function () {
+            $('.Cuteen_DarkSky').fadeOut(1e3, function () {
+                $(this).remove()
+            })
+            }, 2e3)
+        })
+    }
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    
+        <!-- <script src='https://unpkg.com/mermaid@latest/dist/mermaid.min.js'></script> -->
+        <script src='/libs/mermaid/mermaid.min.js'></script>
+        <script>
+          if (window.mermaid) {
+            mermaid.initialize({theme: 'forest'});
+          }
+        </script>
+    
+
+    
+
+    <!-- 雪花特效 -->
+    
+
+    <!-- 鼠标星星特效 -->
+    
+
+     
+        <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+        <script src="/libs/others/TencentCaptcha.js"></script>
+        <button id="TencentCaptcha" data-appid="197482151" data-cbfn="callback" type="button" hidden></button>
+    
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(e.href.match(t)||e.href.match(r))&&(e.href=a.dataset.original)})});</script><script>(r=>{r.imageLazyLoadSetting.processImages=t;var a=r.imageLazyLoadSetting.isSPA,o=r.imageLazyLoadSetting.preloadRatio||1,d=i();function i(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(t){(a||t)&&(d=i());for(var e,n=0;n<d.length;n++)0<=(e=(e=d[n]).getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(r.innerHeight*o||document.documentElement.clientHeight*o)&&(()=>{var t,e,a,o,i=d[n];e=function(){d=d.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).dataset.loaded||(t.hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(a=new Image,o=t.getAttribute("data-original"),a.onload=function(){t.src=o,t.removeAttribute("data-original"),t.setAttribute("data-loaded",!0),e&&e()},a.onerror=function(){t.removeAttribute("data-original"),t.setAttribute("data-loaded",!1),t.src=o},t.src!==o&&(a.src=o)))})()}function e(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",e),r.addEventListener("resize",e),r.addEventListener("orientationchange",e)})(this);</script></body>
+
+</html>
