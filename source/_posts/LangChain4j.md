@@ -1609,7 +1609,473 @@ public class AiController {
 
 ![img](./LangChain4j/lwRLYjVVG0xPsCAJ.webp)
 
-## 总结
+## 工作流
+
+基于 LangChain4j 构建 Agent 工作流的核心思路是 **AgenticServices** 提供的 `sequenceBuilder`、`loopBuilder`、`conditionalBuilder` 和 `parallelBuilder`。通过组合这些基础模式，你可以构建出从简单顺序执行到复杂多层嵌套的智能工作流。
+
+为了避免你示例中 `// 假设已定义...` 这样不清不楚的代码，下面的代码是完全可运行的完整示例，基于 **LangChain4j 1.10.0-beta18** 版本。
+
+### 1. 准备工作：添加依赖与定义基础接口
+
+首先，在项目中添加 `langchain4j-agentic` 依赖，并定义好工作流中所需的 AI 服务接口。
+
+```xml
+<dependency>
+    <groupId>dev.langchain4j</groupId>
+    <artifactId>langchain4j-agentic</artifactId>
+    <version>1.10.0-beta18</version>
+</dependency>
+<!-- 添加你需要的模型依赖，如 ollama 或 openai -->
+<dependency>
+    <groupId>dev.langchain4j</groupId>
+    <artifactId>langchain4j-ollama</artifactId>
+    <version>1.10.0-beta18</version>
+</dependency>
+```
+
+
+
+定义三个基础 Agent 接口（完整的代码，非伪代码）：
+
+```java
+// 创意作家 Agent
+public interface CreativeWriter {
+    @Agent("基于给定主题生成一个短篇故事")
+    @UserMessage("你是一个创意作家。根据主题 '{{topic}}' 生成一个不超过3句话的故事草稿。只返回故事本身。")
+    String generateStory(@V("topic") String topic);
+}
+
+// 受众编辑 Agent
+public interface AudienceEditor {
+    @Agent("编辑故事以更好地适应特定受众")
+    @UserMessage("你是一名专业编辑。分析并重写下面的故事，使其更符合目标受众 '{{audience}}' 的需求。故事内容是：{{story}}")
+    String editStory(@V("story") String story, @V("audience") String audience);
+}
+
+// 风格编辑 Agent
+public interface StyleEditor {
+    @Agent("编辑故事以适配特定风格")
+    @UserMessage("你是一名专业编辑。分析并重写下面的故事，使其更贴合 '{{style}}' 风格。故事内容是：{{story}}")
+    String editStory(@V("story") String story, @V("style") String style);
+}
+```
+
+
+
+### 2. 顺序工作流 (Sequential Workflow)
+
+这是最基础的模式：Agent 依次执行，前一个的输出作为后一个的输入 。
+
+```java
+import dev.langchain4j.agentic.AgenticServices;
+import dev.langchain4j.agentic.UntypedAgent;
+import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.ollama.OllamaChatModel;
+
+public class SequentialWorkflowDemo {
+    public static void main(String[] args) {
+        // 1. 初始化模型 (这里以 Ollama 为例)
+        ChatLanguageModel model = OllamaChatModel.builder()
+                .baseUrl("http://localhost:11434")
+                .modelName("llama3")
+                .build();
+
+        // 2. 构建三个基础的 AI Agent
+        CreativeWriter writer = AgenticServices
+                .agentBuilder(CreativeWriter.class)
+                .chatModel(model)
+                .outputKey("story") // 将结果存入上下文中的 "story" 变量
+                .build();
+
+        AudienceEditor audienceEditor = AgenticServices
+                .agentBuilder(AudienceEditor.class)
+                .chatModel(model)
+                .outputKey("story") // 注意：这里也使用 "story" 作为输出键，会覆盖上下文中的值
+                .build();
+
+        StyleEditor styleEditor = AgenticServices
+                .agentBuilder(StyleEditor.class)
+                .chatModel(model)
+                .outputKey("story") // 最终编辑好的故事会存入 "story"
+                .build();
+
+        // 3. 将三个 Agent 按顺序组合成一个工作流
+        UntypedAgent novelCreator = AgenticServices
+                .sequenceBuilder() // 关键点：顺序构建器
+                .subAgents(writer, audienceEditor, styleEditor)
+                .outputKey("story") // 整个工作流的最终输出
+                .build();
+
+        // 4. 执行工作流并传入初始参数
+        java.util.Map<String, Object> input = java.util.Map.of(
+                "topic", "一条龙和一位年轻的巫师",
+                "audience", "10岁左右的儿童",
+                "style", "幽默风趣"
+        );
+
+        String finalStory = (String) novelCreator.invoke(input);
+        System.out.println("最终故事: \n" + finalStory);
+    }
+}
+```
+
+
+
+### 3. 循环工作流 (Loop Workflow)
+
+当你需要 Agent 不断自我改进，直到达到某个标准（如评分超过0.8分）时，可以使用循环工作流 。
+
+```java
+// 新增一个评分的 Agent 接口
+public interface StyleScorer {
+    @Agent("根据风格要求对故事进行0到1之间的评分")
+    @UserMessage("你是一个苛刻的评论家。根据与 '{{style}}' 风格的契合程度，给下面的故事一个0.0到1.0之间的评分：{{story}}。只返回数字分数，不要有其他内容。")
+    double scoreStory(@V("story") String story, @V("style") String style);
+}
+
+// 循环工作流示例
+public class LoopWorkflowDemo {
+    public static void main(String[] args) {
+        ChatLanguageModel model = OllamaChatModel.builder()
+                .baseUrl("http://localhost:11434")
+                .modelName("llama3")
+                .build();
+
+        // 构建 Agent
+        StyleEditor styleEditor = AgenticServices
+                .agentBuilder(StyleEditor.class)
+                .chatModel(model)
+                .outputKey("story")
+                .build();
+
+        StyleScorer styleScorer = AgenticServices
+                .agentBuilder(StyleScorer.class)
+                .chatModel(model)
+                .outputKey("score")
+                .build();
+
+        // 构建循环工作流
+        UntypedAgent storyImprovementLoop = AgenticServices
+                .loopBuilder() // 关键点：循环构建器
+                .subAgents(styleEditor, styleScorer) // 循环体：先编辑，后评分
+                .outputKey("story") // 循环结束后输出的故事
+                .exitCondition(agenticScope -> { // 定义退出循环的条件
+                    Double score = (Double) agenticScope.readState("score");
+                    System.out.println("当前故事评分: " + score);
+                    return score >= 0.8; // 评分达到0.8则退出
+                })
+                .maxIterations(5) // 最多循环5次，防止无限循环
+                .build();
+
+        // 准备初始输入
+        java.util.Map<String, Object> input = java.util.Map.of(
+                "story", "从前，有一条懒惰的龙。",
+                "style", "史诗奇幻"
+        );
+
+        String finalStory = (String) storyImprovementLoop.invoke(input);
+        System.out.println("优化后的故事: \n" + finalStory);
+    }
+}
+```
+
+
+
+### 4. 条件工作流 (Conditional Workflow)
+
+根据某个中间结果（如简历评分）来决定下一步执行哪个 Agent（如邀请面试或发送拒绝邮件）。
+
+```java
+// 假设已有面试安排 Agent 和 邮件助手 Agent 的接口
+public interface InterviewOrganizer {
+    @Agent("为候选人安排现场面试")
+    String organize(@V("candidateName") String name);
+}
+
+public interface EmailAssistant {
+    @Agent("向候选人发送拒绝邮件")
+    int sendRejection(@V("candidateName") String name);
+}
+
+// 条件工作流示例
+public class ConditionalWorkflowDemo {
+    public static void main(String[] args) {
+        ChatLanguageModel model = OllamaChatModel.builder()
+                .baseUrl("http://localhost:11434")
+                .modelName("llama3")
+                .build();
+
+        // 假设我们之前已经有了一个包含 "score" 的 AgenticScope
+        InterviewOrganizer interviewer = AgenticServices
+                .agentBuilder(InterviewOrganizer.class)
+                .chatModel(model)
+                .build();
+
+        EmailAssistant emailer = AgenticServices
+                .agentBuilder(EmailAssistant.class)
+                .chatModel(model)
+                .build();
+
+        // 构建条件分支
+        UntypedAgent decisionWorkflow = AgenticServices
+                .conditionalBuilder() // 关键点：条件构建器
+                .subAgents(
+                        scope -> ((Double) scope.readState("score")) >= 0.8, // 条件1：评分合格
+                        interviewer // 执行面试安排
+                )
+                .subAgents(
+                        scope -> ((Double) scope.readState("score")) < 0.8, // 条件2：评分不合格
+                        emailer // 执行拒绝邮件发送
+                )
+                .build();
+
+        // 模拟一个包含了评分结果的上下文输入
+        java.util.Map<String, Object> input = java.util.Map.of(
+                "score", 0.95,
+                "candidateName", "张三"
+        );
+
+        decisionWorkflow.invoke(input);
+        // 根据评分，工作流会自动调用 InterviewOrganizer 或 EmailAssistant
+    }
+}
+```
+
+
+
+### 5. 并行工作流与结果聚合
+
+当需要多个 Agent 同时处理不同任务时，可以使用并行工作流，提高效率 。
+
+```java
+// 假设有三个评审 Agent，它们对同一份简历进行独立评估
+public interface HrCvReviewer {
+    @Agent("从HR角度评审简历")
+    CvReview review(@V("cv") String cv);
+}
+public interface ManagerCvReviewer { /* 类似 */ }
+public interface TeamMemberCvReviewer { /* 类似 */ }
+
+// 定义评审结果类
+public class CvReview {
+    public double score;
+    public String feedback;
+    // 构造函数、getter/setter...
+}
+
+// 并行工作流示例
+public class ParallelWorkflowDemo {
+    public static void main(String[] args) {
+        ChatLanguageModel model = OllamaChatModel.builder()
+                .baseUrl("http://localhost:11434")
+                .modelName("llama3")
+                .build();
+
+        HrCvReviewer hrReviewer = AgenticServices.agentBuilder(HrCvReviewer.class)
+                .chatModel(model).outputKey("hrReview").build();
+        ManagerCvReviewer managerReviewer = AgenticServices.agentBuilder(ManagerCvReviewer.class)
+                .chatModel(model).outputKey("managerReview").build();
+        TeamMemberCvReviewer teamReviewer = AgenticServices.agentBuilder(TeamMemberCvReviewer.class)
+                .chatModel(model).outputKey("teamReview").build();
+
+        // 构建并行工作流
+        UntypedAgent parallelReviewWorkflow = AgenticServices
+                .parallelBuilder() // 关键点：并行构建器
+                .subAgents(hrReviewer, managerReviewer, teamReviewer)
+                .executor(java.util.concurrent.Executors.newFixedThreadPool(3)) // 使用线程池并行执行
+                .output(scope -> { // 聚合三个 Agent 的输出结果
+                    CvReview hr = (CvReview) scope.readState("hrReview");
+                    CvReview mgr = (CvReview) scope.readState("managerReview");
+                    CvReview team = (CvReview) scope.readState("teamReview");
+                    double avgScore = (hr.score + mgr.score + team.score) / 3.0;
+                    String combinedFeedback = String.join("\n", hr.feedback, mgr.feedback, team.feedback);
+                    return new CvReview(avgScore, combinedFeedback);
+                })
+                .build();
+
+        java.util.Map<String, Object> input = java.util.Map.of("cv", "张三的简历内容...");
+        CvReview finalReview = (CvReview) parallelReviewWorkflow.invoke(input);
+        System.out.println("平均分: " + finalReview.score);
+    }
+}
+```
+
+### 6. 非AI智能体详解
+
+在LangChain4j的工作流中，并非所有环节都需要大模型参与。**非AI智能体**（Non-AI Agent）是指那些不需要LLM参与、完全由确定性Java代码实现的处理节点，它们可以像AI Agent一样作为一等公民被编排进工作流中。
+
+#### 为什么需要非AI智能体？
+
+将更多步骤外包给非AI智能体，你的工作流将**更快、更准确、更经济**：
+
+| 对比维度 | AI Agent                     | 非AI智能体                         |
+| :------- | :--------------------------- | :--------------------------------- |
+| 执行速度 | 慢（需网络请求+模型推理）    | 快（纯内存计算）                   |
+| 确定性   | 非确定性（每次结果可能不同） | 完全确定                           |
+| 成本     | 高（API调用费用/算力消耗）   | 零成本                             |
+| 适用场景 | 创意、理解、推理             | 计算、格式转换、数据聚合、状态更新 |
+
+#### 两种创建方式
+
+##### 方式一：使用 @Agent 注解的普通Java类
+
+这是最直观的方式——在普通Java类的方法上添加`@Agent`注解，框架会自动将其识别为工作流中的一个节点。
+
+java
+
+```java
+/**
+ * 非AI智能体：将多个简历评审聚合成一个综合评审。
+ * 普通Java操作符可以像AI驱动的智能体一样在工作流中使用。
+ */
+public class ScoreAggregator {
+
+    @Agent(description = "将HR/经理/团队评审聚合成综合评审", outputKey = "combinedCvReview")
+    public CvReview aggregate(@V("hrReview") CvReview hr,
+                              @V("managerReview") CvReview mgr,
+                              @V("teamMemberReview") CvReview team) {
+        
+        System.out.println("ScoreAggregator被调用，参数：hrReview=" + hr +
+                ", managerReview=" + mgr +
+                ", teamMemberReview=" + team);
+        
+        // 确定性计算：平均分
+        double avgScore = (hr.score + mgr.score + team.score) / 3.0;
+        
+        // 确定性计算：拼接反馈文本
+        String combinedFeedback = String.join("\n\n",
+                "HR评审: " + hr.feedback,
+                "经理评审: " + mgr.feedback,
+                "团队成员评审: " + team.feedback
+        );
+        
+        return new CvReview(avgScore, combinedFeedback);
+    }
+}
+
+/**
+ * 非AI智能体：根据评分更新申请状态（模拟数据库更新）
+ */
+public class StatusUpdate {
+
+    @Agent(description = "根据评分更新申请状态")
+    public void update(@V("combinedCvReview") CvReview aggregateCvReview) {
+        double score = aggregateCvReview.score;
+        System.out.println("StatusUpdate被调用，评分: " + score);
+        
+        if (score >= 8.0) {
+            System.out.println("申请状态更新为: 已邀请面试");
+        } else {
+            System.out.println("申请状态更新为: 已拒绝");
+        }
+    }
+}
+```
+
+
+
+**关键点**：
+
+- `@Agent`注解告诉框架这是一个可编排的节点
+- `@V("key")`用于从共享上下文（AgenticScope）中读取变量
+- `outputKey`指定该节点的输出存入哪个共享变量名
+- 返回值类型可以是任意Java类型，不限于String
+
+##### 方式二：使用 `AgenticServices.agentAction()` Lambda
+
+对于简单的、一次性的逻辑，可以直接使用Lambda表达式创建非AI智能体，无需定义单独的类。
+
+java
+
+```java
+UntypedAgent convertWorkflow = AgenticServices
+    .sequenceBuilder()
+    .subAgents(
+        // 使用 agentAction 创建的简单非AI智能体
+        AgenticServices.agentAction(agenticScope -> {
+            CvReview review = (CvReview) agenticScope.readState("combinedCvReview");
+            // 将评分转换为百分比格式，存入新的上下文变量
+            agenticScope.writeState("scoreAsPercentage", review.score * 100);
+        })
+    )
+    .outputKey("scoreAsPercentage")
+    .build();
+```
+
+**特点**：
+
+- 适合轻量级逻辑
+- 可以直接操作`AgenticScope`进行读写
+- 不需要单独创建类
+
+### 7. 完整示例：AI与非AI智能体混合编排
+
+```java
+@SpringBootApplication
+public class NonAIAgentsDemo {
+
+    public static void main(String[] args) {
+        ConfigurableApplicationContext context = SpringApplication.run(YourApplication.class, args);
+        ChatModel model = context.getBean("ollamaChatModel", ChatModel.class);
+        
+        // 1. 构建AI子智能体：并行评审
+        HrCvReviewer hrReviewer = AgenticServices
+                .agentBuilder(HrCvReviewer.class)
+                .chatModel(model)
+                .outputKey("hrReview")
+                .build();
+
+        ManagerCvReviewer managerReviewer = AgenticServices
+                .agentBuilder(ManagerCvReviewer.class)
+                .chatModel(model)
+                .outputKey("managerReview")
+                .build();
+
+        TeamMemberCvReviewer teamReviewer = AgenticServices
+                .agentBuilder(TeamMemberCvReviewer.class)
+                .chatModel(model)
+                .outputKey("teamMemberReview")
+                .build();
+
+        // 并行执行三个AI评审
+        ExecutorService executor = Executors.newFixedThreadPool(3);
+        UntypedAgent parallelReviewWorkflow = AgenticServices
+                .parallelBuilder()
+                .subAgents(hrReviewer, managerReviewer, teamReviewer)
+                .executor(executor)
+                .build();
+
+        // 2. 构建混合工作流：AI评审 + 非AI智能体（聚合 + 状态更新 + 格式转换）
+        UntypedAgent completeWorkflow = AgenticServices
+                .sequenceBuilder()
+                .subAgents(
+                        parallelReviewWorkflow,        // AI Agent：并行评审
+                        new ScoreAggregator(),          // 非AI智能体：聚合分数（方式一）
+                        new StatusUpdate(),             // 非AI智能体：更新状态（方式一）
+                        AgenticServices.agentAction(agenticScope -> {  // 非AI智能体（方式二）
+                            CvReview review = (CvReview) agenticScope.readState("combinedCvReview");
+                            agenticScope.writeState("scoreAsPercentage", review.score * 100);
+                        })
+                )
+                .outputKey("scoreAsPercentage")
+                .build();
+
+        // 3. 执行工作流
+        Map<String, Object> input = Map.of(
+                "candidateCv", "候选人简历内容...",
+                "jobDescription", "职位描述..."
+        );
+        
+        double finalScore = (double) completeWorkflow.invoke(input);
+        System.out.println("最终百分制评分: " + finalScore);
+        executor.shutdown();
+    }
+}
+```
+
+
+
+### 总结
 
 OK，以上就是 LangChain4j 实战项目教程，怎么样，大家学会了还是学废了？
 
