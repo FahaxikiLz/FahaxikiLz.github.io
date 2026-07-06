@@ -6,7 +6,7 @@
   <link href="http://fahaxikilz.github.io/atom.xml" rel="self"/>
   
   <link href="http://fahaxikilz.github.io/"/>
-  <updated>2026-06-10T01:11:18.820Z</updated>
+  <updated>2026-07-06T01:34:18.443Z</updated>
   <id>http://fahaxikilz.github.io/</id>
   
   <author>
@@ -15,6 +15,59 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>设计模式</title>
+    <link href="http://fahaxikilz.github.io/2026/07/06/she-ji-mo-shi/"/>
+    <id>http://fahaxikilz.github.io/2026/07/06/she-ji-mo-shi/</id>
+    <published>2026-07-06T01:33:32.000Z</published>
+    <updated>2026-07-06T01:34:18.443Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;内容转载自：&lt;a href=&quot;https://www.codefather.cn/course/1930517607799193602&quot;&gt;23 种设计模式教程(保姆级) - 编程导航 |</summary>
+        
+      
+    
+    
+    
+    <category term="进阶技术" scheme="http://fahaxikilz.github.io/categories/%E8%BF%9B%E9%98%B6%E6%8A%80%E6%9C%AF/"/>
+    
+    
+    <category term="设计模式" scheme="http://fahaxikilz.github.io/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>WebSocket</title>
+    <link href="http://fahaxikilz.github.io/2026/06/16/websocket/"/>
+    <id>http://fahaxikilz.github.io/2026/06/16/websocket/</id>
+    <published>2026-06-16T05:08:48.000Z</published>
+    <updated>2026-06-16T05:14:35.981Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;一、WebSocket-基础回顾&quot;&gt;&lt;a href=&quot;#一、WebSocket-基础回顾&quot; class=&quot;headerlink&quot; title=&quot;一、WebSocket 基础回顾&quot;&gt;&lt;/a&gt;一、WebSocket 基础回顾&lt;/h2&gt;&lt;h3</summary>
+        
+      
+    
+    
+    
+    <category term="进阶技术" scheme="http://fahaxikilz.github.io/categories/%E8%BF%9B%E9%98%B6%E6%8A%80%E6%9C%AF/"/>
+    
+    
+    <category term="WebSocket" scheme="http://fahaxikilz.github.io/tags/WebSocket/"/>
+    
+    <category term="STOMP" scheme="http://fahaxikilz.github.io/tags/STOMP/"/>
+    
+  </entry>
   
   <entry>
     <title>Java设计模式</title>
@@ -46,14 +99,16 @@
     <link href="http://fahaxikilz.github.io/2026/05/09/shan-dong-chao-jia/"/>
     <id>http://fahaxikilz.github.io/2026/05/09/shan-dong-chao-jia/</id>
     <published>2026-05-09T02:03:32.000Z</published>
-    <updated>2026-05-18T09:16:58.242Z</updated>
+    <updated>2026-06-18T06:10:07.131Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css&quot;&gt;&lt;h2 id=&quot;多少换手才算换手充分&quot;&gt;&lt;a</summary>
+    <summary type="html">&lt;h2 id=&quot;多少换手才算换手充分&quot;&gt;&lt;a href=&quot;#多少换手才算换手充分&quot; class=&quot;headerlink&quot; title=&quot;多少换手才算换手充分&quot;&gt;&lt;/a&gt;多少换手才算换手充分&lt;/h2&gt;&lt;p&gt;  按流通市值分：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;30-50亿的小票 —</summary>
         
       
     
@@ -240,31 +295,6 @@
     
     
     <category term="Electron" scheme="http://fahaxikilz.github.io/tags/Electron/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>设计模式</title>
-    <link href="http://fahaxikilz.github.io/2025/01/03/she-ji-mo-shi/"/>
-    <id>http://fahaxikilz.github.io/2025/01/03/she-ji-mo-shi/</id>
-    <published>2025-01-03T01:14:19.000Z</published>
-    <updated>2025-07-21T06:20:14.264Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css&quot;&gt;&lt;h2 id=&quot;23种设计模式&quot;&gt;&lt;a href=&quot;#23种设计模式&quot;</summary>
-        
-      
-    
-    
-    
-    <category term="进阶技术" scheme="http://fahaxikilz.github.io/categories/%E8%BF%9B%E9%98%B6%E6%8A%80%E6%9C%AF/"/>
-    
-    
-    <category term="设计模式" scheme="http://fahaxikilz.github.io/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/"/>
     
   </entry>
   
@@ -490,31 +520,6 @@
     
     
     <category term="计算机数学" scheme="http://fahaxikilz.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%95%B0%E5%AD%A6/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>数据结构与算法</title>
-    <link href="http://fahaxikilz.github.io/2024/03/02/shu-ju-jie-gou-yu-suan-fa/"/>
-    <id>http://fahaxikilz.github.io/2024/03/02/shu-ju-jie-gou-yu-suan-fa/</id>
-    <published>2024-03-02T13:06:30.000Z</published>
-    <updated>2025-07-21T06:20:14.100Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css&quot;&gt;&lt;h1 id=&quot;Hello-算法&quot;&gt;&lt;a href=&quot;#Hello-算法&quot;</summary>
-        
-      
-    
-    
-    
-    <category term="进阶技术" scheme="http://fahaxikilz.github.io/categories/%E8%BF%9B%E9%98%B6%E6%8A%80%E6%9C%AF/"/>
-    
-    
-    <category term="数据结构" scheme="http://fahaxikilz.github.io/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"/>
     
   </entry>
   
