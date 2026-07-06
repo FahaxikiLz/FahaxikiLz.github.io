@@ -386,14 +386,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    88.9k
+                    84.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    324 分
+                    308 分
                 </div>
                 
 
@@ -421,7 +421,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <blockquote>
+                <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><blockquote>
 <p>内容转载自：<a target="_blank" rel="noopener" href="https://www.codefather.cn/course/1930517607799193602">23 种设计模式教程(保姆级) - 编程导航 | 2026年最新企业级编程实战项目教程</a></p>
 </blockquote>
 <h1 id="一、创建型模式"><a href="#一、创建型模式" class="headerlink" title="一、创建型模式"></a>一、创建型模式</h1><h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>创建型模式是一类专门用来 <strong>解决对象创建问题的设计模式</strong>。它关注的是：对象该怎么创建，什么时候创建，由谁来创建，创建后怎么保证系统结构清晰又可扩展。</p>
@@ -644,17 +644,8 @@
 <h5 id="1、解耦对象的创建和使用"><a href="#1、解耦对象的创建和使用" class="headerlink" title="1、解耦对象的创建和使用"></a>1、<strong>解耦对象的创建和使用</strong></h5><p>工厂方法模式将对象的创建过程与客户端代码解耦。无论是 <code>Calendar.getInstance()</code> 还是 <code>Spring.getBean()</code>，客户端不需要关心对象是如何被创建的，框架内部会根据上下文自动选择合适的实现类，这使得代码更简洁、更灵活。</p>
 <h5 id="2、增强代码的可扩展性"><a href="#2、增强代码的可扩展性" class="headerlink" title="2、增强代码的可扩展性"></a>2、<strong>增强代码的可扩展性</strong></h5><p>在工厂方法模式中，我们只需要修改工厂方法的实现，就可以扩展新的子类或创建新的对象类型。以 <code>Calendar</code>为例，如果将来需要支持更多类型的 <code>Calendar</code>，我们只需要修改 <code>createCalendar()</code> 方法，不需要修改调用者代码。</p>
 <h5 id="3、便于管理复杂的创建逻辑"><a href="#3、便于管理复杂的创建逻辑" class="headerlink" title="3、便于管理复杂的创建逻辑"></a>3、<strong>便于管理复杂的创建逻辑</strong></h5><p>特别是在像 Spring 这样的框架中，Bean 的创建涉及到依赖注入、代理、作用域管理等复杂逻辑。如果直接在业务代码中写这些逻辑，代码会变得极其臃肿和难以维护。而使用工厂方法模式，所有的创建逻辑都封装在工厂方法中，客户端代码只关心接口，极大提高了代码的可维护性。</p>
-<h3 id="相关项目"><a href="#相关项目" class="headerlink" title="相关项目"></a>相关项目</h3><h5 id="编程导航的手写-RPC-框架项目"><a href="#编程导航的手写-RPC-框架项目" class="headerlink" title="编程导航的手写 RPC 框架项目"></a>编程导航的手写 RPC 框架项目</h5><p>在 <a target="_blank" rel="noopener" href="https://www.codefather.cn/course/1768543954720022530">编程导航的手写 RPC 框架项目</a> 的设计中，使用了工厂模式来创建和管理多个核心组件，包括序列化器、注册中心、服务代理、负载均衡器、重试策略和容错策略等。通过定义对应的工厂类，调用方可以通过统一的方法获取所需组件实例，而无需直接使用 <code>new</code> 操作符进行创建。</p>
-<p>这种做法有效地隔离了组件的创建过程，降低了调用方与具体实现类之间的耦合度，提升了系统的灵活性和可扩展性。后续若需替换或扩展某一类组件，只需调整工厂类的实现，无需改动业务逻辑代码。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/133.png"></p>
-<h5 id="编程导航的-OJ-判题项目"><a href="#编程导航的-OJ-判题项目" class="headerlink" title="编程导航的 OJ 判题项目"></a>编程导航的 OJ 判题项目</h5><p>在 <a target="_blank" rel="noopener" href="https://www.codefather.cn/course/1790980707917017089">编程导航的 OJ 判题项目</a> 中，代码沙箱模块采用了工厂模式。根据用户传入的字符串参数（即沙箱类别），系统会动态生成对应的代码沙箱实现类。这里使用的是静态工厂模式，整体实现较为简洁，能够很好地满足当前的需求。通过这种方式，我们可以根据字符串灵活地创建不同类型的沙箱实例，显著提升了模块的通用性和扩展性。后续若需要新增沙箱类型，只需添加对应的实现类和注册逻辑，而无需修改现有代码结构，方便维护和功能扩展。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/134.png"></p>
-<h3 id="相关面试题"><a href="#相关面试题" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1801818998708707329">工厂模式和抽象工厂模式有什么区别？ </a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/135.png"></p>
 <h2 id="2-单例模式"><a href="#2-单例模式" class="headerlink" title="2. 单例模式"></a>2. 单例模式</h2><h3 id="什么是单例模式？"><a href="#什么是单例模式？" class="headerlink" title="什么是单例模式？"></a>什么是单例模式？</h3><p><strong>单例模式</strong>（Singleton Pattern）是一种创建型设计模式，它就是说：一个类在整个应用运行期间，<strong>只能有一个实例</strong>，而且这个实例对外提供一个全局访问点。换句话说，无论是在哪儿调用这个类，拿到的永远都是同一个对象。</p>
 <p>举个例子，鱼皮是鱼鸢网络公司的老板。老板这个角色，整个公司只能有一个，对吧？你不能今天开会有一个老板，明天写代码又冒出来另一个老板。员工要联系老板，肯定不是“自己 new 一个”，而是通过公司内部的某个统一入口，比如“老板办公室”或者“老板微信”，直接找到现有的老板。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/42.png"></p>
 <p>程序里也是一样。像数据库连接池、线程池、缓存管理器这些东西，如果每次用都重新 new，一个项目跑不了几天内存就炸了。所以我们通常只让它们有一个唯一实例，整个系统共享，这样不仅节省资源，还方便统一管理。</p>
 <p>单例模式解决的正是这个问题：<strong>全局只能有一个对象，而且这个对象谁都能随时找到</strong>。</p>
 <h3 id="为什么要使用单例模式？"><a href="#为什么要使用单例模式？" class="headerlink" title="为什么要使用单例模式？"></a>为什么要使用单例模式？</h3><p>它有下列优点：</p>
@@ -817,17 +808,8 @@ runtime<span class="token punctuation">.</span><span class="token function">exec
 </ul>
 <h4 id="优势和作用-1"><a href="#优势和作用-1" class="headerlink" title="优势和作用"></a>优势和作用</h4><p>通过上述的源码分析，我们可以再次总结下单例模式的作用。</p>
 <h5 id="1、资源管理统一"><a href="#1、资源管理统一" class="headerlink" title="1、资源管理统一"></a>1、<strong>资源管理统一</strong></h5><p>像 <code>Runtime</code> 这样的系统工具类，如果每次都 new 一份会造成资源浪费。Java 把它做成了单例，确保整个 JVM 里只有一个实例，全局统一调度。Spring 中默认的 <code>singleton</code> 作用域也是一样，所有请求都会拿到同一个 Bean，实现了资源的集中管理。</p>
-<p>2、<strong>减少内存消耗</strong><br>如果每次请求都 new 一个对象，尤其在并发场景下，系统负担会非常大。用单例模式，只初始化一次，后续复用，能显著降低内存占用和对象创建的开销。</p>
-<p>3、<strong>保证全局状态一致</strong><br>像配置中心、日志管理器这种组件，必须保证状态统一。如果每次都有新对象，配置就可能不一致。单例可以确保整个系统中使用的是同一个状态副本，不容易出错。</p>
-<h3 id="相关项目-1"><a href="#相关项目-1" class="headerlink" title="相关项目"></a>相关项目</h3><h5 id="编程导航的代码生成器平台项目"><a href="#编程导航的代码生成器平台项目" class="headerlink" title="编程导航的代码生成器平台项目"></a>编程导航的代码生成器平台项目</h5><p>在<a target="_blank" rel="noopener" href="https://www.codefather.cn/course/1790980795074654209">编程导航代码生成器平台项目</a>的元信息管理模块中，使用了双检锁单例模式实现 <code>MetaManager</code> 类。项目在启动时需要读取一次 JSON 配置文件并将其转化为 Java 对象，后续直接使用内存中的对象即可。由于这个初始化过程只需执行一次，采用双检锁方式确保 <code>MetaManager</code> 在首次使用时延迟加载，同时保证多线程环境下的线程安全，并避免每次访问都进入同步块，从而提升读取性能。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/46.png"></p>
-<h5 id="编程导航的手写-RPC-框架项目-1"><a href="#编程导航的手写-RPC-框架项目-1" class="headerlink" title="编程导航的手写 RPC 框架项目"></a>编程导航的手写 RPC 框架项目</h5><p>在<a target="_blank" rel="noopener" href="https://www.codefather.cn/course/1768543954720022530">编程导航的手写 RPC 框架项目</a>里，实例加载和 RPC 配置初始化用到了双检锁单例模式来控制实例的创建。通过对实例对象进行两次非空判断，并在中间通过对对应 <code>Class</code> 对象加锁（<code>synchronized</code>）的方式，确保在多线程环境下只会创建一个实例。</p>
-<p>该模式实现了懒加载机制，即仅在实际需要时才初始化对象，避免了程序启动时就占用资源。同时，也保证了线程安全性，防止出现并发初始化导致的问题，从而提升了系统的性能和资源利用效率。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/47.png"></p>
-<h3 id="相关面试题-1"><a href="#相关面试题-1" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1801818689919852545">请解释什么是单例模式，并给出一个使用场景 </a></p>
-<p>2）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1801818854546284546">单例模式有哪几种实现？如何保证线程安全？ </a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/48.png"></p>
+<h5 id="2、减少内存消耗"><a href="#2、减少内存消耗" class="headerlink" title="2、减少内存消耗"></a>2、<strong>减少内存消耗</strong></h5><p>如果每次请求都 new 一个对象，尤其在并发场景下，系统负担会非常大。用单例模式，只初始化一次，后续复用，能显著降低内存占用和对象创建的开销。</p>
+<h5 id="3、保证全局状态一致"><a href="#3、保证全局状态一致" class="headerlink" title="3、保证全局状态一致"></a>3、<strong>保证全局状态一致</strong></h5><p>像配置中心、日志管理器这种组件，必须保证状态统一。如果每次都有新对象，配置就可能不一致。单例可以确保整个系统中使用的是同一个状态副本，不容易出错。</p>
 <h2 id="3-抽象工厂模式"><a href="#3-抽象工厂模式" class="headerlink" title="3. 抽象工厂模式"></a>3. 抽象工厂模式</h2><h3 id="什么是抽象工厂模式？"><a href="#什么是抽象工厂模式？" class="headerlink" title="什么是抽象工厂模式？"></a>什么是抽象工厂模式？</h3><p><strong>抽象工厂模式</strong>（Abstract Factory Pattern）是一种创建型设计模式，说白了，它就是提供一个“超级工厂”的接口，专门用来创建一整组互相关联的产品对象，而且不用我们关心这些产品具体是怎么实现的。</p>
 <p>我们平常在购买手机时，店家提供了多种型号的手机，每种型号的手机提供了不同的配件和服务套餐。这些产品（手机、配件、套餐）可以是不同厂商的不同系列，但是它们在功能和设计上是相互协调的。例如，一个厂商可能提供“手机+耳机+手表”组合，另一个厂商提供“手机+无线充电器+定制化服务”组合。这就是一种“工厂”，它不仅生产手机，还生产与之匹配的其他产品。抽象工厂模式就是帮助我们创建这种相互依赖的产品组合。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/80.png"></p>
@@ -1046,9 +1028,6 @@ runtime<span class="token punctuation">.</span><span class="token function">exec
 <h5 id="1、统一产品创建逻辑"><a href="#1、统一产品创建逻辑" class="headerlink" title="1、统一产品创建逻辑"></a>1、<strong>统一产品创建逻辑</strong></h5><p>在实际开发中，我们经常会遇到“创建一整组相关对象”的场景。像 <code>DocumentBuilderFactory</code> 就是个很典型的例子，它不直接暴露底层的构造逻辑，而是统一提供 <code>DocumentBuilder</code> 实例的创建方式，确保不同平台、不同实现下生成的解析器行为一致。类似地，Spring 的 <code>ApplicationContext</code> 本质上也是个抽象工厂，负责统一创建 Bean 实例，保证配置文件、注解、Java 配置这些方式最终创建出的 Bean 都是风格一致、结构统一的。</p>
 <h5 id="2、提升扩展性"><a href="#2、提升扩展性" class="headerlink" title="2、提升扩展性"></a>2、提升扩展性</h5><p>抽象工厂最大的优势之一是“新增产品族”时非常方便。以 Spring 为例，<code>ApplicationContext</code> 可以根据不同需求，切换为 <code>ClassPathXmlApplicationContext</code>、<code>AnnotationConfigApplicationContext</code> 等不同实现类，但外部调用者只依赖于统一的接口，不需要关心背后怎么创建 Bean。类似地，在 JDK 中我们也可以通过替换 <code>DocumentBuilderFactory</code> 实现，支持不同的 XML 解析器，扩展能力很强。</p>
 <h5 id="3、解耦具体实现"><a href="#3、解耦具体实现" class="headerlink" title="3、解耦具体实现"></a>3、解耦具体实现</h5><p>在系统架构中，解耦是很核心的一件事。我们通过定义抽象工厂接口，把产品的“使用”与“创建”彻底分开。比如我们平时在 Spring 中用 <code>getBean()</code> 获取对象时，根本不用管底层是用反射、CGLIB 还是单例池，具体策略全都被 <code>ApplicationContext</code> 屏蔽掉了。这样的好处是测试、替换、升级都不需要改动业务逻辑，系统整体也变得更灵活。</p>
-<h3 id="相关面试题-2"><a href="#相关面试题-2" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1801818998708707329">工厂模式和抽象工厂模式有什么区别？ </a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/83.png"></p>
 <h2 id="4-建造者模式"><a href="#4-建造者模式" class="headerlink" title="4. 建造者模式"></a>4. 建造者模式</h2><h3 id="什么是建造者模式"><a href="#什么是建造者模式" class="headerlink" title="什么是建造者模式"></a>什么是建造者模式</h3><p><strong>建造者模式</strong>（Builder Pattern）是一种创建型设计模式，它的核心思想是：把一个复杂对象的创建过程拆解成多个小步骤，然后一步步构建出来。这个过程中，客户端只需要告诉系统“我想要什么”，而不用关心“怎么一步步造出来的”。</p>
 <p>比如鱼皮去餐厅点餐，直接选了一个“豪华套餐”——里面包含了主菜、配菜、饮料，甚至还有甜点。鱼皮不需要跑到后厨说“先炒哪个菜，先上主食还是先上汤”，这些细节都交给餐厅的“构建流程”去搞定，鱼皮只管坐等上菜。建造者模式就像是这个套餐系统，负责把一个“复杂的成品”按照预设的步骤、有条不紊地建出来。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/7.png"></p>
@@ -1219,9 +1198,6 @@ context<span class="token punctuation">.</span><span class="token function">refr
 <h5 id="1、提高了代码的可维护性"><a href="#1、提高了代码的可维护性" class="headerlink" title="1、提高了代码的可维护性"></a>1、<strong>提高了代码的可维护性</strong></h5><p>建造者模式的核心在于“分离构建与表示”。像 <code>StringBuilder</code> 就是一个典型例子，我们一步步地 append 内容，而不是直接通过构造方法去拼字符串。这样写出来的代码结构更清晰，也更容易维护。Spring 里的 <code>BeanDefinitionBuilder</code> 也是类似的用法，通过链式 API 逐步设置属性，避免了混乱的构造逻辑，后期想改也很方便。</p>
 <h5 id="2、增强了代码的扩展性"><a href="#2、增强了代码的扩展性" class="headerlink" title="2、增强了代码的扩展性"></a>2、增强了代码的扩展性</h5><p>有时候业务需求经常变化，我们希望在不动原来逻辑的前提下加点功能。用建造者模式就很合适。比如 <code>BeanDefinitionBuilder</code> 允许我们按需添加属性值等配置，不需要修改 BeanDefinition 的核心结构。这种“开放扩展，封闭修改”的写法，让我们能更灵活地应对复杂场景。</p>
 <h5 id="3、简化了复杂对象的创建"><a href="#3、简化了复杂对象的创建" class="headerlink" title="3、简化了复杂对象的创建"></a>3、简化了复杂对象的创建</h5><p>当一个对象涉及的参数很多，而且有些是可选项时，用传统构造方法会非常麻烦，代码也不好看。<code>StringBuilder</code> 的逐步构建方式就避免了这个问题，写起来更自然。Spring 里的 <code>BeanDefinitionBuilder</code> 也是一样，帮我们把复杂的 Bean 配置过程拆成了小步骤，整个创建过程变得清晰、灵活，也更容易调试。</p>
-<h3 id="相关面试题-3"><a href="#相关面试题-3" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1802171325634387970">什么是建造者模式？一般用在什么场景？ </a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/11.png"></p>
 <h2 id="5-原型模式"><a href="#5-原型模式" class="headerlink" title="5. 原型模式"></a>5. 原型模式</h2><h3 id="什么是原型模式？"><a href="#什么是原型模式？" class="headerlink" title="什么是原型模式？"></a>什么是原型模式？</h3><p><strong>原型模式</strong>（Prototype Pattern）是一种创建型设计模式，主要用于<strong>通过复制现有的对象来创建新对象</strong>，而不是通过“new”关键字来直接实例化。简而言之，原型模式让我们能够在已有对象的基础上创建新对象。它依赖于“克隆”已有对象的状态，从而减少了重复构建相同对象的成本。</p>
 <p>举个例子，我们都打印过东西吧，我们把一份文件拿到打印店里，不需要再重新手写一遍，而是直接用复印机“咔咔咔”地复印出一堆一模一样的副本。在这个场景中，原件就像是原型（Prototype），复印机就相当于是调用了原型的克隆功能，快速拷贝出很多个一模一样的对象。</p>
 <p>有时候我们可能还想在复印件上加点批注或者划重点，这就像是在克隆出来的对象上再做一点小修改，也正是原型模式的一个灵活用法。</p>
@@ -1408,9 +1384,6 @@ Images: [cover.png, yes_avatar.png]<span aria-hidden="true" class="line-numbers-
 <h5 id="1、提高系统灵活性，避免全局数据污染"><a href="#1、提高系统灵活性，避免全局数据污染" class="headerlink" title="1、提高系统灵活性，避免全局数据污染"></a>1、提高系统灵活性，避免全局数据污染</h5><p>在多线程或者请求隔离场景下，我们经常需要一份干净的对象副本，而不是去共享一个全局实例。像 <code>ArrayList</code>提供的 <code>clone()</code> 方法，就是为了复制一份当前实例的数据副本，互不影响。Spring 中的 <code>@Scope("prototype")</code> 也是这个思路，确保每次注入的 Bean 都是全新的，避免数据相互错乱。</p>
 <h5 id="2、替代手动-new，提高一致性与可维护性"><a href="#2、替代手动-new，提高一致性与可维护性" class="headerlink" title="2、替代手动 new，提高一致性与可维护性"></a>2、替代手动 new，提高一致性与可维护性</h5><p>如果我们自己去写 <code>new</code>，对象的构造逻辑就散落在各个角落，不好统一管理。而通过 Spring 的原型作用域，我们可以把实例创建交给容器，集中配置。这不仅减少了重复代码，也方便做扩展，比如加依赖注入、初始化逻辑、统一拦截处理等，整个系统更有一致性。</p>
 <h5 id="3、满足生命周期控制、插件解耦等复杂场景"><a href="#3、满足生命周期控制、插件解耦等复杂场景" class="headerlink" title="3、满足生命周期控制、插件解耦等复杂场景"></a>3、满足生命周期控制、插件解耦等复杂场景</h5><p>有些组件每次都得重新创建，比如任务处理器、策略实现、临时缓存、动态表单对象等。用原型模式，我们每次都能拿到一个新对象，避免了线程安全问题，也不影响其他模块。无论是通过 <code>ArrayList.clone()</code> 这种集合克隆，还是 Spring 的原型 Bean，都体现了“按需独立”的设计理念，适合高变动、高隔离的业务场景。</p>
-<h3 id="相关面试题-4"><a href="#相关面试题-4" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1802171457641717761">什么是原型模式？一般用在什么场景？ </a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/116.png"></p>
 <h1 id="二、结构型模式"><a href="#二、结构型模式" class="headerlink" title="二、结构型模式"></a>二、结构型模式</h1><h2 id="介绍-1"><a href="#介绍-1" class="headerlink" title="介绍"></a>介绍</h2><p>结构型模式是一类关注<strong>“类和对象的组合方式”</strong>的设计模式。它的目标不是去解决某个具体的业务问题，而是解决<strong>类之间、对象之间怎么搭配、怎么协作更合理</strong>的问题。<br>在我们日常开发中，单个类往往不能独立完成所有任务，不同的类之间需要互相配合。这个时候，怎么组合它们就变得非常重要。如果组织得不好，类之间的依赖关系会混乱不堪，代码也会变得难以理解和维护。<br>结构型模式就是用来规范这些组合方式的。它通过继承和组合的手段，把已有的类进行合理的拼装，让系统的结构更加清晰、松散耦合，而且更容易扩展和复用。</p>
 <p>我们按照实用性从高到低的顺序，可以有下面这些结构型设计模式：</p>
 <ul>
@@ -1649,12 +1622,6 @@ Images: [cover.png, yes_avatar.png]<span aria-hidden="true" class="line-numbers-
 <h5 id="1、提升系统的兼容性和复用能力"><a href="#1、提升系统的兼容性和复用能力" class="headerlink" title="1、提升系统的兼容性和复用能力"></a>1、提升系统的兼容性和复用能力</h5><p>适配器模式的最大作用就是可以把已有的功能和新的接口标准“对接”起来，避免重复开发，尤其在集成第三方接口或老系统时非常有用。比如我们想复用一个只支持 <code>InputStream</code> 的工具类，但我们的系统是基于字符流的，就可以用 <code>InputStreamReader</code> 做适配。</p>
 <h5 id="2、解耦代码结构，方便扩展"><a href="#2、解耦代码结构，方便扩展" class="headerlink" title="2、解耦代码结构，方便扩展"></a>2、解耦代码结构，方便扩展</h5><p>在 Spring MVC 中，不同的 Controller 类型通过不同的 <code>HandlerAdapter</code> 进行适配，<code>DispatcherServlet</code> 完全不需要关心 Controller 的具体实现逻辑。这种结构的好处就是扩展性强，我们可以根据需求新增 handler 类型，而不会影响原有逻辑。</p>
 <h5 id="3、遵循开闭原则，提高可维护性"><a href="#3、遵循开闭原则，提高可维护性" class="headerlink" title="3、遵循开闭原则，提高可维护性"></a>3、遵循开闭原则，提高可维护性</h5><p>所有的适配器都是通过实现同一个接口来对接系统核心逻辑，这种结构天然符合“对扩展开放，对修改封闭”的设计原则。系统维护起来更容易，新增功能也更稳定。</p>
-<h3 id="相关项目-2"><a href="#相关项目-2" class="headerlink" title="相关项目"></a>相关项目</h3><h5 id="编程导航的聚合搜索项目"><a href="#编程导航的聚合搜索项目" class="headerlink" title="编程导航的聚合搜索项目"></a>编程导航的聚合搜索项目</h5><p>在 <a target="_blank" rel="noopener" href="https://www.codefather.cn/course/1790979621621641217">编程导航的聚合搜索项目</a> 中，使用了适配器模式来对接不同结构的数据源。系统内部定义了一套统一的数据源接入规范，要求所有数据源都支持根据关键词进行分页搜索。然而，部分第三方数据源的搜索方法参数格式与系统定义的接口不兼容，且无法直接修改双方的实现。</p>
-<p>为解决这一接口不一致的问题，引入了适配器模式。通过为这些不兼容的数据源编写适配器类，将其原有接口转换成系统所期望的标准接口，从而实现无侵入的接入。适配器类在不改动原始代码的前提下，实现了接口兼容，降低了耦合度，并提升了对接数据源的灵活性和复用性。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/53.png"></p>
-<h3 id="相关面试题-5"><a href="#相关面试题-5" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1802171589225422850">什么是适配器模式？一般用在什么场景？ </a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/54.png"></p>
 <h2 id="7-代理模式"><a href="#7-代理模式" class="headerlink" title="7. 代理模式"></a>7. 代理模式</h2><h3 id="什么是代理模式？"><a href="#什么是代理模式？" class="headerlink" title="什么是代理模式？"></a>什么是代理模式？</h3><p><strong>代理模式</strong>（Proxy Pattern）是一种结构型设计模式，它的核心思想就是：<strong>给某个对象提供一个代理对象，并由代理对象来控制对这个对象的访问</strong>。听起来像是在加一道“门”，任何人想找目标对象打交道，都必须先经过这个“门”，而这个门就是我们说的代理。 </p>
 <p>比如鱼皮的公司想去团建，要去订机票，但鱼皮不去航空公司官网折腾一堆操作，而是直接找了个靠谱的旅行社。“旅行社”就是代理，它在鱼皮和航空公司之间起到了中介作用，帮忙订票、选座、甚至提醒航班变动。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/68.png"></p>
@@ -1827,15 +1794,6 @@ Images: [cover.png, yes_avatar.png]<span aria-hidden="true" class="line-numbers-
 <h5 id="1、代码增强不入侵业务逻辑"><a href="#1、代码增强不入侵业务逻辑" class="headerlink" title="1、代码增强不入侵业务逻辑"></a>1、代码增强不入侵业务逻辑</h5><p>无论是 JDK 动态代理还是 Spring AOP，本质上都是在不改动原有类的前提下，实现了对方法的“增强”。这就符合代理模式的核心价值：<strong>控制访问 + 结构解耦</strong>。像日志、事务、权限校验这类功能，完全可以通过代理实现，业务代码保持干净简洁。</p>
 <h5 id="2、高度解耦，易于扩展"><a href="#2、高度解耦，易于扩展" class="headerlink" title="2、高度解耦，易于扩展"></a>2、高度解耦，易于扩展</h5><p>通过接口 + 代理的方式，我们可以实现一个非常通用的调用流程。例如在 Spring AOP 中，一个切面可以作用于多个 Bean，不需要对每个 Bean 做定制化的改动。新增或修改切面，也不会影响原始服务类的实现。</p>
 <h5 id="3、便于在运行时动态控制行为"><a href="#3、便于在运行时动态控制行为" class="headerlink" title="3、便于在运行时动态控制行为"></a>3、便于在运行时动态控制行为</h5><p>使用代理之后，我们可以根据运行时的配置来动态决定是否执行某个拦截逻辑，或者动态调整调用流程。比如某些监控逻辑，我们可以通过配置动态启用或者禁用，而不是写死在方法里。</p>
-<h3 id="相关项目-3"><a href="#相关项目-3" class="headerlink" title="相关项目"></a>相关项目</h3><h5 id="编程导航的手写-RPC-框架项目-2"><a href="#编程导航的手写-RPC-框架项目-2" class="headerlink" title="编程导航的手写 RPC 框架项目"></a>编程导航的手写 RPC 框架项目</h5><p>在 <a target="_blank" rel="noopener" href="https://www.codefather.cn/course/1768543954720022530">编程导航的手写 RPC 框架项目</a> 中，远程调用模块通过 JDK 动态代理模式，实现了消费者对服务提供者的“无感知”调用。通过为服务接口生成代理对象，消费者在调用这些接口方法时，底层会通过代理逻辑将调用转换为远程请求发送至服务提供方，从而屏蔽了网络通信的细节。</p>
-<p>这一做法实现了接口层与调用实现的解耦，简化了远程服务的使用方式。消费者只需调用本地代理对象的方法即可，无需感知实际调用的是本地方法还是远程方法，从而提升了系统的可用性和开发效率。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/72.png"></p>
-<h5 id="编程导航的-OJ-判题项目-1"><a href="#编程导航的-OJ-判题项目-1" class="headerlink" title="编程导航的 OJ 判题项目"></a>编程导航的 OJ 判题项目</h5><p>在 <a target="_blank" rel="noopener" href="https://www.codefather.cn/course/1790980707917017089">编程导航的 OJ 判题项目 </a>中，代码沙箱模块采用了代理模式进行功能增强。在调用代码沙箱之前，系统会先记录请求参数；调用完成后，再将响应结果进行日志记录，便于管理员后续分析和排查问题。</p>
-<p>通过引入代理模式，我们增加了一个代理类，专门负责统一处理日志打印相关的逻辑。这样，原有的代码沙箱实现类无需做任何改动，调用方式也基本保持不变，对外使用依旧一致。但在内部，功能却得到了悄然增强，比如自动记录日志、调用次数统计等。既不影响原有业务逻辑，又提升了系统的可维护性和可扩展性，使整体架构更加清晰，后期维护也更加轻松。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/73.png"></p>
-<h3 id="相关面试题-6"><a href="#相关面试题-6" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1802557695141945346">什么是代理模式？一般用在什么场景？ </a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/74.png"></p>
 <h2 id="8-装饰模式"><a href="#8-装饰模式" class="headerlink" title="8. 装饰模式"></a>8. 装饰模式</h2><h3 id="什么是装饰模式？"><a href="#什么是装饰模式？" class="headerlink" title="什么是装饰模式？"></a>什么是<strong>装饰模式？</strong></h3><p><strong>装饰模式</strong>（Decorator Pattern）是一种结构型设计模式，它的核心思想是：<strong>动态地给对象添加额外的功能，而不会影响到其他对象</strong>。</p>
 <p>打个比方，鱼皮早上去咖啡店点了一杯美式。服务员问：要不要加点牛奶？要不要来点奶泡？糖浆需不需要？鱼皮说全都加上！于是原本一杯普通的美式咖啡，就被加出了拿铁的感觉。每加一样东西，其实就是“包了一层新功能”，但我们并没有动到咖啡豆的底层逻辑（原始类），只是一步步往上叠加。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/117.png"></p>
@@ -2015,12 +1973,6 @@ Images: [cover.png, yes_avatar.png]<span aria-hidden="true" class="line-numbers-
 <h5 id="1、增强功能不影响原有结构"><a href="#1、增强功能不影响原有结构" class="headerlink" title="1、增强功能不影响原有结构"></a>1、<strong>增强功能不影响原有结构</strong></h5><p><code>BufferedReader</code> 和 <code>BufferedInputStream</code> 并不是通过继承原始类来加功能，而是通过包装已有对象来增强行为，这种方式不会影响原始类结构；Servlet 中我们也能通过包装 <code>HttpServletRequest</code> 或 <code>HttpServletResponse</code> 来扩展功能，而无需修改原有请求响应逻辑。</p>
 <h5 id="2、支持链式组合，增强更灵活"><a href="#2、支持链式组合，增强更灵活" class="headerlink" title="2、支持链式组合，增强更灵活"></a>2、支持链式组合，增强更灵活</h5><p>装饰器可以一层层套，比如 <code>BufferedInputStream</code> 可以再包一层 <code>DataInputStream</code>；同样，在 Servlet 中也可以对请求对象连续包装多个增强，比如日志、加解密、参数过滤等，组合方式灵活，使用更自由。</p>
 <h5 id="3、逻辑清晰、职责解耦"><a href="#3、逻辑清晰、职责解耦" class="headerlink" title="3、逻辑清晰、职责解耦"></a>3、逻辑清晰、职责解耦</h5><p>像日志、转换、校验这类与业务无关的增强逻辑，都可以通过装饰器独立出来，既避免了业务类臃肿，也方便维护和替换，IO 和 Servlet 场景都很适合这样做。</p>
-<h3 id="相关项目-4"><a href="#相关项目-4" class="headerlink" title="相关项目"></a>相关项目</h3><h5 id="编程导航的手写-RPC-框架项目-3"><a href="#编程导航的手写-RPC-框架项目-3" class="headerlink" title="编程导航的手写 RPC 框架项目"></a>编程导航的手写 RPC 框架项目</h5><p>在 <a target="_blank" rel="noopener" href="https://www.codefather.cn/course/1768543954720022530">编程导航的手写 RPC 框架项目</a> 中，处理 Vert.x TCP 通信中粘包和半包的问题时，使用了装饰者模式对原有处理器进行了增强。由于消息体长度不固定，采用了 Vert.x 内置的 <code>RecordParser</code> 并通过拆分读取的方式：先读取请求体长度，再按该长度完整读取消息体，从而解决变长消息的拆包问题。</p>
-<p>为实现这一逻辑，定义了一个 Wrapper 类对原有的 TCP 处理器进行封装，借助装饰者模式，在不修改原有处理器代码的前提下，扩展了解析能力。使用时只需用该 Wrapper 包装原处理器即可，使系统在处理粘包半包问题时更具灵活性，也提升了整体的可维护性。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/121.png"></p>
-<h3 id="相关面试题-7"><a href="#相关面试题-7" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1803766849256890369">什么是装饰器模式？一般用在什么场景？ </a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/122.png"></p>
 <h2 id="9-外观模式"><a href="#9-外观模式" class="headerlink" title="9. 外观模式"></a>9. 外观模式</h2><h3 id="什么是外观模式？"><a href="#什么是外观模式？" class="headerlink" title="什么是外观模式？"></a>什么是外观模式？</h3><p><strong>外观模式</strong>（Facade pattern）是一种结构型设计模式，它的核心思想是：<strong>为复杂的子系统提供一个统一的对外接口</strong>，通过这个接口，我们就能更方便、更高效地访问这些子系统，而不需要关心它们内部的复杂逻辑。</p>
 <p>比如有一次鱼皮去银行办业务，准备办理一笔贷款，结果银行里面有一堆系统：一个管审核资料，一个管征信查询，一个管资金调度……鱼皮一脸懵。好在银行前台小姐姐一句话：“您这边只需要把身份证交给我，剩下的我来处理～”突然就感觉轻松了有没有。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/55.png"></p>
@@ -2220,14 +2172,6 @@ Images: [cover.png, yes_avatar.png]<span aria-hidden="true" class="line-numbers-
 <h4 id="优势和作用-8"><a href="#优势和作用-8" class="headerlink" title="优势和作用"></a>优势和作用</h4><p>通过上述的源码分析，我们可以再次总结下外观模式的作用。</p>
 <h5 id="1、降低系统复杂度"><a href="#1、降低系统复杂度" class="headerlink" title="1、降低系统复杂度"></a>1、降低系统复杂度</h5><p>无论是 SLF4J 的日志模块，还是 Spring 的 MVC 模块，外观模式都通过一个“门面类”对外提供统一接口，把内部一堆子系统隐藏起来，让我们开发的时候不用关注太多细节。我们写业务的时候，就能更专注在核心逻辑上。</p>
 <h5 id="2、增强扩展性和可维护性"><a href="#2、增强扩展性和可维护性" class="headerlink" title="2、增强扩展性和可维护性"></a>2、增强扩展性和可维护性</h5><p>因为内部逻辑都封装在外观类之后，如果未来底层实现改动，比如日志从输出到文件变成输出到远程服务器，我们也不需要改业务代码，只需要改配置就行了。类似地，Spring MVC 的内部流程如果变动，只要 <code>DispatcherServlet</code> 保持接口不变，对外也不会产生影响。</p>
-<h3 id="相关项目-5"><a href="#相关项目-5" class="headerlink" title="相关项目"></a>相关项目</h3><h5 id="编程导航的智能云图库项目"><a href="#编程导航的智能云图库项目" class="headerlink" title="编程导航的智能云图库项目"></a>编程导航的智能云图库项目</h5><p>在 <a target="_blank" rel="noopener" href="https://www.codefather.cn/course/1864210260732116994">编程导航的智能云图库项目</a> 中，以图搜图功能采用了外观模式。多个独立的类分别负责执行具体任务，如获取搜图页面、解析 HTML 脚本、调用 API 获取结果等。通过引入 <code>ImageSearchApiFacade</code> 门面类，将这些分散的调用流程统一封装为一个 <code>searchImage</code> 方法。外部调用时只需传入图片地址，即可获得相似图片列表，简化了使用方式，屏蔽了内部的实现细节和调用顺序。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/60.png"></p>
-<h5 id="编程导航的聚合搜索项目-1"><a href="#编程导航的聚合搜索项目-1" class="headerlink" title="编程导航的聚合搜索项目"></a>编程导航的聚合搜索项目</h5><p>在 <a target="_blank" rel="noopener" href="https://www.codefather.cn/course/1790979621621641217">编程导航的聚合搜索项目</a> 的搜索聚合模块中，使用了门面模式对多个数据源的搜索结果进行了统一封装。该模式的主要目的是为调用方提供一个简化且一致的接口，屏蔽底层子系统的复杂调用逻辑，从而降低前端调用的理解和使用成本。</p>
-<p>具体做法是：定义了一个门面类，作为前端与各类搜索服务之间的中介，内部持有多个数据源搜索服务的引用。根据前端传入的参数，门面类会选择性地调用对应的数据源服务，并对返回结果进行统一处理和聚合。前端只需通过该门面类提供的统一接口进行调用，无需关注各个数据源的具体实现细节，从而降低了系统的耦合度，提高了扩展性和可维护性。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/61.png"></p>
-<h3 id="相关面试题-8"><a href="#相关面试题-8" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1802557443223658498">什么是外观模式？一般用在什么场景？ </a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/62.png"></p>
 <h2 id="10-桥接模式"><a href="#10-桥接模式" class="headerlink" title="10. 桥接模式"></a>10. 桥接模式</h2><h3 id="什么是桥接模式？"><a href="#什么是桥接模式？" class="headerlink" title="什么是桥接模式？"></a>什么是桥接模式？</h3><p><strong>桥接模式</strong>（Bridge Pattern）是一种结构型设计模式<strong>，</strong>简单来说，就是一种<strong>把抽象和实现分离开来</strong>的方法，让它们可以各自独立变化。</p>
 <p>在实际开发中，我们经常会遇到这样的问题：一个功能模块，既要支持多个平台，又要支持多种操作方式。比如做一个消息通知系统，你可能既要支持“邮件通知、短信通知、微信通知”，又要支持“普通用户、VIP 用户、企业用户”的各种业务逻辑。这两个维度一交叉，代码量直接炸裂，继承结构也一眼看不到头。</p>
 <p>桥接模式的作用，就是把“消息类型”这条线和“用户类型”这条线拆开，不再死绑在一起，而是通过抽象接口桥接起来。这样我们想加一种新消息、新用户，只管在自己的维度扩展就行了，不用去动对方的代码，灵活又清晰。</p>
@@ -2412,9 +2356,6 @@ jdbcTemplate<span class="token punctuation">.</span><span class="token function"
 <h5 id="1、实现“抽象”和“实现”的解耦"><a href="#1、实现“抽象”和“实现”的解耦" class="headerlink" title="1、实现“抽象”和“实现”的解耦"></a>1、实现“抽象”和“实现”的解耦</h5><p>桥接模式最直接的好处，就是可以把抽象层（比如 JdbcTemplate）和实现层（比如各种 DataSource）完全分开维护。这种设计方式，对于框架来说非常关键，因为框架无法预知业务系统中会接入哪种实现。</p>
 <h5 id="2、便于扩展和替换，增强系统灵活性"><a href="#2、便于扩展和替换，增强系统灵活性" class="headerlink" title="2、便于扩展和替换，增强系统灵活性"></a>2、便于扩展和替换，增强系统灵活性</h5><p>以 JdbcTemplate 为例，不管我们底层用的是 HikariCP 还是 Druid，业务代码基本不需要改动。这种灵活性，大大降低了系统的耦合度，也方便未来的升级和优化。</p>
 <h5 id="3、符合接口隔离与开闭原则"><a href="#3、符合接口隔离与开闭原则" class="headerlink" title="3、符合接口隔离与开闭原则"></a>3、符合接口隔离与开闭原则</h5><p>桥接模式鼓励我们面向接口编程，而不是面向具体类。DriverManager 和 JdbcTemplate 都是很好例子，它们通过接口做桥接，让业务代码只关心逻辑而不是实现细节，真正做到了对扩展开放、对修改关闭。</p>
-<h3 id="相关面试题-9"><a href="#相关面试题-9" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1802171736231583745">什么是桥接模式？一般用在什么场景？ </a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/36.png"></p>
 <h2 id="11-组合模式"><a href="#11-组合模式" class="headerlink" title="11. 组合模式"></a>11. 组合模式</h2><h3 id="什么是组合模式？"><a href="#什么是组合模式？" class="headerlink" title="什么是组合模式？"></a>什么是组合模式？</h3><p><strong>组合模式</strong>（Composite Pattern）是一种结构型设计模式，它是一种让我们可以用统一的方式来处理<strong>单个对象</strong>和<strong>一组对象</strong>的设计思路。它的核心思想就是：无论是一个元素，还是一组元素，我都用同一套接口、一致的方式去操作，不用每次都写一堆 if 判断去区分“你到底是个体还是整体”。</p>
 <p>在开发中，我们经常会碰到“部分-整体”的结构，比如文件系统：一个文件夹里可以放文件，也可以放文件夹，后者又可以继续嵌套文件……这时候如果每种情况都单独处理，会导致代码不够优雅。组合模式就让你像处理一个单独文件那样处理整个文件夹，递归也轻松搞定。</p>
 <p>举个例子，我们都搬过家吧，需要整理一大堆打包好的箱子。每个箱子里可能直接装着物品，比如一本书、一只杯子，也可能是一个更小的箱子，里面再装别的东西。</p>
@@ -2622,9 +2563,6 @@ jdbcTemplate<span class="token punctuation">.</span><span class="token function"
 <h5 id="1、统一处理逻辑，简化调用"><a href="#1、统一处理逻辑，简化调用" class="headerlink" title="1、统一处理逻辑，简化调用"></a>1、统一处理逻辑，简化调用</h5><p>组合模式可以让我们对“一个对象”还是“一组对象”进行统一处理，省去了调用方的条件判断和分支逻辑。比如参数解析器，我们不需要管到底是哪个解析器支持，组合器会统一负责找合适的。</p>
 <h5 id="2、扩展性强，插件式开发友好"><a href="#2、扩展性强，插件式开发友好" class="headerlink" title="2、扩展性强，插件式开发友好"></a>2、扩展性强，插件式开发友好</h5><p>每个子解析器（HandlerMethodArgumentResolver 实现类）都可以独立实现，互不干扰，添加新的处理器只需要注册到组合器中，不用改原有逻辑。</p>
 <h5 id="3、层级嵌套灵活，天然适合处理树形结构"><a href="#3、层级嵌套灵活，天然适合处理树形结构" class="headerlink" title="3、层级嵌套灵活，天然适合处理树形结构"></a>3、层级嵌套灵活，天然适合处理树形结构</h5><p>像菜单、目录、组件树等天然结构，都适合用组合模式建模，结构清晰、功能解耦，容易维护。</p>
-<h3 id="相关面试题-10"><a href="#相关面试题-10" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1802557097684312065">什么是组合模式？一般用在什么场景？ </a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/127.png"></p>
 <h2 id="12-享元模式"><a href="#12-享元模式" class="headerlink" title="12. 享元模式"></a>12. 享元模式</h2><h3 id="什么是享元模式？"><a href="#什么是享元模式？" class="headerlink" title="什么是享元模式？"></a>什么是享元模式？</h3><p><strong>享元模式</strong>（Flyweight Pattern）是一种结构型设计模式，它的核心思想是：<strong>通过共享对象，减少系统中对象的数量，从而节省内存，提高性能</strong>。在很多应用场景中，我们经常会遇到需要大量创建相似对象的情况，而这些对象之间其实有很多内容是可以共享的。享元模式就是专门针对这种情况提出的：把可以共享的部分提取出来，放到一个公共对象里，只保留那些不可共享的部分，减少重复创建，从而节省资源开销。</p>
 <p>我们之前在学校上课的时候，每个人都会发一本教科书。想一想，其实每个人的课本内容是一样的，只是使用者不同。如果每个人都印一本新的，那资源就浪费了。我们完全可以共用一本电子教材，每个人阅读的时候，传进去自己的用户信息，这样既节省了纸张，也节省了印刷成本。 这就和享元模式非常类似：共用相同的部分，把变化的部分单独管理。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/63.png"></p>
@@ -2800,9 +2738,6 @@ jdbcTemplate<span class="token punctuation">.</span><span class="token function"
 <h4 id="优势和作用-11"><a href="#优势和作用-11" class="headerlink" title="优势和作用"></a>优势和作用</h4><p>通过上述的源码分析，我们可以再次总结下享元模式的作用。</p>
 <h5 id="1、节省内存，提高性能"><a href="#1、节省内存，提高性能" class="headerlink" title="1、节省内存，提高性能"></a>1、节省内存，提高性能</h5><p>享元模式最直接的好处是<strong>避免重复创建相同对象</strong>，比如 Integer 缓存了 [-128,127] 的对象，很多场景下都能避免频繁的 GC。</p>
 <h5 id="2、统一管理共享对象，逻辑更清晰"><a href="#2、统一管理共享对象，逻辑更清晰" class="headerlink" title="2、统一管理共享对象，逻辑更清晰"></a>2、统一管理共享对象，逻辑更清晰</h5><p>享元工厂作为统一的入口，不但能集中管理复用对象，还能方便我们进行调试和监控，比如监控缓存命中率、缓存数量等。</p>
-<h3 id="相关面试题-11"><a href="#相关面试题-11" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1802557572714405889">什么是享元模式？一般用在什么场景？ </a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/67.png"></p>
 <h1 id="三、行为型模式"><a href="#三、行为型模式" class="headerlink" title="三、行为型模式"></a>三、行为型模式</h1><h2 id="介绍-2"><a href="#介绍-2" class="headerlink" title="介绍"></a>介绍</h2><p>行为型模式，主要是用来解决<strong>对象之间如何协作、职责如何划分、行为如何解耦</strong>的问题。</p>
 <p>如果我们把一个系统比作一个团队，那么每个类或对象就像是团队里的不同成员。每个成员不仅要做好自己的本职工作，还要跟其他成员配合得当，才能把整个项目顺利完成。行为型模式就是在告诉我们，这种协作关系应该怎么设计，才能既高效又灵活。</p>
 <p>在程序开发中，光有数据结构和功能模块还不够，还需要设计<strong>对象之间怎么交流、怎么协作、职责如何划分</strong>。如果这些关系处理不好，系统会变得非常混乱，修改一个功能可能牵一发动全身。</p>
@@ -3026,9 +2961,6 @@ agency<span class="token punctuation">.</span><span class="token function">setNe
 <h5 id="1、解耦事件触发和事件响应逻辑"><a href="#1、解耦事件触发和事件响应逻辑" class="headerlink" title="1、解耦事件触发和事件响应逻辑"></a>1、解耦事件触发和事件响应逻辑</h5><p>观察者模式最大的好处就是解耦。以 Spring 的事件机制为例，<code>UserService</code> 只负责业务本身（注册），根本不用关心通知谁、怎么通知。监听器该做什么，那是它自己的事。</p>
 <h5 id="2、便于扩展和维护"><a href="#2、便于扩展和维护" class="headerlink" title="2、便于扩展和维护"></a>2、便于扩展和维护</h5><p>如果我们后面想在注册成功之后再加一个“发优惠券”的逻辑，只要再添加一个监听器就可以了，原有代码不动。这种“开闭原则”带来的灵活性是非常重要的。</p>
 <h5 id="3、支持异步通知（Spring-中可配置）"><a href="#3、支持异步通知（Spring-中可配置）" class="headerlink" title="3、支持异步通知（Spring 中可配置）"></a>3、支持异步通知（Spring 中可配置）</h5><p>Spring 的事件机制还可以通过 <code>@Async</code> 实现异步事件监听。也就是说，被观察者通知完了之后可以立刻返回，具体处理交给另一个线程去做，提升了响应速度。</p>
-<h3 id="相关面试题-12"><a href="#相关面试题-12" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1802938904808333313">什么是观察者模式？一般用在什么场景？ </a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/20.png"></p>
 <h2 id="14-策略模式"><a href="#14-策略模式" class="headerlink" title="14. 策略模式"></a>14. 策略模式</h2><h3 id="什么是策略模式"><a href="#什么是策略模式" class="headerlink" title="什么是策略模式"></a>什么是策略模式</h3><p><strong>策略模式</strong>（Strategy Pattern）是一种行为型设计模式。它的核心思想就是：<strong>定义一系列算法，把它们一个个封装起来，并且让它们可以互相替换</strong>。<br>换句话说，我们可以把不同的处理逻辑抽象成不同的策略对象，在程序运行时，根据实际情况动态选择合适的策略进行处理，而不需要在代码里堆砌大量的<code>if...else</code>或<code>switch</code>判断。</p>
 <p>拿生活中的场景来说，这事其实我们每天都在干。比如我们早上出门上班时，会根据天气和路况选择出行方式：天气好就骑车，下雨就打车，堵车就改坐地铁。不同的出行方式就是不同的策略，鱼皮根据实际情况灵活选择，背后逻辑就非常符合策略模式的设计理念。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/88.png"></p>
@@ -3164,15 +3096,6 @@ agency<span class="token punctuation">.</span><span class="token function">setNe
 <h5 id="1、让行为扩展更加灵活"><a href="#1、让行为扩展更加灵活" class="headerlink" title="1、让行为扩展更加灵活"></a>1、让行为扩展更加灵活</h5><p>策略模式把行为封装到独立的策略类中，我们只需要新增一个策略实现类，就可以扩展出新的行为，不需要修改已有的逻辑。这种“扩展开放、修改关闭”的设计原则非常有利于维护大型系统。</p>
 <h5 id="2、避免复杂的-if-x2F-else-或-switch-逻辑"><a href="#2、避免复杂的-if-x2F-else-或-switch-逻辑" class="headerlink" title="2、避免复杂的 if/else 或 switch 逻辑"></a>2、避免复杂的 if/else 或 switch 逻辑</h5><p>在实际开发中，我们经常会看到一堆基于类型、状态的 if/else 分支判断。使用策略模式后，这些判断可以转化为策略选择，结构更清晰，职责更单一，逻辑更容易管理。</p>
 <h5 id="3、提高代码复用率和可测试性"><a href="#3、提高代码复用率和可测试性" class="headerlink" title="3、提高代码复用率和可测试性"></a>3、提高代码复用率和可测试性</h5><p>每个策略类职责单一，独立实现，可以单独测试，代码复用度也更高。在 Spring 中，我们可以将不同策略注册为不同的 Bean，根据注入条件灵活切换，配合注解或配置使用非常方便。</p>
-<h3 id="相关项目-6"><a href="#相关项目-6" class="headerlink" title="相关项目"></a>相关项目</h3><h5 id="编程导航的-AI-答题平台项目"><a href="#编程导航的-AI-答题平台项目" class="headerlink" title="编程导航的 AI 答题平台项目"></a>编程导航的 AI 答题平台项目</h5><p>在 <a target="_blank" rel="noopener" href="https://www.codefather.cn/course/1790274408835506178">编程导航的 AI 答题平台项目</a> 的判题评分模块中，使用了策略模式来封装不同的评分算法。由于业务场景中需要支持多种评分方式，不同的评分算法对应不同的处理策略，因此通过统一接口进行抽象，提升了系统的可扩展性和可维护性。</p>
-<p>具体实现上，定义了 <code>ScoringStrategy</code> 接口，用于规范评分方法的入参和出参。每个评分算法实现该接口，并使用自定义注解 <code>ScoringStrategyConfig</code> 标识其对应的应用类型和评分类型。评分驱动类 <code>ScoringStrategyExecutor</code> 通过 Spring 注入所有实现类，执行时遍历评分策略列表，并结合注解中的元信息筛选出匹配的算法并调用其实现，从而实现评分逻辑的灵活调度。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/91.png"></p>
-<h5 id="编程导航的-OJ-判题项目-2"><a href="#编程导航的-OJ-判题项目-2" class="headerlink" title="编程导航的 OJ 判题项目"></a>编程导航的 OJ 判题项目</h5><p>在 <a target="_blank" rel="noopener" href="https://www.codefather.cn/course/1790980707917017089">编程导航的 OJ 判题项目 </a>的判题模块中，为了解决不同编程语言对应的判题逻辑差异问题，使用了策略模式。由于各语言的判题规则存在差异（例如 Java 语言可能需要更高的时间和内存限制），如果直接在业务层通过大量 <code>if-else</code> 语句进行区分，会导致代码的圈复杂度上升，不利于维护。</p>
-<p>为此，系统定义了 <code>JudgeStrategy</code> 接口，统一约定了 <code>doJudge</code> 方法，不同语言的判题逻辑通过实现该接口的策略类进行封装，例如 <code>JavaLanguageJudgeStrategy</code>。当需要调整某种语言的判题逻辑时，只需修改对应的策略类即可，增强了系统的可扩展性和可维护性。同时引入了 <code>JudgeContext</code> 类，用于封装策略执行过程中所需的上下文信息，并通过 <code>JudgeManager</code> 类根据具体编程语言选择对应策略并执行，从而实现了判题逻辑的模块化管理，简化了 service 层的代码结构。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/92.png"></p>
-<h3 id="相关面试题-13"><a href="#相关面试题-13" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1803305303140720641">什么是策略模式？一般用在什么场景？ </a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/93.png"></p>
 <h2 id="15-命令模式"><a href="#15-命令模式" class="headerlink" title="15. 命令模式"></a>15. 命令模式</h2><h3 id="什么是命令模式？"><a href="#什么是命令模式？" class="headerlink" title="什么是命令模式？"></a>什么是命令模式？</h3><p><strong>命令模式</strong>（Command Pattern）是一种行为型设计模式。它的核心思想是：<strong>把请求封装成一个对象</strong>，这样我们就能用不同的请求、队列或者日志来参数化其他对象，同时也支持可撤销操作。</p>
 <p>简单来说，就是把“干什么”和“怎么干”分开了。发送请求的人只需要负责提出需求，不需要关心具体怎么执行。而执行的人，拿到命令对象，就知道要做什么了。</p>
 <p>举个生活里的例子，比如鱼皮我在忙着写教程的时候，会让同事安排点事：“明天早上帮我订张去北京的高铁票”、“今天下班前把这个代码提交了”，这些请求就像是一条条命令，而同事负责的就是把命令照着执行。这期间我不用操心执行细节，同事也不用搞清楚为什么要这么做，只要任务写清楚，拿到命令就能干活。而且我还可以随时更改任务，比如取消订票、把提交代码的时间提前，也就是“撤销命令”或“重新安排命令”。这不就是命令模式的真实写照吗？</p>
@@ -3323,12 +3246,6 @@ executor<span class="token punctuation">.</span><span class="token function">exe
 <h4 id="优势和作用-14"><a href="#优势和作用-14" class="headerlink" title="优势和作用"></a>优势和作用</h4><p>通过上述的源码分析，我们可以再次总结下命令模式的作用。</p>
 <h5 id="1、统一执行入口，提高解耦性"><a href="#1、统一执行入口，提高解耦性" class="headerlink" title="1、统一执行入口，提高解耦性"></a>1、统一执行入口，提高解耦性</h5><p>命令模式的一个核心优势是：它把“做什么”和“怎么执行”给分开了。比如在线程池里，提交任务的人只需要实现 <code>Runnable</code>，不需要关心线程调度的细节；而线程池只管调度和执行任务，也不需要知道具体业务逻辑。这种分工，特别适合解耦复杂系统中的职责划分。</p>
 <h5 id="2、灵活支持命令队列、撤销、重做等机制"><a href="#2、灵活支持命令队列、撤销、重做等机制" class="headerlink" title="2、灵活支持命令队列、撤销、重做等机制"></a>2、灵活支持命令队列、撤销、重做等机制</h5><p>命令模式天然支持“记录每一个命令”，所以特别适合命令队列、操作日志、宏命令等需求。在一些流程编排系统或任务调度框架中，这种模式也很常见。</p>
-<h3 id="相关项目-7"><a href="#相关项目-7" class="headerlink" title="相关项目"></a>相关项目</h3><h5 id="编程导航的代码生成器平台项目-1"><a href="#编程导航的代码生成器平台项目-1" class="headerlink" title="编程导航的代码生成器平台项目"></a>编程导航的代码生成器平台项目</h5><p>在 <a target="_blank" rel="noopener" href="https://www.codefather.cn/course/1790980795074654209">编程导航的代码生成器平台项目</a> 在项目中，我们遵循了 Picocli 框架的规范设计，将每个子命令封装为独立的命令类。例如，<code>GenerateCommand</code> 用于执行代码生成操作，<code>ListCommand</code> 用于列出模板文件，<code>ConfigCommand</code> 用于查看代码生成配置。各个命令类职责单一、彼此独立，便于后续的功能扩展和维护。</p>
-<p>在命令执行器类中，我们集中管理所有命令的注册和调用逻辑。通过 Picocli 提供的 API，将上述子命令统一绑定到主命令中。框架会根据用户在终端输入的命令自动完成解析，并分发执行相应的子命令，实现了清晰、灵活、可扩展的命令行交互体验。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/24.png"></p>
-<h3 id="相关面试题-14"><a href="#相关面试题-14" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1802939265333927937">什么是命令模式？一般用在什么场景？ </a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/25.png"></p>
 <h2 id="16-中介者模式"><a href="#16-中介者模式" class="headerlink" title="16. 中介者模式"></a>16. 中介者模式</h2><h3 id="什么是中介者模式？"><a href="#什么是中介者模式？" class="headerlink" title="什么是中介者模式？"></a>什么是中介者模式？</h3><p><strong>中介者模式</strong>（Mediator Pattern）是一种行为型设计模式。它的核心思想是：<strong>通过引入一个中介对象，来封装对象之间复杂的交互关系</strong>。各个对象之间不再直接引用或依赖彼此，而是统一通过中介者来进行通信和协作。</p>
 <p>说得直白一点，就是大家不再私底下互相打电话沟通，而是都去找一个中间人，由他来负责统一安排和转达。这样做的好处是，每个对象只需要关注自己的行为和中介者的交互，不需要关心其他对象的存在，大大降低了系统的复杂度。</p>
 <p>拿生活中的例子来说，鱼皮我前段时间租房子时就遇到了这种情况。早些年我还试过在各种贴吧和微信群里一个个联系房东，问房源、约看房、谈价格，最后人都快崩溃了。现在可不一样，直接找个靠谱的中介，把自己的需求告诉他：“我想在市中心附近租套两居室，预算多少，最好带阳台”，然后坐等中介那边安排房源、联系房东、协调时间，一站式搞定。这时候，中介公司就是那个“中介者对象”，租客和房东之间互不认识、互不打扰，所有沟通都通过中介来完成，省心又高效。</p>
@@ -3480,9 +3397,6 @@ Yes哥 发送消息：Hi 鱼皮！
 <h4 id="优势和作用-15"><a href="#优势和作用-15" class="headerlink" title="优势和作用"></a>优势和作用</h4><p>通过上述的源码分析，我们可以再次总结下中介者模式的作用。</p>
 <h5 id="1、降低对象之间的耦合度"><a href="#1、降低对象之间的耦合度" class="headerlink" title="1、降低对象之间的耦合度"></a>1、降低对象之间的耦合度</h5><p>在 <code>java.util.Timer</code> 的结构中，所有调度逻辑都集中在 <code>Timer</code> 里，各个 <code>TimerTask</code> 只负责自己的执行逻辑，不需要知道其他任务的存在。通过 <code>Timer</code> 这个中介者，任务之间不再直接交互，模块职责更清晰，代码依赖也更简单。</p>
 <h5 id="2、提升可扩展性与维护性"><a href="#2、提升可扩展性与维护性" class="headerlink" title="2、提升可扩展性与维护性"></a>2、提升可扩展性与维护性</h5><p>任务调度统一由 <code>Timer</code> 控制，我们只需修改 <code>Timer</code> 的逻辑，就能调整所有任务的调度策略。这样的集中管理方式，更适合处理复杂变化，也便于后期扩展和维护。</p>
-<h3 id="相关面试题-15"><a href="#相关面试题-15" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1803305756926664705">什么是中介者模式？一般用在什么场景？ </a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/79.png"></p>
 <h2 id="17-备忘录模式"><a href="#17-备忘录模式" class="headerlink" title="17. 备忘录模式"></a>17. 备忘录模式</h2><h3 id="什么是备忘录模式？"><a href="#什么是备忘录模式？" class="headerlink" title="什么是备忘录模式？"></a>什么是备忘录模式？</h3><p><strong>备忘录模式</strong>（Memento Pattern）是一种行为型设计模式。它的核心思想是：<strong>在不破坏对象封装性的前提下，捕获一个对象的内部状态，并在将来需要的时候能够恢复这个状态</strong>。</p>
 <p>有时候，我们在程序里需要让某个对象可以回到之前的某个历史状态，比如：文档的撤销功能、游戏的存档回档等等。如果不设计得好，我们很可能会暴露对象的内部细节，导致数据不安全，或者让对象之间的关系变得混乱。</p>
 <p>为了实现这个功能，我们通常会额外搞一个“备忘录对象”出来，专门负责记录某个对象的状态。原始对象负责业务逻辑，备忘录只管记录快照，两者分工明确、互不打扰。这样既保留了封装性，又能灵活支持“状态恢复”，安全性和扩展性也都兼顾了。</p>
@@ -3683,9 +3597,6 @@ Yes哥 发送消息：Hi 鱼皮！
 <h5 id="1、实现状态快照，增强系统的可恢复能力"><a href="#1、实现状态快照，增强系统的可恢复能力" class="headerlink" title="1、实现状态快照，增强系统的可恢复能力"></a>1、实现状态快照，增强系统的可恢复能力</h5><p>在 <code>javax.swing.undo.UndoManager</code> 中，每次文本编辑操作都会生成一个 <code>UndoableEdit</code>，相当于对当前状态做了一次“快照”。这些快照被 <code>UndoManager</code> 管理起来，后续无论是撤销（undo）还是重做（redo），我们都可以精确地恢复到之前的某个状态。这种机制让编辑器类应用具备了良好的可恢复性。</p>
 <h5 id="2、保持封装性，不暴露内部状态"><a href="#2、保持封装性，不暴露内部状态" class="headerlink" title="2、保持封装性，不暴露内部状态"></a>2、保持封装性，不暴露内部状态</h5><p>每个 <code>UndoableEdit</code> 都负责封装自己的变化细节，比如插入了什么文字、删了哪一段内容。这些细节并不会直接暴露给外部，调用方只需要通过 <code>UndoManager.undo()</code> 或 <code>redo()</code> 来触发恢复动作。原始编辑对象的封装性得以保留，逻辑也更清晰。</p>
 <h5 id="3、增强代码的职责隔离性"><a href="#3、增强代码的职责隔离性" class="headerlink" title="3、增强代码的职责隔离性"></a>3、增强代码的职责隔离性</h5><p>状态记录这件事是由 <code>UndoManager</code> 管的，编辑组件本身并不需要关心如何保存、撤销，这就实现了代码的职责分离。</p>
-<h3 id="相关面试题-16"><a href="#相关面试题-16" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1803306495400992770">什么是备忘录模式，一般用在什么场景？</a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/41.png"></p>
 <h2 id="18-模板方法模式"><a href="#18-模板方法模式" class="headerlink" title="18. 模板方法模式"></a>18. 模板方法模式</h2><h3 id="什么是模板方法模式？"><a href="#什么是模板方法模式？" class="headerlink" title="什么是模板方法模式？"></a>什么是模板方法模式？</h3><p><strong>模板方法模式</strong>（Template Method Pattern）是一种行为型设计模式，它的核心思想是：<strong>在一个方法中定义好算法的整体流程结构，把一些具体的步骤延迟到子类中去实现</strong>。也就是说，父类负责规定流程框架，具体的细节由子类根据需要自己去填充。</p>
 <p>简单讲，就是我们在父类里搭好框架，规定好执行流程，哪些步骤必须有，哪些步骤需要变化，但是具体怎么做，由子类去填充细节。这样做有一个很重要的好处：能够复用通用流程的代码，又能灵活地定制细节。父类定义流程骨架，子类实现具体内容，两边互不干扰。</p>
 <p>鱼皮在写代码前都有泡茶或者泡咖啡的习惯，这两个其实流程都差不多：先烧水、再冲泡、然后倒进杯子，最后加点糖或者柠檬。烧水、倒水这些是固定套路，但“泡茶”还是“冲咖啡”，就要看具体饮品来决定了。换句话说，这个泡饮品的流程，其实就是父类写的“模板方法”，不同饮品自己来决定怎么实现具体步骤。</p>
@@ -3861,16 +3772,6 @@ Yes哥 发送消息：Hi 鱼皮！
 <h5 id="2、提升扩展能力"><a href="#2、提升扩展能力" class="headerlink" title="2、提升扩展能力"></a>2、提升扩展能力</h5><p>如果我们想加点新逻辑，只需要继承父类或传入回调就行，不需要动原来的模板。像 <code>JdbcTemplate</code> 支持自定义 <code>RowMapper</code>，集合框架也允许我们扩展自定义的 List、Set，非常方便。</p>
 <h5 id="3、减少出错概率"><a href="#3、减少出错概率" class="headerlink" title="3、减少出错概率"></a>3、减少出错概率</h5><p>一些操作必须按照固定顺序执行，比如数据库的连接、释放。如果交给开发者手写，很容易出错。模板方法把这些顺序定死了，流程稳定、出错少。</p>
 <h5 id="4、适合框架封装"><a href="#4、适合框架封装" class="headerlink" title="4、适合框架封装"></a>4、适合框架封装</h5><p>框架里常有固定流程 + 可扩展的场景，模板方法很适合这种结构。Spring、Servlet、JDBC 里都大量用到了它。</p>
-<h3 id="相关项目-8"><a href="#相关项目-8" class="headerlink" title="相关项目"></a>相关项目</h3><h5 id="编程导航的智能云图库项目-1"><a href="#编程导航的智能云图库项目-1" class="headerlink" title="编程导航的智能云图库项目"></a>编程导航的智能云图库项目</h5><p>在 <a target="_blank" rel="noopener" href="https://www.codefather.cn/course/1864210260732116994">编程导航的智能云图库项目</a> 的图片上传模块中，使用了模板方法模式。通用的上传流程（如校验、生成临时文件、上传到对象存储、解析图片信息、删除临时文件）被统一定义在抽象类 <code>PictureUploadTemplate</code> 中。对于“本地文件上传”和“URL 上传”这两种不同的场景，分别通过子类 <code>FilePictureUpload</code> 和 <code>UrlPictureUpload</code> 实现，在“校验图片”、“获取文件名”、“下载或处理文件”等与输入源相关的步骤中提供差异化逻辑，其余流程则复用模板父类的实现。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/98.png"></p>
-<h5 id="编程导航的代码生成器平台项目-2"><a href="#编程导航的代码生成器平台项目-2" class="headerlink" title="编程导航的代码生成器平台项目"></a>编程导航的代码生成器平台项目</h5><p>在 <a target="_blank" rel="noopener" href="https://www.codefather.cn/course/1790980795074654209">编程导航的代码生成器平台项目</a> 的生成器模块中使用了模板方法模式。由于生成流程较多且逻辑复杂，将整体流程抽象成模板基类，统一定义执行步骤的标准流程。具体的生成环节（如生成 JAR 包、生成脚本等）由不同的子类实现，从而在不改动主流程结构的前提下，根据实际需求定制各步骤逻辑。例如，如果需要在生成 JAR 包的环节中增加输出信息，只需新增一个子类并重写对应方法即可，有助于提升代码的可维护性和扩展性。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/99.png"></p>
-<h5 id="编程导航的-OJ-判题项目-3"><a href="#编程导航的-OJ-判题项目-3" class="headerlink" title="编程导航的 OJ 判题项目"></a>编程导航的 OJ 判题项目</h5><p>在 <a target="_blank" rel="noopener" href="https://www.codefather.cn/course/1790980707917017089">编程导航的 OJ 判题项目 </a>的代码沙箱模块中，使用了模板方法模式来统一管理 Java 原生沙箱和 Docker 沙箱的执行流程。由于两者的核心业务流程基本一致，包括保存文件、编译代码、执行程序、收集结果、清理文件和错误处理等操作，且部分步骤可通用，因此通过抽象出统一模板以减少重复实现。</p>
-<p>具体做法是，定义了一个抽象的沙箱模板类，其中用一个模板方法固定了执行流程的整体结构，并将每个处理环节抽象成独立方法，允许子类根据需要进行重写。Java 原生沙箱和 Docker 沙箱分别继承该模板类，共享通用的处理逻辑，同时对差异化环节（如执行逻辑）进行自定义实现。通过这种方式，既避免了重复代码，也提高了流程的清晰度和系统的扩展性。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/100.png"></p>
-<h3 id="相关面试题-17"><a href="#相关面试题-17" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1802939152477790209">什么是模板方法模式？一般用在什么场景？ </a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/101.png"></p>
 <h2 id="19-迭代器模式"><a href="#19-迭代器模式" class="headerlink" title="19. 迭代器模式"></a>19. 迭代器模式</h2><h3 id="什么是迭代器模式"><a href="#什么是迭代器模式" class="headerlink" title="什么是迭代器模式?"></a>什么是迭代器模式?</h3><p><strong>迭代器模式</strong>（Iterator Pattern）是一种行为型设计模式，它的主要作用是<strong>提供一种方法，顺序访问一个集合对象内部的元素，而又不暴露集合的内部结构。</strong></p>
 <p>简单说就是，我们不需要知道集合内部是怎么存储数据的（比如是数组、链表还是其他什么复杂结构），只需要通过统一的接口一步步访问元素，像走楼梯一样一级一级地拿到数据。这种模式，把遍历操作从集合对象里抽取了出来，专门交给迭代器对象去处理。集合本身负责存放数据，迭代器负责按顺序去访问数据，两边各司其职，互不干扰。</p>
 <p>就拿编程导航网站来说，我们会在里面刷帖，首页有各种热门技术帖、面试经验总结、代码分享等等。你点下一页，或者下拉加载，它就自动给你继续展示新的帖子。这个网站背后其实管理着成百上千条帖子，可能分门别类地存放在数据库里，但对于我们用户来说，根本不关心底层是怎么存的，我们只关心——“我下拉之后能不能顺利接着看下一条”。</p>
@@ -4032,8 +3933,6 @@ Executing node: ProcessNode{name='结束'}<span aria-hidden="true" class="line-n
 <h5 id="1、统一访问方式"><a href="#1、统一访问方式" class="headerlink" title="1、统一访问方式"></a>1、统一访问方式</h5><p><code>ArrayList</code> 实现了 <code>Iterable</code> 接口，不管内部是数组还是其他结构，我们都可以用 <code>Iterator</code> 或增强 for 循环来遍历，代码更统一。</p>
 <h5 id="2、隐藏实现细节"><a href="#2、隐藏实现细节" class="headerlink" title="2、隐藏实现细节"></a>2、隐藏实现细节</h5><p>具体的遍历逻辑封装在内部类 <code>Itr</code> 中，使用时只需要关心 <code>hasNext()</code> 和 <code>next()</code>，不用了解底层怎么实现。</p>
 <h5 id="3、增强可扩展性"><a href="#3、增强可扩展性" class="headerlink" title="3、增强可扩展性"></a>3、增强可扩展性</h5><p>只要实现了 <code>Iterable</code> 接口，任何自定义集合都能接入现有遍历逻辑，无需修改调用方代码，方便扩展。</p>
-<h3 id="相关面试题-18"><a href="#相关面试题-18" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1802939021862969346">什么是迭代器模式？一般用在什么场景</a><br><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/87.png"></p>
 <h2 id="20-状态模式"><a href="#20-状态模式" class="headerlink" title="20. 状态模式"></a>20. 状态模式</h2><h3 id="什么是状态模式？"><a href="#什么是状态模式？" class="headerlink" title="什么是状态模式？"></a>什么是状态模式？</h3><p><strong>状态模式</strong>（State Pattern）是一种行为型设计模式，它的核心思想是：<strong>允许对象在内部状态变化时，改变它的行为，看起来就像是对象本身发生了变化一样</strong>。</p>
 <p>换句话说，在不同的状态下，同一个对象的表现是不一样的。我们把状态相关的行为抽取成独立的状态类，然后让原来的对象根据当前的状态，把具体的工作交给对应的状态类来处理。</p>
 <p>这种设计的好处是，把原本一大堆 if-else 的状态切换逻辑拆分成小而清晰的模块。每个状态自己负责自己那一套行为，代码职责更明确，也更容易维护和扩展。</p>
@@ -4227,9 +4126,6 @@ Executing node: ProcessNode{name='结束'}<span aria-hidden="true" class="line-n
 <h5 id="1、提高代码可维护性"><a href="#1、提高代码可维护性" class="headerlink" title="1、提高代码可维护性"></a>1、提高代码可维护性</h5><p>状态模式的最大优点就是把状态和行为解耦。就拿 Spring State Machine 来说，每个状态和对应的转换逻辑都封装成对象后，我们就不用再写一堆 if-else 或 switch-case 来判断当前处于哪个状态，也不用担心某个地方多写了状态判断而导致逻辑重复。</p>
 <h5 id="2、方便扩展新状态或新行为"><a href="#2、方便扩展新状态或新行为" class="headerlink" title="2、方便扩展新状态或新行为"></a>2、方便扩展新状态或新行为</h5><p>如果以后新增一个订单状态，比如“等待签收”，我们只需要新增一个状态对象，并注册相应的转换逻辑即可，不用改动现有的代码。这种开放封闭原则的体现，正是状态模式的强项。</p>
 <h5 id="3、复杂流程管理更清晰"><a href="#3、复杂流程管理更清晰" class="headerlink" title="3、复杂流程管理更清晰"></a>3、复杂流程管理更清晰</h5><p>在像订单流转、审批流这种有明确流程的系统中，状态模式能很好地把状态流转管理清楚。尤其在多个状态共享某些公共行为或触发不同的事件时，状态模式能有效地把逻辑整理清楚，避免混乱。</p>
-<h3 id="相关面试题-19"><a href="#相关面试题-19" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1802939360414605313">什么是状态模式？一般用在什么场景？</a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/16.png"></p>
 <h2 id="21-责任链模式"><a href="#21-责任链模式" class="headerlink" title="21. 责任链模式"></a>21. 责任链模式</h2><h3 id="什么是责任链模式？"><a href="#什么是责任链模式？" class="headerlink" title="什么是责任链模式？"></a>什么是责任链模式？</h3><p><strong>责任链模式</strong>（Chain of Responsibility Pattern）是一种行为型设计模式，它的核心思想就是：<strong>将多个处理请求的对象连接成一条链，每个对象在链上依次处理请求，直到有对象处理完请求为止</strong>。换句话说，当一个请求到来时，它会沿着链上的对象逐个传递，每个对象有机会去处理这个请求。如果当前对象无法处理，它就将请求传递给链上的下一个对象。</p>
 <p>就像我们平时遇到问题时，可能会先找一个人问，然后如果他不懂，就转交给下一个人，直到问题得到解决。每个人都承担自己可以处理的部分，任务逐级分配，直到问题得到处理。</p>
 <p>我举个例子哈。我们在公司请假时，流程其实挺像责任链的：请个两天假，组长就批了；请五天假，组长批不了，得往上递给部门经理；如果我想请个长假出去玩一个月，那就得让总监出面了。这种逐级审批的流程，本质上就是一条责任链。我只要发起请假申请，不管谁批的，反正最后有人能拍板就行。 </p>
@@ -4499,9 +4395,6 @@ Executing node: ProcessNode{name='结束'}<span aria-hidden="true" class="line-n
 <h5 id="1、提高代码的可维护性"><a href="#1、提高代码的可维护性" class="headerlink" title="1、提高代码的可维护性"></a>1、提高代码的可维护性</h5><p>我们在 Filter 或 Interceptor 链上添加新的处理逻辑时，不需要去改已有的类逻辑，只需要新增一个过滤器或拦截器，再加到链条里就可以了。这种方式让每个节点的职责都非常清晰，修改起来也很安全，维护成本低。</p>
 <h5 id="2、增强系统的扩展能力"><a href="#2、增强系统的扩展能力" class="headerlink" title="2、增强系统的扩展能力"></a>2、增强系统的扩展能力</h5><p>比如我们有一个订单系统，假设需要在请求处理前先进行权限校验、再记录日志、再做数据脱敏。用责任链模式之后，我们只需要依次添加几个拦截器（或者过滤器），每个模块都独立，互不影响。新增或替换其中某个处理流程都很容易，不会牵一发而动全身。</p>
 <h5 id="3、提升代码结构的清晰度"><a href="#3、提升代码结构的清晰度" class="headerlink" title="3、提升代码结构的清晰度"></a>3、提升代码结构的清晰度</h5><p>通过链式结构，整个请求处理流程是线性的、可预测的。每一层都只关注自己的职责，这种“单一职责 + 链式组合”的方式，极大地提高了代码的清晰度。</p>
-<h3 id="相关面试题-20"><a href="#相关面试题-20" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1803305518413373442">什么是责任链模式？一般用在什么场景？ </a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/107.png"></p>
 <h2 id="22-解释器模式"><a href="#22-解释器模式" class="headerlink" title="22. 解释器模式"></a>22. 解释器模式</h2><h3 id="什么是解释器模式？"><a href="#什么是解释器模式？" class="headerlink" title="什么是解释器模式？"></a>什么是解释器模式？</h3><p><strong>解释器模式</strong>（Interpreter Pattern）是一种行为型设计模式，它的主要作用是<strong>为特定类型的语言提供解释执行的方法</strong>。在这个模式中，我们定义了一个语言的语法规则，并通过这些规则来解释输入的表达式或语句，最终得出我们想要的结果。</p>
 <p>简单来说，解释器模式就像是<strong>“给机器提供一个规则，让它能够理解我们输入的内容并根据规则来执行”</strong>。它通常用于处理某些固定语法规则的语言或表达式，比如数学表达式、正则表达式、查询语言等。</p>
 <p>比如说鱼皮家里的遥控器，按一下“音量+”就是发出一个简单的命令，这时候电视机要能理解“音量+”是要加音量而不是换台，就得有一套规则去解释这个指令。再比如你看到“✅”就知道是“同意”，“❌”就是“不同意”，人脑能理解，但如果让程序处理这些表格符号，就得教它这套规则，也就是写一个解释器。</p>
@@ -5117,9 +5010,6 @@ Executing node: ProcessNode{name='结束'}<span aria-hidden="true" class="line-n
 <h5 id="1、结构稳定，操作可扩展"><a href="#1、结构稳定，操作可扩展" class="headerlink" title="1、结构稳定，操作可扩展"></a>1、结构稳定，操作可扩展</h5><p>在 JDK 和 Spring 这类框架中，结构往往是比较稳定的，比如 <code>Element</code>、<code>BeanDefinition</code> 这些类的结构不轻易改动。而访问者模式允许我们在不修改这些类的前提下，自由地添加各种操作。新加一个行为只需要实现一个新的访问者，不需要动原有结构，非常利于扩展和维护。</p>
 <h5 id="2、逻辑集中，职责清晰"><a href="#2、逻辑集中，职责清晰" class="headerlink" title="2、逻辑集中，职责清晰"></a>2、逻辑集中，职责清晰</h5><p>访问者把不同的操作集中到一个类中，比如 <code>ElementVisitor</code> 或 <code>BeanDefinitionVisitor</code>，这样每种操作的代码都聚集在一块，逻辑更清晰，也方便后期维护和测试。而且不同访问者之间互不干扰，不容易引发耦合问题。</p>
 <h5 id="3、支持多态调度"><a href="#3、支持多态调度" class="headerlink" title="3、支持多态调度"></a>3、支持多态调度</h5><p>通过 <code>accept()</code> 方法的双重分发机制（也叫“双分派”），访问者模式能够根据访问者和被访问者的具体类型，自动调用对应的访问逻辑。这种机制对处理复杂层级结构（比如编译器的 AST、Spring 的配置树）特别有用。</p>
-<h3 id="相关面试题-21"><a href="#相关面试题-21" class="headerlink" title="相关面试题"></a>相关面试题</h3><p>可以在 <a target="_blank" rel="noopener" href="https://www.mianshiya.com/">程序员面试刷题神器 - 面试鸭</a> 上获取到企业常问的设计模式面试题。比如：</p>
-<p>1）<a target="_blank" rel="noopener" href="https://www.mianshiya.com/bank/1801559627969929217/question/1803306004491264002">什么是访问者模式？一般用在什么场景？ </a></p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/112.png"></p>
 <h1 id="四、多种设计模式的组合应用"><a href="#四、多种设计模式的组合应用" class="headerlink" title="四、多种设计模式的组合应用"></a>四、多种设计模式的组合应用</h1><h3 id="为什么要组合使用设计模式"><a href="#为什么要组合使用设计模式" class="headerlink" title="为什么要组合使用设计模式?"></a>为什么要组合使用设计模式?</h3><p>很多人学设计模式的时候，最开始是一个个单独学的。比如：学了策略模式、学了单例模式、又学了观察者模式。但你会发现，实际写业务代码的时候，光靠一个模式，很多时候根本解决不了问题。虽然每个设计模式都有明确的使用场景和目的，但在真实项目中，业务逻辑往往是多方面交织的，职责也不是单一维度的。比如，我们需要做一个电商系统，搞一个“限时满减 + 会员折扣 + 积分抵扣”的促销逻辑。这能靠一个策略模式就搞定吗？不行，你可能需要下面几种设计模式：</p>
 <ul>
 <li>策略模式，动态切换不同的优惠算法；</li>
@@ -6340,7 +6230,7 @@ Executing node: ProcessNode{name='结束'}<span aria-hidden="true" class="line-n
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1229.8k</span>
+                        class="white-color">1225.1k</span>
             
             
             
