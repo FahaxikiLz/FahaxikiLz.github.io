@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class DeleteImageUtil {
     public static void main(String[] args) throws IOException {
-        File file = new File("G:\\L ZHEN\\Desktop\\LZBlog\\source\\_posts");
+        File file = new File("C:\\Users\\L Z\\Desktop\\MyBlog\\source\\_posts");
 
         File[] files = file.listFiles();
         /*所有文件夹*/
@@ -50,14 +50,14 @@ public class DeleteImageUtil {
                     }
 
                     if (!flag && notHaveFlag == filePathList.size()*2) {
-                        File bkFile = new File("G:\\L ZHEN\\Desktop\\imagesBk\\" + dirFile.getName());
+                        File bkFile = new File("C:\\Users\\L Z\\Desktop\\imagesBk\\" + dirFile.getName());
 
                         if (!bkFile.exists()) {
                             bkFile.mkdirs();
                         }
 
                         Path srcPath = Paths.get(image.getPath());
-                        Path tarPath = Paths.get("G:\\L ZHEN\\Desktop\\imagesBk\\" + dirFile.getName() + "\\" + URLDecoder.decode(name, "UTF-8"));
+                        Path tarPath = Paths.get("C:\\Users\\L Z\\Desktop\\imagesBk\\" + dirFile.getName() + "\\" + URLDecoder.decode(name, "UTF-8"));
 
                         Files.move(srcPath, tarPath);
                     }
