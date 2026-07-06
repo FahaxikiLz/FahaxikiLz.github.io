@@ -70,31 +70,6 @@
   </entry>
   
   <entry>
-    <title>Java设计模式</title>
-    <link href="http://fahaxikilz.github.io/2026/06/10/java-she-ji-mo-shi/"/>
-    <id>http://fahaxikilz.github.io/2026/06/10/java-she-ji-mo-shi/</id>
-    <published>2026-06-10T01:10:59.000Z</published>
-    <updated>2026-06-10T01:11:18.820Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css&quot;&gt;&lt;h1 id=&quot;Java-设计模式完整笔记&quot;&gt;&lt;a</summary>
-        
-      
-    
-    
-    
-    <category term="进阶技术" scheme="http://fahaxikilz.github.io/categories/%E8%BF%9B%E9%98%B6%E6%8A%80%E6%9C%AF/"/>
-    
-    
-    <category term="设计模式" scheme="http://fahaxikilz.github.io/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/"/>
-    
-  </entry>
-  
-  <entry>
     <title>山东炒家</title>
     <link href="http://fahaxikilz.github.io/2026/05/09/shan-dong-chao-jia/"/>
     <id>http://fahaxikilz.github.io/2026/05/09/shan-dong-chao-jia/</id>
@@ -499,27 +474,52 @@
   </entry>
   
   <entry>
-    <title>计算机数学</title>
-    <link href="http://fahaxikilz.github.io/2024/04/10/ji-suan-ji-shu-xue/"/>
-    <id>http://fahaxikilz.github.io/2024/04/10/ji-suan-ji-shu-xue/</id>
-    <published>2024-04-10T01:00:00.000Z</published>
-    <updated>2025-07-21T06:20:14.222Z</updated>
+    <title>数据结构与算法</title>
+    <link href="http://fahaxikilz.github.io/2024/03/02/shu-ju-jie-gou-yu-suan-fa/"/>
+    <id>http://fahaxikilz.github.io/2024/03/02/shu-ju-jie-gou-yu-suan-fa/</id>
+    <published>2024-03-02T13:06:30.000Z</published>
+    <updated>2025-07-21T06:20:14.100Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css&quot;&gt;&lt;h1 id=&quot;数列&quot;&gt;&lt;a href=&quot;#数列&quot;</summary>
+    <summary type="html">&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css&quot;&gt;&lt;h1 id=&quot;Hello-算法&quot;&gt;&lt;a href=&quot;#Hello-算法&quot;</summary>
         
       
     
     
     
-    <category term="408" scheme="http://fahaxikilz.github.io/categories/408/"/>
+    <category term="进阶技术" scheme="http://fahaxikilz.github.io/categories/%E8%BF%9B%E9%98%B6%E6%8A%80%E6%9C%AF/"/>
     
     
-    <category term="计算机数学" scheme="http://fahaxikilz.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%95%B0%E5%AD%A6/"/>
+    <category term="数据结构" scheme="http://fahaxikilz.github.io/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>MongoDB</title>
+    <link href="http://fahaxikilz.github.io/2024/01/09/mongodb/"/>
+    <id>http://fahaxikilz.github.io/2024/01/09/mongodb/</id>
+    <published>2024-01-09T01:45:56.000Z</published>
+    <updated>2025-07-21T06:20:10.779Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css&quot;&gt;&lt;h1 id=&quot;一、简介&quot;&gt;&lt;a href=&quot;#一、简介&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="数据库" scheme="http://fahaxikilz.github.io/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
+    
+    
+    <category term="MongoDB" scheme="http://fahaxikilz.github.io/tags/MongoDB/"/>
     
   </entry>
   
