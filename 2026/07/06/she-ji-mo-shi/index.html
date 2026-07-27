@@ -59,9 +59,9 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="爱哭的小河豚" type="application/atom+xml">
+
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="alternate" href="/atom.xml" title="爱哭的小河豚" type="application/atom+xml">
 </head>
 
 
@@ -379,14 +379,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2026-07-06
+                    2026-07-08
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    84.2k
+                    84k
                 </div>
                 
 
@@ -421,20 +421,12 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><blockquote>
+                <blockquote>
 <p>内容转载自：<a target="_blank" rel="noopener" href="https://www.codefather.cn/course/1930517607799193602">23 种设计模式教程(保姆级) - 编程导航 | 2026年最新企业级编程实战项目教程</a></p>
 </blockquote>
 <h1 id="一、创建型模式"><a href="#一、创建型模式" class="headerlink" title="一、创建型模式"></a>一、创建型模式</h1><h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>创建型模式是一类专门用来 <strong>解决对象创建问题的设计模式</strong>。它关注的是：对象该怎么创建，什么时候创建，由谁来创建，创建后怎么保证系统结构清晰又可扩展。</p>
 <p>在我们日常开发中，直接用<code>new</code>去实例化对象虽然很方便，但如果对象的创建过程很复杂，比如需要很多配置参数，或者对象之间有依赖关系，直接<code>new</code>就容易把创建逻辑和业务逻辑耦合在一起，系统变得不好维护。</p>
 <p>创建型模式通过抽象出创建对象的方式，把“怎么建造对象”这件事情独立出来，保持了代码结构的单一职责性，同时让我们在需要修改对象创建逻辑时，能很轻松地调整，不破坏已有的系统。</p>
-<p>我们按照实用性从高到低的顺序，可以有下面这些创建型设计模式：</p>
-<ul>
-<li><a href="2-%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F.md">单例模式</a></li>
-<li><a href="1-%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F.md">工厂方法模式</a></li>
-<li><a href="3-%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F.md">抽象工厂模式</a></li>
-<li><a href="4-%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8F.md">建造者模式</a></li>
-<li><a href="5-%E5%8E%9F%E5%9E%8B%E6%A8%A1%E5%BC%8F.md">原型模式</a></li>
-</ul>
 <h2 id="思维导图"><a href="#思维导图" class="headerlink" title="思维导图"></a>思维导图</h2><p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/3.webp" alt="3.webp"></p>
 <h2 id="1-工厂方法模式"><a href="#1-工厂方法模式" class="headerlink" title="1. 工厂方法模式"></a>1. 工厂方法模式</h2><h3 id="什么是工厂方法模式？"><a href="#什么是工厂方法模式？" class="headerlink" title="什么是工厂方法模式？"></a>什么是工厂方法模式？</h3><p><strong>工厂方法模式</strong>（Factory Method Pattern<strong>）</strong>是一种创建型设计模式，旨在定义一个<strong>用于创建对象的接口</strong>，但将具体的实例化工作放到子类中去完成。换句话说，工厂方法模式<strong>通过让子类决定实例化哪个具体类</strong>，从而实现了对象创建的灵活性和可扩展性。</p>
 <p>用通俗的话来说就是工厂方法模式就像是一个“定制工厂”，告诉它我们的需求，它根据需求提供合适的产品，而不需要我们关心具体的生产过程。</p>
@@ -1382,16 +1374,6 @@ Images: [cover.png, yes_avatar.png]<span aria-hidden="true" class="line-numbers-
 <h5 id="2、替代手动-new，提高一致性与可维护性"><a href="#2、替代手动-new，提高一致性与可维护性" class="headerlink" title="2、替代手动 new，提高一致性与可维护性"></a>2、替代手动 new，提高一致性与可维护性</h5><p>如果我们自己去写 <code>new</code>，对象的构造逻辑就散落在各个角落，不好统一管理。而通过 Spring 的原型作用域，我们可以把实例创建交给容器，集中配置。这不仅减少了重复代码，也方便做扩展，比如加依赖注入、初始化逻辑、统一拦截处理等，整个系统更有一致性。</p>
 <h5 id="3、满足生命周期控制、插件解耦等复杂场景"><a href="#3、满足生命周期控制、插件解耦等复杂场景" class="headerlink" title="3、满足生命周期控制、插件解耦等复杂场景"></a>3、满足生命周期控制、插件解耦等复杂场景</h5><p>有些组件每次都得重新创建，比如任务处理器、策略实现、临时缓存、动态表单对象等。用原型模式，我们每次都能拿到一个新对象，避免了线程安全问题，也不影响其他模块。无论是通过 <code>ArrayList.clone()</code> 这种集合克隆，还是 Spring 的原型 Bean，都体现了“按需独立”的设计理念，适合高变动、高隔离的业务场景。</p>
 <h1 id="二、结构型模式"><a href="#二、结构型模式" class="headerlink" title="二、结构型模式"></a>二、结构型模式</h1><h2 id="介绍-1"><a href="#介绍-1" class="headerlink" title="介绍"></a>介绍</h2><p>结构型模式是一类关注<strong>“类和对象的组合方式”</strong>的设计模式。它的目标不是去解决某个具体的业务问题，而是解决<strong>类之间、对象之间怎么搭配、怎么协作更合理</strong>的问题。<br>在我们日常开发中，单个类往往不能独立完成所有任务，不同的类之间需要互相配合。这个时候，怎么组合它们就变得非常重要。如果组织得不好，类之间的依赖关系会混乱不堪，代码也会变得难以理解和维护。<br>结构型模式就是用来规范这些组合方式的。它通过继承和组合的手段，把已有的类进行合理的拼装，让系统的结构更加清晰、松散耦合，而且更容易扩展和复用。</p>
-<p>我们按照实用性从高到低的顺序，可以有下面这些结构型设计模式：</p>
-<ul>
-<li><a href="7-%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F.md">代理模式</a></li>
-<li><a href="8-%E8%A3%85%E9%A5%B0%E6%A8%A1%E5%BC%8F.md">装饰模式</a></li>
-<li><a href="6-%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8F.md">适配器模式</a></li>
-<li><a href="9-%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F.md">外观模式</a></li>
-<li><a href="11-%E7%BB%84%E5%90%88%E6%A8%A1%E5%BC%8F.md">组合模式</a></li>
-<li><a href="10-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F.md">观察者模式</a></li>
-<li><a href="12-%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F.md">享元模式</a></li>
-</ul>
 <h2 id="思维导图-1"><a href="#思维导图-1" class="headerlink" title="思维导图"></a>思维导图</h2><p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/2.png" alt="2.png"></p>
 <h2 id="6-适配器模式"><a href="#6-适配器模式" class="headerlink" title="6. 适配器模式"></a>6. 适配器模式</h2><h3 id="什么是适配器模式"><a href="#什么是适配器模式" class="headerlink" title="什么是适配器模式?"></a>什么是适配器模式?</h3><p><strong>适配器模式</strong>（Adapter pattern）是一种结构型设计模式，通过创建一个适配器类，<strong>将一个接口转换成客户端所期望的另一个接口</strong>。 </p>
 <p>换句话说，就是当两个东西原本接口不匹配，但我们又想让它们协作时，就可以用一个“适配器”做中间桥梁。</p>
@@ -2732,20 +2714,6 @@ jdbcTemplate<span class="token punctuation">.</span><span class="token function"
 <p>如果我们把一个系统比作一个团队，那么每个类或对象就像是团队里的不同成员。每个成员不仅要做好自己的本职工作，还要跟其他成员配合得当，才能把整个项目顺利完成。行为型模式就是在告诉我们，这种协作关系应该怎么设计，才能既高效又灵活。</p>
 <p>在程序开发中，光有数据结构和功能模块还不够，还需要设计<strong>对象之间怎么交流、怎么协作、职责如何划分</strong>。如果这些关系处理不好，系统会变得非常混乱，修改一个功能可能牵一发动全身。</p>
 <p>而通过行为型模式，我们可以把对象之间的职责划分清楚，通信路径明确，既能降低耦合，又方便后期扩展和维护。</p>
-<p>我们按照实用性从高到低的顺序，可以有下面这些行为型设计模式:</p>
-<ul>
-<li><a href="14-%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F.md">策略模式</a></li>
-<li><a href="13-%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F.md">观察者模式</a></li>
-<li><a href="18-%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F.md">模板方法模式</a></li>
-<li><a href="21-%E8%B4%A3%E4%BB%BB%E9%93%BE%E6%A8%A1%E5%BC%8F.md">责任链模式</a></li>
-<li><a href="20-%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F.md">状态模式</a></li>
-<li><a href="15-%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F.md">命令模式</a></li>
-<li><a href="16-%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F.md">中介者模式</a></li>
-<li><a href="19-%E8%BF%AD%E4%BB%A3%E5%99%A8%E6%A8%A1%E5%BC%8F.md">迭代器模式</a></li>
-<li><a href="17-%E5%A4%87%E5%BF%98%E5%BD%95%E6%A8%A1%E5%BC%8F.md">备忘录模式</a></li>
-<li><a href="23-%E8%AE%BF%E9%97%AE%E8%80%85%E6%A8%A1%E5%BC%8F.md">访问者模式</a></li>
-<li><a href="22-%E8%A7%A3%E9%87%8A%E5%99%A8%E6%A8%A1%E5%BC%8F.md">解释器模式</a></li>
-</ul>
 <h2 id="思维导图-2"><a href="#思维导图-2" class="headerlink" title="思维导图"></a>思维导图</h2><p><img src="/medias/loading.gif" data-original="/2026/07/06/she-ji-mo-shi/1.png" alt="1.png"></p>
 <h2 id="13-观察者模式"><a href="#13-观察者模式" class="headerlink" title="13. 观察者模式"></a>13. 观察者模式</h2><h3 id="什么是观察者模式"><a href="#什么是观察者模式" class="headerlink" title="什么是观察者模式"></a>什么是观察者模式</h3><p><strong>观察者模式</strong>（Observer Pattern）是一种行为型设计模式，它的核心思想就是：<strong>当一个对象状态发生变化时，自动通知所有依赖于它的对象，并自动更新它们</strong>。<br>这种模式在很多地方都有应用，尤其是在事件监听、消息推送、UI 刷新这些场景中特别常见。我们一般把这个被监听的对象叫“主题”或“被观察者”，而那些关心它变化的对象，叫“观察者”。一旦主题有任何风吹草动，它就会把消息广播出去，所有关注它的观察者都能第一时间收到通知。</p>
 <p>更通俗一点来说，其实它就是在程序里实现了“公众号推送”这种机制。</p>
@@ -5973,18 +5941,17 @@ Executing node: ProcessNode{name='结束'}<span aria-hidden="true" class="line-n
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2026/07/06/she-ji-mo-shi/">
+                <a href="/2026/07/25/esp32/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/loading.gif" data-original="/medias/featureimages/17.jpg" class="responsive-img" alt="设计模式">
+                        <img src="/medias/loading.gif" data-original="/medias/featureimages/9.jpg" class="responsive-img" alt="ESP32">
                         
-                        <span class="card-title">设计模式</span>
+                        <span class="card-title">ESP32</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -5994,27 +5961,26 @@ Executing node: ProcessNode{name='结束'}<span aria-hidden="true" class="line-n
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2026-07-06
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2026-07-25
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E8%BF%9B%E9%98%B6%E6%8A%80%E6%9C%AF/" class="post-category">
-                                    进阶技术
+                            <a href="/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/" class="post-category">
+                                    嵌入式
                                 </a>
                             
                             
                         </span>
                     </div>
                 </div>
-
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">
-                        <span class="chip bg-color">设计模式</span>
+                    <a href="/tags/ESP32/">
+                        <span class="chip bg-color">ESP32</span>
                     </a>
                     
                 </div>
@@ -6210,7 +6176,7 @@ Executing node: ProcessNode{name='结束'}<span aria-hidden="true" class="line-n
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1225.1k</span>
+                        class="white-color">1225k</span>
             
             
             
