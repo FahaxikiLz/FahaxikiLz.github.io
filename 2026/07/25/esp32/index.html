@@ -17,19 +17,14 @@
 
 
 
-数码管显示
+练习
+// Arduino Blink Example
+void setup() {
+  pinMode(13, OUTPUT);
+}
 
-电流从公共进就是共阳 从公共出就是共阴
-
-
-
-4位数码管显示
-
-
-
-
-
-">
+void loop() {
+  digita">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -80,9 +75,9 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="爱哭的小河豚" type="application/atom+xml">
-
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="爱哭的小河豚" type="application/atom+xml">
 </head>
 
 
@@ -400,14 +395,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2026-07-27
+                    2026-07-29
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    45
+                    71
                 </div>
                 
 
@@ -442,7 +437,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260726164930096.png" alt="image-20260726164930096"></p>
+                <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260726164930096.png" alt="image-20260726164930096"></p>
 <h2 id="常用函数"><a href="#常用函数" class="headerlink" title="常用函数"></a>常用函数</h2><p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260725211052026.png" alt="image-20260725211052026"></p>
 <h2 id="面包板与杜邦线"><a href="#面包板与杜邦线" class="headerlink" title="面包板与杜邦线"></a>面包板与杜邦线</h2><p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260725213120088.png" alt="image-20260725213120088"></p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260725213214109.png" alt="image-20260725213214109"></p>
@@ -454,6 +449,21 @@
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260725214650567.png" alt="image-20260725214650567"></p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260725220907189.png" alt="image-20260725220907189"></p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260725221633656.png" alt="image-20260725221633656"></p>
+<h3 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h3><p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260728140433948.png" alt="image-20260728140433948"></p>
+<pre class="line-numbers language-none"><code class="language-none">// Arduino Blink Example
+void setup() {
+  pinMode(13, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(13, HIGH);
+  delay(1000);
+  digitalWrite(13, LOW);
+  delay(1000);
+}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
 <h2 id="数码管显示"><a href="#数码管显示" class="headerlink" title="数码管显示"></a>数码管显示</h2><p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260726020942771.png" alt="image-20260726020942771"></p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260726024303567.png" alt="image-20260726024303567"></p>
 <p>电流从公共进就是共阳 从公共出就是共阴</p>
@@ -466,6 +476,12 @@
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260726162514757.png" alt="image-20260726162514757"></p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260726162528100.png" alt="image-20260726162528100"></p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260726162732840.png" alt="image-20260726162732840"></p>
+<h2 id="按键实验"><a href="#按键实验" class="headerlink" title="按键实验"></a>按键实验</h2><p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260729094851124.png" alt="image-20260729094851124"></p>
+<p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260729094858996.png" alt="image-20260729094858996"></p>
+<p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260729094908692.png" alt="image-20260729094908692"></p>
+<p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260729094915467.png" alt="image-20260729094915467"></p>
+<p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260729094922264.png" alt="image-20260729094922264"></p>
+<p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260729094928097.png" alt="image-20260729094928097"></p>
 
                 
             </div>
