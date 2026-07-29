@@ -39,6 +39,26 @@ categories:
 
 ![image-20260725221633656](./ESP32/image-20260725221633656.png)
 
+### 练习
+
+![image-20260728140433948](./ESP32/image-20260728140433948.png)
+
+```
+// Arduino Blink Example
+void setup() {
+  pinMode(13, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(13, HIGH);
+  delay(1000);
+  digitalWrite(13, LOW);
+  delay(1000);
+}
+```
+
+
+
 ## 数码管显示
 
 ![image-20260726020942771](./ESP32/image-20260726020942771.png)
@@ -66,3 +86,17 @@ categories:
 ![image-20260726162528100](./ESP32/image-20260726162528100.png)
 
 ![image-20260726162732840](./ESP32/image-20260726162732840.png)
+
+## 按键实验
+
+![image-20260729094851124](./ESP32/image-20260729094851124.png)
+
+![image-20260729094858996](./ESP32/image-20260729094858996.png)
+
+![image-20260729094908692](./ESP32/image-20260729094908692.png)
+
+![image-20260729094915467](./ESP32/image-20260729094915467.png)
+
+![image-20260729094922264](./ESP32/image-20260729094922264.png)
+
+![image-20260729094928097](./ESP32/image-20260729094928097.png)
