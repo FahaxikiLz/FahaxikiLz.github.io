@@ -100,3 +100,32 @@ void loop() {
 ![image-20260729094922264](./ESP32/image-20260729094922264.png)
 
 ![image-20260729094928097](./ESP32/image-20260729094928097.png)
+
+```
+int led_pin = 15;
+int button_pin = 12;
+
+
+void setup() {
+  pinMode(button_pin, INPUT_PULLDOWN);
+  pinMode(led_pin, OUTPUT);
+}
+
+int led_logic = 0; // led高低电平
+bool status = false; // 按钮状态
+
+void loop() {
+  if(digitalRead(button_pin)){
+    delay(10); // 消抖
+    if(digitalRead(button_pin) && !status){
+      led_logic = !led_logic;
+      digitalWrite(led_pin,led_logic);
+      status = !status;
+    }else if(!digitalRead(button_pin)){
+      status = false;
+    }
+  }
+}
+
+```
+
