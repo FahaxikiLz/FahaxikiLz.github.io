@@ -628,87 +628,327 @@ Long / String
 
 ### 结构化输出
 
-结构化输出是指将大模型返回的文本输出转换为结构化的数据格式，比如一段 JSON、一个对象、或者是复杂的对象列表。
+🧩 **先搞懂：什么是"结构化输出"？**  
+结构化输出就是让 LLM **不只生成自由文本，而是按照你指定的 JSON 格式返回数据**，方便直接映射到 Java 对象。打个比方：普通的 LLM 像一个写作文的学生，你说什么他就答什么；结构化输出让他变成填表格的员工——表格里有几栏、每栏填什么类型，他都严格按规矩来。
 
-![img](./LangChain4j/NassLrvSebRl7Nnn.webp)
+⚡ **核心结论一句话**  
+想让 LLM 稳定返回结构化数据？**优先用 JSON Schema**（如果模型支持），其次用提示 + JSON 模式，最后才用纯提示。在 AI Service 里只需把返回类型改成 POJO/List/Enum 等，框架自动搞定一切。
 
-结构化输出有 3 种实现方式：
+---
 
-- 利用大模型的 JSON schema
-- 利用 Prompt + JSON Mode
-- 利用 Prompt
+#### 📋 三种方法可靠性排序
 
-默认是 Prompt 模式，也就是在原本的用户提示词下 **拼接一段内容** 来指定大模型强制输出包含特定字段的 JSON 文本。
+| 排名 | 方法             | 可靠性        | 适用场景                              |
+| ---- | ---------------- | ------------- | ------------------------------------- |
+| 🥇    | JSON Schema      | 最高 ✅推荐    | 模型支持时首选                        |
+| 🥈    | 提示 + JSON 模式 | 中等          | OpenAI response\_format: json\_object |
+| 🥉    | 纯提示           | 最低 fallback | 模型不支持前两种时的兜底方案          |
 
-```markdown
-你是一个专业的信息提取助手。请从给定文本中提取人员信息，
-并严格按照以下 JSON 格式返回结果：
+---
 
-{
-    "name": "人员姓名",
-    "age": 年龄数字,
-    "height": 身高（米），
-    "married": true/false,
-    "occupation": "职业"
-}
+#### 1、JSON Schema —— 最可靠的方法
 
-重要规则：
-1. 只返回 JSON 格式，不要添加任何解释
-2. 如果信息不明确，使用 null
-3. age 必须是数字，不是字符串
-4. married 必须是布尔值
-```
+##### 原理
 
-感兴趣的同学可以 [阅读这篇文章](https://glaforge.dev/posts/2024/11/18/data-extraction-the-many-ways-to-get-llms-to-spit-json-content/) 了解更多，不过我们开发时无需关心这些，只要修改对话方法的返回值，框架就会自动帮我们实现结构化输出，非常爽！
+LLM 提供商 API 有一个专用字段叫 `responseFormat`，你在里面指定一个完整的 JSON Schema。LLM 看到后**必须**按这个 schema 生成合法 JSON，否则 API 会拒绝。
 
-![img](./LangChain4j/to2o362ACVyeuSHr.webp)
+关键点：**不需要在你的提示词里写任何格式要求**，schema 是通过 API 的专用参数传递的。
 
-比如我们增加一个 **让 AI 生成学习报告** 的方法，AI 需要输出学习报告对象，包含名称和建议列表：
+##### 支持的模型
+
+Azure OpenAI · Google AI Gemini · Mistral · Ollama · OpenAI
+
+##### 在 ChatModel 中使用 JSON Schema
+
+完整示例：从一段非结构化文本中提取 Person 对象
 
 ```java
-@SystemMessage(fromResource = "system-prompt.txt")
-Report chatForReport(String userMessage);
-
-// 学习报告
-record Report(String name, List<String> suggestionList){}
-```
-
-编写单元测试：
-
-```java
-@Test
-void chatForReport() {
-    String userMessage = "你好，我是程序员鱼皮，学编程两年半，请帮我制定学习报告";
-    AiCodeHelperService.Report report = aiCodeHelperService.chatForReport(userMessage);
-    System.out.println(report);
-}
-```
-
-运行单元测试，效果很不错：
-
-![img](./LangChain4j/izbHuu94x8BvZ6UX.webp)
-
-如果你发现 AI 有时无法生成准确的 JSON，那么可以采用 JSON Schema 模式，直接在请求中约束 LLM 的输出格式。这是目前最可靠、精确度最高的结构化输出实现。
-
-```java
+// Step 1: 定义 JSON Schema
 ResponseFormat responseFormat = ResponseFormat.builder()
-        .type(JSON)
-        .jsonSchema(JsonSchema.builder()
-                .name("Person")
-                .rootElement(JsonObjectSchema.builder()
-                        .addStringProperty("name")
-                        .addIntegerProperty("age")
-                        .addNumberProperty("height")
-                        .addBooleanProperty("married")
-                        .required("name", "age", "height", "married") 
-                        .build())
-                .build())
-        .build();
+    .type(ResponseFormatType.JSON)   // ← 告诉 LLM 我要 JSON
+    .jsonSchema(JsonSchema.builder()
+        .name("Person")              // ← OpenAI 需要指定名称
+        .rootElement(JsonObjectSchema.builder()
+            .addStringProperty("name")
+            .addIntegerProperty("age")
+            .addNumberProperty("height")
+            .addBooleanProperty("married")
+            .required("name", "age", "height", "married")  // ← 必填项要显式声明！
+            .build())
+        .build())
+    .build();
+
+// Step 2: 准备用户消息
+UserMessage userMessage = UserMessage.from("""
+    John is 42 years old and lives an independent life.
+    He stands 1.75 meters tall. Currently unmarried.
+    """);
+
+// Step 3: 发送请求
 ChatRequest chatRequest = ChatRequest.builder()
-        .responseFormat(responseFormat)
-        .messages(userMessage)
-        .build();
+    .responseFormat(responseFormat)
+    .messages(userMessage)
+    .build();
+
+ChatResponse chatResponse = model.chat(chatRequest);
+String output = chatResponse.aiMessage().text();
+// 输出: {"name":"John","age":42,"height":1.75,"married":false}
+
+// Step 4: 解析为 Java 对象
+Person person = new ObjectMapper().readValue(output, Person.class);
 ```
+
+**重要提醒：**
+
+- 根元素必须是 `JsonObjectSchema`（Gemini 除外，它也允许 JsonEnumSchema 和 JsonArraySchema）
+- **必填属性必须显式指定**，不指定的话会被当作可选
+
+##### JsonSchemaElement 类型速查表
+
+所有类型都继承自 `JsonSchemaElement` 接口：
+
+| JsonSchemaElement 子类 | 对应 Java 类型            | 快捷方法                                   |
+| ---------------------- | ------------------------- | ------------------------------------------ |
+| JsonObjectSchema       | 自定义对象 / POJO         | `.addStringProperty()` 等                  |
+| JsonStringSchema       | String, char              | `.addStringProperty("name")`               |
+| JsonIntegerSchema      | int, long, BigInteger     | `.addIntegerProperty("age")`               |
+| JsonNumberSchema       | float, double, BigDecimal | `.addNumberProperty("height")`             |
+| JsonBooleanSchema      | boolean                   | `.addBooleanProperty("married")`           |
+| JsonEnumSchema         | enum                      | `.addEnumProperty("status", List.of(...))` |
+| JsonArraySchema        | List, Set, Array          | `.items(itemSchema)`                       |
+| JsonReferenceSchema    | 递归引用                  | 嵌套同类型对象                             |
+| JsonAnyOfSchema        | 多态（union type）        | Circle OR Rectangle                        |
+| JsonNullSchema         | 可空类型                  | null 值支持                                |
+| JsonRawSchema          | 原始 JSON Schema 字符串   | 直接使用已有的 schema 文件                 |
+
+##### JsonObjectSchema 的三种添加属性方式
+
+**方式一：批量添加 properties Map**
+
+```java
+Map<String, JsonSchemaElement> props = Map.of(
+    "city", JsonStringSchema.builder().description("城市名").build(),
+    "unit", JsonEnumSchema.builder().enumValues("CELSIUS", "FAHRENHEIT").build()
+);
+JsonObjectSchema root = JsonObjectSchema.builder()
+    .addProperties(props).required("city").build();
+```
+
+**方式二：逐个添加 addProperty**
+
+```java
+JsonObjectSchema root = JsonObjectSchema.builder()
+    .addProperty("city", citySchema)
+    .addProperty("temperatureUnit", tempUnitSchema)
+    .required("city").build();
+```
+
+**方式三：使用快捷方法 addXxxProperty（最简洁）**
+
+```java
+JsonObjectSchema root = JsonObjectSchema.builder()
+    .addStringProperty("city", "The city for the forecast")
+    .addEnumProperty("temperatureUnit", List.of("CELSIUS", "FAHRENHEIT"))
+    .required("city").build();
+```
+
+##### JsonReferenceSchema —— 支持递归
+
+比如 Person 类有 `Set<Person> children` 字段：
+
+```java
+String reference = "person";  // 引用名必须在 schema 中唯一
+
+JsonObjectSchema schema = JsonObjectSchema.builder()
+    .addStringProperty("name")
+    .addProperty("children", JsonArraySchema.builder()
+        .items(JsonReferenceSchema.builder().reference(reference).build()).build())
+    .required("name", "children")
+    .definitions(Map.of(reference, /* 重复的定义 */)).build();
+```
+
+注意：目前仅 Azure OpenAI、 Mistral 和 OpenAI 支持。
+
+##### JsonAnyOfSchema —— 支持多态性
+
+```java
+JsonSchemaElement circle = JsonObjectSchema.builder().addNumberProperty("radius").build();
+JsonSchemaElement rect = JsonObjectSchema.builder()
+    .addNumberProperty("width").addNumberProperty("height").build();
+
+JsonSchemaElement shape = JsonAnyOfSchema.builder().anyOf(circle, rect).build();
+// 最终输出: {"shapes":[{"radius":5},{"width":10,"height":20}]}
+```
+
+注意：目前仅 OpenAI 和 Azure OpenAI 支持。
+
+##### JsonRawSchema —— 使用现成的 JSON Schema 字符串
+
+```java
+var rawSchema = """
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": { "city": { "type": "string" } },
+    "required": ["city"]
+}
+""";
+JsonRawSchema schema = JsonRawSchema.from(rawSchema);
+```
+
+##### 添加描述 —— 提高成功率
+
+```java
+JsonStringSchema.builder()
+    .description("The name of the person, for example: John Doe")
+    .build();
+```
+
+除 JsonReferenceSchema 外的所有类型都支持 description。
+
+##### ChatModel 中使用 JSON Schema 的限制
+
+| 限制                | 说明                                                       |
+| ------------------- | ---------------------------------------------------------- |
+| 模型支持            | 仅 Azure OpenAI、Google AI Gemini、Mistral、Ollama、OpenAI |
+| 流式模式            | ❌ OpenAI 暂不支持                                          |
+| JsonReferenceSchema | 仅 Azure OpenAI、Mistral、OpenAI                           |
+| JsonAnyOfSchema     | 仅 OpenAI、Azure OpenAI                                    |
+
+各模型的启用方式：
+
+| 模型              | 启用方式                                                     |
+| ----------------- | ------------------------------------------------------------ |
+| OpenAI \(新模型\) | `.supportedCapabilities(RESPONSE_FORMAT_JSON_SCHEMA).strictJsonSchema(true)` |
+| OpenAI \(旧模型\) | `.responseFormat("json_object")`                             |
+| Azure OpenAI      | `.responseFormat(new ChatCompletionsJsonResponseFormat())`   |
+| Vertex AI Gemini  | `.responseMimeType("application/json")` 或 `.responseSchema(SchemaHelper.fromClass(Person.class))` |
+| Google AI Gemini  | `.responseFormat(ResponseFormat.JSON)`                       |
+
+---
+
+#### 2、在 AI Services 中使用 JSON Schema —— 一行代码搞定
+
+这才是真正爽的地方。不需要手动构建 JsonSchema，只需要：
+
+ 1.     把方法返回类型改成你想要的 Java 类型
+ 2.     在 ChatModel 配置中启用 JSON Schema 支持
+
+```java
+// Step 1: 定义接口，返回类型就是你要的结构化数据
+interface PersonExtractor {
+    @UserMessage("从以下文本中提取人员信息：{{it}}")
+    Person extractPersonFrom(String text);
+}
+
+// Step 2: 创建模型并启用 JSON Schema 支持
+ChatModel chatModel = OpenAiChatModel.builder()
+    .apiKey(System.getenv("OPENAI_API_KEY"))
+    .modelName("gpt-4o-mini")
+    .supportedCapabilities(RESPONSE_FORMAT_JSON_SCHEMA)  // ← 关键！
+    .strictJsonSchema(true)                               // ← 严格模式
+    .build();
+
+// Step 3: 创建 AI 服务
+PersonExtractor extractor = AiServices.create(PersonExtractor.class, chatModel);
+
+// Step 4: 调用
+Person person = extractor.extractPersonFrom("""
+    John is 42 years old. He stands 1.75m tall. Currently unmarried.
+    """);
+// person.name="John", age=42, height=1.75, married=false
+```
+
+框架会自动：根据 Person 类的结构生成对应的 JSON Schema → 发送给 LLM → 将返回的 JSON 反序列化为 Person 对象。
+
+##### AI Services 中的限制
+
+| 限制         | 说明                                                  |
+| ------------ | ----------------------------------------------------- |
+| 必须显式启用 | `.supportedCapabilities(RESPONSE_FORMAT_JSON_SCHEMA)` |
+| 流式模式     | ❌ 不适用                                              |
+| 嵌套类型     | 只能包含标量、enum、嵌套 POJO、List/Set/数组          |
+| 递归         | 仅 Azure OpenAI、Mistral、OpenAI                      |
+| 多态性       | ❌ 尚不支持                                            |
+| 抽象类/接口  | ❌ 必须是具体类                                        |
+
+---
+
+#### 3、提示 + JSON 模式 \& 纯提示
+
+**提示 + JSON 模式：** 结合自然语言指令和 responseFormat 参数，比纯提示更可靠，但不如 JSON Schema 严格。
+
+**纯提示（兜底方案）：** 当 JSON Schema 不可用时，AI Service 自动生成格式指令附加到 UserMessage 末尾，然后尝试将 LLM 输出解析为目标类型。**缺点是不可靠**，LLM 可能偶尔忽略格式要求。
+
+---
+
+#### 四、支持的类型对照表
+
+| 返回类型                    | JSON Schema | 纯提示 | 备注           |
+| --------------------------- | ----------- | ------ | -------------- |
+| POJO                        | ✅           | ✅      | 最常用         |
+| List\<POJO>, Set\<POJO>     | ✅           | ❌      | 不能用于纯提示 |
+| Enum                        | ✅           | ✅      |                |
+| List\<Enum>, Set\<Enum>     | ✅           | ✅      |                |
+| List\<String>, Set\<String> | ✅           | ✅      |                |
+| boolean, Boolean            | ✅           | ✅      |                |
+| int, Integer                | ✅           | ✅      |                |
+| long, Long                  | ✅           | ✅      |                |
+| float, Float                | ✅           | ✅      |                |
+| double, Double              | ✅           | ✅      |                |
+| byte, Byte                  | ❌           | ✅      | 仅提示         |
+| short, Short                | ❌           | ✅      | 仅提示         |
+| BigInteger                  | ❌           | ✅      | 仅提示         |
+| BigDecimal                  | ❌           | ✅      | 仅提示         |
+| Date                        | ❌           | ✅      | 仅提示         |
+| LocalDate                   | ❌           | ✅      | 仅提示         |
+| LocalTime                   | ❌           | ✅      | 仅提示         |
+| LocalDateTime               | ❌           | ✅      | 仅提示         |
+| Map\<\?, \?>                | ❌           | ✅      | 仅提示         |
+
+---
+
+#### 五、实际例子一览
+
+```java
+// 提取单个 Person
+Person extractPersonFrom(String text);
+
+// 提取多个 Person
+Set<Person> extractPeopleFrom(String text);
+
+// 情感分类
+Sentiment extractSentimentFrom(String text);
+List<Sentiment> extractSentimentsFrom(String text);
+
+// 生成大纲
+List<String> generateOutlineFor(String topic);
+```
+
+---
+
+#### 六、 总结
+
+结构化输出的三种方法按可靠性排序：
+
+1.  **JSON Schema**（最强 ✅）—— 通过 API 专用参数指定 schema，LLM 必须遵守
+2.  **提示 + JSON 模式**（中等）—— 结合自然语言指令和 responseFormat 参数
+3.  **纯提示**（兜底）—— 只在提示词里写"请用 JSON 格式回复"
+
+在 AI Service 中使用 JSON Schema 非常简单：
+
+- 定义接口，返回类型为 POJO/List/Enum 等
+- 在 ChatModel 配置中启用 RESPONSE\_FORMAT\_JSON\_SCHEMA
+- 框架自动生成 schema、发送请求、解析结果
+
+注意事项：
+
+- 不是所有 Java 类型都支持 JSON Schema（byte/short/Date 等仅限提示模式）
+- 流式模式下不支持 JSON Schema
+- 递归和多态性支持有限（仅部分模型）
+- 返回类型必须是具体类，不支持接口或抽象类
+
+掌握结构化输出之后，你可以轻松构建信息抽取、数据分类、文档摘要等各种需要 LLM 返回结构化数据的场景。
 
 ### 检索增强生成 - RAG
 
