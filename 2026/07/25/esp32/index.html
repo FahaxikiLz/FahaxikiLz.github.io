@@ -395,21 +395,21 @@ void loop() {
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2026-07-29
+                    2026-08-01
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    128
+                    1k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    5 分
                 </div>
                 
 
@@ -450,17 +450,17 @@ void loop() {
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260725220907189.png" alt="image-20260725220907189"></p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260725221633656.png" alt="image-20260725221633656"></p>
 <h3 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h3><p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260728140433948.png" alt="image-20260728140433948"></p>
-<pre class="line-numbers language-none"><code class="language-none">// Arduino Blink Example
-void setup() {
-  pinMode(13, OUTPUT);
-}
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// Arduino Blink Example</span>
+<span class="token keyword">void</span> <span class="token function">setup</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token function">pinMode</span><span class="token punctuation">(</span><span class="token number">13</span><span class="token punctuation">,</span> OUTPUT<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-void loop() {
-  digitalWrite(13, HIGH);
-  delay(1000);
-  digitalWrite(13, LOW);
-  delay(1000);
-}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token keyword">void</span> <span class="token function">loop</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token function">digitalWrite</span><span class="token punctuation">(</span><span class="token number">13</span><span class="token punctuation">,</span> HIGH<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">delay</span><span class="token punctuation">(</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">digitalWrite</span><span class="token punctuation">(</span><span class="token number">13</span><span class="token punctuation">,</span> LOW<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">delay</span><span class="token punctuation">(</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 
 
@@ -476,38 +476,239 @@ void loop() {
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260726162514757.png" alt="image-20260726162514757"></p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260726162528100.png" alt="image-20260726162528100"></p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260726162732840.png" alt="image-20260726162732840"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">int</span> seg_1 <span class="token operator">=</span> <span class="token number">27</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> seg_2 <span class="token operator">=</span> <span class="token number">14</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> seg_3 <span class="token operator">=</span> <span class="token number">12</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> seg_4 <span class="token operator">=</span> <span class="token number">13</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> pin_a <span class="token operator">=</span> <span class="token number">26</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> pin_b <span class="token operator">=</span> <span class="token number">33</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> pin_c <span class="token operator">=</span> <span class="token number">4</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> pin_d <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> pin_e <span class="token operator">=</span> <span class="token number">15</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> pin_f <span class="token operator">=</span> <span class="token number">25</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> pin_g <span class="token operator">=</span> <span class="token number">16</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> pin_dp <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> seg_list<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>seg_1<span class="token punctuation">,</span> seg_2<span class="token punctuation">,</span> seg_3<span class="token punctuation">,</span> seg_4<span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> pin_list<span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>pin_a<span class="token punctuation">,</span> pin_b<span class="token punctuation">,</span> pin_c<span class="token punctuation">,</span> pin_d<span class="token punctuation">,</span> pin_e<span class="token punctuation">,</span> pin_f<span class="token punctuation">,</span> pin_g<span class="token punctuation">,</span> pin_dp<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 共阳极段码：0=亮，1=灭</span>
+<span class="token keyword">int</span> num_list<span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">//0</span>
+  <span class="token punctuation">{</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">//1</span>
+  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">//2</span>
+  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">//3</span>
+  <span class="token punctuation">{</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">//4</span>
+  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">//5</span>
+  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">//6</span>
+  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">//7</span>
+  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">//8</span>
+  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">}</span>  <span class="token comment">//9</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">setup</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  Serial<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">// 位选初始化（全部关闭）</span>
+  <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">4</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">pinMode</span><span class="token punctuation">(</span>seg_list<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> OUTPUT<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">digitalWrite</span><span class="token punctuation">(</span>seg_list<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> LOW<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">// 共阳极：低电平关闭</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment">// 段选初始化（全部关闭）</span>
+  <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">pinMode</span><span class="token punctuation">(</span>pin_list<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> OUTPUT<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">digitalWrite</span><span class="token punctuation">(</span>pin_list<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> HIGH<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">// 共阳极：高电平关闭</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token function">delay</span><span class="token punctuation">(</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+
+<span class="token keyword">void</span> <span class="token function">loop</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token function">display_num</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">display_num</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+
+<span class="token keyword">void</span> <span class="token function">display_num</span><span class="token punctuation">(</span><span class="token keyword">int</span> order<span class="token punctuation">,</span><span class="token keyword">int</span> num<span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token comment">// 重新初始化消隐</span>
+  <span class="token comment">// 位选初始化（全部关闭）</span>
+  <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">4</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">pinMode</span><span class="token punctuation">(</span>seg_list<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> OUTPUT<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">digitalWrite</span><span class="token punctuation">(</span>seg_list<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> LOW<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">// 共阳极：低电平关闭</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment">// 段选初始化（全部关闭）</span>
+  <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">pinMode</span><span class="token punctuation">(</span>pin_list<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> OUTPUT<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">digitalWrite</span><span class="token punctuation">(</span>pin_list<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> HIGH<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">// 共阳极：高电平关闭</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token function">digitalWrite</span><span class="token punctuation">(</span>seg_list<span class="token punctuation">[</span>order<span class="token punctuation">]</span><span class="token punctuation">,</span> HIGH<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span>pin_list<span class="token punctuation">)</span><span class="token operator">/</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span>pin_list<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token function">digitalWrite</span><span class="token punctuation">(</span>pin_list<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span>num_list<span class="token punctuation">[</span>num<span class="token punctuation">]</span><span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260729120315064.png" alt="image-20260729120315064"></p>
+<p>串扰，需要重新初始化位选线、段选线来消隐</p>
+<h2 id="动态扫描"><a href="#动态扫描" class="headerlink" title="动态扫描"></a>动态扫描</h2><h3 id="核心思想"><a href="#核心思想" class="headerlink" title="核心思想"></a>核心思想</h3><p><strong>利用人眼的视觉暂留效应</strong>，快速轮流点亮各位数码管，让人感觉所有位同时亮。</p>
+<h3 id="工作流程"><a href="#工作流程" class="headerlink" title="工作流程"></a>工作流程</h3><p>text</p>
+<pre class="line-numbers language-none"><code class="language-none">第1位亮 → 熄灭 → 第2位亮 → 熄灭 → 第3位亮 → 熄灭 → 第4位亮 → 熄灭 → 回到第1位
+  ↑                                                            ↓
+  └────────────────────── 循环周期（例如20ms）────────────────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">int</span> seg_1 <span class="token operator">=</span> <span class="token number">27</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> seg_2 <span class="token operator">=</span> <span class="token number">14</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> seg_3 <span class="token operator">=</span> <span class="token number">12</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> seg_4 <span class="token operator">=</span> <span class="token number">13</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> pin_a <span class="token operator">=</span> <span class="token number">26</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> pin_b <span class="token operator">=</span> <span class="token number">33</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> pin_c <span class="token operator">=</span> <span class="token number">4</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> pin_d <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> pin_e <span class="token operator">=</span> <span class="token number">15</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> pin_f <span class="token operator">=</span> <span class="token number">25</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> pin_g <span class="token operator">=</span> <span class="token number">16</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> pin_dp <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> seg_list<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>seg_1<span class="token punctuation">,</span> seg_2<span class="token punctuation">,</span> seg_3<span class="token punctuation">,</span> seg_4<span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> pin_list<span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>pin_a<span class="token punctuation">,</span> pin_b<span class="token punctuation">,</span> pin_c<span class="token punctuation">,</span> pin_d<span class="token punctuation">,</span> pin_e<span class="token punctuation">,</span> pin_f<span class="token punctuation">,</span> pin_g<span class="token punctuation">,</span> pin_dp<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 共阳极段码：0=亮，1=灭</span>
+<span class="token keyword">int</span> num_list<span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">//0</span>
+  <span class="token punctuation">{</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">//1</span>
+  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">//2</span>
+  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">//3</span>
+  <span class="token punctuation">{</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">//4</span>
+  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">//5</span>
+  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">//6</span>
+  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">//7</span>
+  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">//8</span>
+  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">}</span>  <span class="token comment">//9</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">setup</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment">// 位选初始化（全部关闭）</span>
+  <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">4</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">pinMode</span><span class="token punctuation">(</span>seg_list<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> OUTPUT<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">digitalWrite</span><span class="token punctuation">(</span>seg_list<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> LOW<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">// 共阳极：低电平关闭</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment">// 段选初始化（全部关闭）</span>
+  <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">pinMode</span><span class="token punctuation">(</span>pin_list<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> OUTPUT<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">digitalWrite</span><span class="token punctuation">(</span>pin_list<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> HIGH<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">// 共阳极：高电平关闭</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+
+<span class="token keyword">void</span> <span class="token function">loop</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token function">display_arr</span><span class="token punctuation">(</span><span class="token number">1234</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 动态扫描</span>
+<span class="token keyword">void</span> <span class="token function">display_arr</span><span class="token punctuation">(</span><span class="token keyword">int</span> num<span class="token punctuation">)</span><span class="token punctuation">{</span>
+
+  <span class="token keyword">int</span> arr<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">3</span><span class="token punctuation">;</span>i<span class="token operator">&gt;=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">--</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    arr<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> num <span class="token operator">%</span> <span class="token number">10</span><span class="token punctuation">;</span>
+    num <span class="token operator">/=</span><span class="token number">10</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> j <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>j<span class="token operator">&lt;</span><span class="token number">4</span><span class="token punctuation">;</span>j<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token function">display_num</span><span class="token punctuation">(</span>j<span class="token punctuation">,</span>arr<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">delay</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">display_num</span><span class="token punctuation">(</span><span class="token keyword">int</span> order<span class="token punctuation">,</span><span class="token keyword">int</span> num<span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token comment">// 方法1：直接控制（简单）</span>
+  <span class="token comment">// 位选初始化（全部关闭）</span>
+  <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">4</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">digitalWrite</span><span class="token punctuation">(</span>seg_list<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> LOW<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">// 共阳极：低电平关闭</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment">// 段选初始化（全部关闭）</span>
+  <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">digitalWrite</span><span class="token punctuation">(</span>pin_list<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> HIGH<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">// 共阳极：高电平关闭</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token function">digitalWrite</span><span class="token punctuation">(</span>seg_list<span class="token punctuation">[</span>order<span class="token punctuation">]</span><span class="token punctuation">,</span> HIGH<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span>pin_list<span class="token punctuation">)</span><span class="token operator">/</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span>pin_list<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token function">digitalWrite</span><span class="token punctuation">(</span>pin_list<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span>num_list<span class="token punctuation">[</span>num<span class="token punctuation">]</span><span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
 <h2 id="按键实验"><a href="#按键实验" class="headerlink" title="按键实验"></a>按键实验</h2><p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260729094851124.png" alt="image-20260729094851124"></p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260729094858996.png" alt="image-20260729094858996"></p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260729094908692.png" alt="image-20260729094908692"></p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260729094915467.png" alt="image-20260729094915467"></p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260729094922264.png" alt="image-20260729094922264"></p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260729094928097.png" alt="image-20260729094928097"></p>
-<pre class="line-numbers language-none"><code class="language-none">int led_pin = 15;
-int button_pin = 12;
+<p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260801150227004.png" alt="image-20260801150227004"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">int</span> led_pin <span class="token operator">=</span> <span class="token number">15</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> button_pin <span class="token operator">=</span> <span class="token number">12</span><span class="token punctuation">;</span>
 
 
-void setup() {
-  pinMode(button_pin, INPUT_PULLDOWN);
-  pinMode(led_pin, OUTPUT);
-}
+<span class="token keyword">void</span> <span class="token function">setup</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token function">pinMode</span><span class="token punctuation">(</span>button_pin<span class="token punctuation">,</span> INPUT_PULLDOWN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">pinMode</span><span class="token punctuation">(</span>led_pin<span class="token punctuation">,</span> OUTPUT<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-int led_logic = 0; // led高低电平
-bool status = false; // 按钮状态
+<span class="token keyword">int</span> led_logic <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token comment">// led高低电平</span>
+bool status <span class="token operator">=</span> false<span class="token punctuation">;</span> <span class="token comment">// 按钮状态</span>
 
-void loop() {
-  if(digitalRead(button_pin)){
-    delay(10); // 消抖
-    if(digitalRead(button_pin) &amp;&amp; !status){
-      led_logic = !led_logic;
-      digitalWrite(led_pin,led_logic);
-      status = !status;
-    }else if(!digitalRead(button_pin)){
-      status = false;
-    }
-  }
-}
+<span class="token keyword">void</span> <span class="token function">loop</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">digitalRead</span><span class="token punctuation">(</span>button_pin<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token function">delay</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 消抖</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">digitalRead</span><span class="token punctuation">(</span>button_pin<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>status<span class="token punctuation">)</span><span class="token punctuation">{</span>
+      led_logic <span class="token operator">=</span> <span class="token operator">!</span>led_logic<span class="token punctuation">;</span>
+      <span class="token function">digitalWrite</span><span class="token punctuation">(</span>led_pin<span class="token punctuation">,</span>led_logic<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      status <span class="token operator">=</span> <span class="token operator">!</span>status<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token keyword">else</span> <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">digitalRead</span><span class="token punctuation">(</span>button_pin<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+      status <span class="token operator">=</span> false<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
+<h2 id="宏定义"><a href="#宏定义" class="headerlink" title="宏定义"></a>宏定义</h2><p>宏定义用于创建常量和代替符号</p>
+<pre class="line-numbers language-none"><code class="language-none">#define LED_PIN 15;
+#define BUTTON_PIN 12;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260801145143063.png" alt="image-20260801145143063"></p>
+<h2 id="PWM呼吸灯"><a href="#PWM呼吸灯" class="headerlink" title="PWM呼吸灯"></a>PWM呼吸灯</h2><p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260801145415922.png" alt="image-20260801145415922"></p>
+<p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260801145553623.png" alt="image-20260801145553623"></p>
+<pre class="line-numbers language-none"><code class="language-none">#define LED_PIN 12
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+}
+
+void loop() {
+  // 渐亮：从暗到亮
+  for(int i = 0; i &lt; 256; i++){
+    analogWrite(LED_PIN, i);
+    delay(10);  // 每步延时10毫秒，让变化可见
+  }
+  
+  // 渐暗：从亮到暗
+  for(int i = 255; i &gt;= 0; i--){
+    analogWrite(LED_PIN, i);
+    delay(10);  // 每步延时10毫秒
+  }
+}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260801152402436.png" alt="image-20260801152402436"></p>
 
                 
             </div>
@@ -1152,7 +1353,7 @@ void loop() {
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1225k</span>
+                        class="white-color">1227.3k</span>
             
             
             

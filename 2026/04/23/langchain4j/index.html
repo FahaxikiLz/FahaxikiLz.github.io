@@ -379,21 +379,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2026-06-10
+                    2026-08-14
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    12.3k
+                    13.6k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    51 分
+                    57 分
                 </div>
                 
 
@@ -421,7 +421,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><blockquote>
+                <blockquote>
 <p>转载：<a target="_blank" rel="noopener" href="https://www.codefather.cn/post/1943518702568288258">https://www.codefather.cn/post/1943518702568288258</a></p>
 </blockquote>
 <h2 id="什么是-LangChain4j？"><a href="#什么是-LangChain4j？" class="headerlink" title="什么是 LangChain4j？"></a>什么是 LangChain4j？</h2><p>目前主流的 Java AI 开发框架有 <a target="_blank" rel="noopener" href="https://spring.io/projects/spring-ai">Spring AI</a> 和 <a target="_blank" rel="noopener" href="https://docs.langchain4j.dev/intro">LangChain4j</a>，它们都提供了很多 <strong>开箱即用的 API</strong> 来帮你调用大模型、实现 AI 开发常用的功能，比如我们今天要学的：</p>
@@ -875,70 +875,482 @@
 <pre class="line-numbers language-none"><code class="language-none">Long / String<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p>不要混用 <code>int / long / String</code></p>
-<h3 id="结构化输出"><a href="#结构化输出" class="headerlink" title="结构化输出"></a>结构化输出</h3><p>结构化输出是指将大模型返回的文本输出转换为结构化的数据格式，比如一段 JSON、一个对象、或者是复杂的对象列表。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/04/23/langchain4j/NassLrvSebRl7Nnn.webp" alt="img"></p>
-<p>结构化输出有 3 种实现方式：</p>
-<ul>
-<li>利用大模型的 JSON schema</li>
-<li>利用 Prompt + JSON Mode</li>
-<li>利用 Prompt</li>
-</ul>
-<p>默认是 Prompt 模式，也就是在原本的用户提示词下 <strong>拼接一段内容</strong> 来指定大模型强制输出包含特定字段的 JSON 文本。</p>
-<pre class="line-numbers language-markdown" data-language="markdown"><code class="language-markdown">你是一个专业的信息提取助手。请从给定文本中提取人员信息，
-并严格按照以下 JSON 格式返回结果：
+<h3 id="结构化输出"><a href="#结构化输出" class="headerlink" title="结构化输出"></a>结构化输出</h3><p>🧩 <strong>先搞懂：什么是”结构化输出”？</strong><br>结构化输出就是让 LLM <strong>不只生成自由文本，而是按照你指定的 JSON 格式返回数据</strong>，方便直接映射到 Java 对象。打个比方：普通的 LLM 像一个写作文的学生，你说什么他就答什么；结构化输出让他变成填表格的员工——表格里有几栏、每栏填什么类型，他都严格按规矩来。</p>
+<p>⚡ <strong>核心结论一句话</strong><br>想让 LLM 稳定返回结构化数据？<strong>优先用 JSON Schema</strong>（如果模型支持），其次用提示 + JSON 模式，最后才用纯提示。在 AI Service 里只需把返回类型改成 POJO/List/Enum 等，框架自动搞定一切。</p>
+<hr>
+<h4 id="📋-三种方法可靠性排序"><a href="#📋-三种方法可靠性排序" class="headerlink" title="📋 三种方法可靠性排序"></a>📋 三种方法可靠性排序</h4><table>
+<thead>
+<tr>
+<th>排名</th>
+<th>方法</th>
+<th>可靠性</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>🥇</td>
+<td>JSON Schema</td>
+<td>最高 ✅推荐</td>
+<td>模型支持时首选</td>
+</tr>
+<tr>
+<td>🥈</td>
+<td>提示 + JSON 模式</td>
+<td>中等</td>
+<td>OpenAI response_format: json_object</td>
+</tr>
+<tr>
+<td>🥉</td>
+<td>纯提示</td>
+<td>最低 fallback</td>
+<td>模型不支持前两种时的兜底方案</td>
+</tr>
+</tbody></table>
+<hr>
+<h4 id="1、JSON-Schema-——-最可靠的方法"><a href="#1、JSON-Schema-——-最可靠的方法" class="headerlink" title="1、JSON Schema —— 最可靠的方法"></a>1、JSON Schema —— 最可靠的方法</h4><h5 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h5><p>LLM 提供商 API 有一个专用字段叫 <code>responseFormat</code>，你在里面指定一个完整的 JSON Schema。LLM 看到后<strong>必须</strong>按这个 schema 生成合法 JSON，否则 API 会拒绝。</p>
+<p>关键点：<strong>不需要在你的提示词里写任何格式要求</strong>，schema 是通过 API 的专用参数传递的。</p>
+<h5 id="支持的模型"><a href="#支持的模型" class="headerlink" title="支持的模型"></a>支持的模型</h5><p>Azure OpenAI · Google AI Gemini · Mistral · Ollama · OpenAI</p>
+<h5 id="在-ChatModel-中使用-JSON-Schema"><a href="#在-ChatModel-中使用-JSON-Schema" class="headerlink" title="在 ChatModel 中使用 JSON Schema"></a>在 ChatModel 中使用 JSON Schema</h5><p>完整示例：从一段非结构化文本中提取 Person 对象</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">// Step 1: 定义 JSON Schema</span>
+<span class="token class-name">ResponseFormat</span> responseFormat <span class="token operator">=</span> <span class="token class-name">ResponseFormat</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">type</span><span class="token punctuation">(</span><span class="token class-name">ResponseFormatType</span><span class="token punctuation">.</span><span class="token constant">JSON</span><span class="token punctuation">)</span>   <span class="token comment">// ← 告诉 LLM 我要 JSON</span>
+    <span class="token punctuation">.</span><span class="token function">jsonSchema</span><span class="token punctuation">(</span><span class="token class-name">JsonSchema</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">name</span><span class="token punctuation">(</span><span class="token string">"Person"</span><span class="token punctuation">)</span>              <span class="token comment">// ← OpenAI 需要指定名称</span>
+        <span class="token punctuation">.</span><span class="token function">rootElement</span><span class="token punctuation">(</span><span class="token class-name">JsonObjectSchema</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token punctuation">.</span><span class="token function">addStringProperty</span><span class="token punctuation">(</span><span class="token string">"name"</span><span class="token punctuation">)</span>
+            <span class="token punctuation">.</span><span class="token function">addIntegerProperty</span><span class="token punctuation">(</span><span class="token string">"age"</span><span class="token punctuation">)</span>
+            <span class="token punctuation">.</span><span class="token function">addNumberProperty</span><span class="token punctuation">(</span><span class="token string">"height"</span><span class="token punctuation">)</span>
+            <span class="token punctuation">.</span><span class="token function">addBooleanProperty</span><span class="token punctuation">(</span><span class="token string">"married"</span><span class="token punctuation">)</span>
+            <span class="token punctuation">.</span><span class="token function">required</span><span class="token punctuation">(</span><span class="token string">"name"</span><span class="token punctuation">,</span> <span class="token string">"age"</span><span class="token punctuation">,</span> <span class="token string">"height"</span><span class="token punctuation">,</span> <span class="token string">"married"</span><span class="token punctuation">)</span>  <span class="token comment">// ← 必填项要显式声明！</span>
+            <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-{
-    "name": "人员姓名",
-    "age": 年龄数字,
-    "height": 身高（米），
-    "married": true/false,
-    "occupation": "职业"
-}
+<span class="token comment">// Step 2: 准备用户消息</span>
+<span class="token class-name">UserMessage</span> userMessage <span class="token operator">=</span> <span class="token class-name">UserMessage</span><span class="token punctuation">.</span><span class="token function">from</span><span class="token punctuation">(</span><span class="token triple-quoted-string string">"""
+    John is 42 years old and lives an independent life.
+    He stands 1.75 meters tall. Currently unmarried.
+    """</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-重要规则：
-<span class="token list punctuation">1.</span> 只返回 JSON 格式，不要添加任何解释
-<span class="token list punctuation">2.</span> 如果信息不明确，使用 null
-<span class="token list punctuation">3.</span> age 必须是数字，不是字符串
-<span class="token list punctuation">4.</span> married 必须是布尔值<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>感兴趣的同学可以 <a target="_blank" rel="noopener" href="https://glaforge.dev/posts/2024/11/18/data-extraction-the-many-ways-to-get-llms-to-spit-json-content/">阅读这篇文章</a> 了解更多，不过我们开发时无需关心这些，只要修改对话方法的返回值，框架就会自动帮我们实现结构化输出，非常爽！</p>
-<p><img src="/medias/loading.gif" data-original="/2026/04/23/langchain4j/to2o362ACVyeuSHr.webp" alt="img"></p>
-<p>比如我们增加一个 <strong>让 AI 生成学习报告</strong> 的方法，AI 需要输出学习报告对象，包含名称和建议列表：</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@SystemMessage</span><span class="token punctuation">(</span>fromResource <span class="token operator">=</span> <span class="token string">"system-prompt.txt"</span><span class="token punctuation">)</span>
-<span class="token class-name">Report</span> <span class="token function">chatForReport</span><span class="token punctuation">(</span><span class="token class-name">String</span> userMessage<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">// 学习报告</span>
-<span class="token keyword">record</span> <span class="token class-name">Report</span><span class="token punctuation">(</span><span class="token class-name">String</span> name<span class="token punctuation">,</span> <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> suggestionList<span class="token punctuation">)</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>编写单元测试：</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@Test</span>
-<span class="token keyword">void</span> <span class="token function">chatForReport</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token class-name">String</span> userMessage <span class="token operator">=</span> <span class="token string">"你好，我是程序员鱼皮，学编程两年半，请帮我制定学习报告"</span><span class="token punctuation">;</span>
-    <span class="token class-name">AiCodeHelperService<span class="token punctuation">.</span>Report</span> report <span class="token operator">=</span> aiCodeHelperService<span class="token punctuation">.</span><span class="token function">chatForReport</span><span class="token punctuation">(</span>userMessage<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>report<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>运行单元测试，效果很不错：</p>
-<p><img src="/medias/loading.gif" data-original="/2026/04/23/langchain4j/izbHuu94x8BvZ6UX.webp" alt="img"></p>
-<p>如果你发现 AI 有时无法生成准确的 JSON，那么可以采用 JSON Schema 模式，直接在请求中约束 LLM 的输出格式。这是目前最可靠、精确度最高的结构化输出实现。</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token class-name">ResponseFormat</span> responseFormat <span class="token operator">=</span> <span class="token class-name">ResponseFormat</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-        <span class="token punctuation">.</span><span class="token function">type</span><span class="token punctuation">(</span><span class="token constant">JSON</span><span class="token punctuation">)</span>
-        <span class="token punctuation">.</span><span class="token function">jsonSchema</span><span class="token punctuation">(</span><span class="token class-name">JsonSchema</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-                <span class="token punctuation">.</span><span class="token function">name</span><span class="token punctuation">(</span><span class="token string">"Person"</span><span class="token punctuation">)</span>
-                <span class="token punctuation">.</span><span class="token function">rootElement</span><span class="token punctuation">(</span><span class="token class-name">JsonObjectSchema</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-                        <span class="token punctuation">.</span><span class="token function">addStringProperty</span><span class="token punctuation">(</span><span class="token string">"name"</span><span class="token punctuation">)</span>
-                        <span class="token punctuation">.</span><span class="token function">addIntegerProperty</span><span class="token punctuation">(</span><span class="token string">"age"</span><span class="token punctuation">)</span>
-                        <span class="token punctuation">.</span><span class="token function">addNumberProperty</span><span class="token punctuation">(</span><span class="token string">"height"</span><span class="token punctuation">)</span>
-                        <span class="token punctuation">.</span><span class="token function">addBooleanProperty</span><span class="token punctuation">(</span><span class="token string">"married"</span><span class="token punctuation">)</span>
-                        <span class="token punctuation">.</span><span class="token function">required</span><span class="token punctuation">(</span><span class="token string">"name"</span><span class="token punctuation">,</span> <span class="token string">"age"</span><span class="token punctuation">,</span> <span class="token string">"height"</span><span class="token punctuation">,</span> <span class="token string">"married"</span><span class="token punctuation">)</span> 
-                        <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-                <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-        <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// Step 3: 发送请求</span>
 <span class="token class-name">ChatRequest</span> chatRequest <span class="token operator">=</span> <span class="token class-name">ChatRequest</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-        <span class="token punctuation">.</span><span class="token function">responseFormat</span><span class="token punctuation">(</span>responseFormat<span class="token punctuation">)</span>
-        <span class="token punctuation">.</span><span class="token function">messages</span><span class="token punctuation">(</span>userMessage<span class="token punctuation">)</span>
-        <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    <span class="token punctuation">.</span><span class="token function">responseFormat</span><span class="token punctuation">(</span>responseFormat<span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">messages</span><span class="token punctuation">(</span>userMessage<span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
+<span class="token class-name">ChatResponse</span> chatResponse <span class="token operator">=</span> model<span class="token punctuation">.</span><span class="token function">chat</span><span class="token punctuation">(</span>chatRequest<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">String</span> output <span class="token operator">=</span> chatResponse<span class="token punctuation">.</span><span class="token function">aiMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">text</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// 输出: {"name":"John","age":42,"height":1.75,"married":false}</span>
+
+<span class="token comment">// Step 4: 解析为 Java 对象</span>
+<span class="token class-name">Person</span> person <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ObjectMapper</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">readValue</span><span class="token punctuation">(</span>output<span class="token punctuation">,</span> <span class="token class-name">Person</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><strong>重要提醒：</strong></p>
+<ul>
+<li>根元素必须是 <code>JsonObjectSchema</code>（Gemini 除外，它也允许 JsonEnumSchema 和 JsonArraySchema）</li>
+<li><strong>必填属性必须显式指定</strong>，不指定的话会被当作可选</li>
+</ul>
+<h5 id="JsonSchemaElement-类型速查表"><a href="#JsonSchemaElement-类型速查表" class="headerlink" title="JsonSchemaElement 类型速查表"></a>JsonSchemaElement 类型速查表</h5><p>所有类型都继承自 <code>JsonSchemaElement</code> 接口：</p>
+<table>
+<thead>
+<tr>
+<th>JsonSchemaElement 子类</th>
+<th>对应 Java 类型</th>
+<th>快捷方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>JsonObjectSchema</td>
+<td>自定义对象 / POJO</td>
+<td><code>.addStringProperty()</code> 等</td>
+</tr>
+<tr>
+<td>JsonStringSchema</td>
+<td>String, char</td>
+<td><code>.addStringProperty("name")</code></td>
+</tr>
+<tr>
+<td>JsonIntegerSchema</td>
+<td>int, long, BigInteger</td>
+<td><code>.addIntegerProperty("age")</code></td>
+</tr>
+<tr>
+<td>JsonNumberSchema</td>
+<td>float, double, BigDecimal</td>
+<td><code>.addNumberProperty("height")</code></td>
+</tr>
+<tr>
+<td>JsonBooleanSchema</td>
+<td>boolean</td>
+<td><code>.addBooleanProperty("married")</code></td>
+</tr>
+<tr>
+<td>JsonEnumSchema</td>
+<td>enum</td>
+<td><code>.addEnumProperty("status", List.of(...))</code></td>
+</tr>
+<tr>
+<td>JsonArraySchema</td>
+<td>List, Set, Array</td>
+<td><code>.items(itemSchema)</code></td>
+</tr>
+<tr>
+<td>JsonReferenceSchema</td>
+<td>递归引用</td>
+<td>嵌套同类型对象</td>
+</tr>
+<tr>
+<td>JsonAnyOfSchema</td>
+<td>多态（union type）</td>
+<td>Circle OR Rectangle</td>
+</tr>
+<tr>
+<td>JsonNullSchema</td>
+<td>可空类型</td>
+<td>null 值支持</td>
+</tr>
+<tr>
+<td>JsonRawSchema</td>
+<td>原始 JSON Schema 字符串</td>
+<td>直接使用已有的 schema 文件</td>
+</tr>
+</tbody></table>
+<h5 id="JsonObjectSchema-的三种添加属性方式"><a href="#JsonObjectSchema-的三种添加属性方式" class="headerlink" title="JsonObjectSchema 的三种添加属性方式"></a>JsonObjectSchema 的三种添加属性方式</h5><p><strong>方式一：批量添加 properties Map</strong></p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token class-name">Map</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">JsonSchemaElement</span><span class="token punctuation">&gt;</span></span> props <span class="token operator">=</span> <span class="token class-name">Map</span><span class="token punctuation">.</span><span class="token function">of</span><span class="token punctuation">(</span>
+    <span class="token string">"city"</span><span class="token punctuation">,</span> <span class="token class-name">JsonStringSchema</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">description</span><span class="token punctuation">(</span><span class="token string">"城市名"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token string">"unit"</span><span class="token punctuation">,</span> <span class="token class-name">JsonEnumSchema</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">enumValues</span><span class="token punctuation">(</span><span class="token string">"CELSIUS"</span><span class="token punctuation">,</span> <span class="token string">"FAHRENHEIT"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">JsonObjectSchema</span> root <span class="token operator">=</span> <span class="token class-name">JsonObjectSchema</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">addProperties</span><span class="token punctuation">(</span>props<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">required</span><span class="token punctuation">(</span><span class="token string">"city"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><strong>方式二：逐个添加 addProperty</strong></p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token class-name">JsonObjectSchema</span> root <span class="token operator">=</span> <span class="token class-name">JsonObjectSchema</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">addProperty</span><span class="token punctuation">(</span><span class="token string">"city"</span><span class="token punctuation">,</span> citySchema<span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">addProperty</span><span class="token punctuation">(</span><span class="token string">"temperatureUnit"</span><span class="token punctuation">,</span> tempUnitSchema<span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">required</span><span class="token punctuation">(</span><span class="token string">"city"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><strong>方式三：使用快捷方法 addXxxProperty（最简洁）</strong></p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token class-name">JsonObjectSchema</span> root <span class="token operator">=</span> <span class="token class-name">JsonObjectSchema</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">addStringProperty</span><span class="token punctuation">(</span><span class="token string">"city"</span><span class="token punctuation">,</span> <span class="token string">"The city for the forecast"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">addEnumProperty</span><span class="token punctuation">(</span><span class="token string">"temperatureUnit"</span><span class="token punctuation">,</span> <span class="token class-name">List</span><span class="token punctuation">.</span><span class="token function">of</span><span class="token punctuation">(</span><span class="token string">"CELSIUS"</span><span class="token punctuation">,</span> <span class="token string">"FAHRENHEIT"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">required</span><span class="token punctuation">(</span><span class="token string">"city"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h5 id="JsonReferenceSchema-——-支持递归"><a href="#JsonReferenceSchema-——-支持递归" class="headerlink" title="JsonReferenceSchema —— 支持递归"></a>JsonReferenceSchema —— 支持递归</h5><p>比如 Person 类有 <code>Set&lt;Person&gt; children</code> 字段：</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token class-name">String</span> reference <span class="token operator">=</span> <span class="token string">"person"</span><span class="token punctuation">;</span>  <span class="token comment">// 引用名必须在 schema 中唯一</span>
+
+<span class="token class-name">JsonObjectSchema</span> schema <span class="token operator">=</span> <span class="token class-name">JsonObjectSchema</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">addStringProperty</span><span class="token punctuation">(</span><span class="token string">"name"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">addProperty</span><span class="token punctuation">(</span><span class="token string">"children"</span><span class="token punctuation">,</span> <span class="token class-name">JsonArraySchema</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">items</span><span class="token punctuation">(</span><span class="token class-name">JsonReferenceSchema</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">reference</span><span class="token punctuation">(</span>reference<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">required</span><span class="token punctuation">(</span><span class="token string">"name"</span><span class="token punctuation">,</span> <span class="token string">"children"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">definitions</span><span class="token punctuation">(</span><span class="token class-name">Map</span><span class="token punctuation">.</span><span class="token function">of</span><span class="token punctuation">(</span>reference<span class="token punctuation">,</span> <span class="token comment">/* 重复的定义 */</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>注意：目前仅 Azure OpenAI、 Mistral 和 OpenAI 支持。</p>
+<h5 id="JsonAnyOfSchema-——-支持多态性"><a href="#JsonAnyOfSchema-——-支持多态性" class="headerlink" title="JsonAnyOfSchema —— 支持多态性"></a>JsonAnyOfSchema —— 支持多态性</h5><pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token class-name">JsonSchemaElement</span> circle <span class="token operator">=</span> <span class="token class-name">JsonObjectSchema</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">addNumberProperty</span><span class="token punctuation">(</span><span class="token string">"radius"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">JsonSchemaElement</span> rect <span class="token operator">=</span> <span class="token class-name">JsonObjectSchema</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">addNumberProperty</span><span class="token punctuation">(</span><span class="token string">"width"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">addNumberProperty</span><span class="token punctuation">(</span><span class="token string">"height"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token class-name">JsonSchemaElement</span> shape <span class="token operator">=</span> <span class="token class-name">JsonAnyOfSchema</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">anyOf</span><span class="token punctuation">(</span>circle<span class="token punctuation">,</span> rect<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// 最终输出: {"shapes":[{"radius":5},{"width":10,"height":20}]}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>注意：目前仅 OpenAI 和 Azure OpenAI 支持。</p>
+<h5 id="JsonRawSchema-——-使用现成的-JSON-Schema-字符串"><a href="#JsonRawSchema-——-使用现成的-JSON-Schema-字符串" class="headerlink" title="JsonRawSchema —— 使用现成的 JSON Schema 字符串"></a>JsonRawSchema —— 使用现成的 JSON Schema 字符串</h5><pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">var</span> rawSchema <span class="token operator">=</span> <span class="token triple-quoted-string string">"""
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": { "city": { "type": "string" } },
+    "required": ["city"]
+}
+"""</span><span class="token punctuation">;</span>
+<span class="token class-name">JsonRawSchema</span> schema <span class="token operator">=</span> <span class="token class-name">JsonRawSchema</span><span class="token punctuation">.</span><span class="token function">from</span><span class="token punctuation">(</span>rawSchema<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h5 id="添加描述-——-提高成功率"><a href="#添加描述-——-提高成功率" class="headerlink" title="添加描述 —— 提高成功率"></a>添加描述 —— 提高成功率</h5><pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token class-name">JsonStringSchema</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">description</span><span class="token punctuation">(</span><span class="token string">"The name of the person, for example: John Doe"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>除 JsonReferenceSchema 外的所有类型都支持 description。</p>
+<h5 id="ChatModel-中使用-JSON-Schema-的限制"><a href="#ChatModel-中使用-JSON-Schema-的限制" class="headerlink" title="ChatModel 中使用 JSON Schema 的限制"></a>ChatModel 中使用 JSON Schema 的限制</h5><table>
+<thead>
+<tr>
+<th>限制</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>模型支持</td>
+<td>仅 Azure OpenAI、Google AI Gemini、Mistral、Ollama、OpenAI</td>
+</tr>
+<tr>
+<td>流式模式</td>
+<td>❌ OpenAI 暂不支持</td>
+</tr>
+<tr>
+<td>JsonReferenceSchema</td>
+<td>仅 Azure OpenAI、Mistral、OpenAI</td>
+</tr>
+<tr>
+<td>JsonAnyOfSchema</td>
+<td>仅 OpenAI、Azure OpenAI</td>
+</tr>
+</tbody></table>
+<p>各模型的启用方式：</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>启用方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>OpenAI (新模型)</td>
+<td><code>.supportedCapabilities(RESPONSE_FORMAT_JSON_SCHEMA).strictJsonSchema(true)</code></td>
+</tr>
+<tr>
+<td>OpenAI (旧模型)</td>
+<td><code>.responseFormat("json_object")</code></td>
+</tr>
+<tr>
+<td>Azure OpenAI</td>
+<td><code>.responseFormat(new ChatCompletionsJsonResponseFormat())</code></td>
+</tr>
+<tr>
+<td>Vertex AI Gemini</td>
+<td><code>.responseMimeType("application/json")</code> 或 <code>.responseSchema(SchemaHelper.fromClass(Person.class))</code></td>
+</tr>
+<tr>
+<td>Google AI Gemini</td>
+<td><code>.responseFormat(ResponseFormat.JSON)</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h4 id="2、在-AI-Services-中使用-JSON-Schema-——-一行代码搞定"><a href="#2、在-AI-Services-中使用-JSON-Schema-——-一行代码搞定" class="headerlink" title="2、在 AI Services 中使用 JSON Schema —— 一行代码搞定"></a>2、在 AI Services 中使用 JSON Schema —— 一行代码搞定</h4><p>这才是真正爽的地方。不需要手动构建 JsonSchema，只需要：</p>
+<ol>
+<li><pre><code>把方法返回类型改成你想要的 Java 类型
+</code></pre>
+</li>
+<li><pre><code>在 ChatModel 配置中启用 JSON Schema 支持
+</code></pre>
+</li>
+</ol>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">// Step 1: 定义接口，返回类型就是你要的结构化数据</span>
+<span class="token keyword">interface</span> <span class="token class-name">PersonExtractor</span> <span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@UserMessage</span><span class="token punctuation">(</span><span class="token string">"从以下文本中提取人员信息：{{it}}"</span><span class="token punctuation">)</span>
+    <span class="token class-name">Person</span> <span class="token function">extractPersonFrom</span><span class="token punctuation">(</span><span class="token class-name">String</span> text<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// Step 2: 创建模型并启用 JSON Schema 支持</span>
+<span class="token class-name">ChatModel</span> chatModel <span class="token operator">=</span> <span class="token class-name">OpenAiChatModel</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">apiKey</span><span class="token punctuation">(</span><span class="token class-name">System</span><span class="token punctuation">.</span><span class="token function">getenv</span><span class="token punctuation">(</span><span class="token string">"OPENAI_API_KEY"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">modelName</span><span class="token punctuation">(</span><span class="token string">"gpt-4o-mini"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">supportedCapabilities</span><span class="token punctuation">(</span><span class="token constant">RESPONSE_FORMAT_JSON_SCHEMA</span><span class="token punctuation">)</span>  <span class="token comment">// ← 关键！</span>
+    <span class="token punctuation">.</span><span class="token function">strictJsonSchema</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span>                               <span class="token comment">// ← 严格模式</span>
+    <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Step 3: 创建 AI 服务</span>
+<span class="token class-name">PersonExtractor</span> extractor <span class="token operator">=</span> <span class="token class-name">AiServices</span><span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token class-name">PersonExtractor</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> chatModel<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Step 4: 调用</span>
+<span class="token class-name">Person</span> person <span class="token operator">=</span> extractor<span class="token punctuation">.</span><span class="token function">extractPersonFrom</span><span class="token punctuation">(</span><span class="token triple-quoted-string string">"""
+    John is 42 years old. He stands 1.75m tall. Currently unmarried.
+    """</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// person.name="John", age=42, height=1.75, married=false</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>框架会自动：根据 Person 类的结构生成对应的 JSON Schema → 发送给 LLM → 将返回的 JSON 反序列化为 Person 对象。</p>
+<h5 id="AI-Services-中的限制"><a href="#AI-Services-中的限制" class="headerlink" title="AI Services 中的限制"></a>AI Services 中的限制</h5><table>
+<thead>
+<tr>
+<th>限制</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>必须显式启用</td>
+<td><code>.supportedCapabilities(RESPONSE_FORMAT_JSON_SCHEMA)</code></td>
+</tr>
+<tr>
+<td>流式模式</td>
+<td>❌ 不适用</td>
+</tr>
+<tr>
+<td>嵌套类型</td>
+<td>只能包含标量、enum、嵌套 POJO、List/Set/数组</td>
+</tr>
+<tr>
+<td>递归</td>
+<td>仅 Azure OpenAI、Mistral、OpenAI</td>
+</tr>
+<tr>
+<td>多态性</td>
+<td>❌ 尚不支持</td>
+</tr>
+<tr>
+<td>抽象类/接口</td>
+<td>❌ 必须是具体类</td>
+</tr>
+</tbody></table>
+<hr>
+<h4 id="3、提示-JSON-模式-amp-纯提示"><a href="#3、提示-JSON-模式-amp-纯提示" class="headerlink" title="3、提示 + JSON 模式 &amp; 纯提示"></a>3、提示 + JSON 模式 &amp; 纯提示</h4><p><strong>提示 + JSON 模式：</strong> 结合自然语言指令和 responseFormat 参数，比纯提示更可靠，但不如 JSON Schema 严格。</p>
+<p><strong>纯提示（兜底方案）：</strong> 当 JSON Schema 不可用时，AI Service 自动生成格式指令附加到 UserMessage 末尾，然后尝试将 LLM 输出解析为目标类型。<strong>缺点是不可靠</strong>，LLM 可能偶尔忽略格式要求。</p>
+<hr>
+<h4 id="四、支持的类型对照表"><a href="#四、支持的类型对照表" class="headerlink" title="四、支持的类型对照表"></a>四、支持的类型对照表</h4><table>
+<thead>
+<tr>
+<th>返回类型</th>
+<th>JSON Schema</th>
+<th>纯提示</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>POJO</td>
+<td>✅</td>
+<td>✅</td>
+<td>最常用</td>
+</tr>
+<tr>
+<td>List&lt;POJO&gt;, Set&lt;POJO&gt;</td>
+<td>✅</td>
+<td>❌</td>
+<td>不能用于纯提示</td>
+</tr>
+<tr>
+<td>Enum</td>
+<td>✅</td>
+<td>✅</td>
+<td></td>
+</tr>
+<tr>
+<td>List&lt;Enum&gt;, Set&lt;Enum&gt;</td>
+<td>✅</td>
+<td>✅</td>
+<td></td>
+</tr>
+<tr>
+<td>List&lt;String&gt;, Set&lt;String&gt;</td>
+<td>✅</td>
+<td>✅</td>
+<td></td>
+</tr>
+<tr>
+<td>boolean, Boolean</td>
+<td>✅</td>
+<td>✅</td>
+<td></td>
+</tr>
+<tr>
+<td>int, Integer</td>
+<td>✅</td>
+<td>✅</td>
+<td></td>
+</tr>
+<tr>
+<td>long, Long</td>
+<td>✅</td>
+<td>✅</td>
+<td></td>
+</tr>
+<tr>
+<td>float, Float</td>
+<td>✅</td>
+<td>✅</td>
+<td></td>
+</tr>
+<tr>
+<td>double, Double</td>
+<td>✅</td>
+<td>✅</td>
+<td></td>
+</tr>
+<tr>
+<td>byte, Byte</td>
+<td>❌</td>
+<td>✅</td>
+<td>仅提示</td>
+</tr>
+<tr>
+<td>short, Short</td>
+<td>❌</td>
+<td>✅</td>
+<td>仅提示</td>
+</tr>
+<tr>
+<td>BigInteger</td>
+<td>❌</td>
+<td>✅</td>
+<td>仅提示</td>
+</tr>
+<tr>
+<td>BigDecimal</td>
+<td>❌</td>
+<td>✅</td>
+<td>仅提示</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>❌</td>
+<td>✅</td>
+<td>仅提示</td>
+</tr>
+<tr>
+<td>LocalDate</td>
+<td>❌</td>
+<td>✅</td>
+<td>仅提示</td>
+</tr>
+<tr>
+<td>LocalTime</td>
+<td>❌</td>
+<td>✅</td>
+<td>仅提示</td>
+</tr>
+<tr>
+<td>LocalDateTime</td>
+<td>❌</td>
+<td>✅</td>
+<td>仅提示</td>
+</tr>
+<tr>
+<td>Map&lt;?, ?&gt;</td>
+<td>❌</td>
+<td>✅</td>
+<td>仅提示</td>
+</tr>
+</tbody></table>
+<hr>
+<h4 id="五、实际例子一览"><a href="#五、实际例子一览" class="headerlink" title="五、实际例子一览"></a>五、实际例子一览</h4><pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">// 提取单个 Person</span>
+<span class="token class-name">Person</span> <span class="token function">extractPersonFrom</span><span class="token punctuation">(</span><span class="token class-name">String</span> text<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 提取多个 Person</span>
+<span class="token class-name">Set</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Person</span><span class="token punctuation">&gt;</span></span> <span class="token function">extractPeopleFrom</span><span class="token punctuation">(</span><span class="token class-name">String</span> text<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 情感分类</span>
+<span class="token class-name">Sentiment</span> <span class="token function">extractSentimentFrom</span><span class="token punctuation">(</span><span class="token class-name">String</span> text<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Sentiment</span><span class="token punctuation">&gt;</span></span> <span class="token function">extractSentimentsFrom</span><span class="token punctuation">(</span><span class="token class-name">String</span> text<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 生成大纲</span>
+<span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">&gt;</span></span> <span class="token function">generateOutlineFor</span><span class="token punctuation">(</span><span class="token class-name">String</span> topic<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<hr>
+<h4 id="六、-总结"><a href="#六、-总结" class="headerlink" title="六、 总结"></a>六、 总结</h4><p>结构化输出的三种方法按可靠性排序：</p>
+<ol>
+<li><strong>JSON Schema</strong>（最强 ✅）—— 通过 API 专用参数指定 schema，LLM 必须遵守</li>
+<li><strong>提示 + JSON 模式</strong>（中等）—— 结合自然语言指令和 responseFormat 参数</li>
+<li><strong>纯提示</strong>（兜底）—— 只在提示词里写”请用 JSON 格式回复”</li>
+</ol>
+<p>在 AI Service 中使用 JSON Schema 非常简单：</p>
+<ul>
+<li>定义接口，返回类型为 POJO/List/Enum 等</li>
+<li>在 ChatModel 配置中启用 RESPONSE_FORMAT_JSON_SCHEMA</li>
+<li>框架自动生成 schema、发送请求、解析结果</li>
+</ul>
+<p>注意事项：</p>
+<ul>
+<li>不是所有 Java 类型都支持 JSON Schema（byte/short/Date 等仅限提示模式）</li>
+<li>流式模式下不支持 JSON Schema</li>
+<li>递归和多态性支持有限（仅部分模型）</li>
+<li>返回类型必须是具体类，不支持接口或抽象类</li>
+</ul>
+<p>掌握结构化输出之后，你可以轻松构建信息抽取、数据分类、文档摘要等各种需要 LLM 返回结构化数据的场景。</p>
 <h3 id="检索增强生成-RAG"><a href="#检索增强生成-RAG" class="headerlink" title="检索增强生成 - RAG"></a>检索增强生成 - RAG</h3><p>RAG（Retrieval-Augmented Generation，检索增强生成）是一种结合信息检索技术和 AI 内容生成的混合架构，可以解决大模型的知识时效性限制和幻觉问题。</p>
 <p>简单来说，RAG 就像给 AI 配了一个 “小抄本”，让 AI 回答问题前先查一查特定的知识库来获取知识，确保回答是基于真实资料而不是凭空想象。很多企业也基于 RAG 搭建了自己的智能客服，可以用自己积累的领域知识回复用户。</p>
 <p>RAG 的完整工作流程如下：</p>
@@ -2655,7 +3067,7 @@ public class AiController {
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1225k</span>
+                        class="white-color">1227.3k</span>
             
             
             

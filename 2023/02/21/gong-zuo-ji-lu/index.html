@@ -384,14 +384,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2026-04-24
+                    2026-07-29
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    37.6k
+                    37.7k
                 </div>
                 
 
@@ -426,7 +426,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h2 id="1、开发环境及配置项放在pom中"><a href="#1、开发环境及配置项放在pom中" class="headerlink" title="1、开发环境及配置项放在pom中"></a>1、开发环境及配置项放在pom中</h2><p>像这样有多个配置环境，和yaml中的配置文件@xxx@的这种写法</p>
+                <h2 id="1、开发环境及配置项放在pom中"><a href="#1、开发环境及配置项放在pom中" class="headerlink" title="1、开发环境及配置项放在pom中"></a>1、开发环境及配置项放在pom中</h2><p>像这样有多个配置环境，和yaml中的配置文件@xxx@的这种写法</p>
 <p><img src="/medias/loading.gif" data-original="/2023/02/21/gong-zuo-ji-lu/image-20230221143457572.png" alt="image-20230221143457572"></p>
 <p><img src="/medias/loading.gif" data-original="/2023/02/21/gong-zuo-ji-lu/image-20230221143521989.png" alt="image-20230221143521989"></p>
 <p>在父工程的pom文件中配置了配置项的位置</p>
@@ -808,7 +808,7 @@ sealed = false<span aria-hidden="true" class="line-numbers-rows"><span></span><s
     <span class="token punctuation">}</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h4 id="实现AbstractRoutingDataSource，获取当前使用的数据源"><a href="#实现AbstractRoutingDataSource，获取当前使用的数据源" class="headerlink" title="实现AbstractRoutingDataSource，获取当前使用的数据源"></a>实现<code>AbstractRoutingDataSource</code>，获取当前使用的数据源</h4><p><strong>Spring 框架中，每次执行数据库操作时，都会调用 <code>determineCurrentLookupKey()</code> 来获取当前应该使用的数据源。</strong></p>
+<h4 id="实现AbstractRoutingDataSource，获取当前使用的数据源"><a href="#实现AbstractRoutingDataSource，获取当前使用的数据源" class="headerlink" title="实现AbstractRoutingDataSource，获取当前使用的数据源"></a>实现<code>AbstractRoutingDataSource</code>，获取当前使用的数据源</h4><p><strong>在 Spring 框架中，每次执行数据库操作时，<code>AbstractRoutingDataSource</code> 的 <code>getConnection()</code> 方法会被调用，该方法内部会调用 <code>determineCurrentLookupKey()</code> 来获取当前线程上下文中所对应的数据源标识（Lookup Key），进而路由到目标数据源。</strong></p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">/**
  * 动态数据源实现类
  */</span>
@@ -6297,7 +6297,7 @@ map<span class="token punctuation">.</span><span class="token function">putIfAbs
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1225k</span>
+                        class="white-color">1227.3k</span>
             
             
             
