@@ -113,12 +113,12 @@ tags:
 >
 >   ```java
 >   public class demo {
->     
+>       
 >       public static final int MYDEMO = 10;
->     
+>       
 >       public static void main(String[] args) {
 >           System.out.println("demo=========" + MYDEMO);
->     
+>       
 >           example example = new example();
 >       }
 >   }
@@ -3281,197 +3281,208 @@ class Outer {
 
 #### 常用的函数式接口
 
-Java内置四大核心函数式接口
+Java 8 在 `java.util.function` 包中定义了大量函数式接口，核心掌握以下几个即可覆盖 90% 场景。
 
-![image-20230323173017705](Java/image-20230323173017705.png)
-
-![](Java/QQ截图20230508154256.png)
-
-##### 消费型接口
-
-1. `void accept(T t)`：对给定的参数执行此操作
-2. `defaultConsumer<T> andThen(Consumer after)`：返回一个组合的Consumer，依次执行此操作，然后执行after操作.
+##### 1. `Supplier<T>` — 供给型（无参，有返回）
 
 ```java
-/**
- * Consumer<T> 消费型接口 :
- */
-@Test
-public void consumerTest() {
-    happy(2999.99, m -> System.out.println("此次消费了：" + m + "元"));
-}
-
-public void happy(Double money, Consumer<Double> consumer) {
-    consumer.accept(money);
-}
-
-```
-
-```JAVA
-import java.util.function.Consumer;
- 
-public class ConsumerDemo2 {
-    public static void main(String[] args) {
-        String[] strArray={"ljy,18","znx,19","zsy,20"};
- 
-        printInfo(strArray,str-> System.out.print("姓名："+str.split(",")[0]),
-                str-> System.out.println(",年龄："+str.split(",")[1]));
-    }
- 
-    //info（信息，情报）
-    private static void printInfo(String[] strArray, Consumer<String>con1,Consumer<String>con2){
-        for(String str:strArray){
-            con1.andThen(con2).accept(str);
-        }
-    }
+@FunctionalInterface
+public interface Supplier<T> {
+    T get();
 }
 ```
 
-##### 提供型接口
-
-1. `T get()`：获得结果
+**用途**：工厂方法、懒加载、生成默认值。
 
 ```java
-/**
- * Supplier<T> 供给型接口 :
- */
-@Test
-public void supplierTest() {
-    Random random = new Random();
-    List<Integer> numList = getNumList(10, () -> random.nextInt(100));
-    numList.forEach(System.out::println);
-}
+Supplier<LocalDate> now = LocalDate::now;
+System.out.println(now.get()); // 2026-08-21
 
-/**
- * 需求：产生指定个数的整数，并放入集合中
- *
- * @param num
- * @param sup
- * @return
- */
-public List<Integer> getNumList(int num, Supplier<Integer> sup) {
-    List<Integer> list = new ArrayList<>();
-
-    for (int i = 0; i < num; i++) {
-        Integer n = sup.get();
-        list.add(n);
-    }
-
-    return list;
-}
-
+// 结合 Optional.orElseGet 懒求值
+Optional.ofNullable(null).orElseGet(() -> "默认值");
 ```
 
-##### 函数型接口
-
-1. `R apply(Tt)`：将此函数应用于给定的参数
-2. `default V> Function andThen(Function after)`：返回一个组合函数，首先将该函数应用于输入，然后将after函数应用于结果Function<T,R>接口通常用于对参数进行处理，转换(处理逻辑由Lambda表达式实现)，然后返回一个新的值
+##### 2. `Consumer<T>` — 消费型（有参，无返回）
 
 ```java
-/**
- * Function<T, R> 函数型接口
- */
-@Test
-public void functionTest() {
-    // s -> s.trim() 可替换成 String::trim
-    String newStr = strHandler("\t\t\t 威武   ", s -> s.trim());
-    System.out.println(newStr);
-
-    String subStr = strHandler("  威武呀", s -> s.substring(2, 5));
-    System.out.println(subStr);
-}
-
-/**
- * 需求：用于处理字符串
- *
- * @param str
- * @param fun
- * @return
- */
-public String strHandler(String str, Function<String, String> fun) {
-    return fun.apply(str);
-}
-
-```
-
-```JAVA
-import java.util.function.Function;
- 
-public class FunctionDemo1 {
-    public static void main(String[] args) {
-        convert("100",s -> Integer.parseInt(s),i->String.valueOf(i+556));
-    }
- 
-    //定义一个方法，把一个字符串转换为int类型，把int类型加上一个整数后，转换为字符串在控制台输出
-    private static void convert(String s,Function<String,Integer>fun1,Function<Integer,String>fun2){
-        fun1.andThen(fun2).apply(s);
-    }
+@FunctionalInterface
+public interface Consumer<T> {
+    void accept(T t);
 }
 ```
 
-##### 断言型接口
-
-1. `boolean test(T t)`：对给定的参数进行判断(判断逻辑由Lambda表达式实现)，返回一个布尔值
-2. `default Predicate<T> negate()`：返回一个逻辑的否定，对应逻辑非
-3. `default Predicate<T> and(Prduicate other)`：返回一个组合判断，对应短路与
-4. `default Predicate<T> or(Predicate other)`：返回一个组合判断，对应短路或
+**用途**：副作用操作，如打印、保存。
 
 ```java
-/**
- * Predicate<T> 断言型接口：
- */
-@Test
-public void predicateTest(){
-    List<String> list = Arrays.asList("Hello", "yxj", "Lambda", "www", "ok");
-    List<String> strings = filterStr(list, p -> p.length() > 3);
-    strings.forEach(System.out::println);
-}
+Consumer<String> printer = System.out::println;
+printer.accept("Hello"); // Hello
 
-/**
- * 需求：将满足条件的字符串，放入集合中
- *
- * @param list
- * @param pre
- * @return
- */
-public List<String> filterStr(List<String> list, Predicate<String> pre) {
-    List<String> strList = new ArrayList<>();
+// forEach 遍历
+list.forEach(item -> System.out.println(item));
 
-    for (String str : list) {
-        if (pre.test(str)) {
-            strList.add(str);
-        }
-    }
-
-    return strList;
-}
-
+// andThen 链式调用
+Consumer<String> first = s -> System.out.println("1: " + s);
+Consumer<String> second = s -> System.out.println("2: " + s);
+first.andThen(second).accept("test");
 ```
+
+##### 3. `Function<T, R>` — 函数型（T→R 转换）
 
 ```java
-import java.util.function.Predicate;
- 
-public class PredicateDemo2 {
-    public static void main(String[] args) {
-        boolean b = cheakString("helloworld", s -> s.length() > 5, s -> s.length() < 8);
-        System.out.println(b);
-    }
- 
-    private static boolean cheakString(String s, Predicate<String> pre1,Predicate<String>pre2){
-        return pre1.and(pre2).test(s);
-        //等价于
-//        Boolean b1 = pre1.test(s);
-//        Boolean b2 = pre2.test(s);
-//        return b1&&b2;
- 
-        //pre1.or(pre2).test(s);
-    }
+@FunctionalInterface
+public interface Function<T, R> {
+    R apply(T t);
 }
 ```
 
-##### 其他接口
+**用途**：类型转换、map 映射。
 
-![20201207110028521](Java/972b5de54dce1bfd05ca22047cc1c7dd.png)
+```java
+Function<String, Integer> str2Int = Integer::parseInt;
+System.out.println(str2Int.apply("123")); // 123
+
+// stream map 转换
+list.stream().map(String::toUpperCase).collect(Collectors.toList());
+
+// andThen / compose 组合
+Function<Integer, Integer> plus1 = x -> x + 1;
+Function<Integer, Integer> times2 = x -> x * 2;
+// (x+1)*2
+Function<Integer, Integer> f = plus1.andThen(times2);
+System.out.println(f.apply(3)); // 8
+```
+
+##### 4. `Predicate<T>` — 断言型（T→boolean）
+
+```java
+@FunctionalInterface
+public interface Predicate<T> {
+    boolean test(T t);
+}
+```
+
+**用途**：条件判断、filter 过滤。
+
+```java
+Predicate<String> isNotEmpty = s -> s != null && !s.isEmpty();
+System.out.println(isNotEmpty.test("")); // false
+
+// stream filter
+list.stream().filter(s -> s.length() > 3).collect(Collectors.toList());
+
+// and / or / negate 逻辑组合
+Predicate<Integer> gt10 = x -> x > 10;
+Predicate<Integer> lt100 = x -> x < 100;
+Predicate<Integer> range = gt10.and(lt100); // 10 < x < 100
+```
+
+##### 5. `BiFunction<T, U, R>` — 双参函数型
+
+```java
+@FunctionalInterface
+public interface BiFunction<T, U, R> {
+    R apply(T t, U u);
+}
+```
+
+**用途**：合并两个参数，如 reduce 累加。
+
+```java
+BiFunction<Integer, Integer, Integer> add = Integer::sum;
+System.out.println(add.apply(1, 2)); // 3
+
+// stream reduce
+list.stream().reduce(0, Integer::sum);
+
+// Map.replaceAll
+map.replaceAll((k, v) -> v + 1);
+```
+
+##### 6. `UnaryOperator<T>` / `BinaryOperator<T>`
+
+继承自 `Function<T,T>` / `BiFunction<T,T,T>`，参数与返回类型相同。
+
+```java
+UnaryOperator<String> trim = String::trim;
+BinaryOperator<Integer> max = Integer::max;
+
+// 常用于 List.replaceAll
+list.replaceAll(String::toUpperCase);
+```
+
+------
+
+##### 基础类型的变体（避免装箱拆箱）
+
+为 `int`、`long`、`double` 提供专用接口：
+
+| 接口                                                         | 说明                 |
+| :----------------------------------------------------------- | :------------------- |
+| `IntSupplier` / `IntConsumer` / `IntFunction<R>` / `IntPredicate` | 入参或出参为 int     |
+| `IntToLongFunction` / `IntToDoubleFunction`                  | 类型转换             |
+| `ToIntFunction<T>`                                           | 返回 int 的 Function |
+| `IntBinaryOperator`                                          | 两个 int 运算        |
+| `ObjIntConsumer<T>`                                          | 一个对象 + 一个 int  |
+
+Java
+
+
+
+```java
+// IntStream 直接用 IntPredicate，避免装箱
+IntStream.range(0, 10).filter(x -> x % 2 == 0).sum();
+
+ToIntFunction<String> lengthFn = String::length;
+```
+
+------
+
+##### 实战场景
+
+###### 场景 1：策略模式
+
+```java
+public enum DiscountStrategy {
+    NORMAL(price -> price),
+    VIP(price -> price * 0.8),
+    SVIP(price -> price * 0.5);
+
+    private final Function<Double, Double> func;
+    DiscountStrategy(Function<Double, Double> func) { this.func = func; }
+    public double calc(double price) { return func.apply(price); }
+}
+```
+
+###### 场景 2：Optional 链式处理
+
+```java
+String result = Optional.ofNullable(user)
+    .map(User::getName)
+    .filter(n -> n.length() > 2)
+    .orElseGet(() -> "匿名");
+```
+
+###### 场景 3：自定义函数式接口
+
+```java
+@FunctionalInterface
+public interface TriFunction<T, U, V, R> {
+    R apply(T t, U u, V v);
+}
+
+TriFunction<String, Integer, Boolean, String> f =
+    (s, i, b) -> s + i + b;
+```
+
+##### 一句话速记
+
+| 接口                | 签名           | 一句话   |
+| :------------------ | :------------- | :------- |
+| `Supplier<T>`       | `() -> T`      | 取一个值 |
+| `Consumer<T>`       | `T -> void`    | 用一个值 |
+| `Function<T,R>`     | `T -> R`       | 转一个值 |
+| `Predicate<T>`      | `T -> boolean` | 判一个值 |
+| `BiFunction<T,U,R>` | `(T,U) -> R`   | 两值合一 |
 
 ### 方法引用
 
