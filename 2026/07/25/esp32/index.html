@@ -383,14 +383,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    44.4k
+                    43.7k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    171 分
+                    167 分
                 </div>
                 
 
@@ -418,7 +418,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="第1章-使用-Arduino-开发-ESP32-简介"><a href="#第1章-使用-Arduino-开发-ESP32-简介" class="headerlink" title="第1章 使用 Arduino 开发 ESP32 简介"></a>第1章 使用 Arduino 开发 ESP32 简介</h2><h3 id="ESP32-开发板介绍"><a href="#ESP32-开发板介绍" class="headerlink" title="ESP32 开发板介绍"></a>ESP32 开发板介绍</h3><p>ESP32 是一款国产芯片，这个芯片专为移动设备、可穿戴设备与物联网应用而设计，集成了低功耗蓝牙和 Wi-Fi。这也是为什么 ESP32 在 DIY 爱好者中备受推崇的原因。</p>
+                <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h2 id="第1章-使用-Arduino-开发-ESP32-简介"><a href="#第1章-使用-Arduino-开发-ESP32-简介" class="headerlink" title="第1章 使用 Arduino 开发 ESP32 简介"></a>第1章 使用 Arduino 开发 ESP32 简介</h2><h3 id="ESP32-开发板介绍"><a href="#ESP32-开发板介绍" class="headerlink" title="ESP32 开发板介绍"></a>ESP32 开发板介绍</h3><p>ESP32 是一款国产芯片，这个芯片专为移动设备、可穿戴设备与物联网应用而设计，集成了低功耗蓝牙和 Wi-Fi。这也是为什么 ESP32 在 DIY 爱好者中备受推崇的原因。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_001.png"></p>
 <p>其中模块的含义：</p>
 <table>
@@ -449,8 +449,8 @@
 <td>GPIO（general purpose intput output）是通用输入输出端口的简称，可以通过软件来控制其输入和输出。</td>
 </tr>
 </tbody></table>
-<p>ESP32 芯片有 48 个引脚，具有多种功能，并不是所有的 ESP32 开发板的管脚都暴露在外，有些管脚不能使用。</p>
-<p>ESP32 芯片有 34 个可编程的 GPIO 引脚，每个引脚执行多个功能，也就是 IO 口复用，设置 IO 口功能的时候只有一个功能会被激活。可以在程序中将引脚配置为 GPIO、ADC、UART 等等。此外，有些引脚具有特定的功能，使得它们适合或不适合特定的项目。</p>
+<p><strong>ESP32 芯片有 48 个引脚</strong>，具有多种功能，并不是所有的 ESP32 开发板的管脚都暴露在外，有些管脚不能使用。</p>
+<p><strong>ESP32 芯片有 34 个可编程的 GPIO 引脚，每个引脚执行多个功能</strong>，也就是 IO 口复用，设置 IO 口功能的时候只有一个功能会被激活。可以在程序中将引脚配置为 GPIO、ADC、UART 等等。此外，有些引脚具有特定的功能，使得它们适合或不适合特定的项目。</p>
 <p>ESP32 开发板引脚图如下：</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_002.png"></p>
 <h3 id="ESP32-开发方式"><a href="#ESP32-开发方式" class="headerlink" title="ESP32 开发方式"></a>ESP32 开发方式</h3><p>ESP32 的开发方式主要有三种：</p>
@@ -794,8 +794,8 @@ a <span class="token operator">=</span> <span class="token number">20</span><spa
 <p>面包板的外观和内部结构如上图所示，常见的最小单元面包板分上、中、下三部分，上面和下面部分一般是由一行或两行的插孔构成的窄条，中间部分是由中间一条隔离凹槽和上下各 5 行的插孔构成的宽条。</p>
 <p>上下两部分的窄条，外观和结构如下图：</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_032.png"></p>
-<p>窄条上下两行之间电气不连通。每 5 个插孔为一组，通常的面包板上有 10 组(为了方便展示，第一张图展示的是小面包板，只有 5 组，原理相同)。标注 <code>+</code> 的窄条一般接电源，<code>-</code> 接地。</p>
-<p>中间部分宽条是由中间一条隔离凹槽和上下各 5 行的插孔构成。在同一列中的 5 个插孔是互相连通的，列和列之间以及凹槽上下部分则是不连通的。外观及结构如下图：</p>
+<p><strong>窄条上下两行之间电气不连通。</strong>每 5 个插孔为一组，通常的面包板上有 10 组(为了方便展示，第一张图展示的是小面包板，只有 5 组，原理相同)。标注 <code>+</code> 的窄条一般接电源，<code>-</code> 接地。</p>
+<p>中间部分宽条是由中间一条隔离凹槽和上下各 5 行的插孔构成。<strong>在同一列中的 5 个插孔是互相连通的</strong>，列和列之间以及凹槽上下部分则是不连通的。外观及结构如下图：</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_033.png"></p>
 <h3 id="杜邦线"><a href="#杜邦线" class="headerlink" title="杜邦线"></a>杜邦线</h3><p>杜邦线是美国杜邦公司生产的有特殊效用的排线。电子行业中，杜邦线可用于实验板的引脚扩展，增加实验项目等，能够非常牢靠地和插针连接，无需焊接，便于快速进行电路试验。</p>
 <p>杜邦线的线头有公、母两种，公杜邦线指的是尖头的杜邦线，有针脚。母杜邦线是带孔的连接线。</p>
@@ -807,14 +807,14 @@ a <span class="token operator">=</span> <span class="token number">20</span><spa
 <h3 id="实验原理"><a href="#实验原理" class="headerlink" title="实验原理"></a>实验原理</h3><h4 id="1-GPIO-引脚"><a href="#1-GPIO-引脚" class="headerlink" title="1. GPIO 引脚"></a>1. GPIO 引脚</h4><p>引脚又叫管脚，英文叫 Pin, 就是从集成电路（芯片以及一些电子元件）内部电路引出与外围电路的接线的接口。</p>
 <p>在我们的 ESP32 开发板上, 我们可以把这些称为引脚, 这些引脚其实是从 ESP32 芯片内部引出来的, 我们可以看到每个引脚都标了自己独特的名字。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_036.png"></p>
-<p>其中有一类引脚叫 GPIO 引脚, 负责输入/输出电压。开发板上 D 开头的引脚都是这种引脚, 比如 D2、D4、D15 等等。</p>
+<p>其中<strong>有一类引脚叫 GPIO 引脚, 负责输入/输出电压。开发板上 D 开头的引脚都是这种引脚, 比如 D2、D4、D15 等等。</strong></p>
 <p>输入我们暂时不讲，这里我们先讲一下输出，简单来说，每个 GPIO 都可以输出高低电平。</p>
 <blockquote>
 <p>什么是电平？</p>
-<p>电路上某点的电压（对公共参考点）或电位是高还是低。比如在逻辑电路中，高于某个数值的电位称其为高电位，或高电平，低于某个数值的，为低电位或低电平。比如 ESP32 中，高电平的数值大于2.5V，低电平的数值小于0.5V，具体的数值最好通过测试研究来确定。</p>
+<p>电路上某点的电压（对公共参考点）或电位是高还是低。比如在逻辑电路中，高于某个数值的电位称其为高电位，或高电平，低于某个数值的，为低电位或低电平。<strong>比如 ESP32 中，高电平的数值大于2.5V，低电平的数值小于0.5V，具体的数值最好通过测试研究来确定。</strong></p>
 </blockquote>
-<h4 id="2-LED"><a href="#2-LED" class="headerlink" title="2. LED"></a>2. LED</h4><p>LED（light-emitting diode） 即发光二极管。它具有单向导电性，通过 5mA 左右电流即可发光，电流越大，其亮度越强，但若电流过大，会烧毁二极管，一般我们控制在 3mA-20mA 之间，通常我们会在 LED 管脚上串联一个电阻，目的就是为了限制通过发光二极管的电流不要太大，因此这些电阻又可以称为<code>限流电阻</code>。当发光二极管发光时，测量它两端电压约为 1.7V，这个电压又叫做发光二极管的<code>导通压降</code>。</p>
-<p>发光二极管正极又称阳极，负极又称阴极，电流只能从阳极流向阴极。直插式发光二极管长脚为阳极，短脚为阴极。</p>
+<h4 id="2-LED"><a href="#2-LED" class="headerlink" title="2. LED"></a>2. LED</h4><p>LED（light-emitting diode） 即发光二极管。<strong>它具有单向导电性，通过 5mA 左右电流即可发光，电流越大，其亮度越强</strong>，但若电流过大，会烧毁二极管，<strong>一般我们控制在 3mA-20mA 之间</strong>，通常我们会在 LED 管脚上串联一个电阻，目的就是为了限制通过发光二极管的电流不要太大，因此这些电阻又可以称为<code>限流电阻</code>。当发光二极管发光时，测量它两端电压约为 1.7V，这个电压又叫做发光二极管的<code>导通压降</code>。</p>
+<p><strong>发光二极管正极又称阳极，负极又称阴极，电流只能从阳极流向阴极。直插式发光二极管长脚为阳极，短脚为阴极。</strong></p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_037.png"></p>
 <h3 id="硬件电路设计"><a href="#硬件电路设计" class="headerlink" title="硬件电路设计"></a>硬件电路设计</h3><p>物料清单（BOM 表）：</p>
 <table>
@@ -916,111 +916,11 @@ a <span class="token operator">=</span> <span class="token number">20</span><spa
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_039.png"></p>
 <p>当然你也可以选择只使用一个电阻：</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_040.png"></p>
-<h3 id="软件程序设计"><a href="#软件程序设计" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>设计这个程序时，我们需要使用二维数组。</p>
-<p>如果我们想让这个数码管某一引脚亮起来，那么我们需要给对应的引脚设置一个低电平。如果我们想要显示一个数字时，就需要让多个 LED 同时亮，比如数字 1 需要 b、c 引脚给低电平，其余引脚给高电平。程序可以这样写：</p>
-<pre class="line-numbers language-arduino" data-language="arduino"><code class="language-arduino"><span class="token comment">// 定义输出引脚并把所有引脚存到数组中</span>
-<span class="token keyword">int</span> pin_a <span class="token operator">=</span> <span class="token number">4</span><span class="token punctuation">;</span>
-<span class="token keyword">int</span> pin_b <span class="token operator">=</span> <span class="token number">5</span><span class="token punctuation">;</span>
-<span class="token keyword">int</span> pin_c <span class="token operator">=</span> <span class="token number">19</span><span class="token punctuation">;</span>
-<span class="token keyword">int</span> pin_d <span class="token operator">=</span> <span class="token number">21</span><span class="token punctuation">;</span>
-<span class="token keyword">int</span> pin_e <span class="token operator">=</span> <span class="token number">22</span><span class="token punctuation">;</span>
-<span class="token keyword">int</span> pin_f <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
-<span class="token keyword">int</span> pin_g <span class="token operator">=</span> <span class="token number">15</span><span class="token punctuation">;</span>
-<span class="token keyword">int</span> pin_dp <span class="token operator">=</span> <span class="token number">18</span><span class="token punctuation">;</span>
-
-<span class="token keyword">int</span> pin_array<span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>pin_a<span class="token punctuation">,</span> pin_b<span class="token punctuation">,</span> pin_c<span class="token punctuation">,</span> pin_d<span class="token punctuation">,</span> pin_e<span class="token punctuation">,</span> pin_f<span class="token punctuation">,</span> pin_g<span class="token punctuation">,</span> pin_dp<span class="token punctuation">}</span><span class="token punctuation">;</span>
-
-<span class="token comment">// 定义数字显示逻辑的二维数组</span>
-<span class="token keyword">int</span> number_array<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
-  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">// 0</span>
-  <span class="token punctuation">{</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">// 1</span>
-  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">// 2</span>
-  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">// 3</span>
-  <span class="token punctuation">{</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">// 4</span>
-  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">// 5</span>
-  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">// 6</span>
-  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">// 7</span>
-  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">// 8</span>
-  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">// 9</span>
-<span class="token punctuation">}</span><span class="token punctuation">;</span>
-
-<span class="token keyword">void</span> <span class="token keyword">setup</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-  <span class="token comment">// 设置所有引脚为输出模式，初始化所有引脚为高电平</span>
-  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span><span class="token number">8</span><span class="token punctuation">;</span>i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
-    <span class="token function">pinMode</span><span class="token punctuation">(</span>pin_array<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token constant">OUTPUT</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">digitalWrite</span><span class="token punctuation">(</span>pin_array<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token constant">HIGH</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-
-<span class="token keyword">void</span> <span class="token keyword">loop</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-  <span class="token comment">// 显示数字</span>
-  <span class="token keyword">int</span> num <span class="token operator">=</span> <span class="token number">8</span><span class="token punctuation">;</span>
-  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span><span class="token number">8</span><span class="token punctuation">;</span>i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
-    <span class="token function">digitalWrite</span><span class="token punctuation">(</span>pin_array<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> number_array<span class="token punctuation">[</span>num<span class="token punctuation">]</span><span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>我们也可以使用函数来把显示数字的逻辑代码封装起来，方便我们在其他地方使用：</p>
-<pre class="line-numbers language-arduino" data-language="arduino"><code class="language-arduino"><span class="token comment">// 定义输出引脚并把所有引脚存到数组中</span>
-<span class="token keyword">int</span> pin_a <span class="token operator">=</span> <span class="token number">4</span><span class="token punctuation">;</span>
-<span class="token keyword">int</span> pin_b <span class="token operator">=</span> <span class="token number">5</span><span class="token punctuation">;</span>
-<span class="token keyword">int</span> pin_c <span class="token operator">=</span> <span class="token number">19</span><span class="token punctuation">;</span>
-<span class="token keyword">int</span> pin_d <span class="token operator">=</span> <span class="token number">21</span><span class="token punctuation">;</span>
-<span class="token keyword">int</span> pin_e <span class="token operator">=</span> <span class="token number">22</span><span class="token punctuation">;</span>
-<span class="token keyword">int</span> pin_f <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
-<span class="token keyword">int</span> pin_g <span class="token operator">=</span> <span class="token number">15</span><span class="token punctuation">;</span>
-<span class="token keyword">int</span> pin_dp <span class="token operator">=</span> <span class="token number">18</span><span class="token punctuation">;</span>
-
-<span class="token keyword">int</span> pin_array<span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>pin_a<span class="token punctuation">,</span> pin_b<span class="token punctuation">,</span> pin_c<span class="token punctuation">,</span> pin_d<span class="token punctuation">,</span> pin_e<span class="token punctuation">,</span> pin_f<span class="token punctuation">,</span> pin_g<span class="token punctuation">,</span> pin_dp<span class="token punctuation">}</span><span class="token punctuation">;</span>
-
-<span class="token comment">// 定义数字显示逻辑的二维数组</span>
-<span class="token keyword">int</span> number_array<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
-  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">// 0</span>
-  <span class="token punctuation">{</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">// 1</span>
-  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">// 2</span>
-  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">// 3</span>
-  <span class="token punctuation">{</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">// 4</span>
-  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">// 5</span>
-  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">// 6</span>
-  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">// 7</span>
-  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">// 8</span>
-  <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment">// 9</span>
-<span class="token punctuation">}</span><span class="token punctuation">;</span>
-
-<span class="token keyword">void</span> <span class="token function">display_number</span><span class="token punctuation">(</span><span class="token keyword">int</span> num<span class="token punctuation">)</span><span class="token punctuation">{</span>
-  <span class="token comment">// 清屏</span>
-  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span><span class="token number">8</span><span class="token punctuation">;</span>i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
-    <span class="token function">digitalWrite</span><span class="token punctuation">(</span>pin_array<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token constant">HIGH</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">}</span>
-
-  <span class="token comment">// 改变对应引脚的电平</span>
-  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span><span class="token number">8</span><span class="token punctuation">;</span>i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
-    <span class="token function">digitalWrite</span><span class="token punctuation">(</span>pin_array<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> number_array<span class="token punctuation">[</span>num<span class="token punctuation">]</span><span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-
-<span class="token keyword">void</span> <span class="token keyword">setup</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-  <span class="token comment">// 设置所有引脚为输出模式，初始化所有引脚为高电平</span>
-  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span><span class="token number">8</span><span class="token punctuation">;</span>i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
-    <span class="token function">pinMode</span><span class="token punctuation">(</span>pin_array<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token constant">OUTPUT</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">digitalWrite</span><span class="token punctuation">(</span>pin_array<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token constant">HIGH</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-
-<span class="token keyword">void</span> <span class="token keyword">loop</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-  <span class="token comment">// 显示数字</span>
-  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span><span class="token number">10</span><span class="token punctuation">;</span>i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
-    <span class="token function">display_number</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">delay</span><span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <hr>
 <h2 id="第7章-数码管显示"><a href="#第7章-数码管显示" class="headerlink" title="第7章 数码管显示"></a>第7章 数码管显示</h2><p>现阶段，无论 LCD 和 OLED 显示技术有多好，都无法替代这个古老的显示方式 - 数码管。直到现在，很多领域都离不开数码管。最主要的原因是他便宜有稳定，而且控制简单。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_041.png"></p>
-<p>示例一</p>
+<img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_041.png" style="zoom:67%;">
+
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_042.png"></p>
-<p>示例二</p>
 <h3 id="实验原理-1"><a href="#实验原理-1" class="headerlink" title="实验原理"></a>实验原理</h3><p>数码管是一种半导体发光器件，其基本单元依然是 LED。数码管按段数可分为七段数码管和八段数码管，八段数码管比七段数码管多一个发光二极管单元，也就是多一个小数点（DP），这个小数点可以更精确的表示数码管想要显示的内容。</p>
 <p>按照能显示的位数可分为 1 位、2 位、3 位、4 位、5 位、6 位、7 位等数码管。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_043.png"></p>
@@ -1044,7 +944,8 @@ a <span class="token operator">=</span> <span class="token number">20</span><spa
 <ol start="3">
 <li>使用万用表的二极管档，红表笔接公共端，黑表笔接任一引脚，亮了说明是<code>共阳型数码管</code>，反之，则说明是<code>共阴型数码管</code>。</li>
 </ol>
-<p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_047.png"></p>
+<img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_047.png" style="zoom: 50%;">
+
 <blockquote>
 <p>提示：建议把所有引脚测试一遍，也可以检查出是否有坏了的 LED。</p>
 </blockquote>
@@ -1075,7 +976,7 @@ a <span class="token operator">=</span> <span class="token number">20</span><spa
 </tbody></table>
 <p>将材料按照下图相连:</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_048.png"></p>
-<h3 id="软件程序设计-1"><a href="#软件程序设计-1" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>设计这个程序时，我们需要使用二维数组。</p>
+<h3 id="软件程序设计"><a href="#软件程序设计" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>设计这个程序时，我们需要使用二维数组。</p>
 <p>如果我们想让这个数码管某一引脚亮起来，那么我们需要给对应的引脚设置一个低电平。如果我们想要显示一个数字时，就需要让多个 LED 同时亮，比如数字 1 需要 b、c 引脚给低电平，其余引脚给高电平。程序可以这样写：</p>
 <pre class="line-numbers language-arduino" data-language="arduino"><code class="language-arduino"><span class="token comment">// 定义输出引脚并把所有引脚存到数组中</span>
 <span class="token keyword">int</span> pin_a <span class="token operator">=</span> <span class="token number">4</span><span class="token punctuation">;</span>
@@ -1209,7 +1110,7 @@ a <span class="token operator">=</span> <span class="token number">20</span><spa
 <p>将材料按照下图相连:</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_053.png"></p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_054.png"></p>
-<h3 id="软件程序设计-2"><a href="#软件程序设计-2" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>我们一步一步的来，先写一个最简单的程序，让任意一位数码管显示任意数字，代码可以这么写：</p>
+<h3 id="软件程序设计-1"><a href="#软件程序设计-1" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>我们一步一步的来，先写一个最简单的程序，让任意一位数码管显示任意数字，代码可以这么写：</p>
 <pre class="line-numbers language-arduino" data-language="arduino"><code class="language-arduino"><span class="token comment">// 定义位选线引脚</span>
 <span class="token keyword">int</span> seg_1 <span class="token operator">=</span> <span class="token number">5</span><span class="token punctuation">;</span>
 <span class="token keyword">int</span> seg_2 <span class="token operator">=</span> <span class="token number">18</span><span class="token punctuation">;</span>
@@ -1489,7 +1390,7 @@ a <span class="token operator">=</span> <span class="token number">20</span><spa
 <p>将材料按照下图相连:</p>
 <p>按键一端接 3V3 引脚，一端接 D14，LED 接 D2。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_058.png"></p>
-<h3 id="软件程序设计-3"><a href="#软件程序设计-3" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>这里我们在使用 <code>pinMode</code> 方法的时候，第二个参数就不能传递 <code>OUTPUT</code> 了，并且我们需要使用 <code>digitalRead</code> 方法来获取输入值。</p>
+<h3 id="软件程序设计-2"><a href="#软件程序设计-2" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>这里我们在使用 <code>pinMode</code> 方法的时候，第二个参数就不能传递 <code>OUTPUT</code> 了，并且我们需要使用 <code>digitalRead</code> 方法来获取输入值。</p>
 <p>与输出不同的是，设置输入引脚时，我们需要配置上拉或下拉电阻，目的是确定某个状态电路中的高电平或低电平。</p>
 <p><strong>上、下拉电阻的作用</strong> 是提高电路稳定性，避免引起误动作。按键如果不通过电阻上拉到高电平，那么在上电瞬间可能就发生误动作，因为在上电瞬间单片机的引脚电平是不确定的，上拉电阻的存在保证了其引脚处于高电平状态，而不会发生误动作。</p>
 <p>在 Arduino 中，设置引脚的上拉电阻或下拉电阻需要使用 <code>pinMode</code> 函数和 <code>INPUT_PULLUP</code> 或 <code>INPUT_PULLDOWN</code> 常量。</p>
@@ -1609,7 +1510,7 @@ a <span class="token operator">=</span> <span class="token number">20</span><spa
 <blockquote>
 <p>警告：一定要接电阻，不然会由于电流过大，烧坏 LED。</p>
 </blockquote>
-<h3 id="软件程序设计-4"><a href="#软件程序设计-4" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><h4 id="1-analogWrite-函数实现呼吸灯效果"><a href="#1-analogWrite-函数实现呼吸灯效果" class="headerlink" title="1. analogWrite() 函数实现呼吸灯效果"></a>1. analogWrite() 函数实现呼吸灯效果</h4><p>想要通过 Arduino 输出 PWM 有两种方法，第一种就是使用 Arduino 自带的 <code>analogWrite(pin, value)</code> 函数，其中的两个参数：</p>
+<h3 id="软件程序设计-3"><a href="#软件程序设计-3" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><h4 id="1-analogWrite-函数实现呼吸灯效果"><a href="#1-analogWrite-函数实现呼吸灯效果" class="headerlink" title="1. analogWrite() 函数实现呼吸灯效果"></a>1. analogWrite() 函数实现呼吸灯效果</h4><p>想要通过 Arduino 输出 PWM 有两种方法，第一种就是使用 Arduino 自带的 <code>analogWrite(pin, value)</code> 函数，其中的两个参数：</p>
 <ul>
 <li><code>pin</code>：要写入的 Arduino 引脚。允许的数据类型：int。</li>
 <li><code>value</code>：占空比：介于 0（始终关闭）和 255（始终开启）之间。允许的数据类型：int。</li>
@@ -1755,7 +1656,7 @@ a <span class="token operator">=</span> <span class="token number">20</span><spa
 </tbody></table>
 <p>电位器相当于一个滑动变阻器，两端引脚阻值是固定的，中间引脚对任何一端的引脚阻值是可变的，他等效于从中间把电位器分成两个串联的电阻，串联总阻值是确定的，一端接输入电源，一端接地。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_064.png"></p>
-<h3 id="软件程序设计-5"><a href="#软件程序设计-5" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><h4 id="1-在串口监视器显示-analogRead-模拟输入"><a href="#1-在串口监视器显示-analogRead-模拟输入" class="headerlink" title="1. 在串口监视器显示 analogRead() 模拟输入"></a>1. 在串口监视器显示 analogRead() 模拟输入</h4><p>我们可以先在串口监视器中，打印一下读取到的 <code>analogRead()</code> 的值，这里需要使用到 Arduino 内置的串口函数：</p>
+<h3 id="软件程序设计-4"><a href="#软件程序设计-4" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><h4 id="1-在串口监视器显示-analogRead-模拟输入"><a href="#1-在串口监视器显示-analogRead-模拟输入" class="headerlink" title="1. 在串口监视器显示 analogRead() 模拟输入"></a>1. 在串口监视器显示 analogRead() 模拟输入</h4><p>我们可以先在串口监视器中，打印一下读取到的 <code>analogRead()</code> 的值，这里需要使用到 Arduino 内置的串口函数：</p>
 <ul>
 <li><code>Serial.begin()</code>：设置通信波特率，一般使用 9600，这样就可以在串口监视器中直接打印出来内容；</li>
 <li><code>Serial.println()</code>：在串口屏中打印内容。</li>
@@ -1890,7 +1791,7 @@ a <span class="token operator">=</span> <span class="token number">20</span><spa
 </blockquote>
 <p>这里连接的这两个引脚可不是随便连接的，而是对应了 ESP32 芯片原理图，ESP32 的 I2C 引脚的 SDA 对应 D21，SCL 对应 D22，如图：</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_068.png"></p>
-<h3 id="软件程序设计-6"><a href="#软件程序设计-6" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>在 Arduino 中使用 I2C 控制 LCD1602 需要下载第三方代码 <code>LiquidCrystal_I2C</code>，其中包括 <code>LiquidCrystal_I2C.h</code> 和 <code>LiquidCrystal_I2C.cpp</code> 两个文件，我们只需要把这两个文件放在项目的文件夹中即可。</p>
+<h3 id="软件程序设计-5"><a href="#软件程序设计-5" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>在 Arduino 中使用 I2C 控制 LCD1602 需要下载第三方代码 <code>LiquidCrystal_I2C</code>，其中包括 <code>LiquidCrystal_I2C.h</code> 和 <code>LiquidCrystal_I2C.cpp</code> 两个文件，我们只需要把这两个文件放在项目的文件夹中即可。</p>
 <p>Arduino 项目的创建非常简单，就是打开 Arduino IDE 后保存，它会在你选择的位置新建一个文件夹，这就是项目的文件夹。</p>
 <p><code>.h</code> 与 <code>.cpp</code> 文件到底是什么？在 Arduino 开发中，<code>.h</code> 和 <code>.cpp</code> 文件同样是用于代码组织和模块化的文件类型，但在 Arduino 环境中有些特殊的用法和约定。</p>
 <ol>
@@ -2125,7 +2026,7 @@ a <span class="token operator">=</span> <span class="token number">20</span><spa
 </tr>
 </tbody></table>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_083.png"></p>
-<h3 id="软件程序设计-7"><a href="#软件程序设计-7" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>如果想要使用 Arduino 控制 SSD1306 驱动的 OLED 屏幕，有以下两种第三方库可以使用：</p>
+<h3 id="软件程序设计-6"><a href="#软件程序设计-6" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>如果想要使用 Arduino 控制 SSD1306 驱动的 OLED 屏幕，有以下两种第三方库可以使用：</p>
 <ol>
 <li><code>Adafruit_SSD1306 库</code>：专门针对 SSD1306 驱动 OLED 屏幕的显示图形库；</li>
 <li><code>U8G2 库</code>：目前 Arduino 平台上使用最广泛的 OLED 库。</li>
@@ -2440,7 +2341,7 @@ U8G2_SSD1306_128X64_NONAME_F_4W_SW_SPI<span aria-hidden="true" class="line-numbe
 </tbody></table>
 <p>将材料按照下图相连:</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_093.png"></p>
-<h3 id="软件程序设计-8"><a href="#软件程序设计-8" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>Arduino 中的外部中断配置函数 <code>attachInterrupt(digitalPinToInterrupt(pin), ISR, mode)</code> 包括 3 个参数：</p>
+<h3 id="软件程序设计-7"><a href="#软件程序设计-7" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>Arduino 中的外部中断配置函数 <code>attachInterrupt(digitalPinToInterrupt(pin), ISR, mode)</code> 包括 3 个参数：</p>
 <ol>
 <li><code>pin</code>：GPIO 端口号；</li>
 <li><code>ISR</code>：中断服务程序，没有参数与返回值的函数；</li>
@@ -2554,7 +2455,7 @@ volatile <span class="token keyword">bool</span> flag <span class="token operato
 <blockquote>
 <p>注意：一定要接电阻，不然会由于电流过大，烧坏 LED。</p>
 </blockquote>
-<h3 id="软件程序设计-9"><a href="#软件程序设计-9" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><h4 id="1-硬件定时器"><a href="#1-硬件定时器" class="headerlink" title="1. 硬件定时器"></a>1. 硬件定时器</h4><p>在 ESP32 Arduino 开发环境中，可以使用以下几个库函数来配置和操作硬件定时器（Timer）：</p>
+<h3 id="软件程序设计-8"><a href="#软件程序设计-8" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><h4 id="1-硬件定时器"><a href="#1-硬件定时器" class="headerlink" title="1. 硬件定时器"></a>1. 硬件定时器</h4><p>在 ESP32 Arduino 开发环境中，可以使用以下几个库函数来配置和操作硬件定时器（Timer）：</p>
 <ol>
 <li><p><code>void timerBegin(timer_num_t timer_num, uint32_t divider, bool count_up)</code>：初始化硬件定时器，参数说明：</p>
 <ul>
@@ -2758,7 +2659,7 @@ Ticker timer_once<span class="token punctuation">;</span>
 <blockquote>
 <p>提示：注意接线顺序</p>
 </blockquote>
-<h3 id="软件程序设计-10"><a href="#软件程序设计-10" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><h4 id="1-LEDC-输出-PWM-信号"><a href="#1-LEDC-输出-PWM-信号" class="headerlink" title="1. LEDC 输出 PWM 信号"></a>1. LEDC 输出 PWM 信号</h4><p>首先，我们使用 <code>LEDC</code> 输出 PWM 信号，根据之前的实验原理，我们可以确定 <code>频率</code>、<code>最大脉宽</code> 与 <code>最小脉宽</code>，代码如下：</p>
+<h3 id="软件程序设计-9"><a href="#软件程序设计-9" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><h4 id="1-LEDC-输出-PWM-信号"><a href="#1-LEDC-输出-PWM-信号" class="headerlink" title="1. LEDC 输出 PWM 信号"></a>1. LEDC 输出 PWM 信号</h4><p>首先，我们使用 <code>LEDC</code> 输出 PWM 信号，根据之前的实验原理，我们可以确定 <code>频率</code>、<code>最大脉宽</code> 与 <code>最小脉宽</code>，代码如下：</p>
 <pre class="line-numbers language-arduino" data-language="arduino"><code class="language-arduino"><span class="token comment">// 1/20 秒，50Hz 的频率，20ms 的周期，这个变量用来存储时钟基准。</span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">FREQ</span> <span class="token expression"><span class="token number">50</span></span></span>
 <span class="token comment">// 通道(高速通道（0 ~ 7）由 80MHz 时钟驱动，低速通道（8 ~ 15）由 1MHz 时钟驱动。)</span>
@@ -2980,7 +2881,7 @@ const char <span class="token operator">*</span> password <span class="token ope
 
 <p>其中，<code>name</code>、<code>age</code>、<code>isStudent</code>、<code>hobbies</code> 和 <code>address</code> 都是键，而对应的值分别是字符串 <code>"罗大富"</code>、数字 <code>29</code>、布尔值 <code>false</code>、字符串数组 <code>["睡觉", "打游戏"]</code> 和一个嵌套的 JSON 对象 <code>{"city": "菏泽", "state": "山东"}</code>。</p>
 <p>JSON 数据通常用于 Web 应用程序中，例如从后端服务器获取数据或向后端服务器发送数据。在前端 JavaScript 中，可以使用内置的 JSON 对象将 JSON 字符串转换为 JavaScript 对象，或将 JavaScript 对象转换为 JSON 字符串。</p>
-<h3 id="软件程序设计-11"><a href="#软件程序设计-11" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>想要发送 HTTP 请求，我们就需要用到 HTTPClient 库。</p>
+<h3 id="软件程序设计-10"><a href="#软件程序设计-10" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>想要发送 HTTP 请求，我们就需要用到 HTTPClient 库。</p>
 <p><code>HTTPClient</code> 库是一个用于 Arduino 的 HTTP 客户端库，它提供了一组函数来轻松地发送 HTTP 请求并处理服务器响应。<code>HTTPClient</code> 库基于 ESP-IDF 的 HTTP 客户端实现，并在 Arduino 框架下进行了封装，使其易于使用。</p>
 <p>以下是 <code>HTTPClient</code> 库的一些常用功能和函数：</p>
 <ol>
@@ -3211,7 +3112,7 @@ const char<span class="token operator">*</span> password <span class="token oper
 </tbody></table>
 <p>步进电机有防呆插头，直接插在电路板上即可。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_110.png"></p>
-<h3 id="软件程序设计-12"><a href="#软件程序设计-12" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><pre class="line-numbers language-arduino" data-language="arduino"><code class="language-arduino"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_1</span> <span class="token expression"><span class="token number">13</span></span></span>
+<h3 id="软件程序设计-11"><a href="#软件程序设计-11" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><pre class="line-numbers language-arduino" data-language="arduino"><code class="language-arduino"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_1</span> <span class="token expression"><span class="token number">13</span></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_2</span> <span class="token expression"><span class="token number">12</span></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_3</span> <span class="token expression"><span class="token number">14</span></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_4</span> <span class="token expression"><span class="token number">27</span></span></span>
@@ -3437,7 +3338,7 @@ CheapStepper <span class="token function">stepper</span> <span class="token punc
 <p>PS2 模块的 +5V 引脚接 ESP32 的 3V3 引脚，一般情况下 ESP32 的 ADC 电压输入范围为 0-3.3V，高于 3.3V 可能会烧坏 ADC。摇杆模块的 GND 接 GND；模块的 SW 接 D4，VRX 接 D15，VRY 接 D2。</p>
 <p>舵机接开发板另一侧的 5V 引脚、GND 和 D13。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_112.png"></p>
-<h3 id="软件程序设计-13"><a href="#软件程序设计-13" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>我们可以先在串口监视器中打印读取到的数值，代码如下：</p>
+<h3 id="软件程序设计-12"><a href="#软件程序设计-12" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>我们可以先在串口监视器中打印读取到的数值，代码如下：</p>
 <pre class="line-numbers language-arduino" data-language="arduino"><code class="language-arduino"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">PS2_X</span> <span class="token expression"><span class="token number">15</span></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">PS2_Y</span> <span class="token expression"><span class="token number">2</span></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SW</span> <span class="token expression"><span class="token number">4</span></span></span>
@@ -3601,7 +3502,7 @@ CheapStepper <span class="token function">stepper</span> <span class="token punc
 <p>PS2 模块的 +5V 引脚接 ESP32 的 3V3 引脚，GND 接 GND，SW 接 D34，X 接 D15，Y 接 D35。</p>
 <p>LED 点阵屏的 1-8 分别接 D23、D22、D21、D19、D18、D5、D4、D2；9 - 16 分别接 D13、D12、D14、D27、D26、D25、D33、D32。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_116.png"></p>
-<h3 id="软件程序设计-14"><a href="#软件程序设计-14" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><h4 id="1-循环遍历所有-LED"><a href="#1-循环遍历所有-LED" class="headerlink" title="1. 循环遍历所有 LED"></a>1. 循环遍历所有 LED</h4><p>我们第一个程序就先写检测一下是否所有的 LED 都可以正常工作，代码如下：</p>
+<h3 id="软件程序设计-13"><a href="#软件程序设计-13" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><h4 id="1-循环遍历所有-LED"><a href="#1-循环遍历所有-LED" class="headerlink" title="1. 循环遍历所有 LED"></a>1. 循环遍历所有 LED</h4><p>我们第一个程序就先写检测一下是否所有的 LED 都可以正常工作，代码如下：</p>
 <pre class="line-numbers language-arduino" data-language="arduino"><code class="language-arduino"><span class="token comment">// 定义行引脚数组</span>
 <span class="token keyword">int</span> row_array<span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">13</span><span class="token punctuation">,</span> <span class="token number">25</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">27</span><span class="token punctuation">,</span> <span class="token number">23</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">22</span><span class="token punctuation">,</span> <span class="token number">18</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
 <span class="token comment">// 定义列引脚数组</span>
@@ -3801,7 +3702,7 @@ CheapStepper <span class="token function">stepper</span> <span class="token punc
 <p>把继电器模块上电，输入引脚接开发板的 D15 引脚。</p>
 <p>两个 LED 的阳极分别接继电器模块的的 <code>常开</code> 和 <code>常闭</code> 引脚，并串联一个电阻，阴极接 GND，如下图：</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_123.png"></p>
-<h3 id="软件程序设计-15"><a href="#软件程序设计-15" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>当使用 Arduino 控制继电器时，通常需要使用 GPIO 引脚。继电器本质上是电磁开关，通过电磁线圈控制机械开关的闭合和断开，因此需要一个能够输出高电平和低电平的 IO 口来控制继电器的开关。</p>
+<h3 id="软件程序设计-14"><a href="#软件程序设计-14" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>当使用 Arduino 控制继电器时，通常需要使用 GPIO 引脚。继电器本质上是电磁开关，通过电磁线圈控制机械开关的闭合和断开，因此需要一个能够输出高电平和低电平的 IO 口来控制继电器的开关。</p>
 <p>以下是一个 Arduino 控制继电器的简单示例：</p>
 <pre class="line-numbers language-arduino" data-language="arduino"><code class="language-arduino"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">RELAY_PIN</span> <span class="token expression"><span class="token number">15</span></span></span>
 
@@ -3874,7 +3775,7 @@ hw_timer_t <span class="token operator">*</span>timer <span class="token operato
 </tbody></table>
 <p>有源蜂鸣器正极接 D22，无源蜂鸣器正极接 D23；6 个按键依次接 D25，D26，D27，D14，D12，D13。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_126.png"></p>
-<h3 id="软件程序设计-16"><a href="#软件程序设计-16" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><h4 id="1-有源蜂鸣器定时器闹钟"><a href="#1-有源蜂鸣器定时器闹钟" class="headerlink" title="1. 有源蜂鸣器定时器闹钟"></a>1. 有源蜂鸣器定时器闹钟</h4><p>我们可以通过外部中断和定时器中断来制作一个闹钟，按下按键时中断闹钟</p>
+<h3 id="软件程序设计-15"><a href="#软件程序设计-15" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><h4 id="1-有源蜂鸣器定时器闹钟"><a href="#1-有源蜂鸣器定时器闹钟" class="headerlink" title="1. 有源蜂鸣器定时器闹钟"></a>1. 有源蜂鸣器定时器闹钟</h4><p>我们可以通过外部中断和定时器中断来制作一个闹钟，按下按键时中断闹钟</p>
 <pre class="line-numbers language-arduino" data-language="arduino"><code class="language-arduino"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">BUTTON</span> <span class="token expression"><span class="token number">13</span></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">BUZZER</span> <span class="token expression"><span class="token number">22</span></span></span>
 
@@ -4047,7 +3948,7 @@ hw_timer_t <span class="token operator">*</span>timer <span class="token operato
 <p>矩阵键盘从左到右依次接 D13、D12、D14、D27、D26、D25、D33、D32。</p>
 <p>LCD 1602 接 5V 电源，SCL 接 D22，SDA 接 D21。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_132.png"></p>
-<h3 id="软件程序设计-17"><a href="#软件程序设计-17" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><h4 id="1-在串口监视器中显示触发的按键"><a href="#1-在串口监视器中显示触发的按键" class="headerlink" title="1. 在串口监视器中显示触发的按键"></a>1. 在串口监视器中显示触发的按键</h4><p>我们可以先把按键值打印在串口监视器中，代码如下：</p>
+<h3 id="软件程序设计-16"><a href="#软件程序设计-16" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><h4 id="1-在串口监视器中显示触发的按键"><a href="#1-在串口监视器中显示触发的按键" class="headerlink" title="1. 在串口监视器中显示触发的按键"></a>1. 在串口监视器中显示触发的按键</h4><p>我们可以先把按键值打印在串口监视器中，代码如下：</p>
 <pre class="line-numbers language-arduino" data-language="arduino"><code class="language-arduino"><span class="token comment">// 定义行引脚</span>
 <span class="token keyword">int</span> row_pins<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">13</span><span class="token punctuation">,</span> <span class="token number">12</span><span class="token punctuation">,</span> <span class="token number">14</span><span class="token punctuation">,</span> <span class="token number">27</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
 <span class="token comment">// 定义列引脚</span>
@@ -4307,7 +4208,7 @@ char <span class="token function">read_keypad</span><span class="token punctuati
 </tr>
 </tbody></table>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_136.png"></p>
-<h3 id="软件程序设计-18"><a href="#软件程序设计-18" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>在 Arduino 中对 SD 卡进行操作，可以使用 ESP32 自带的 <code>SD</code> 库。<code>SD</code> 库提供了一系列函数用于在 SD 卡上进行文件操作。下面是 <code>SD</code> 库中的一些常用函数的详细说明：</p>
+<h3 id="软件程序设计-17"><a href="#软件程序设计-17" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>在 Arduino 中对 SD 卡进行操作，可以使用 ESP32 自带的 <code>SD</code> 库。<code>SD</code> 库提供了一系列函数用于在 SD 卡上进行文件操作。下面是 <code>SD</code> 库中的一些常用函数的详细说明：</p>
 <ol>
 <li><p><code>SD.begin(uint8_t ssPin=SS, SPIClass &amp;spi=SPI, uint32_t frequency=4000000, const char * mountpoint="/sd", uint8_t max_files=5, bool format_if_empty=false)</code>：初始化 SD 卡。此函数用于初始化 SD 卡并启动 SPI 通信。使用硬件 SPI，参数可以不填，使用默认参数即可。例如：<code>SD.begin()</code>。</p>
 </li>
@@ -4500,7 +4401,7 @@ char <span class="token function">read_keypad</span><span class="token punctuati
 <p>ESP32 的 RX2 引脚连串口模块的 TX，TX2 连 RX，让 ESP32 和 串口模块都连接电脑。</p>
 <p>将材料按照下图相连:</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_140.png"></p>
-<h3 id="软件程序设计-19"><a href="#软件程序设计-19" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>我们在之前一直都在使用 <code>Serial</code> 对象，在 Arduino IDE 的串口监视器中显示信息，其实这个 <code>Serial</code>，就是在 <code>HardwareSerial.h</code> 头文件中定义好的，它提供了与硬件串口通信相关的类和函数。该头文件定义了 <code>HardwareSerial</code> 类，允许你使用硬件串口进行通信。</p>
+<h3 id="软件程序设计-18"><a href="#软件程序设计-18" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><p>我们在之前一直都在使用 <code>Serial</code> 对象，在 Arduino IDE 的串口监视器中显示信息，其实这个 <code>Serial</code>，就是在 <code>HardwareSerial.h</code> 头文件中定义好的，它提供了与硬件串口通信相关的类和函数。该头文件定义了 <code>HardwareSerial</code> 类，允许你使用硬件串口进行通信。</p>
 <p><code>HardwareSerial</code> 类是用于访问和控制硬件串口的主要类。你可以使用预定义好的 <code>HardwareSerial</code> 对象（<code>Serial</code>、<code>Serial1</code>、<code>Serial2</code> 分别对应了 UART0、UART1 和 UART2。）与特定的硬件串口进行通信。</p>
 <p>下面是 <code>HardwareSerial</code> 类的常用函数：</p>
 <ul>
@@ -5183,7 +5084,7 @@ char <span class="token function">read_keypad</span><span class="token punctuati
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1270.6k</span>
+                        class="white-color">1270k</span>
             
             
             
