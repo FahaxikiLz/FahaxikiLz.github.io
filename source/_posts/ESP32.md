@@ -1213,7 +1213,7 @@ void display_4_number(int number) {
 
 按钮有两组引脚（触点）。当按下按钮时，它会连接这两个触点，从而关闭电路。
 
-一般来说 4 脚开关（轻触按键）相距较远的是相通的，离得较近的是一组开关，最好是测量一下，如果懒得测，接对角肯定是可以的。
+**一般来说 4 脚开关（轻触按键）相距较远的是相通的，离得较近的是一组开关**，最好是测量一下，如果懒得测，接对角肯定是可以的。
 
 下图说明了按钮内部的连接：
 
@@ -1223,20 +1223,20 @@ void display_4_number(int number) {
 
 > 什么是按键消抖？
 >
-> 该实验中所用开关为机械弹性开关，当机械触点断开、闭合时，由于机械触点的弹性作用，一个按键开关在闭合时不会马上稳定地接通，在断开时也不会一下子断开。因而在闭合及断开的瞬间均伴随有一连串的抖动，为了不产生这种现象而作的措施就是**按键消抖**。
+> **该实验中所用开关为机械弹性开关，当机械触点断开、闭合时，由于机械触点的弹性作用，一个按键开关在闭合时不会马上稳定地接通，在断开时也不会一下子断开。**因而在闭合及断开的瞬间均伴随有一连串的抖动，为了不产生这种现象而作的措施就是**按键消抖**。
 >
 > 按键的抖动对于人类来说是感觉不到的，但对单片机来说，则是完全可以感应到的，而且还是一个很漫长的过程，因为单片机处理的速度在微秒级，而按键抖动的时间至少在毫秒级。
 
-一次按键动作的电平波形如下图。存在抖动现象，其前后沿抖动时间一般在 5ms~10ms 之间。由于单片机运行速度非常快，刚按下的时候会检测到低电平判断按键被按下。但是由于按键存在抖动，单片机在此时也会检测到高电平，误以为松开按键，紧接着又检测到低电平，判断到按键被按下。周而复始，在 5-10ms 内可能会出现很多次按下的动作，每一次按键的动作判断的次数都不相同。
+一次按键动作的电平波形如下图。存在抖动现象，其前后沿抖动时间一般在 5ms~10ms 之间。**由于单片机运行速度非常快，刚按下的时候会检测到低电平判断按键被按下。但是由于按键存在抖动，单片机在此时也会检测到高电平，误以为松开按键，紧接着又检测到低电平，判断到按键被按下。周而复始，在 5-10ms 内可能会出现很多次按下的动作，每一次按键的动作判断的次数都不相同。**
 
 ![](./ESP32/img_057.png)
 
 这种抖动可能会影响程序误判，造成严重后果，一般我们采用两种方式对按键进行消抖：
 
-1. 硬件消抖，硬件消抖的典型做法是：采用 R-S 触发器或 RC 积分电路。
-2. 软件消抖，通常我们会使用软件延时 10ms 来消抖。例如，当按键按下后，引脚为低电平；所以首先读取引脚电平，若引脚为低电平，则延时 10ms 后再次读取引脚电平，若为低电平，则证明按键已按下。
+1. **硬件消抖**，硬件消抖的典型做法是：采用 R-S 触发器或 RC 积分电路。
+2. **软件消抖，通常我们会使用软件延时 10ms 来消抖。**例如，当按键按下后，引脚为低电平；所以首先读取引脚电平，若引脚为低电平，则延时 10ms 后再次读取引脚电平，若为低电平，则证明按键已按下。
 
-硬件方法一般用在对按键操作过程比较严格，且按键数量较少的场合，而按键数量较多时，通常采用软件消抖。值得一提的是，对于复杂且多任务的单片机系统来说，若简单地采用循环指令来实现软件延时，则会浪费CPU宝贵的时间资源，大大降低系统的实时性，所以，更好的做法是利用定时中断服务程序或利用标志位的方法来实现软件消抖。
+**硬件方法一般用在对按键操作过程比较严格，且按键数量较少的场合，而按键数量较多时，通常采用软件消抖。**值得一提的是，对于复杂且多任务的单片机系统来说，若简单地采用循环指令来实现软件延时，则会浪费CPU宝贵的时间资源，大大降低系统的实时性，所以，更好的做法是利用定时中断服务程序或利用标志位的方法来实现软件消抖。
 
 ### 硬件电路设计
 
@@ -1275,37 +1275,37 @@ void display_4_number(int number) {
 > 选择上拉电阻，GPIO 引脚默认位高电平，那我们想要改变信号，就需要传递一个低电平，接地；
 >
 > 选择下拉电阻，GPIO 引脚默认为低电平，那我们想要改变信号，就需要传递一个高电平，接电源。
+>
+> 一句话：**上拉 = 把引脚默认拉高到 VCC；下拉 = 把引脚默认拉低到 GND。** 目的是防止引脚"悬空"导致电平不确定。
 
 因此，我们的代码需要这么写：
 
 ```arduino
-// 定义 LED 与 按键引脚
-int led_pin = 2;
-int button_pin = 14;
+// ===== 引脚定义 =====
+const int led_pin = 2;
+const int button_pin = 14;
 
-// 定义 LED 逻辑值
-int led_logic = 0;
-// 判断 LED 的状态是否改变过
-bool status = false;
+// ===== 状态变量 =====
+int led_logic = 0;        // LED 状态：0=灭，1=亮
+bool status = false;      // 是否已处理过本次按下（防止长按重复翻转）
 
 void setup() {
   pinMode(led_pin, OUTPUT);
-  pinMode(button_pin, INPUT_PULLDOWN);
+  pinMode(button_pin, INPUT_PULLDOWN);  // 内部下拉：松开=LOW，按下=HIGH
+
+  digitalWrite(led_pin, led_logic);     // 初始灭
 }
 
 void loop() {
-  // 按键消抖
-  if (digitalRead(button_pin)) {
-    // 睡眠 10ms，如果依然为高电平，说明抖动已消失。
-    delay(10);
+  if (digitalRead(button_pin)) {           // 按下（HIGH）
+    delay(10);                             // 消抖
     if (digitalRead(button_pin) && !status) {
-      led_logic = !led_logic;
+      led_logic = !led_logic;              // 翻转一次
       digitalWrite(led_pin, led_logic);
-      // led 的状态发生了变化，即使我持续按着按键，LED 的状态也不应该改变。
-      status = !status;
-    } else if (!digitalRead(button_pin)) {
-      status = false; 
+      status = true;                       // 锁住：按住不再翻
     }
+  } else {                                 // 松开（LOW）
+    status = false;                        // 解锁：允许下次翻转
   }
 }
 ```
@@ -1328,29 +1328,27 @@ void loop() {
 #define LED_PIN 2
 #define BUTTON_PIN 14
 
-// 定义 LED 逻辑值
-int led_logic = 0;
-// 判断 LED 的状态是否改变过
-bool status = false;
+// ===== 状态变量 =====
+int led_logic = 0;        // LED 状态：0=灭，1=亮
+bool status = false;      // 是否已处理过本次按下（防止长按重复翻转）
 
-void setup() { 
-  pinMode(LED_PIN, OUTPUT);
-  pinMode(BUTTON_PIN, INPUT_PULLDOWN);
+void setup() {
+  pinMode(led_pin, OUTPUT);
+  pinMode(button_pin, INPUT_PULLDOWN);  // 内部下拉：松开=LOW，按下=HIGH
+
+  digitalWrite(led_pin, led_logic);     // 初始灭
 }
 
 void loop() {
-  // 按键消抖
-  if (digitalRead(BUTTON_PIN)) {
-    // 睡眠 10ms，如果依然为高电平，说明抖动已消失。
-    delay(10);
-    if (digitalRead(BUTTON_PIN) && !status) {
-      led_logic = !led_logic;
-      digitalWrite(LED_PIN, led_logic);
-      // led 的状态发生了变化，即使我持续按着按键，LED 的状态也不应该改变。
-      status = !status;
-    } else if (!digitalRead(BUTTON_PIN)) {
-      status = false; 
+  if (digitalRead(button_pin)) {           // 按下（HIGH）
+    delay(10);                             // 消抖
+    if (digitalRead(button_pin) && !status) {
+      led_logic = !led_logic;              // 翻转一次
+      digitalWrite(led_pin, led_logic);
+      status = true;                       // 锁住：按住不再翻
     }
+  } else {                                 // 松开（LOW）
+    status = false;                        // 解锁：允许下次翻转
   }
 }
 ```
