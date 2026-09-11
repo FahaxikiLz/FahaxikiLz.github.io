@@ -376,21 +376,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2026-09-10
+                    2026-09-11
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    43.7k
+                    43.8k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    167 分
+                    168 分
                 </div>
                 
 
@@ -1340,23 +1340,23 @@ a <span class="token operator">=</span> <span class="token number">20</span><spa
 <h3 id="实验原理-3"><a href="#实验原理-3" class="headerlink" title="实验原理"></a>实验原理</h3><p>按键是一种电子开关，使用时轻轻按开关按钮就可使开关接通，当松开手时，开关断开。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_055.png"></p>
 <p>按钮有两组引脚（触点）。当按下按钮时，它会连接这两个触点，从而关闭电路。</p>
-<p>一般来说 4 脚开关（轻触按键）相距较远的是相通的，离得较近的是一组开关，最好是测量一下，如果懒得测，接对角肯定是可以的。</p>
+<p><strong>一般来说 4 脚开关（轻触按键）相距较远的是相通的，离得较近的是一组开关</strong>，最好是测量一下，如果懒得测，接对角肯定是可以的。</p>
 <p>下图说明了按钮内部的连接：</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_056.png"></p>
 <p>使用按键的时候，通常情况下需要进行消抖。</p>
 <blockquote>
 <p>什么是按键消抖？</p>
-<p>该实验中所用开关为机械弹性开关，当机械触点断开、闭合时，由于机械触点的弹性作用，一个按键开关在闭合时不会马上稳定地接通，在断开时也不会一下子断开。因而在闭合及断开的瞬间均伴随有一连串的抖动，为了不产生这种现象而作的措施就是<strong>按键消抖</strong>。</p>
+<p><strong>该实验中所用开关为机械弹性开关，当机械触点断开、闭合时，由于机械触点的弹性作用，一个按键开关在闭合时不会马上稳定地接通，在断开时也不会一下子断开。</strong>因而在闭合及断开的瞬间均伴随有一连串的抖动，为了不产生这种现象而作的措施就是<strong>按键消抖</strong>。</p>
 <p>按键的抖动对于人类来说是感觉不到的，但对单片机来说，则是完全可以感应到的，而且还是一个很漫长的过程，因为单片机处理的速度在微秒级，而按键抖动的时间至少在毫秒级。</p>
 </blockquote>
-<p>一次按键动作的电平波形如下图。存在抖动现象，其前后沿抖动时间一般在 5ms~10ms 之间。由于单片机运行速度非常快，刚按下的时候会检测到低电平判断按键被按下。但是由于按键存在抖动，单片机在此时也会检测到高电平，误以为松开按键，紧接着又检测到低电平，判断到按键被按下。周而复始，在 5-10ms 内可能会出现很多次按下的动作，每一次按键的动作判断的次数都不相同。</p>
+<p>一次按键动作的电平波形如下图。存在抖动现象，其前后沿抖动时间一般在 5ms~10ms 之间。<strong>由于单片机运行速度非常快，刚按下的时候会检测到低电平判断按键被按下。但是由于按键存在抖动，单片机在此时也会检测到高电平，误以为松开按键，紧接着又检测到低电平，判断到按键被按下。周而复始，在 5-10ms 内可能会出现很多次按下的动作，每一次按键的动作判断的次数都不相同。</strong></p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_057.png"></p>
 <p>这种抖动可能会影响程序误判，造成严重后果，一般我们采用两种方式对按键进行消抖：</p>
 <ol>
-<li>硬件消抖，硬件消抖的典型做法是：采用 R-S 触发器或 RC 积分电路。</li>
-<li>软件消抖，通常我们会使用软件延时 10ms 来消抖。例如，当按键按下后，引脚为低电平；所以首先读取引脚电平，若引脚为低电平，则延时 10ms 后再次读取引脚电平，若为低电平，则证明按键已按下。</li>
+<li><strong>硬件消抖</strong>，硬件消抖的典型做法是：采用 R-S 触发器或 RC 积分电路。</li>
+<li><strong>软件消抖，通常我们会使用软件延时 10ms 来消抖。</strong>例如，当按键按下后，引脚为低电平；所以首先读取引脚电平，若引脚为低电平，则延时 10ms 后再次读取引脚电平，若为低电平，则证明按键已按下。</li>
 </ol>
-<p>硬件方法一般用在对按键操作过程比较严格，且按键数量较少的场合，而按键数量较多时，通常采用软件消抖。值得一提的是，对于复杂且多任务的单片机系统来说，若简单地采用循环指令来实现软件延时，则会浪费CPU宝贵的时间资源，大大降低系统的实时性，所以，更好的做法是利用定时中断服务程序或利用标志位的方法来实现软件消抖。</p>
+<p><strong>硬件方法一般用在对按键操作过程比较严格，且按键数量较少的场合，而按键数量较多时，通常采用软件消抖。</strong>值得一提的是，对于复杂且多任务的单片机系统来说，若简单地采用循环指令来实现软件延时，则会浪费CPU宝贵的时间资源，大大降低系统的实时性，所以，更好的做法是利用定时中断服务程序或利用标志位的方法来实现软件消抖。</p>
 <h3 id="硬件电路设计-4"><a href="#硬件电路设计-4" class="headerlink" title="硬件电路设计"></a>硬件电路设计</h3><p>使用按键电路实现开关灯的效果。</p>
 <p>物料清单（BOM 表）：</p>
 <table>
@@ -1399,37 +1399,36 @@ a <span class="token operator">=</span> <span class="token number">20</span><spa
 <p>提示：如果你不认识上拉电阻和下拉电阻，在这个阶段是无所谓的，你只需要了解他们的存在是为了确定初始电平状态。</p>
 <p>选择上拉电阻，GPIO 引脚默认位高电平，那我们想要改变信号，就需要传递一个低电平，接地；</p>
 <p>选择下拉电阻，GPIO 引脚默认为低电平，那我们想要改变信号，就需要传递一个高电平，接电源。</p>
+<p>一句话：<strong>上拉 = 把引脚默认拉高到 VCC；下拉 = 把引脚默认拉低到 GND。</strong> 目的是防止引脚”悬空”导致电平不确定。</p>
 </blockquote>
 <p>因此，我们的代码需要这么写：</p>
-<pre class="line-numbers language-arduino" data-language="arduino"><code class="language-arduino"><span class="token comment">// 定义 LED 与 按键引脚</span>
-<span class="token keyword">int</span> led_pin <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
-<span class="token keyword">int</span> button_pin <span class="token operator">=</span> <span class="token number">14</span><span class="token punctuation">;</span>
+<pre class="line-numbers language-arduino" data-language="arduino"><code class="language-arduino"><span class="token comment">// ===== 引脚定义 =====</span>
+const <span class="token keyword">int</span> led_pin <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
+const <span class="token keyword">int</span> button_pin <span class="token operator">=</span> <span class="token number">14</span><span class="token punctuation">;</span>
 
-<span class="token comment">// 定义 LED 逻辑值</span>
-<span class="token keyword">int</span> led_logic <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-<span class="token comment">// 判断 LED 的状态是否改变过</span>
-<span class="token keyword">bool</span> status <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+<span class="token comment">// ===== 状态变量 =====</span>
+<span class="token keyword">int</span> led_logic <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>        <span class="token comment">// LED 状态：0=灭，1=亮</span>
+<span class="token keyword">bool</span> status <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>      <span class="token comment">// 是否已处理过本次按下（防止长按重复翻转）</span>
 
 <span class="token keyword">void</span> <span class="token keyword">setup</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
   <span class="token function">pinMode</span><span class="token punctuation">(</span>led_pin<span class="token punctuation">,</span> <span class="token constant">OUTPUT</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token function">pinMode</span><span class="token punctuation">(</span>button_pin<span class="token punctuation">,</span> INPUT_PULLDOWN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">pinMode</span><span class="token punctuation">(</span>button_pin<span class="token punctuation">,</span> INPUT_PULLDOWN<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">// 内部下拉：松开=LOW，按下=HIGH</span>
+
+  <span class="token function">digitalWrite</span><span class="token punctuation">(</span>led_pin<span class="token punctuation">,</span> led_logic<span class="token punctuation">)</span><span class="token punctuation">;</span>     <span class="token comment">// 初始灭</span>
 <span class="token punctuation">}</span>
 
 <span class="token keyword">void</span> <span class="token keyword">loop</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-  <span class="token comment">// 按键消抖</span>
-  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">digitalRead</span><span class="token punctuation">(</span>button_pin<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token comment">// 睡眠 10ms，如果依然为高电平，说明抖动已消失。</span>
-    <span class="token function">delay</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">digitalRead</span><span class="token punctuation">(</span>button_pin<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>           <span class="token comment">// 按下（HIGH）</span>
+    <span class="token function">delay</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                             <span class="token comment">// 消抖</span>
     <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">digitalRead</span><span class="token punctuation">(</span>button_pin<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>status<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-      led_logic <span class="token operator">=</span> <span class="token operator">!</span>led_logic<span class="token punctuation">;</span>
+      led_logic <span class="token operator">=</span> <span class="token operator">!</span>led_logic<span class="token punctuation">;</span>              <span class="token comment">// 翻转一次</span>
       <span class="token function">digitalWrite</span><span class="token punctuation">(</span>led_pin<span class="token punctuation">,</span> led_logic<span class="token punctuation">)</span><span class="token punctuation">;</span>
-      <span class="token comment">// led 的状态发生了变化，即使我持续按着按键，LED 的状态也不应该改变。</span>
-      status <span class="token operator">=</span> <span class="token operator">!</span>status<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">digitalRead</span><span class="token punctuation">(</span>button_pin<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-      status <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span> 
+      status <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>                       <span class="token comment">// 锁住：按住不再翻</span>
     <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>                                 <span class="token comment">// 松开（LOW）</span>
+    status <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>                        <span class="token comment">// 解锁：允许下次翻转</span>
   <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>我们也可以不在 <code>setup</code> 前定义变量，而是选择 <code>宏定义</code> 的方法。</p>
 <p>在 Arduino 中，宏定义是一种预处理器指令，它被用于创建常量和替代符号。通过使用宏定义，可以让代码更易读，更易于维护和修改，同时也可以避免在代码中出现重复的代码块。</p>
@@ -1441,31 +1440,29 @@ a <span class="token operator">=</span> <span class="token number">20</span><spa
 <pre class="line-numbers language-arduino" data-language="arduino"><code class="language-arduino"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">LED_PIN</span> <span class="token expression"><span class="token number">2</span></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">BUTTON_PIN</span> <span class="token expression"><span class="token number">14</span></span></span>
 
-<span class="token comment">// 定义 LED 逻辑值</span>
-<span class="token keyword">int</span> led_logic <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-<span class="token comment">// 判断 LED 的状态是否改变过</span>
-<span class="token keyword">bool</span> status <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+<span class="token comment">// ===== 状态变量 =====</span>
+<span class="token keyword">int</span> led_logic <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>        <span class="token comment">// LED 状态：0=灭，1=亮</span>
+<span class="token keyword">bool</span> status <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>      <span class="token comment">// 是否已处理过本次按下（防止长按重复翻转）</span>
 
-<span class="token keyword">void</span> <span class="token keyword">setup</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> 
-  <span class="token function">pinMode</span><span class="token punctuation">(</span>LED_PIN<span class="token punctuation">,</span> <span class="token constant">OUTPUT</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token function">pinMode</span><span class="token punctuation">(</span>BUTTON_PIN<span class="token punctuation">,</span> INPUT_PULLDOWN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token keyword">setup</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token function">pinMode</span><span class="token punctuation">(</span>led_pin<span class="token punctuation">,</span> <span class="token constant">OUTPUT</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">pinMode</span><span class="token punctuation">(</span>button_pin<span class="token punctuation">,</span> INPUT_PULLDOWN<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">// 内部下拉：松开=LOW，按下=HIGH</span>
+
+  <span class="token function">digitalWrite</span><span class="token punctuation">(</span>led_pin<span class="token punctuation">,</span> led_logic<span class="token punctuation">)</span><span class="token punctuation">;</span>     <span class="token comment">// 初始灭</span>
 <span class="token punctuation">}</span>
 
 <span class="token keyword">void</span> <span class="token keyword">loop</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-  <span class="token comment">// 按键消抖</span>
-  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">digitalRead</span><span class="token punctuation">(</span>BUTTON_PIN<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token comment">// 睡眠 10ms，如果依然为高电平，说明抖动已消失。</span>
-    <span class="token function">delay</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">digitalRead</span><span class="token punctuation">(</span>BUTTON_PIN<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>status<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-      led_logic <span class="token operator">=</span> <span class="token operator">!</span>led_logic<span class="token punctuation">;</span>
-      <span class="token function">digitalWrite</span><span class="token punctuation">(</span>LED_PIN<span class="token punctuation">,</span> led_logic<span class="token punctuation">)</span><span class="token punctuation">;</span>
-      <span class="token comment">// led 的状态发生了变化，即使我持续按着按键，LED 的状态也不应该改变。</span>
-      status <span class="token operator">=</span> <span class="token operator">!</span>status<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">digitalRead</span><span class="token punctuation">(</span>BUTTON_PIN<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-      status <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span> 
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">digitalRead</span><span class="token punctuation">(</span>button_pin<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>           <span class="token comment">// 按下（HIGH）</span>
+    <span class="token function">delay</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                             <span class="token comment">// 消抖</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">digitalRead</span><span class="token punctuation">(</span>button_pin<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>status<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      led_logic <span class="token operator">=</span> <span class="token operator">!</span>led_logic<span class="token punctuation">;</span>              <span class="token comment">// 翻转一次</span>
+      <span class="token function">digitalWrite</span><span class="token punctuation">(</span>led_pin<span class="token punctuation">,</span> led_logic<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      status <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>                       <span class="token comment">// 锁住：按住不再翻</span>
     <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>                                 <span class="token comment">// 松开（LOW）</span>
+    status <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>                        <span class="token comment">// 解锁：允许下次翻转</span>
   <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>宏定义和变量定义都是定义标识符的方式，但二者有以下区别：</p>
 <ul>
@@ -5084,7 +5081,7 @@ char <span class="token function">read_keypad</span><span class="token punctuati
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1270k</span>
+                        class="white-color">1270.1k</span>
             
             
             
