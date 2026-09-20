@@ -59,9 +59,9 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="爱哭的小河豚" type="application/atom+xml">
+
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="alternate" href="/atom.xml" title="爱哭的小河豚" type="application/atom+xml">
 </head>
 
 
@@ -379,14 +379,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2026-05-27
+                    2026-09-18
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    37.1k
+                    37.2k
                 </div>
                 
 
@@ -421,7 +421,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h1 id="MySQL基础篇"><a href="#MySQL基础篇" class="headerlink" title="MySQL基础篇"></a>MySQL基础篇</h1><h2 id="Windows安装MySQL"><a href="#Windows安装MySQL" class="headerlink" title="Windows安装MySQL"></a><a target="_blank" rel="noopener" href="https://blog.csdn.net/wangpaiblog/article/details/112000033">Windows安装MySQL</a></h2><h2 id="Linux安装Mysql"><a href="#Linux安装Mysql" class="headerlink" title="Linux安装Mysql"></a>Linux安装Mysql</h2><h3 id="1-下载Linux版MySQL安装包"><a href="#1-下载Linux版MySQL安装包" class="headerlink" title="1.下载Linux版MySQL安装包"></a>1.下载Linux版MySQL安装包</h3><blockquote>
+                <h1 id="MySQL基础篇"><a href="#MySQL基础篇" class="headerlink" title="MySQL基础篇"></a>MySQL基础篇</h1><h2 id="Windows安装MySQL"><a href="#Windows安装MySQL" class="headerlink" title="Windows安装MySQL"></a><a target="_blank" rel="noopener" href="https://blog.csdn.net/wangpaiblog/article/details/112000033">Windows安装MySQL</a></h2><h2 id="Linux安装Mysql"><a href="#Linux安装Mysql" class="headerlink" title="Linux安装Mysql"></a>Linux安装Mysql</h2><h3 id="1-下载Linux版MySQL安装包"><a href="#1-下载Linux版MySQL安装包" class="headerlink" title="1.下载Linux版MySQL安装包"></a>1.下载Linux版MySQL安装包</h3><blockquote>
 <p>下载地址：<a target="_blank" rel="noopener" href="https://downloads.mysql.com/archives/community/">MySQL :: Download MySQL Community Server (Archived Versions)</a></p>
 </blockquote>
 <p><img src="/medias/loading.gif" data-original="/2022/08/31/mysql/image-20221030150821856.png" alt="image-20221030150821856"></p>
@@ -3086,10 +3086,10 @@ select * from user where name = 'Arm';
 <li><p>最左前缀法则中指的最左边的列，是指在查询时，联合索引的最左边的字段(即是 第一个字段)必须存在，与我们编写SQL时，条件编写的先后顺序无关。</p>
 <pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token comment">-- 创建联合索引</span>
 <span class="token keyword">create</span> <span class="token keyword">index</span> ind_name_age_add <span class="token keyword">on</span> <span class="token keyword">user</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span>age<span class="token punctuation">,</span>address<span class="token punctuation">)</span>
-    
+      
 <span class="token comment">-- 下面列的位置不影响索引的使用</span>
 <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> <span class="token keyword">user</span> <span class="token keyword">where</span> name <span class="token operator">=</span> <span class="token string">"lz"</span> <span class="token operator">and</span> age <span class="token operator">=</span> <span class="token number">22</span> <span class="token operator">and</span> address <span class="token operator">=</span> <span class="token string">"山东"</span>
-    
+      
 <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> <span class="token keyword">user</span> <span class="token keyword">where</span> address <span class="token operator">=</span><span class="token string">"山东"</span> <span class="token operator">and</span> age <span class="token operator">=</span> <span class="token number">22</span> <span class="token operator">and</span> name <span class="token operator">=</span> <span class="token string">"lz"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
 </ul>
 </blockquote>
@@ -3127,10 +3127,10 @@ select * from user where name = 'Arm';
 <li><p>如果 MySQL 评估使用索引比全表更慢，则不使用索引。</p>
 <pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token comment">-- 假设user表有21人，年龄从1-21岁，age列添加常规索引</span>
 <span class="token keyword">create</span> <span class="token keyword">index</span> ind_user_age <span class="token keyword">on</span> <span class="token keyword">user</span><span class="token punctuation">(</span>age<span class="token punctuation">)</span>
-      
+         
 <span class="token comment">-- 不走索引，走全文扫描。因为大部分人的年龄都大于1 </span>
 <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> <span class="token keyword">user</span> <span class="token keyword">where</span> age <span class="token operator">&gt;</span> <span class="token number">1</span>
-      
+         
 <span class="token comment">-- 走索引，因为大部分的年龄不到11</span>
 <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> <span class="token keyword">user</span> <span class="token keyword">where</span> age <span class="token operator">&gt;</span> <span class="token number">11</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
 </ol>
@@ -3200,7 +3200,7 @@ select * from user where name = 'Arm';
 </li>
 <li><p>求选择性公式：</p>
 <pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">select</span> <span class="token function">count</span><span class="token punctuation">(</span><span class="token keyword">distinct</span> email<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token function">count</span><span class="token punctuation">(</span><span class="token operator">*</span><span class="token punctuation">)</span> <span class="token keyword">from</span> tb_user<span class="token punctuation">;</span>
-    
+      
 <span class="token keyword">select</span> <span class="token function">count</span><span class="token punctuation">(</span><span class="token keyword">distinct</span> substring<span class="token punctuation">(</span>email<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token function">count</span><span class="token punctuation">(</span><span class="token operator">*</span><span class="token punctuation">)</span> <span class="token keyword">from</span> tb_user<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></li>
 </ul>
 </blockquote>
@@ -3248,11 +3248,11 @@ select * from user where name = 'Arm';
 <li><p>大批量插入：<br>如果一次性需要插入大批量数据，使用insert语句插入性能较低，此时可以使用MySQL数据库提供的load指令插入。</p>
 <pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token comment"># 客户端连接服务端时，加上参数 --local-infile（这一行在bash/cmd界面输入）</span>
 mysql <span class="token comment">--local-infile -u root -p</span>
-    
+      
 <span class="token comment"># 设置全局参数local_infile为1，开启从本地加载文件导入数据的开关</span>
 <span class="token keyword">select</span> @<span class="token variable">@local_infile</span><span class="token punctuation">;</span>
 <span class="token keyword">set</span> <span class="token keyword">global</span> local_infile <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
-    
+      
 <span class="token comment"># 执行load指令将准备好的数据，加载到表结构中</span>
 <span class="token keyword">load</span> <span class="token keyword">data</span> <span class="token keyword">local</span> <span class="token keyword">infile</span> <span class="token string">'/root/sql1.log'</span> <span class="token keyword">into</span> <span class="token keyword">table</span> <span class="token string">'tb_user'</span> <span class="token keyword">fields</span> <span class="token keyword">terminated</span> <span class="token keyword">by</span> <span class="token string">','</span> <span class="token keyword">lines</span> <span class="token keyword">terminated</span> <span class="token keyword">by</span> <span class="token string">'\n'</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
 </ul>
@@ -3284,16 +3284,16 @@ mysql <span class="token comment">--local-infile -u root -p</span>
 <li><p>Using index：通过有序索引顺序扫描直接返回有序数据，这种情况即为 using index，不需要额外排序，操作效率高</p>
 <pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token comment">-- 创建索引</span>
 <span class="token keyword">create</span> <span class="token keyword">index</span> idx_user_age_phone <span class="token keyword">on</span> tb_user<span class="token punctuation">(</span>age<span class="token punctuation">,</span>phone<span class="token punctuation">)</span><span class="token punctuation">;</span>
-      
+         
 <span class="token comment">-- 排序,通过索引排序</span>
 <span class="token keyword">select</span> id<span class="token punctuation">,</span>age<span class="token punctuation">,</span>phone <span class="token keyword">from</span> tb_user <span class="token keyword">order</span> <span class="token keyword">by</span> age<span class="token punctuation">,</span>phone<span class="token punctuation">;</span>
-      
+         
 <span class="token comment">-- 通过索引排序，反向扫描</span>
 <span class="token keyword">select</span> id<span class="token punctuation">,</span>age<span class="token punctuation">,</span>phone <span class="token keyword">from</span> tb_user <span class="token keyword">order</span> <span class="token keyword">by</span> age <span class="token keyword">desc</span><span class="token punctuation">,</span>phone <span class="token keyword">desc</span><span class="token punctuation">;</span>
-      
+         
 <span class="token comment">-- 通过全表扫描排序，不符合最左前缀法则。因为在创建索引的时候， age是第一个字段，phone是第二个字段，所以排序时，也就该按照这个顺序来，否则就会出现 Using filesort。</span>
 <span class="token keyword">select</span> id<span class="token punctuation">,</span>age<span class="token punctuation">,</span>phone <span class="token keyword">from</span> tb_user <span class="token keyword">order</span> <span class="token keyword">by</span> phone<span class="token punctuation">,</span>age<span class="token punctuation">;</span>
-      
+         
 <span class="token comment">-- 通过全表扫描排序</span>
 <span class="token keyword">select</span> id<span class="token punctuation">,</span>age<span class="token punctuation">,</span>phone <span class="token keyword">from</span> tb_user <span class="token keyword">order</span> <span class="token keyword">by</span> age <span class="token keyword">asc</span><span class="token punctuation">,</span>phone <span class="token keyword">desc</span><span class="token punctuation">;</span>
 <span class="token comment">-- 解决方式，创建一个age asc，phone desc的索引</span>
@@ -4767,6 +4767,9 @@ UPDATE test SET value = 'E' WHERE id = 10; -- 这里会被阻塞，因为id &gt;
 <p><img src="/medias/loading.gif" data-original="/2022/08/31/mysql/image-20240820130553946.png" alt="image-20240820130553946"></p>
 </li>
 </ol>
+<h3 id="一句话解释"><a href="#一句话解释" class="headerlink" title="一句话解释"></a>一句话解释</h3><blockquote>
+<p>普通 SELECT 不加锁；UPDATE / DELETE / INSERT 都加 IX（意向排他锁）。UPDATE / DELETE 在 RR（可重复读） 下：唯一索引等值命中加记录锁，未命中加间隙锁；非唯一索引等值加临键锁并回表；范围查询加临键锁；没走索引就全表扫描逐行加锁，效果等同锁全表。</p>
+</blockquote>
 <h2 id="InnoDB引擎"><a href="#InnoDB引擎" class="headerlink" title="InnoDB引擎"></a>InnoDB引擎</h2><h3 id="逻辑存储结构"><a href="#逻辑存储结构" class="headerlink" title="逻辑存储结构"></a>逻辑存储结构</h3><p><img src="/medias/loading.gif" data-original="/2022/08/31/mysql/993f4821eb59a902b58c509c276f56f4.png" alt="在这里插入图片描述"></p>
 <h3 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h3><p>。。。</p>
 <h3 id="事务的原理"><a href="#事务的原理" class="headerlink" title="事务的原理"></a>事务的原理</h3><ul>
@@ -6135,7 +6138,7 @@ select * from test where name = 'zhangsan' and pwd = MD5('123456'); <span aria-h
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1270.1k</span>
+                        class="white-color">1272k</span>
             
             
             

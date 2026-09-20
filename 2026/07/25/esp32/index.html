@@ -56,9 +56,9 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="爱哭的小河豚" type="application/atom+xml">
+
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="alternate" href="/atom.xml" title="爱哭的小河豚" type="application/atom+xml">
 </head>
 
 
@@ -376,21 +376,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2026-09-11
+                    2026-09-20
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    43.8k
+                    45.7k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    168 分
+                    175 分
                 </div>
                 
 
@@ -418,7 +418,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h2 id="第1章-使用-Arduino-开发-ESP32-简介"><a href="#第1章-使用-Arduino-开发-ESP32-简介" class="headerlink" title="第1章 使用 Arduino 开发 ESP32 简介"></a>第1章 使用 Arduino 开发 ESP32 简介</h2><h3 id="ESP32-开发板介绍"><a href="#ESP32-开发板介绍" class="headerlink" title="ESP32 开发板介绍"></a>ESP32 开发板介绍</h3><p>ESP32 是一款国产芯片，这个芯片专为移动设备、可穿戴设备与物联网应用而设计，集成了低功耗蓝牙和 Wi-Fi。这也是为什么 ESP32 在 DIY 爱好者中备受推崇的原因。</p>
+                <h2 id="第1章-使用-Arduino-开发-ESP32-简介"><a href="#第1章-使用-Arduino-开发-ESP32-简介" class="headerlink" title="第1章 使用 Arduino 开发 ESP32 简介"></a>第1章 使用 Arduino 开发 ESP32 简介</h2><h3 id="ESP32-开发板介绍"><a href="#ESP32-开发板介绍" class="headerlink" title="ESP32 开发板介绍"></a>ESP32 开发板介绍</h3><p>ESP32 是一款国产芯片，这个芯片专为移动设备、可穿戴设备与物联网应用而设计，集成了低功耗蓝牙和 Wi-Fi。这也是为什么 ESP32 在 DIY 爱好者中备受推崇的原因。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_001.png"></p>
 <p>其中模块的含义：</p>
 <table>
@@ -1603,6 +1603,33 @@ const <span class="token keyword">int</span> button_pin <span class="token opera
     <span class="token punctuation">}</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
+<pre class="line-numbers language-none"><code class="language-none">// 频率和分辨率保持不变
+#define FREQ 2000       // 频率
+#define RESOLUTION 8    // 分辨率
+
+#define LED 12
+
+void setup() {
+  // 3.x 新 API：ledcAttach(引脚, 频率, 分辨率)
+  // 通道号由系统自动分配，无需手动指定
+  ledcAttach(LED, FREQ, RESOLUTION);
+}
+
+void loop() {
+  // 渐亮
+  for (int i = 0; i &lt; (1 &lt;&lt; RESOLUTION); i++) {
+    // 3.x 中 ledcWrite 直接写引脚号
+    ledcWrite(LED, i);
+    delay(5);
+  }
+
+  // 渐暗
+  for (int i = (1 &lt;&lt; RESOLUTION) - 1; i &gt;= 0; i--) {
+    ledcWrite(LED, i);
+    delay(5);
+  }
+}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <hr>
 <h2 id="第11章-数模转换器-ADC-实验"><a href="#第11章-数模转换器-ADC-实验" class="headerlink" title="第11章 数模转换器 - ADC 实验"></a>第11章 数模转换器 - ADC 实验</h2><p>前面我们介绍使用 PWM 输出不同电压值，类似于模拟信号输出。如果需要 ESP32 检测外部输入的模拟信号该怎么办？这就是本节课要学习的 ADC，通过 ADC 将模拟信号转换为数字信号给 ESP32 处理。</p>
 <h3 id="实验原理-5"><a href="#实验原理-5" class="headerlink" title="实验原理"></a>实验原理</h3><p>在学习 ADC 之前，我们要首先学习什么是模拟信号，什么是数字信号。</p>
@@ -1619,7 +1646,7 @@ const <span class="token keyword">int</span> button_pin <span class="token opera
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_062.png"></p>
 <p>ADC（Analog to Digital Converter）即模数转换器，它可以将模拟信号转换为数字信号。由于单片机只能识别二进制数字，所以外界模拟信号常常会通过 ADC 转换成其可以识别的数字信号。常见的应用就是将变化的电压转成数字信号。</p>
 <blockquote>
-<p>注意：使用默认配置时，ADC 引脚上的输入电压必须介于 0.0V 和 1.0V 之间（任何高于 1.0V 的值都将读为 4095）。如果需要增加测量范围，需要配置衰减器。</p>
+<p>注意：<strong>使用默认配置时，ADC 引脚上的输入电压必须介于 0.0V 和 1.0V 之间（任何高于 1.0V 的值都将读为 4095）</strong>。如果需要增加测量范围，需要配置衰减器。</p>
 </blockquote>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_063.png"></p>
 <h3 id="硬件电路设计-6"><a href="#硬件电路设计-6" class="headerlink" title="硬件电路设计"></a>硬件电路设计</h3><p>物料清单（BOM 表）：</p>
@@ -1653,10 +1680,33 @@ const <span class="token keyword">int</span> button_pin <span class="token opera
 </tbody></table>
 <p>电位器相当于一个滑动变阻器，两端引脚阻值是固定的，中间引脚对任何一端的引脚阻值是可变的，他等效于从中间把电位器分成两个串联的电阻，串联总阻值是确定的，一端接输入电源，一端接地。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_064.png"></p>
+<h3 id="电位器"><a href="#电位器" class="headerlink" title="电位器"></a>电位器</h3><p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/image-20260920110047230.png" alt="image-20260920110047230"></p>
+<h4 id="一句话理解"><a href="#一句话理解" class="headerlink" title="一句话理解"></a>一句话理解</h4><p><strong>电位器就是一个能用旋钮改变阻值的元件</strong>，本质是一个<strong>可调的分压器</strong>。</p>
+<p>底部三个引脚标得很清楚：</p>
+<pre class="line-numbers language-none"><code class="language-none">GND   SIG   VCC
+ │     │     │
+ ●     ●     ●<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<ul>
+<li><strong>GND 和 VCC</strong> 之间是一段<strong>固定电阻</strong>（比如 10kΩ）</li>
+<li><strong>SIG</strong> 是中间的滑动端，位置由<strong>中间的圆盘旋钮</strong>决定</li>
+<li>你转动圆盘，SIG 就在 GND 和 VCC 之间移动</li>
+</ul>
+<h4 id="转动时发生了什么"><a href="#转动时发生了什么" class="headerlink" title="转动时发生了什么"></a>转动时发生了什么</h4><pre class="line-numbers language-none"><code class="language-none">圆盘转到最左（靠 GND）：
+  SIG 输出 ≈ 0V      → ADC 读到接近 0
+
+圆盘转到最右（靠 VCC）：
+  SIG 输出 ≈ 3.3V    → ADC 读到接近 4095
+
+圆盘在中间：
+  SIG 输出 ≈ 1.65V   → ADC 读到约 2048<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><strong>滑动触点越靠近 VCC，SIG 电压越高；越靠近 GND，电压越低</strong></p>
+<p>所以 <strong>转动旋钮 = 输出一个连续变化的模拟电压</strong>，正好用 ADC 来读。</p>
 <h3 id="软件程序设计-4"><a href="#软件程序设计-4" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><h4 id="1-在串口监视器显示-analogRead-模拟输入"><a href="#1-在串口监视器显示-analogRead-模拟输入" class="headerlink" title="1. 在串口监视器显示 analogRead() 模拟输入"></a>1. 在串口监视器显示 analogRead() 模拟输入</h4><p>我们可以先在串口监视器中，打印一下读取到的 <code>analogRead()</code> 的值，这里需要使用到 Arduino 内置的串口函数：</p>
 <ul>
-<li><code>Serial.begin()</code>：设置通信波特率，一般使用 9600，这样就可以在串口监视器中直接打印出来内容；</li>
-<li><code>Serial.println()</code>：在串口屏中打印内容。</li>
+<li><strong><code>Serial.begin()</code>：设置通信波特率，一般使用 9600，这样就可以在串口监视器中直接打印出来内容；</strong></li>
+<li><strong><code>Serial.println()</code>：在串口屏中打印内容。</strong></li>
 </ul>
 <p>因此，我们的代码可以这么写：</p>
 <pre class="line-numbers language-arduino" data-language="arduino"><code class="language-arduino"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">POT</span> <span class="token expression"><span class="token number">26</span></span></span>
@@ -1745,6 +1795,33 @@ const <span class="token keyword">int</span> button_pin <span class="token opera
     <span class="token function">ledcWrite</span><span class="token punctuation">(</span>CHANNEL<span class="token punctuation">,</span> pot_value<span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token function">delay</span><span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-none"><code class="language-none">#define POT 14
+#define LED 13
+#define CHANNEL 0
+
+// 初始化电位计输入信号
+int pot_value;
+
+void setup() {
+  Serial.begin(9600);
+
+  analogReadResolution(12);
+
+  analogSetAttenuation(ADC_11db);
+
+  ledcAttach(LED, 1000, 12); // 3.x：引脚, 频率, 12位分辨率
+}
+
+void loop() {
+
+  pot_value = analogRead(POT);
+
+  ledcWrite(LED, pot_value); // ✅ 引脚, 占空比(0~4095)
+  
+  delay(50);
+}
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <hr>
 <h2 id="第12章-IIC-驱动-LCD1602-液晶屏幕"><a href="#第12章-IIC-驱动-LCD1602-液晶屏幕" class="headerlink" title="第12章 IIC 驱动 LCD1602 液晶屏幕"></a>第12章 IIC 驱动 LCD1602 液晶屏幕</h2><p>上一课介绍了如何使用四位数码管模块来显示数字，本课将进一步介绍如何使用基于 IIC 接口驱动的 LCD1602 液晶屏。</p>
@@ -2289,9 +2366,225 @@ U8G2_SSD1306_128X64_NONAME_F_4W_SW_SPI<span aria-hidden="true" class="line-numbe
 <li><code>2</code>：表示分配两个页面大小的缓存</li>
 <li><code>F</code>：表示分配全屏大小的缓存（内存占用大，但刷新速度快）</li>
 </ul>
-<blockquote>
-<p>注：第 14 章原文在 U8G2 库缓存大小说明之后的代码示例部分因页面内容较长未能完整抓取。</p>
-</blockquote>
+<p>所有的软件模拟总线构造函数的第一个参数都是 <code>rotation</code>，这个参数表示显示内容是否旋转，U8G2 提供了以下几个选项：</p>
+<ul>
+<li><code>U8G2_R0</code>：不旋转；</li>
+<li><code>U8G2_R1</code>：顺时针转 90°；</li>
+<li><code>U8G2_R2</code>：顺时针转 180°；</li>
+<li><code>U8G2_R3</code>：顺时针转 270°；</li>
+<li><code>U8G2_MIRROR</code>：镜像翻转；</li>
+</ul>
+<p>构造完对象之后，我们就可以学习 U8G2 的方法了，方法可以分为四大类（这里我们只列举了部分，详细内容可以查阅 <code>u8g2 库</code>）：</p>
+<ol>
+<li>基本函数</li>
+<li><code>begin()</code>：初始化方法；</li>
+<li><code>initDisplay()</code>：初始化显示控制器，这个方法不需要我们单独调用，会在 begin 函数主动调用一次，我们主要理解即可，会在里面针对具体的 OLED 进行配置；；</li>
+<li><code>clearDisplay()</code>：清除屏幕内容，这个方法不需要我们单独调用，会在 begin 函数主动调用一次，我们主要理解即可，并且不要在 firstPage 和 nextPage 函数之间调用该方法；</li>
+<li><code>clear()</code>：清除操作；</li>
+<li><code>clearBuffer()</code>：清除缓冲区；</li>
+<li><code>enableUTF8Print()</code>：开启 Arduino 平台下支持输出 UTF8 字符集，我们的中文字符就是UTF8；</li>
+<li><code>home()</code>：重置显示光标的位置，回到原点（0，0）；</li>
+<li>绘制相关函数</li>
+<li><code>drawPixel()</code>：绘制像素点；</li>
+<li><code>drawHLine()</code>：绘制水平线；</li>
+<li><code>drawLine()</code>：两点之间绘制线</li>
+<li><code>drawBox()</code>：画实心方形；</li>
+<li><code>drawFrame()</code>：画空心方形</li>
+<li><code>drawCircle()</code>：画空心圆；</li>
+<li><code>drawDisc()</code>：画实心圆；</li>
+<li><code>drawStr()</code>：绘制字符串，需要先设置字体，调用 setFont 方法；</li>
+<li><code>drawXBM()/drawXBMP()</code>：绘制图像；</li>
+<li><code>firstPage()/nextPage()</code>：绘制命令，firstPage 方法会把当前页码位置变成 0，修改内容处于 firstPage 和 nextPage 之间，每次都是重新渲染所有内容；</li>
+<li><code>print()</code>：绘制内容；</li>
+<li>显示配置相关函数</li>
+<li><code>getDisplayHeight()</code>：获取显示器的高度；</li>
+<li><code>getDisplayWidth()</code>：获取显示器的宽度；</li>
+<li><code>setCursor()</code>：设置绘制光标位置；</li>
+<li><code>setDisplayRotation()</code>：设置显示器的旋转角度；</li>
+<li><code>setFont()</code>：设置字体集（字体集用于字符串绘制方法或者glyph绘制方法）；</li>
+<li>缓存相关函数<ul>
+<li><code>getBufferPtr()</code>：获取缓存空间的地址；</li>
+<li><code>getBufferTileHeight()</code>：获取缓冲区的Tile高度，一个tile等于8个像素点；</li>
+<li><code>getBufferTileWidth()</code>：获取缓冲区的Tile宽度；</li>
+<li><code>getBufferCurrTileRow()</code>：获取缓冲区的当前Tile row；</li>
+<li><code>clearBuffer()</code>：清除内部缓存区；</li>
+<li><code>sendBuffer()</code>：发送缓冲区的内容到显示器。</li>
+</ul>
+</li>
+</ol>
+<p>U8g2 支持以下两种绘制模式：</p>
+<ol>
+<li><code>Full screen buffer mode</code>，全屏缓存模式；</li>
+<li><code>Page mode</code>，分页模式；</li>
+</ol>
+<p>全屏缓存模式使用步骤：</p>
+<ol>
+<li>构造对象，根据 OLED 的型号选择对应的构造器，构造器必须带 <code>F</code>，因此，需要使用 <code>U8G2_SSD1306_128X64_NONAME_F_4W_SW_SPI</code>；</li>
+<li>初始化对象，使用 begin() 方法，清除缓冲区内容，使用 u8g2.clearBuffer()；</li>
+<li>绘制内容，使用绘制函数或者设置字体等；</li>
+<li>发送缓冲区的内容到显示器 u8g2.sendBuffer()。</li>
+</ol>
+<p>了解完构造方法与使用方法之后，我们就可以来在程序中使用 U8G2 库了，代码如下：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">cpp#include <span class="token operator">&lt;</span>Arduino<span class="token punctuation">.</span>h<span class="token operator">&gt;</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;U8g2lib.h&gt;</span></span>
+ 
+<span class="token comment">// 构造对象</span>
+U8G2_SSD1306_128X64_NONAME_F_4W_SW_SPI <span class="token function">u8g2</span><span class="token punctuation">(</span>U8G2_R0<span class="token punctuation">,</span> <span class="token comment">/* clock=*/</span><span class="token number">18</span><span class="token punctuation">,</span> <span class="token comment">/* data=*/</span><span class="token number">13</span><span class="token punctuation">,</span> 
+                                             <span class="token comment">/* cs=*/</span><span class="token number">4</span><span class="token punctuation">,</span> <span class="token comment">/* dc=*/</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token comment">/* reset=*/</span><span class="token number">15</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+<span class="token keyword">void</span> <span class="token function">setup</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment">// 初始化 oled 对象</span>
+  u8g2<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">// 开启中文字符集支持</span>
+  u8g2<span class="token punctuation">.</span><span class="token function">enableUTF8Print</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+ 
+<span class="token keyword">void</span> <span class="token function">loop</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment">// 设置字体</span>
+  u8g2<span class="token punctuation">.</span><span class="token function">setFont</span><span class="token punctuation">(</span>u8g2_font_unifont_t_chinese2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">// 设置字体方向</span>
+  u8g2<span class="token punctuation">.</span><span class="token function">setFontDirection</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">// </span>
+  u8g2<span class="token punctuation">.</span><span class="token function">clearBuffer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  u8g2<span class="token punctuation">.</span><span class="token function">setCursor</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">15</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  u8g2<span class="token punctuation">.</span><span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"Hello GeeksMan!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  u8g2<span class="token punctuation">.</span><span class="token function">setCursor</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">40</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  u8g2<span class="token punctuation">.</span><span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"你好, ESP32!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  u8g2<span class="token punctuation">.</span><span class="token function">sendBuffer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+  <span class="token function">delay</span><span class="token punctuation">(</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="4-U8G2-库的分页模式实现进度条效果"><a href="#4-U8G2-库的分页模式实现进度条效果" class="headerlink" title="4. U8G2 库的分页模式实现进度条效果"></a>4. U8G2 库的分页模式实现进度条效果</h4><p>分页模式的使用步骤：</p>
+<ol>
+<li>构造对象，根据 OLED 的型号选择对应的构造器；</li>
+<li>初始化对象，使用 begin() 方法，调用 firstPage() 进入第一页</li>
+<li>开始一个 do while 循环，循环条件是 nextPage()，作用是进入下一页，如果还有下一页则返回 true；</li>
+<li>在循环内部 操作一些绘制方法。</li>
+</ol>
+<p> 注意</p>
+<p>请注意，firstPage() 和 nextPage() 必须配合使用，并在循环中正确调用。另外，确保在每次循环开始时使用 u8g2.clearBuffer() 清除缓冲区，以防止前一页的内容残留在当前页上。</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">cpp#include <span class="token operator">&lt;</span>Arduino<span class="token punctuation">.</span>h<span class="token operator">&gt;</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;U8g2lib.h&gt;</span></span>
+ 
+U8G2_SSD1306_128X64_NONAME_2_4W_SW_SPI <span class="token function">u8g2</span><span class="token punctuation">(</span>U8G2_R0<span class="token punctuation">,</span> <span class="token comment">/* clock=*/</span><span class="token number">18</span><span class="token punctuation">,</span> <span class="token comment">/* data=*/</span><span class="token number">13</span><span class="token punctuation">,</span>
+                                             <span class="token comment">/* cs=*/</span><span class="token number">4</span><span class="token punctuation">,</span> <span class="token comment">/* dc=*/</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token comment">/* reset=*/</span><span class="token number">15</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+<span class="token keyword">int</span> progress <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+ 
+<span class="token keyword">void</span> <span class="token function">setup</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment">// 初始化 OLED 对象</span>
+  u8g2<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+ 
+<span class="token keyword">void</span> <span class="token function">loop</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment">// 进入第一页</span>
+  u8g2<span class="token punctuation">.</span><span class="token function">firstPage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">do</span>
+  <span class="token punctuation">{</span>
+    <span class="token comment">// 显示进度条边框</span>
+    u8g2<span class="token punctuation">.</span><span class="token function">drawFrame</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">128</span><span class="token punctuation">,</span> <span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 显示进度</span>
+    u8g2<span class="token punctuation">.</span><span class="token function">drawBox</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">15</span><span class="token punctuation">,</span> progress<span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+  <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>u8g2<span class="token punctuation">.</span><span class="token function">nextPage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">// 进入下一页，如果还有下一页则返回true</span>
+ 
+  <span class="token comment">// 进度递增</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>progress <span class="token operator">&lt;</span> <span class="token number">118</span><span class="token punctuation">)</span>
+  <span class="token punctuation">{</span>
+    progress<span class="token operator">++</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">else</span>
+  <span class="token punctuation">{</span>
+    progress <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="5-按键控制菜单"><a href="#5-按键控制菜单" class="headerlink" title="5. 按键控制菜单"></a>5. 按键控制菜单</h4><p>在搞清楚 U8G2 库的使用方法之后，我们就可以设计一个按键控制菜单了，UI 大概就是下面这个样子</p>
+<p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/202306080037837.png" alt="img"></p>
+<p>按键控制菜单的原理其实很简单 -，当我检测到按键按下的时候，就切换屏幕状态，因为只有部分区域发生了改变，让你产生立箭头移动的错觉，代码如下：</p>
+<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">cpp#include <span class="token operator">&lt;</span>Arduino<span class="token punctuation">.</span>h<span class="token operator">&gt;</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;U8g2lib.h&gt;</span></span>
+ 
+<span class="token comment">// PlatformIO 中 自己编写的函数如果处于末尾，需要在文件顶部显式声明</span>
+<span class="token keyword">void</span> <span class="token function">display_menu</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">int</span> index<span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+U8G2_SSD1306_128X64_NONAME_2_4W_SW_SPI <span class="token function">u8g2</span><span class="token punctuation">(</span>U8G2_R0<span class="token punctuation">,</span> <span class="token comment">/* clock=*/</span><span class="token number">18</span><span class="token punctuation">,</span> <span class="token comment">/* data=*/</span><span class="token number">13</span><span class="token punctuation">,</span>
+                                            <span class="token comment">/* cs=*/</span><span class="token number">4</span><span class="token punctuation">,</span> <span class="token comment">/* dc=*/</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token comment">/* reset=*/</span><span class="token number">15</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">MENU_SIZE</span> <span class="token expression"><span class="token number">4</span></span></span>
+<span class="token keyword">char</span> <span class="token operator">*</span>menu<span class="token punctuation">[</span>MENU_SIZE<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"Item 1"</span><span class="token punctuation">,</span> <span class="token string">"Item 2"</span><span class="token punctuation">,</span> <span class="token string">"Item 3"</span><span class="token punctuation">,</span> <span class="token string">"Item 4"</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+ 
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">BUTTON_UP</span> <span class="token expression"><span class="token number">12</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">BUTTON_DOWN</span> <span class="token expression"><span class="token number">14</span></span></span>
+ 
+<span class="token comment">// 定义当前选项</span>
+<span class="token keyword">unsigned</span> <span class="token keyword">int</span>  order <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+ 
+<span class="token keyword">void</span> <span class="token function">setup</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment">// 初始化 OLED 对象</span>
+  u8g2<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  u8g2<span class="token punctuation">.</span><span class="token function">setFont</span><span class="token punctuation">(</span>u8g2_font_6x12_tr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+  <span class="token comment">// 配置输入按键</span>
+  <span class="token function">pinMode</span><span class="token punctuation">(</span>BUTTON_UP<span class="token punctuation">,</span> INPUT_PULLUP<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">pinMode</span><span class="token punctuation">(</span>BUTTON_DOWN<span class="token punctuation">,</span> INPUT_PULLUP<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+ 
+<span class="token keyword">void</span> <span class="token function">loop</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment">// 判断按键是否按下，并记录当前箭头位置</span>
+  <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">digitalRead</span><span class="token punctuation">(</span>BUTTON_UP<span class="token punctuation">)</span><span class="token punctuation">)</span> 
+  <span class="token punctuation">{</span>
+    order <span class="token operator">=</span> <span class="token punctuation">(</span>order <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">4</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">digitalRead</span><span class="token punctuation">(</span>BUTTON_DOWN<span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">{</span>
+    order <span class="token operator">=</span> <span class="token punctuation">(</span>order <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">4</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+ 
+  <span class="token comment">// 显示菜单</span>
+  <span class="token function">display_menu</span><span class="token punctuation">(</span>order<span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+  <span class="token comment">// 延时</span>
+  <span class="token function">delay</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+ 
+<span class="token keyword">void</span> <span class="token function">display_menu</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">int</span> index<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment">// 进入第一页</span>
+  u8g2<span class="token punctuation">.</span><span class="token function">firstPage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">do</span>
+  <span class="token punctuation">{</span>
+    <span class="token comment">// 绘制页面内容</span>
+    u8g2<span class="token punctuation">.</span><span class="token function">drawStr</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">12</span><span class="token punctuation">,</span> <span class="token string">"Menu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    u8g2<span class="token punctuation">.</span><span class="token function">drawHLine</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">14</span><span class="token punctuation">,</span> <span class="token number">128</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> MENU_SIZE<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>i <span class="token operator">==</span> index<span class="token punctuation">)</span>
+      <span class="token punctuation">{</span>
+        u8g2<span class="token punctuation">.</span><span class="token function">drawStr</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">12</span> <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token string">"&gt;"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        u8g2<span class="token punctuation">.</span><span class="token function">drawStr</span><span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">,</span> <span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">12</span> <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">,</span> menu<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+      <span class="token keyword">else</span>
+      <span class="token punctuation">{</span>
+        u8g2<span class="token punctuation">.</span><span class="token function">drawStr</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">12</span> <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">,</span> menu<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>u8g2<span class="token punctuation">.</span><span class="token function">nextPage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 进入下一页，如果还有下一页则返回 True.</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>在写这个程序的时候，我们用到了以下几个新的知识点，</p>
+<ol>
+<li>使用 <code>unsigned int</code> 可以声明小于 0 的整数；</li>
+<li><code>do ... while</code> 是先执行一次循环体，再判断的循环；</li>
+<li>自己写的函数需要在文件顶部声明；</li>
+<li>指针数组是一个数组，其中的每个元素都是指针类型的变量。换句话说，指针数组存储了多个指针，每个指针可以指向内存中的不同位置。</li>
+</ol>
 <hr>
 <h2 id="第15章-外部中断"><a href="#第15章-外部中断" class="headerlink" title="第15章 外部中断"></a>第15章 外部中断</h2><p>之前我们学习了 ESP32 的按键控制，当时通过查询 GPIO 输入电平来判断按键状态，这种方法占用 CPU 资源，效率不高。本节课我们学习外部中断，通过外部中断实现按键控制 LED。</p>
 <h3 id="实验原理-8"><a href="#实验原理-8" class="headerlink" title="实验原理"></a>实验原理</h3><p>在单片机中，中断是指当 CPU 在正常处理主程序时，突然发生了另一件事件 A（中断发生）需要 CPU 去处理，这时 CPU 就会暂停处理主程序（中断响应），转而去处理事件 A（中断服务）。当事件 A 处理完以后，再回到主程序原来中断的地方继续执行主程序（中断返回）。这一整个过程称为中断。</p>
@@ -5081,7 +5374,7 @@ char <span class="token function">read_keypad</span><span class="token punctuati
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1270.1k</span>
+                        class="white-color">1272k</span>
             
             
             
