@@ -1506,6 +1506,35 @@ void loop()
 }
 ```
 
+```
+// 频率和分辨率保持不变
+#define FREQ 2000       // 频率
+#define RESOLUTION 8    // 分辨率
+
+#define LED 12
+
+void setup() {
+  // 3.x 新 API：ledcAttach(引脚, 频率, 分辨率)
+  // 通道号由系统自动分配，无需手动指定
+  ledcAttach(LED, FREQ, RESOLUTION);
+}
+
+void loop() {
+  // 渐亮
+  for (int i = 0; i < (1 << RESOLUTION); i++) {
+    // 3.x 中 ledcWrite 直接写引脚号
+    ledcWrite(LED, i);
+    delay(5);
+  }
+
+  // 渐暗
+  for (int i = (1 << RESOLUTION) - 1; i >= 0; i--) {
+    ledcWrite(LED, i);
+    delay(5);
+  }
+}
+```
+
 ---
 
 ## 第11章 数模转换器 - ADC 实验
@@ -1535,7 +1564,7 @@ void loop()
 
 ADC（Analog to Digital Converter）即模数转换器，它可以将模拟信号转换为数字信号。由于单片机只能识别二进制数字，所以外界模拟信号常常会通过 ADC 转换成其可以识别的数字信号。常见的应用就是将变化的电压转成数字信号。
 
-> 注意：使用默认配置时，ADC 引脚上的输入电压必须介于 0.0V 和 1.0V 之间（任何高于 1.0V 的值都将读为 4095）。如果需要增加测量范围，需要配置衰减器。
+> 注意：**使用默认配置时，ADC 引脚上的输入电压必须介于 0.0V 和 1.0V 之间（任何高于 1.0V 的值都将读为 4095）**。如果需要增加测量范围，需要配置衰减器。
 
 ![](./ESP32/img_063.png)
 
@@ -1555,14 +1584,53 @@ ADC（Analog to Digital Converter）即模数转换器，它可以将模拟信�
 
 ![](./ESP32/img_064.png)
 
+### 电位器
+
+![image-20260920110047230](./ESP32/image-20260920110047230.png)
+
+#### 一句话理解
+
+**电位器就是一个能用旋钮改变阻值的元件**，本质是一个**可调的分压器**。
+
+
+
+底部三个引脚标得很清楚：
+
+```
+GND   SIG   VCC
+ │     │     │
+ ●     ●     ●
+```
+
+- **GND 和 VCC** 之间是一段**固定电阻**（比如 10kΩ）
+- **SIG** 是中间的滑动端，位置由**中间的圆盘旋钮**决定
+- 你转动圆盘，SIG 就在 GND 和 VCC 之间移动
+
+#### 转动时发生了什么
+
+```
+圆盘转到最左（靠 GND）：
+  SIG 输出 ≈ 0V      → ADC 读到接近 0
+
+圆盘转到最右（靠 VCC）：
+  SIG 输出 ≈ 3.3V    → ADC 读到接近 4095
+
+圆盘在中间：
+  SIG 输出 ≈ 1.65V   → ADC 读到约 2048
+```
+
+**滑动触点越靠近 VCC，SIG 电压越高；越靠近 GND，电压越低**
+
+所以 **转动旋钮 = 输出一个连续变化的模拟电压**，正好用 ADC 来读。
+
 ### 软件程序设计
 
 #### 1. 在串口监视器显示 analogRead() 模拟输入
 
 我们可以先在串口监视器中，打印一下读取到的 `analogRead()` 的值，这里需要使用到 Arduino 内置的串口函数：
 
-- `Serial.begin()`：设置通信波特率，一般使用 9600，这样就可以在串口监视器中直接打印出来内容；
-- `Serial.println()`：在串口屏中打印内容。
+- **`Serial.begin()`：设置通信波特率，一般使用 9600，这样就可以在串口监视器中直接打印出来内容；**
+- **`Serial.println()`：在串口屏中打印内容。**
 
 因此，我们的代码可以这么写：
 
@@ -1661,6 +1729,35 @@ void loop() {
     ledcWrite(CHANNEL, pot_value);
     delay(50);
 }
+```
+
+```
+#define POT 14
+#define LED 13
+#define CHANNEL 0
+
+// 初始化电位计输入信号
+int pot_value;
+
+void setup() {
+  Serial.begin(9600);
+
+  analogReadResolution(12);
+
+  analogSetAttenuation(ADC_11db);
+
+  ledcAttach(LED, 1000, 12); // 3.x：引脚, 频率, 12位分辨率
+}
+
+void loop() {
+
+  pot_value = analogRead(POT);
+
+  ledcWrite(LED, pot_value); // ✅ 引脚, 占空比(0~4095)
+  
+  delay(50);
+}
+
 ```
 
 ---
@@ -2337,7 +2434,240 @@ U8G2_SSD1306_128X64_NONAME_F_4W_SW_SPI
 - `2`：表示分配两个页面大小的缓存
 - `F`：表示分配全屏大小的缓存（内存占用大，但刷新速度快）
 
-> 注：第 14 章原文在 U8G2 库缓存大小说明之后的代码示例部分因页面内容较长未能完整抓取。
+
+
+所有的软件模拟总线构造函数的第一个参数都是 `rotation`，这个参数表示显示内容是否旋转，U8G2 提供了以下几个选项：
+
+- `U8G2_R0`：不旋转；
+- `U8G2_R1`：顺时针转 90°；
+- `U8G2_R2`：顺时针转 180°；
+- `U8G2_R3`：顺时针转 270°；
+- `U8G2_MIRROR`：镜像翻转；
+
+构造完对象之后，我们就可以学习 U8G2 的方法了，方法可以分为四大类（这里我们只列举了部分，详细内容可以查阅 `u8g2 库`）：
+
+1. 基本函数
+2. `begin()`：初始化方法；
+3. `initDisplay()`：初始化显示控制器，这个方法不需要我们单独调用，会在 begin 函数主动调用一次，我们主要理解即可，会在里面针对具体的 OLED 进行配置；；
+4. `clearDisplay()`：清除屏幕内容，这个方法不需要我们单独调用，会在 begin 函数主动调用一次，我们主要理解即可，并且不要在 firstPage 和 nextPage 函数之间调用该方法；
+5. `clear()`：清除操作；
+6. `clearBuffer()`：清除缓冲区；
+7. `enableUTF8Print()`：开启 Arduino 平台下支持输出 UTF8 字符集，我们的中文字符就是UTF8；
+8. `home()`：重置显示光标的位置，回到原点（0，0）；
+9. 绘制相关函数
+10. `drawPixel()`：绘制像素点；
+11. `drawHLine()`：绘制水平线；
+12. `drawLine()`：两点之间绘制线
+13. `drawBox()`：画实心方形；
+14. `drawFrame()`：画空心方形
+15. `drawCircle()`：画空心圆；
+16. `drawDisc()`：画实心圆；
+17. `drawStr()`：绘制字符串，需要先设置字体，调用 setFont 方法；
+18. `drawXBM()/drawXBMP()`：绘制图像；
+19. `firstPage()/nextPage()`：绘制命令，firstPage 方法会把当前页码位置变成 0，修改内容处于 firstPage 和 nextPage 之间，每次都是重新渲染所有内容；
+20. `print()`：绘制内容；
+21. 显示配置相关函数
+22. `getDisplayHeight()`：获取显示器的高度；
+23. `getDisplayWidth()`：获取显示器的宽度；
+24. `setCursor()`：设置绘制光标位置；
+25. `setDisplayRotation()`：设置显示器的旋转角度；
+26. `setFont()`：设置字体集（字体集用于字符串绘制方法或者glyph绘制方法）；
+27. 缓存相关函数
+    - `getBufferPtr()`：获取缓存空间的地址；
+    - `getBufferTileHeight()`：获取缓冲区的Tile高度，一个tile等于8个像素点；
+    - `getBufferTileWidth()`：获取缓冲区的Tile宽度；
+    - `getBufferCurrTileRow()`：获取缓冲区的当前Tile row；
+    - `clearBuffer()`：清除内部缓存区；
+    - `sendBuffer()`：发送缓冲区的内容到显示器。
+
+U8g2 支持以下两种绘制模式：
+
+1. `Full screen buffer mode`，全屏缓存模式；
+2. `Page mode`，分页模式；
+
+全屏缓存模式使用步骤：
+
+1. 构造对象，根据 OLED 的型号选择对应的构造器，构造器必须带 `F`，因此，需要使用 `U8G2_SSD1306_128X64_NONAME_F_4W_SW_SPI`；
+2. 初始化对象，使用 begin() 方法，清除缓冲区内容，使用 u8g2.clearBuffer()；
+3. 绘制内容，使用绘制函数或者设置字体等；
+4. 发送缓冲区的内容到显示器 u8g2.sendBuffer()。
+
+了解完构造方法与使用方法之后，我们就可以来在程序中使用 U8G2 库了，代码如下：
+
+```cpp
+cpp#include <Arduino.h>
+#include <U8g2lib.h>
+ 
+// 构造对象
+U8G2_SSD1306_128X64_NONAME_F_4W_SW_SPI u8g2(U8G2_R0, /* clock=*/18, /* data=*/13, 
+                                             /* cs=*/4, /* dc=*/2, /* reset=*/15);
+ 
+void setup(void)
+{
+  // 初始化 oled 对象
+  u8g2.begin();
+  // 开启中文字符集支持
+  u8g2.enableUTF8Print();
+}
+ 
+void loop(void)
+{
+  // 设置字体
+  u8g2.setFont(u8g2_font_unifont_t_chinese2);
+  // 设置字体方向
+  u8g2.setFontDirection(0);
+  // 
+  u8g2.clearBuffer();
+  u8g2.setCursor(0, 15);
+  u8g2.print("Hello GeeksMan!");
+  u8g2.setCursor(0, 40);
+  u8g2.print("你好, ESP32!");
+  u8g2.sendBuffer();
+ 
+  delay(1000);
+}
+```
+
+#### 4. U8G2 库的分页模式实现进度条效果
+
+分页模式的使用步骤：
+
+1. 构造对象，根据 OLED 的型号选择对应的构造器；
+2. 初始化对象，使用 begin() 方法，调用 firstPage() 进入第一页
+3. 开始一个 do while 循环，循环条件是 nextPage()，作用是进入下一页，如果还有下一页则返回 true；
+4. 在循环内部 操作一些绘制方法。
+
+ 注意
+
+请注意，firstPage() 和 nextPage() 必须配合使用，并在循环中正确调用。另外，确保在每次循环开始时使用 u8g2.clearBuffer() 清除缓冲区，以防止前一页的内容残留在当前页上。
+
+```cpp
+cpp#include <Arduino.h>
+#include <U8g2lib.h>
+ 
+U8G2_SSD1306_128X64_NONAME_2_4W_SW_SPI u8g2(U8G2_R0, /* clock=*/18, /* data=*/13,
+                                             /* cs=*/4, /* dc=*/2, /* reset=*/15);
+ 
+int progress = 0;
+ 
+void setup()
+{
+  // 初始化 OLED 对象
+  u8g2.begin();
+}
+ 
+void loop()
+{
+  // 进入第一页
+  u8g2.firstPage();
+  do
+  {
+    // 显示进度条边框
+    u8g2.drawFrame(0, 10, 128, 20);
+    // 显示进度
+    u8g2.drawBox(5, 15, progress, 10);
+ 
+  } while (u8g2.nextPage());  // 进入下一页，如果还有下一页则返回true
+ 
+  // 进度递增
+  if (progress < 118)
+  {
+    progress++;
+  }
+  else
+  {
+    progress = 0;
+  }
+}
+```
+
+#### 5. 按键控制菜单
+
+在搞清楚 U8G2 库的使用方法之后，我们就可以设计一个按键控制菜单了，UI 大概就是下面这个样子
+
+![img](./ESP32/202306080037837.png)
+
+按键控制菜单的原理其实很简单 -，当我检测到按键按下的时候，就切换屏幕状态，因为只有部分区域发生了改变，让你产生立箭头移动的错觉，代码如下：
+
+```cpp
+cpp#include <Arduino.h>
+#include <U8g2lib.h>
+ 
+// PlatformIO 中 自己编写的函数如果处于末尾，需要在文件顶部显式声明
+void display_menu(unsigned int index);
+ 
+U8G2_SSD1306_128X64_NONAME_2_4W_SW_SPI u8g2(U8G2_R0, /* clock=*/18, /* data=*/13,
+                                            /* cs=*/4, /* dc=*/2, /* reset=*/15);
+ 
+#define MENU_SIZE 4
+char *menu[MENU_SIZE] = {"Item 1", "Item 2", "Item 3", "Item 4"};
+ 
+#define BUTTON_UP 12
+#define BUTTON_DOWN 14
+ 
+// 定义当前选项
+unsigned int  order = 0;
+ 
+void setup()
+{
+  // 初始化 OLED 对象
+  u8g2.begin();
+  u8g2.setFont(u8g2_font_6x12_tr);
+ 
+  // 配置输入按键
+  pinMode(BUTTON_UP, INPUT_PULLUP);
+  pinMode(BUTTON_DOWN, INPUT_PULLUP);
+}
+ 
+void loop()
+{
+  // 判断按键是否按下，并记录当前箭头位置
+  if(!digitalRead(BUTTON_UP)) 
+  {
+    order = (order - 1) % 4;
+  }else if (!digitalRead(BUTTON_DOWN))
+  {
+    order = (order + 1) % 4;
+  }
+ 
+  // 显示菜单
+  display_menu(order);
+ 
+  // 延时
+  delay(100);
+}
+ 
+void display_menu(unsigned int index)
+{
+  // 进入第一页
+  u8g2.firstPage();
+  do
+  {
+    // 绘制页面内容
+    u8g2.drawStr(0, 12, "Menu");
+    u8g2.drawHLine(0, 14, 128);
+    for (int i = 0; i < MENU_SIZE; i++)
+    {
+      if (i == index)
+      {
+        u8g2.drawStr(5, (i + 2) * 12 + 2, ">");
+        u8g2.drawStr(20, (i + 2) * 12 + 2, menu[i]);
+      }
+      else
+      {
+        u8g2.drawStr(5, (i + 2) * 12 + 2, menu[i]);
+      }
+    }
+  } while (u8g2.nextPage()); // 进入下一页，如果还有下一页则返回 True.
+}
+```
+
+在写这个程序的时候，我们用到了以下几个新的知识点，
+
+1. 使用 `unsigned int` 可以声明小于 0 的整数；
+2. `do ... while` 是先执行一次循环体，再判断的循环；
+3. 自己写的函数需要在文件顶部声明；
+4. 指针数组是一个数组，其中的每个元素都是指针类型的变量。换句话说，指针数组存储了多个指针，每个指针可以指向内存中的不同位置。
 
 ---
 

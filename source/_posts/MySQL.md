@@ -2346,10 +2346,10 @@ drop index idx_user_email on tb_user;
 >   ```sql
 >   -- 创建联合索引
 >   create index ind_name_age_add on user(name,age,address)
->       
+>         
 >   -- 下面列的位置不影响索引的使用
 >   select * from user where name = "lz" and age = 22 and address = "山东"
->       
+>         
 >   select * from user where address ="山东" and age = 22 and name = "lz"
 >   ```
 
@@ -2400,10 +2400,10 @@ drop index idx_user_email on tb_user;
 >    ```sql
 >    -- 假设user表有21人，年龄从1-21岁，age列添加常规索引
 >    create index ind_user_age on user(age)
->          
+>             
 >    -- 不走索引，走全文扫描。因为大部分人的年龄都大于1 
 >    select * from user where age > 1
->          
+>             
 >    -- 走索引，因为大部分的年龄不到11
 >    select * from user where age > 11
 >    ```
@@ -2481,7 +2481,7 @@ select * from user use ind_user_name where name = 'lz'
 >
 >   ```sql
 >   select count(distinct email) / count(*) from tb_user;
->       
+>         
 >   select count(distinct substring(email, 1, 5)) / count(*) from tb_user;
 >   ```
 
@@ -2532,11 +2532,11 @@ select * from user use ind_user_name where name = 'lz'
 >   ```sql
 >   # 客户端连接服务端时，加上参数 --local-infile（这一行在bash/cmd界面输入）
 >   mysql --local-infile -u root -p
->       
+>         
 >   # 设置全局参数local_infile为1，开启从本地加载文件导入数据的开关
 >   select @@local_infile;
 >   set global local_infile = 1;
->       
+>         
 >   # 执行load指令将准备好的数据，加载到表结构中
 >   load data local infile '/root/sql1.log' into table 'tb_user' fields terminated by ',' lines terminated by '\n';
 >   ```
@@ -2565,16 +2565,16 @@ select * from user use ind_user_name where name = 'lz'
 >    ```sql
 >    -- 创建索引
 >    create index idx_user_age_phone on tb_user(age,phone);
->          
+>             
 >    -- 排序,通过索引排序
 >    select id,age,phone from tb_user order by age,phone;
->          
+>             
 >    -- 通过索引排序，反向扫描
 >    select id,age,phone from tb_user order by age desc,phone desc;
->          
+>             
 >    -- 通过全表扫描排序，不符合最左前缀法则。因为在创建索引的时候， age是第一个字段，phone是第二个字段，所以排序时，也就该按照这个顺序来，否则就会出现 Using filesort。
 >    select id,age,phone from tb_user order by phone,age;
->          
+>             
 >    -- 通过全表扫描排序
 >    select id,age,phone from tb_user order by age asc,phone desc;
 >    -- 解决方式，创建一个age asc，phone desc的索引
@@ -4504,6 +4504,10 @@ UPDATE test SET value = 'E' WHERE id = 10; -- 这里会被阻塞，因为id > 5�
    **增删改查一般不会直接加表锁，但可以使用 `LOCK TABLES 表名 READ/WRITE` 增加表共享读锁和表独占写锁。共享锁不会阻塞其他共享锁，但会阻塞排他锁；排他锁会阻塞共享锁和其他排他锁。**
    
    ![image-20240820130553946](MySql/image-20240820130553946.png)
+
+### 一句话解释
+
+> 普通 SELECT 不加锁；UPDATE / DELETE / INSERT 都加 IX（意向排他锁）。UPDATE / DELETE 在 RR（可重复读） 下：唯一索引等值命中加记录锁，未命中加间隙锁；非唯一索引等值加临键锁并回表；范围查询加临键锁；没走索引就全表扫描逐行加锁，效果等同锁全表。
 
 ## InnoDB引擎
 
