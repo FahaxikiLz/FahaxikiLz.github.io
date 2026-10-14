@@ -25,9 +25,9 @@ menu:
   Friends:
     url: /friends
     icon: fas fa-address-book
-  写给我家乖乖:
-    url: /love
-    icon: fas fa-heart
+  # 写给我家乖乖:
+  #   url: /love
+  #   icon: fas fa-heart
   # 二级菜单写法如下
   #Medias:
   #  icon: fas fa-list
