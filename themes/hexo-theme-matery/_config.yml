@@ -19,6 +19,9 @@ menu:
   Hello 算法:
     url: /hello-algo
     icon: fas fa-anchor
+  Musics:
+    url: /lz-musics
+    icon: fas fa-music
   # Contact:
   #   url: /contact
   #   icon: fas fa-comments
