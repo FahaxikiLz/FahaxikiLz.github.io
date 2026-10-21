@@ -56,9 +56,9 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="爱哭的小河豚" type="application/atom+xml">
+
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="alternate" href="/atom.xml" title="爱哭的小河豚" type="application/atom+xml">
 </head>
 
 
@@ -376,14 +376,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2026-09-21
+                    2026-10-21
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    45.7k
+                    45.4k
                 </div>
                 
 
@@ -2638,18 +2638,18 @@ U8G2_SSD1306_128X64_NONAME_2_4W_SW_SPI <span class="token function">u8g2</span><
 <li><code>mode</code>：中断触发的方式，支持以下触发方式：<ul>
 <li><code>LOW</code> 低电平触发</li>
 <li><code>HIGH</code> 高电平触发</li>
-<li><code>RISING</code> 上升沿触发</li>
-<li><code>FALLING</code> 下降沿触发</li>
+<li><code>RISING</code> 上升沿触发：信号从 <strong>低电平（0）跳变到高电平（1）</strong> 的那一瞬间。</li>
+<li><code>FALLING</code> 下降沿触发：信号从 <strong>高电平（1）跳变到低电平（0）</strong> 的那一瞬间。</li>
 <li><code>CHANGE</code> 电平变化触发</li>
 </ul>
 </li>
 </ol>
 <p>在 Arduino 中使用中断需要注意以下几点：</p>
 <ol>
-<li>尽量保证中断程序内容少；</li>
-<li>避免在中断处理函数中使用阻塞函数（如 <code>delay()</code>），使用非阻塞的延迟方法来处理需要延迟的操作（<code>micros() 函数</code>），以保证中断的正常执行和系统的稳定性。这是因为 <code>delay()</code> 函数会阻塞整个系统，包括中断的正常执行。当中断触发时，处理函数应该尽快执行完毕，以确保及时响应并避免中断积压；</li>
-<li>与主程序共享的变量要加上 volatile 关键字；</li>
-<li>在 Arduino 中使用中断时，应尽量避免在中断处理函数中使用 <code>Serial</code> 对象的打印函数。当在中断处理函数中使用 <code>Serial</code> 打印函数时，会导致以下问题：<ul>
+<li><strong>尽量保证中断程序内容少；</strong></li>
+<li><strong>避免在中断处理函数中使用阻塞函数（如 <code>delay()</code>），使用非阻塞的延迟方法来处理需要延迟的操作（<code>micros() 函数</code>），以保证中断的正常执行和系统的稳定性。这是因为 <code>delay()</code> 函数会阻塞整个系统，包括中断的正常执行。当中断触发时，处理函数应该尽快执行完毕，以确保及时响应并避免中断积压；</strong></li>
+<li><strong>与主程序共享的变量要加上 volatile 关键字；</strong></li>
+<li><strong>在 Arduino 中使用中断时，应尽量避免在中断处理函数中使用 <code>Serial</code> 对象的打印函数。</strong>当在中断处理函数中使用 <code>Serial</code> 打印函数时，会导致以下问题：<ul>
 <li>时间延迟：<code>Serial</code> 打印函数通常是比较耗时的操作，它会阻塞中断的执行时间，导致中断响应的延迟。这可能会导致在中断期间丢失其他重要的中断事件或导致系统不稳定。</li>
 <li>缓冲区溢出：<code>Serial</code> 对象在内部使用一个缓冲区来存储要发送的数据。如果在中断处理函数中频繁调用 <code>Serial</code> 打印函数，可能会导致缓冲区溢出，造成数据丢失或不可预测的行为。</li>
 </ul>
@@ -3032,7 +3032,9 @@ Ticker timer_once<span class="token punctuation">;</span>
 <h3 id="硬件电路设计-12"><a href="#硬件电路设计-12" class="headerlink" title="硬件电路设计"></a>硬件电路设计</h3><p>连接无线路由器，将 ESP32 的 IP 地址等信息通过 Shell 控制台输出显示。</p>
 <p>由于 ESP32 内置 WIFI 功能，所以直接在开发板上使用即可，无需额外连接。</p>
 <h3 id="软件电路设计"><a href="#软件电路设计" class="headerlink" title="软件电路设计"></a>软件电路设计</h3><p>Arduino 已经集成了 Wi-Fi 模块，因此我们可以直接使用该模块。</p>
-<p>模块包含热点 AP 模式和客户端 STA 模式，热点 AP 是指电脑或手机端直接连接 ESP32 发出的热点实现连接，如果电脑连接模块 AP 热点，这样电脑就不能上网，因此在使用电脑端和模块进行网络通信时，一般情况下都是使用 STA 模式。也就是电脑和设备同时连接到相同网段的路由器上。</p>
+<p>模块包含热点 AP 模式和客户端 STA 模式；<strong>热点 AP 模式</strong>，就是 ESP32 自己发出一个 Wi-Fi 热点，电脑或手机直接连到这个热点上，从而和 ESP32 建立连接。</p>
+<p>但问题是：如果电脑连了 ESP32 的 AP 热点，电脑的 Wi-Fi 就被这个热点占用了，没法再连家里的路由器，所以电脑就上不了网。</p>
+<p>因此，当电脑要和模块进行网络通信时，一般改用 <strong>STA 模式</strong>。也就是让电脑和 ESP32 都连到同一个路由器上，处在同一个网段里，这样两者能互相通信，电脑也还能正常上网。</p>
 <p>下面是一些 ESP32 Arduino 库中常用的 Wi-Fi 相关函数的介绍：</p>
 <ol>
 <li><code>WiFi.begin(ssid, password)</code>：该函数用于连接到 Wi-Fi 网络。需要提供要连接的网络的 SSID 和密码作为参数。</li>
@@ -3303,31 +3305,9 @@ const char<span class="token operator">*</span> password <span class="token oper
 
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h3 id="如何制作自己的-API-后台"><a href="#如何制作自己的-API-后台" class="headerlink" title="如何制作自己的 API 后台"></a>如何制作自己的 API 后台</h3><p>我们目前使用的这些 API 接口，都是其他公司提供的服务，而如果我们想要搭建自己的 API 接口，该怎么办呢？</p>
-<p>首先，你需要明白，想要搭建自己的 API 接口，其实就是搭建你自己的网站，而搭建网站分为前端和后端，前端和后端是指构成Web应用程序的两个主要部分：</p>
-<ol>
-<li><p>前端通常指 Web 应用程序中用户可以看到和与之交互的部分，包括网页布局、样式、交互和功能；</p>
-</li>
-<li><p>后端则是指 Web 应用程序的后台，用于处理服务器端的逻辑和数据存储，例如数据库和 API。</p>
-</li>
-</ol>
-<p>后端的功能往往是由编程语言（如 Python、Java 等）和相关框架实现的，而前端通常由 HTML、CSS 和 JavaScript 等技术实现。前端和后端需要通过网络协议（如 HTTP）进行通信，将前端用户输入的数据传递到后端进行处理，再将处理结果返回到前端。</p>
-<p>前端和后端的交互使得 Web 应用程序具有强大的功能和可扩展性。</p>
-<p>如果你是非科班出身，想要转行做程序员，前端是你最好的选择，WEB 前端是最容易入门的编程岗位，初级前端技术很容易掌握，高级前端需要一步步学习和工作经验的积累。</p>
-<p>后端的分类就很多了，国内主流的后端开发使用的是 Java、Go、Python、Node.js、C++、Rust、PHP 等。所以你该怎么选呢？以下仅代表我个人建议：</p>
-<ol>
-<li><p>如果你明确目的，打算未来深耕于 Web 后端，你的第一选择必然是 Java，因为 Java 在国内 Web 开发的地位无法撼动；</p>
-</li>
-<li><p>如果你是前端程序员，打算转行后端，那就先从 Node.js 开始，简单的说 Node.js 就是运行在服务端的 JavaScript，而 JS 也是前端必学的三大基础内容；</p>
-</li>
-<li><p>如果你并非前两者，Python 就是你最好的选择，使用 Python 最大的优点就是简单、效率高，我们后面也会给大家带来 Python Web 开发的教程；</p>
-</li>
-<li><p>千万不要学 PHP，大家或许听过 “PHP 是最好的语言” 这个程序员常用梗，因为 PHP 上手比较简单，收获了很多开发者，又是早期互联网的重要服务端语言，所以在各个社交平台上时常能见到讨论，甚至吹捧 PHP 的文章。其中难免有些技术较差，或者不能接受新技术的上古遗老开发者，于是只能在网上做键盘侠，声称 PHP 是最好的语言。</p>
-</li>
-</ol>
 <hr>
 <h2 id="第20章-步进电机"><a href="#第20章-步进电机" class="headerlink" title="第20章 步进电机"></a>第20章 步进电机</h2><p>这一节我们学习如何使用我们的 ESP32 开发板来控制步进电机。</p>
-<h3 id="实验原理-12"><a href="#实验原理-12" class="headerlink" title="实验原理"></a>实验原理</h3><p>步进电机是一种通过步进（即以固定的角度移动）方式使轴旋转的电机。其内部构造使它无需传感器，通过简单的步数计算即可获知轴的确切角位置。这种特性使它适用于多种应用。</p>
+<h3 id="实验原理-12"><a href="#实验原理-12" class="headerlink" title="实验原理"></a>实验原理</h3><p><strong>步进电机是一种通过步进（即以固定的角度移动）方式使轴旋转的电机。</strong>其内部构造使它无需传感器，通过简单的步数计算即可获知轴的确切角位置。这种特性使它适用于多种应用。</p>
 <p>步进电机广泛应用于各种需要控制位置和速度的场景，例如：</p>
 <ul>
 <li><p>CNC 机床：用于控制刀具的位置和速度。</p>
@@ -3351,14 +3331,14 @@ const char<span class="token operator">*</span> password <span class="token oper
 <p>下图显示了其工作原理。首先，线圈 A 通电并产生磁场，转子与该磁场对齐；线圈 B 通电后，转子顺时针旋转 60° 以与新的磁场对齐；线圈 C 通电后也会出现同样的情况。下图中定子小齿的颜色指示出定子绕组产生的磁场方向。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_105.png"></p>
 <p>我们今天实验用到的是 28BYJ-48 步进电机，28BYJ-48 含义：<code>28</code> 指的是电机最大外径，<code>B</code> 指的是步进式电机，<code>Y</code> 指的是永磁式电机，<code>J</code> 指的是减速型电机，<code>48</code> 表示可以四相八拍。换句话说，28BYJ-48 的含义为外径 28 毫米四相八拍式永磁减速型步进电机。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_106.png"></p>
-<p>首先我们需要了解什么是 <code>4相永磁式</code>，28BYJ-48 的内部结构示意图如下所示。先看里圈，它上面有 6 个齿，分别标注为 0～5，这个叫做转子，顾名思义，它是要转动的，转子的每个齿上都带有永久的磁性，是一块永磁体，这就是 <code>永磁式</code> 的概念。再看外圈，这个就是定子，它是保持不动的，实际上它是跟电机的外壳固定在一起的，它上面有 8 个齿，而每个齿上都缠上了一个线圈绕组，正对着的 2 个齿上的绕组又是串联在一起的，也就是说正对着的 2 个绕组总是会同时导通或关断的，如此就形成了 4 相，在图中分别标注为 A-B-C-D，这就是 <code>4相</code> 的概念。</p>
+<p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/file.webp" alt="image.png"></p>
+<p>首先我们需要了解什么是 <code>4相永磁式</code>，28BYJ-48 的内部结构示意图如下所示。<strong>先看里圈，它上面有 6 个齿，分别标注为 0～5，这个叫做转子</strong>，顾名思义，它是要转动的，转子的每个齿上都带有永久的磁性，是一块永磁体，这就是 <code>永磁式</code> 的概念。<strong>再看外圈，这个就是定子，它是保持不动的，实际上它是跟电机的外壳固定在一起的，它上面有 8 个齿，而每个齿上都缠上了一个线圈绕组，正对着的 2 个齿上的绕组又是串联在一起的，也就是说正对着的 2 个绕组总是会同时导通或关断的，如此就形成了 4 相</strong>，在图中分别标注为 A-B-C-D，这就是 <code>4相</code> 的概念。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_107.png"></p>
 <p>步进电机驱动方式三种工作模式：</p>
 <ol>
-<li><p><code>单四拍</code>：这是最简单的步进电机驱动方式。这种方式，电机在每个瞬间只有一个线圈导通，消耗电力小。但在切换瞬间时没有任何的电磁作用在转子上，容易造成振动，也容易因为惯性而失步；</p>
+<li><p><code>单四拍</code>：这是最简单的步进电机驱动方式。这种方式，<strong>电机在每个瞬间只有一个线圈导通，消耗电力小。但在切换瞬间时没有任何的电磁作用在转子上，容易造成振动，也容易因为惯性而失步；</strong></p>
 </li>
-<li><p><code>双四拍</code>：这种方式输出的转矩较大且振动较少，切换过程中至少有一个线圈通电作用于转子，使得输出的转矩较大，振动较小，也比单四拍平稳，不易失步；</p>
+<li><p><code>双四拍</code>：这种方式输出的转矩较大且振动较少，<strong>切换过程中至少有一个线圈通电作用于转子，使得输出的转矩较大，振动较小，也比单四拍平稳，不易失步；</strong></p>
 </li>
 <li><p><code>八拍</code>：综合上述两种驱动信号，使用单四拍和双四拍交替进行的方式，每传送一个励磁信号，步进电机前进半个步距角。其特点是分辨率高，运转更加平滑，也是最常用的一种方式；</p>
 </li>
@@ -3368,9 +3348,14 @@ const char<span class="token operator">*</span> password <span class="token oper
 <p>接着，我们需要了解一下他的工作原理，假定电机的起始状态就如上图所示，逆时针方向转动，起始时是 B 相绕组的开关闭合，B 相绕组导通，那么导通电流就会在正上和正下两个定子齿上产生磁性，这两个定子齿上的磁性就会对转子上的 0 和 3 号齿产生最强的吸引力，就会如图所示的那样，转子的 0 号齿在正上、3 号齿在正下而处于平衡状态；此时我们会发现，转子的 1 号齿与右上的定子齿也就是 C 相的一个绕组呈现一个很小的夹角，2 号齿与右边的定子齿也就是 D 相绕组呈现一个稍微大一点的夹角。</p>
 <p>接下来，我们把 B 相绕组断开，而使 C 相绕组导通，右上的定子齿将对转子 1 号齿产生最大的吸引力，而左下的定子齿将对转子 4 号齿，产生最大的吸引力，在这个吸引力的作用下，转子 1、4 号齿将对齐到右上和左下的定子齿上而保持平衡。</p>
 <p>再接下来，断开 C 相绕组，导通 D 相绕组，过程与上述的情况完全相同，最终将使转子 2、5 号齿与定子 D 相绕组对齐，转子又转过了上述同样的角度。</p>
-<p>当 A 相绕组再次导通，即完成一个 B-C-D-A 的四节拍操作后，转子的 0、3 号齿将由原来的对齐到上下 2 个定子齿，而变为了对齐到左上和右下的两个定子齿上，即转子转过了一个定子齿的角度。依此类推，再来一个四节拍，转子就将再转过一个齿的角度，8个四节拍以后转子将转过完整的一圈，而其中单个节拍使转子转过的角度就很容易计算出来了，即 <code>360°/(8 * 4) = 11.25°</code>，这个值就叫做 <code>步进角度</code>。而上述这种工作模式就是步进电机的 <code>单四拍模式</code>。</p>
-<p><code>八拍</code> 就是在单四拍的每两个节拍之间再插入一个双绕组导通的中间节拍，组成八拍模式。比如，在从 B 相导通到 C 项导通的过程中，假如一个 B 相和 C 相同时导通的节拍，这个时候，由于 B、C 两个绕组的定子齿对它们附近的转子齿同时产生相同的吸引力，这将导致这两个转子齿的中心线对比到 B、C 两个绕组的中心线上。这样一来，就使转动精度增加了一倍，而转子转动一圈则需要 8*8=64 拍。</p>
-<p><code>双四拍</code> 的工作模式其实就是把八拍模式中的两个绕组同时通电的那四拍单独拿出来，而舍弃掉单绕组通电的那四拍而已。其步进角度同单四拍是一样的，但由于它是两个绕组同时导通，所以扭矩会比单四拍模式大。</p>
+<p>当 A 相绕组再次导通，即完成一个 B-C-D-A 的四节拍操作后，转子的 0、3 号齿将由原来的对齐到上下 2 个定子齿，而变为了对齐到左上和右下的两个定子齿上，即转子转过了一个定子齿的角度。依此类推，<strong>再来一个四节拍，转子就将再转过一个齿的角度，8个四节拍以后转子将转过完整的一圈，而其中单个节拍使转子转过的角度就很容易计算出来了，即 <code>360°/(8 * 4) = 11.25°</code>，这个值就叫做 <code>步进角度</code>。</strong>而上述这种工作模式就是步进电机的 <code>单四拍模式</code>。</p>
+<p>八拍，是在单四拍的每两个相邻节拍之间，再插入一个“两个绕组同时通电”的中间节拍，从而组成八拍循环。</p>
+<p>以 B 相导通切换到 C 相导通为例：在 B 拍和 C 拍之间，插入一个 B、C 两相同时导通的节拍。此时，B 相定子齿对转子 0 号齿有吸引力，C 相定子齿对转子 1 号齿也有吸引力，两个吸引力大小相同、方向互相“争抢”，转子不会停到任何一个定子齿的正对齐位置，而是停在 B、C 两个定子齿中心线的角平分线上——也就是转子齿的中心线落在 B、C 两相绕组中心线的中间。</p>
+<p>这个中间位置，恰好是单四拍中 B 拍位置与 C 拍位置的中间点。因此八拍中每一拍（无论是单相拍还是双相拍）使转子转过的角度，只有单四拍每拍的一半，即 11.25°÷2 = 5.625°。转动精度因此提高一倍，转子转一圈需要 8×8 = 64 拍。</p>
+<p>双四拍，就是把八拍模式中“两个绕组同时通电”的那四拍单独取出来使用，舍弃掉“单绕组通电”的那四拍。</p>
+<p>其序列为：B+C → C+D → D+A → A+B → 回到 B+C。</p>
+<p>每一拍转子都停在两个定子齿中心线的角平分线上。相邻两拍之间（例如 B+C 到 C+D），转子跨过的是一个完整的定子齿距，即 11.25°。所以双四拍的步进角度与单四拍相同，转一圈同样是 32 拍。</p>
+<p><strong>它与单四拍的区别不在步距角，而在于每一拍都有两个绕组同时导通、共同出力，因此扭矩比单四拍模式大。</strong></p>
 <p><code>八拍模式</code> 是这类4相步进电机的最佳工作模式，能最大限度的发挥电机的各项性能，也是绝大多数实际工程中所选择的模式。</p>
 <p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_109.png"></p>
 <p>转子转 64 圈，最终输出轴才会转一圈，也就是需要 64×64=4096 个节拍输出轴才转过一圈。4096 个节拍转动一圈，那么一个节拍转动的角度（步进角度）就是 360/4096 度。</p>
@@ -3401,11 +3386,91 @@ const char<span class="token operator">*</span> password <span class="token oper
 </tr>
 </tbody></table>
 <p>步进电机有防呆插头，直接插在电路板上即可。</p>
-<p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/img_110.png"></p>
-<h3 id="软件程序设计-11"><a href="#软件程序设计-11" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><pre class="line-numbers language-arduino" data-language="arduino"><code class="language-arduino"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_1</span> <span class="token expression"><span class="token number">13</span></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_2</span> <span class="token expression"><span class="token number">12</span></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_3</span> <span class="token expression"><span class="token number">14</span></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_4</span> <span class="token expression"><span class="token number">27</span></span></span>
+<p><img src="/medias/loading.gif" data-original="/2026/07/25/esp32/file-1792555601209-3.webp" alt="img"></p>
+<pre class="line-numbers language-none"><code class="language-none">   ESP32 开发板                   ULN2003 驱动板                28BYJ-48 电机
++---------------+               +----------------+             +--------------+
+|               |               |                |             |              |
+|  [GPIO 19]    |==============&gt;| [IN1]          |             |              |
+|               |               |                |             |              |
+|  [GPIO 18]    |==============&gt;| [IN2]          |             |              |
+|               |               |                |             |              |
+|  [GPIO 5 ]    |==============&gt;| [IN3]          |             |              |
+|               |               |                |             |              |
+|  [GPIO 17]    |==============&gt;| [IN4]          |             |              |
+|               |               |                |             |              |
+|               |               |                |             |              |
+|  [5V]         |==============&gt;| [VCC (+)]      |             |              |
+|               |               |                |             |              |
+|  [GND]        |==============&gt;| [GND (-)]      |             |              |
+|               |               |                |             |              |
+|               |               | [OUT1]         |============&gt;| (蓝线 1)     |
+|               |               |                |             |              |
+|               |               | [OUT2]         |============&gt;| (粉线 2)     |
+|               |               |                |             |              |
+|               |               | [OUT3]         |============&gt;| (黄线 3)     |
+|               |               |                |             |              |
+|               |               | [OUT4]         |============&gt;| (橙线 4)     |
+|               |               |                |             |              |
+|               |               | [VCC (+)]      |============&gt;| (红线 5)     |
+|               |               |                |             |              |
++---------------+               +----------------+             +--------------+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<table>
+<thead>
+<tr>
+<th align="left">序号</th>
+<th align="left">从哪里连 (ESP32)</th>
+<th align="left">连到哪里 (ULN2003驱动板)</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">1</td>
+<td align="left"><strong>GPIO 19</strong></td>
+<td align="left"><strong>IN1</strong></td>
+<td align="left">控制 A 相</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="left"><strong>GPIO 18</strong></td>
+<td align="left"><strong>IN2</strong></td>
+<td align="left">控制 B 相</td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td align="left"><strong>GPIO 5</strong></td>
+<td align="left"><strong>IN3</strong></td>
+<td align="left">控制 C 相</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="left"><strong>GPIO 17</strong></td>
+<td align="left"><strong>IN4</strong></td>
+<td align="left">控制 D 相</td>
+</tr>
+<tr>
+<td align="left">5</td>
+<td align="left"><strong>5V</strong></td>
+<td align="left"><strong>+ (VCC)</strong></td>
+<td align="left">驱动板主供电（供电机和芯片）</td>
+</tr>
+<tr>
+<td align="left">6</td>
+<td align="left"><strong>GND</strong></td>
+<td align="left"><strong>- (GND)</strong></td>
+<td align="left">共地（<strong>必须接</strong>，否则不转或乱转）</td>
+</tr>
+<tr>
+<td align="left">7</td>
+<td align="left">电机自带白插头</td>
+<td align="left">直接插在驱动板 5 针白插座上</td>
+<td align="left">注意防呆方向</td>
+</tr>
+</tbody></table>
+<h3 id="软件程序设计-11"><a href="#软件程序设计-11" class="headerlink" title="软件程序设计"></a>软件程序设计</h3><pre class="line-numbers language-arduino" data-language="arduino"><code class="language-arduino"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_1</span> <span class="token expression"><span class="token number">19</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_2</span> <span class="token expression"><span class="token number">18</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_3</span> <span class="token expression"><span class="token number">5</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_4</span> <span class="token expression"><span class="token number">17</span></span></span>
 
 <span class="token comment">// 设置延时,这个时间不能设置太小，否则电机来不及响应</span>
 <span class="token keyword">int</span> delay_time <span class="token operator">=</span> <span class="token number">5</span><span class="token punctuation">;</span>
@@ -3569,10 +3634,10 @@ const char<span class="token operator">*</span> password <span class="token oper
 <p>或者我们也可以使用第三方库 <code>CheapStepper</code>，代码如下：</p>
 <pre class="line-numbers language-arduino" data-language="arduino"><code class="language-arduino"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;CheapStepper.h&gt;</span></span>
 
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_1</span> <span class="token expression"><span class="token number">13</span></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_2</span> <span class="token expression"><span class="token number">12</span></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_3</span> <span class="token expression"><span class="token number">14</span></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_4</span> <span class="token expression"><span class="token number">27</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_1</span> <span class="token expression"><span class="token number">19</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_2</span> <span class="token expression"><span class="token number">18</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_3</span> <span class="token expression"><span class="token number">5</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">IN_4</span> <span class="token expression"><span class="token number">17</span></span></span>
 
 <span class="token comment">// 定义对象</span>
 CheapStepper <span class="token function">stepper</span> <span class="token punctuation">(</span>IN_1<span class="token punctuation">,</span> IN_2<span class="token punctuation">,</span> IN_3<span class="token punctuation">,</span> IN_4<span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -5374,7 +5439,7 @@ char <span class="token function">read_keypad</span><span class="token punctuati
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">1272k</span>
+                        class="white-color">1271.8k</span>
             
             
             
